@@ -472,7 +472,7 @@ export function militaryTick(sim: Sim, s: number): void {
       }
       // Rückkehr zum Ankerpunkt (defensiv, nachdem Jagd beendet)
       if (stance !== Stance.Hold && anchorDist > 3 && u.flags[s] & 16) {
-        u.goal[s] = tileOf(sim, u.ax[s], u.ay[s]) * 2 + u.layer[s];
+        u.goal[s] = -1; // direkter Rückweg (spart Flowfields)
         u.tx[s] = u.ax[s];
         u.ty[s] = u.ay[s];
         u.state[s] = S.Move;
@@ -525,9 +525,14 @@ export function militaryTick(sim: Sim, s: number): void {
         }
         u.flags[s] |= 32;
         u.state[s] = S.Attack;
-      } else if (u.stuck[s] > 40) {
-        // festgefahren: kurz neu planen
+      } else if (u.stuck[s] > 60) {
+        // festgefahren: aufgeben
         u.stuck[s] = 0;
+        if (u.goal[s] < 0) {
+          u.state[s] = S.Idle;
+          u.ax[s] = u.x[s];
+          u.ay[s] = u.y[s];
+        }
       }
       break;
     }
@@ -617,11 +622,10 @@ function attackStateTick(sim: Sim, s: number, def: (typeof UNITS)[number]): void
     u.targetKind[s] = 0;
     u.target[s] = 0;
     u.flags[s] &= ~(8 | 32 | 64);
-    const g = resume ? goalNodeAt(sim, u.ax[s], u.ay[s], sim.teamOf[owner]) : null;
-    if (g && Math.hypot(u.ax[s] - u.x[s], u.ay[s] - u.y[s]) > 1.5) {
-      u.goal[s] = g.node;
-      u.tx[s] = g.px;
-      u.ty[s] = g.py;
+    if (resume && u.march[s] >= 0 && Math.hypot(u.ax[s] - u.x[s], u.ay[s] - u.y[s]) > 1.5) {
+      u.goal[s] = u.march[s];
+      u.tx[s] = u.ax[s];
+      u.ty[s] = u.ay[s];
       u.state[s] = S.AttackMove;
     } else {
       u.state[s] = S.Idle;

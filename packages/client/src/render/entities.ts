@@ -97,6 +97,8 @@ export interface RenderOpts {
   hoverTile: { x: number; y: number } | null;
   /** Sichtbarkeitsprüfung (Fog of War) */
   visible: ((x: number, y: number) => boolean) | null;
+  /** Erkundet (Gebäude bleiben sichtbar, wenn einmal gesehen) */
+  explored: ((x: number, y: number) => boolean) | null;
   me: number;
   myTeam: number;
   teamOfPlayer: number[];
@@ -261,6 +263,7 @@ export class EntityRenderer {
         const def = BUILDINGS[b.t];
         // Fallen sind für Gegner unsichtbar
         if ((b.t === BT.Pit || b.t === BT.KillingPit) && o.teamOfPlayer[b.o] !== o.myTeam) continue;
+        if (o.explored && o.teamOfPlayer[b.o] !== o.myTeam && !o.explored(b.x + b.w / 2, b.y + b.h / 2)) continue;
         const m = this.bldMesh(b.t);
         const cx = b.x + b.w / 2;
         const cz = b.y + b.h / 2;

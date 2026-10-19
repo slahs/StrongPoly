@@ -24,6 +24,7 @@ export class Minimap {
   private mapH = 1;
   private lastDraw = 0;
   private disposers: (() => void)[] = [];
+  private fogCanvas: HTMLCanvasElement | null = null;
 
   constructor(
     private world: ClientWorld,
@@ -87,6 +88,24 @@ export class Minimap {
     this.baseCtx.drawImage(tmp, 0, 0, SIZE, SIZE);
   }
 
+  /** Erkundungsnebel (dunkle Fläche über nicht erkundeten Tiles) */
+  setFog(exp: Uint8Array | null): void {
+    if (!exp) {
+      this.fogCanvas = null;
+      return;
+    }
+    const m = this.world.map;
+    const img = new ImageData(m.w, m.h);
+    for (let i = 0; i < m.n; i++) {
+      img.data[i * 4 + 3] = exp[i] ? 0 : 235;
+    }
+    const c = this.fogCanvas ?? document.createElement('canvas');
+    c.width = m.w;
+    c.height = m.h;
+    c.getContext('2d')!.putImageData(img, 0, 0);
+    this.fogCanvas = c;
+  }
+
   /** Ändert einzelne Tiles (Bäume gefällt, Graben) */
   patchTile(i: number): void {
     const m = this.world.map;
@@ -107,6 +126,10 @@ export class Minimap {
     const ctx = this.ctx;
     const sx = SIZE / this.mapW;
     ctx.drawImage(this.base, 0, 0);
+    if (this.fogCanvas) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(this.fogCanvas, 0, 0, SIZE, SIZE);
+    }
     for (const b of w.buildings.values()) {
       if (teamOf[b.o] !== myTeam && isVisible && !isVisible(b.x + b.w / 2, b.y + b.h / 2)) continue;
       ctx.fillStyle = '#' + PLAYER_COLORS[b.o % 8].toString(16).padStart(6, '0');

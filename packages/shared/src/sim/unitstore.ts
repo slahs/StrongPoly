@@ -34,6 +34,8 @@ export class UnitStore {
   ty = new Float32Array(UNIT_CAP);
   /** Zielknoten des Flowfields (-1 = keins) */
   goal = new Int32Array(UNIT_CAP);
+  /** Marschziel der Gruppe (Flowfield-Knoten), bleibt beim Kämpfen erhalten */
+  march = new Int32Array(UNIT_CAP);
   /** Ziel-Handle (Einheit oder Gebäude) */
   target = new Int32Array(UNIT_CAP);
   /** 0 keins, 1 Einheit, 2 Gebäude */
@@ -93,6 +95,7 @@ export class UnitStore {
     this.tx[s] = x;
     this.ty[s] = y;
     this.goal[s] = -1;
+    this.march[s] = -1;
     this.target[s] = 0;
     this.targetKind[s] = 0;
     this.cd[s] = 0;

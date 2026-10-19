@@ -137,6 +137,7 @@ export function orderMove(sim: Sim, p: number, ids: number[], x: number, y: numb
       py = g.py;
     }
     u.goal[s] = g.node;
+    u.march[s] = g.node;
     u.tx[s] = px;
     u.ty[s] = py;
     u.ax[s] = px;

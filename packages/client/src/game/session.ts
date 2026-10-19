@@ -261,6 +261,17 @@ export class Session {
       if (this.fogTimer <= 0) {
         this.fogTimer = 0.25;
         this.fog.update(this.world, this.myTeam, this.teamOf);
+        this.gs.terrain?.applyFog(this.fog.visibleMap, this.fog.exploredMap);
+        let n = 0;
+        const e = this.fog.exploredMap;
+        for (let i = 0; i < e.length; i += 7) n += e[i];
+        if (n !== this.lastExplored && performance.now() - this.lastDecorFog > 1500) {
+          this.lastExplored = n;
+          this.lastDecorFog = performance.now();
+          this.gs.decor?.setExplored(e);
+          this.world.buildingsDirty = true;
+          this.hud.minimap.setFog(e);
+        }
       }
     }
     // Rendering
@@ -269,6 +280,7 @@ export class Session {
     const pc = this.world.proj.length / 8;
     if (pc > this.lastProj + 1) this.audio?.shoot();
     this.lastProj = pc;
+    const tU0 = performance.now();
     this.entities.consumeEvents();
     this.entities.update(dt, {
       alpha,
@@ -278,12 +290,18 @@ export class Session {
       selectedBuilding: this.selection.building,
       hoverTile: null,
       visible: this.fog ? (x, y) => this.fog!.visible(x, y) : null,
+      explored: this.fog ? (x, y) => this.fog!.explored(Math.floor(x), Math.floor(y)) : null,
       me: this.me,
       myTeam: this.myTeam,
       teamOfPlayer: this.teamOf,
     });
     this.entities.clearEvents();
+    const tU1 = performance.now();
     this.gs.render(dt, nowSec);
+    const tU2 = performance.now();
+    this.perf.entities += tU1 - tU0;
+    this.perf.render += tU2 - tU1;
+    this.perf.n++;
     // HUD (5 Hz)
     this.hudTimer -= dt;
     if (this.hudTimer <= 0) {
@@ -309,12 +327,17 @@ export class Session {
       this.fpsAcc.fps = Math.round(this.fpsAcc.frames / this.fpsAcc.t);
       this.fpsAcc.frames = 0;
       this.fpsAcc.t = 0;
-      this.hud.fpsEl.textContent = `${this.fpsAcc.fps} FPS · Sim ${this.info.tickMs.toFixed(1)} ms · ${this.world.top ? this.info.units : 0} Einh.`;
+      const pf = this.perf;
+      this.hud.fpsEl.textContent = `${this.fpsAcc.fps} FPS · Entities ${(pf.entities / Math.max(1, pf.n)).toFixed(1)} ms · Render ${(pf.render / Math.max(1, pf.n)).toFixed(1)} ms · Sim ${this.info.tickMs.toFixed(1)} ms · ${this.info.units} Einh.`;
+      pf.entities = pf.render = pf.n = 0;
     }
   }
   private fogTimer = 0;
   private camInit = false;
   private lastProj = 0;
+  private lastExplored = -1;
+  private lastDecorFog = 0;
+  perf = { entities: 0, render: 0, n: 0 };
 
   private initAfterFull(): void {
     const w = this.world;

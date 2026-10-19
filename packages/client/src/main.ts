@@ -38,6 +38,8 @@ const hooks = {
   quitGame: null as (() => void) | null,
   startSkirmish: (setup: GameSetup) => launch(setup, false),
   startOnline: (n: NetClient, me: number, setup: GameSetup) => {
+    // Wiederverbindung: Sitzung läuft weiter, der Server schickt nur einen neuen Voll-Snapshot
+    if (session && !session.conn.local && net === n) return;
     net = n;
     launch({ ...setup, me }, true, n);
   },

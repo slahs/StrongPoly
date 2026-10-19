@@ -41,7 +41,11 @@ export class TerrainRenderer {
   private chunks = new Map<number, THREE.Mesh>();
   private dirty = new Set<number>();
   private cw = 0;
-  private material = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
+  private material = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true, side: THREE.DoubleSide });
+  private chunkData = new Map<number, { base: Float32Array; starts: Int32Array; counts: Int32Array; colorAttr: THREE.BufferAttribute }>();
+  private fogState: Uint8Array | null = null;
+  private fogVis: Uint8Array | null = null;
+  private fogExp: Uint8Array | null = null;
 
   constructor(private map: GameMap) {
     this.cw = Math.ceil(map.w / CHUNK);
@@ -61,6 +65,8 @@ export class TerrainRenderer {
       m.geometry.dispose();
     }
     this.chunks.clear();
+    this.chunkData.clear();
+    this.fogState = this.fogVis ? new Uint8Array(this.map.n).fill(255) : null;
     const ch = Math.ceil(this.map.h / CHUNK);
     for (let cy = 0; cy < ch; cy++) for (let cx = 0; cx < this.cw; cx++) this.buildChunk(cx, cy);
   }
@@ -102,6 +108,8 @@ export class TerrainRenderer {
     const y1 = Math.min(m.h, y0 + CHUNK);
     const pos: number[] = [];
     const colr: number[] = [];
+    const tStart = new Int32Array(CHUNK * CHUNK).fill(-1);
+    const tCount = new Int32Array(CHUNK * CHUNK);
 
     const quad = (a: number[], b: number[], c: number[], d: number[], color: number[]) => {
       pos.push(...a, ...b, ...c, ...a, ...c, ...d);
@@ -117,6 +125,8 @@ export class TerrainRenderer {
     for (let y = y0; y < y1; y++) {
       for (let x = x0; x < x1; x++) {
         const i = m.idx(x, y);
+        const local = (y - y0) * CHUNK + (x - x0);
+        tStart[local] = colr.length / 3;
         const t = m.terrain[i];
         const y_ = tileTopY(m, i);
         const tc = TC[t] ?? TC[T.Steppe];
@@ -142,11 +152,14 @@ export class TerrainRenderer {
           else if (dy === 1) quad([x, y_, y + 1], [x, ny_, y + 1], [x + 1, ny_, y + 1], [x + 1, y_, y + 1], cc);
           else quad([x + 1, y_, y], [x + 1, ny_, y], [x, ny_, y], [x, y_, y], cc);
         }
+        tCount[local] = colr.length / 3 - tStart[local];
       }
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    geo.setAttribute('color', new THREE.Float32BufferAttribute(colr, 3));
+    const colorAttr = new THREE.Float32BufferAttribute(colr, 3);
+    geo.setAttribute('color', colorAttr);
+    this.chunkData.set(key, { base: Float32Array.from(colr), starts: tStart, counts: tCount, colorAttr });
     geo.computeBoundingSphere();
     geo.computeBoundingBox();
     const mesh = new THREE.Mesh(geo, this.material);
@@ -154,6 +167,50 @@ export class TerrainRenderer {
     mesh.castShadow = false;
     this.chunks.set(key, mesh);
     this.group.add(mesh);
+    if (this.fogVis && this.fogExp && this.fogState) this.applyFogChunk(cx, cy, true);
+  }
+
+  /** Kriegsnebel in die Vertexfarben einarbeiten (nur geänderte Tiles). */
+  applyFog(vis: Uint8Array | null, exp: Uint8Array | null): void {
+    if (!vis || !exp) {
+      if (this.fogVis) {
+        this.fogVis = this.fogExp = this.fogState = null;
+        this.rebuildAll();
+      }
+      return;
+    }
+    this.fogVis = vis;
+    this.fogExp = exp;
+    if (!this.fogState) this.fogState = new Uint8Array(this.map.n).fill(255);
+    const ch = Math.ceil(this.map.h / CHUNK);
+    for (let cy = 0; cy < ch; cy++) for (let cx = 0; cx < this.cw; cx++) this.applyFogChunk(cx, cy, false);
+  }
+
+  private applyFogChunk(cx: number, cy: number, force: boolean): void {
+    const d = this.chunkData.get(cy * this.cw + cx);
+    const vis = this.fogVis;
+    const exp = this.fogExp;
+    const st = this.fogState;
+    if (!d || !vis || !exp || !st) return;
+    const m = this.map;
+    const arr = d.colorAttr.array as Float32Array;
+    let changed = false;
+    const x1 = Math.min(m.w, (cx + 1) * CHUNK);
+    const y1 = Math.min(m.h, (cy + 1) * CHUNK);
+    for (let y = cy * CHUNK; y < y1; y++)
+      for (let x = cx * CHUNK; x < x1; x++) {
+        const i = y * m.w + x;
+        const s = vis[i] ? 2 : exp[i] ? 1 : 0;
+        if (!force && st[i] === s) continue;
+        st[i] = s;
+        const local = (y - cy * CHUNK) * CHUNK + (x - cx * CHUNK);
+        const start = d.starts[local];
+        if (start < 0) continue;
+        const f = s === 2 ? 1 : s === 1 ? 0.55 : 0.08;
+        for (let v = start * 3; v < (start + d.counts[local]) * 3; v++) arr[v] = d.base[v] * f;
+        changed = true;
+      }
+    if (changed) d.colorAttr.needsUpdate = true;
   }
 
   setShadows(on: boolean): void {

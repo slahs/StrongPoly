@@ -45,6 +45,7 @@ export class DecorRenderer {
   private meshes: Record<string, THREE.InstancedMesh> = {};
   private dirty = true;
   private lastBuild = 0;
+  private explored: Uint8Array | null = null;
 
   constructor(private map: GameMap) {
     this.group.name = 'decor';
@@ -52,6 +53,12 @@ export class DecorRenderer {
 
   setMap(map: GameMap): void {
     this.map = map;
+    this.dirty = true;
+  }
+
+  /** Erkundungskarte (Kriegsnebel): nicht erkundete Tiles bekommen keine Dekoration */
+  setExplored(e: Uint8Array | null): void {
+    this.explored = e;
     this.dirty = true;
   }
 
@@ -94,6 +101,7 @@ export class DecorRenderer {
     for (let y = 0; y < map.h; y++) {
       for (let x = 0; x < map.w; x++) {
         const i = map.idx(x, y);
+        if (this.explored && !this.explored[i]) continue;
         const t = map.terrain[i];
         const base = map.height[i] * HEIGHT_STEP;
         const r1 = hash2(map.seed + 3, x, y);

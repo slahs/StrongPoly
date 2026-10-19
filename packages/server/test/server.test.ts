@@ -133,6 +133,41 @@ describe('Server', () => {
     b2.ws.close();
   }, 30000);
 
+  it('Soak: 2 Menschen + 4 KI-Lords (200x200, 3x) laufen stabil und bleiben synchron', async () => {
+    const a = new TestClient('Anna');
+    const b = new TestClient('Ben');
+    await a.connect();
+    await b.connect();
+    await a.waitFor((m) => m.t === 'welcome');
+    await b.waitFor((m) => m.t === 'welcome');
+    a.send({ t: 'create', settings: { name: 'Soak', size: 200, seed: 21, speed: 3, maxPlayers: 6 } });
+    const soakRoom = (await a.waitFor((m) => m.t === 'room' && !!m.room)) as Extract<ServerMsg, { t: 'room' }>;
+    b.send({ t: 'join', room: soakRoom.room!.id });
+    await b.waitFor((m) => m.t === 'room' && !!m.room);
+    a.send({ t: 'slot', index: 0, patch: { team: 0 } });
+    a.send({ t: 'slot', index: 1, patch: { team: 0 } });
+    for (let i = 2; i < 6; i++) a.send({ t: 'slot', index: i, patch: { kind: 'ai', ai: i + 2, team: i, difficulty: 1 } });
+    b.send({ t: 'ready', ready: true });
+    await a.until(() => a.controls.some((m) => m.t === 'room' && m.room?.slots[5].kind === 'ai'));
+    await new Promise((r) => setTimeout(r, 200));
+    a.send({ t: 'start' });
+    await a.waitFor((m) => m.t === 'start');
+    await b.waitFor((m) => m.t === 'start');
+    // ~15 s Spielzeit bei 3x => 450 Ticks
+    await a.until(() => a.world.tick > 400, 40000);
+    await b.until(() => b.world.tick > 400, 40000);
+    expect(a.world.players.length).toBe(6);
+    // Beide Spiegel zeigen dieselbe Welt (Tick-Versatz erlaubt)
+    expect(Math.abs(a.world.tick - b.world.tick)).toBeLessThan(40);
+    expect(Math.abs(a.world.buildings.size - b.world.buildings.size)).toBeLessThan(6);
+    expect(a.world.buildings.size).toBeGreaterThan(30);
+    // Server lebt
+    const health = await fetch(`http://localhost:${PORT}/healthz`).then((r) => r.json());
+    expect(health.ok).toBe(true);
+    a.ws.close();
+    b.ws.close();
+  }, 60000);
+
   it('weist unzulässige Starts ab', async () => {
     const c = new TestClient('Solo');
     await c.connect();
