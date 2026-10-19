@@ -784,7 +784,8 @@ export class AiController {
       w.stage = { x: ek.cx + (dx / d) * Math.min(26, d * 0.5), y: ek.cy + (dy / d) * Math.min(26, d * 0.5) };
       const take = Math.max(8, Math.round(free.length * doc.aggression));
       w.ids = free.slice(0, take).map((s) => u.id(s));
-      applyCommand(sim, this.p, { c: 'move', units: w.ids, x: w.stage.x, y: w.stage.y });
+      // Angriffsmarsch: auf dem Weg und am Sammelpunkt wehrt sich die Welle gegen Ausfälle
+      applyCommand(sim, this.p, { c: 'move', units: w.ids, x: w.stage.x, y: w.stage.y, attack: true });
       for (const id of w.ids) {
         const s = u.slot(id);
         if (s >= 0) u.stance[s] = Stance.Aggressive;

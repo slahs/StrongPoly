@@ -27,12 +27,12 @@ const SN = Object.fromEntries(Object.entries(S).map(([k, v]) => [v, k]));
 const u = sim.units;
 while (sim.tick < minutes * 600 && !sim.gameOver) {
   sim.step();
-  if (sim.tick % 600 !== 0) continue;
+  if (sim.tick % 300 !== 0) continue;
   for (let p = 0; p < 2; p++) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ai = (sim.players[p] as any).ai;
     const w = ai.wave;
-    if (w.phase !== 2) continue;
+    if (w.phase < 1 || p !== Number(process.env.P ?? p)) continue;
     const e = w.target;
     const ek = sim.buildings.get(sim.players[e].keepId)!;
     const lord = u.slot(sim.players[e].lordId);
@@ -61,7 +61,7 @@ while (sim.tick < minutes * 600 && !sim.gameOver) {
       if (bb.def.gate) gates++;
     }
     console.log(
-      `${(sim.tick / 600).toFixed(0)}min P${p}->P${e} wave#${w.index} n=${w.ids.length} avgD=${(dsum / Math.max(1, w.ids.length)).toFixed(1)} minD=${dmin.toFixed(1)} atKeep=${atKeep} keepHp=${Math.round(ek.hp)} lord=${lord >= 0 ? `${u.hp[lord].toFixed(0)}hp d=${Math.hypot(u.x[lord] - ek.cx, u.y[lord] - ek.cy).toFixed(1)}` : 'dead'} walls=${walls} gates=${gates} wallHp=${Math.round(wallHp)}`,
+      `${(sim.tick / 600).toFixed(1)}min P${p}->P${e} wave#${w.index} ph${w.phase} n=${w.ids.length} avgD=${(dsum / Math.max(1, w.ids.length)).toFixed(1)} minD=${dmin.toFixed(1)} atKeep=${atKeep} keepHp=${Math.round(ek.hp)} lord=${lord >= 0 ? `${u.hp[lord].toFixed(0)}hp d=${Math.hypot(u.x[lord] - ek.cx, u.y[lord] - ek.cy).toFixed(1)}` : 'dead'} walls=${walls} gates=${gates} wallHp=${Math.round(wallHp)}`,
     );
     console.log(`   states ${JSON.stringify(st)} types ${JSON.stringify(ty)}`);
   }
