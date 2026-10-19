@@ -1,4 +1,5 @@
 import {
+  ABILITIES,
   BUILDINGS,
   BT,
   ClientWorld,
@@ -22,6 +23,7 @@ import type { AudioEngine } from '../audio/audio';
 export interface SessionOptions {
   setup: GameSetup;
   extreme: boolean;
+  mission?: string | null;
   onExit: () => void;
   onMenu: () => void;
   settings: Settings;
@@ -149,8 +151,21 @@ export class Session {
   useAbility(id: number, x: number, y: number): void {
     this.send({ c: 'ability', id, x, y });
   }
-  armAbility(_i: number): void {
-    // Extreme-Meilenstein
+  armAbility(i: number): void {
+    if (!this.opts.extreme) return;
+    const a = ABILITIES[i];
+    if (!a) return;
+    const v = this.view;
+    if (v && (v.power < a.cost || (v.abilityCd[i] ?? 0) > 0)) {
+      this.hud.toast(`${a.name} noch nicht bereit`, true);
+      return;
+    }
+    if (a.radius === 0) {
+      // Fähigkeiten ohne Zielgebiet sofort auslösen
+      this.useAbility(a.id, this.gs.cam.tx, this.gs.cam.tz);
+      return;
+    }
+    this.input.setMode({ k: 'ability', id: a.id });
   }
 
   toggleShadows(): void {
@@ -164,6 +179,7 @@ export class Session {
     this.gs.applyGfx({ shadows: st.shadows, quality: st.quality });
     this.entities.setShadows(st.shadows);
     this.audio?.setVolume(st.volume);
+    this.audio?.setMusic(st.music);
   }
 
   changeSpeed(dir: number): void {
@@ -216,7 +232,10 @@ export class Session {
         this.alertCooldown = 6;
         this.hud.toast(e.k === 'attack' ? 'Wir werden angegriffen!' : 'Achtung!', true);
         this.audio?.alert();
-      } else if (e.e === 'lose' && e.p === this.me) this.hud.banner('Niederlage', '#d8362f');
+      } else if (e.e === 'lose' && e.p === this.me) {
+        this.hud.banner('Niederlage', '#d8362f');
+        this.audio?.defeat();
+      }
       else if (e.e === 'fx') this.audio?.fx(e.k, e.x, e.y, this.gs.cam.tx, this.gs.cam.tz);
     }
   }
@@ -225,7 +244,8 @@ export class Session {
     this.ended = true;
     const won = winner === this.myTeam;
     this.hud.banner(won ? 'Sieg!' : winner < 0 ? 'Unentschieden' : 'Niederlage', won ? '#f0c040' : '#d8362f');
-    setTimeout(() => this.opts.onMenu(), 3500);
+    if (won) this.audio?.victory();
+    setTimeout(() => this.opts.onExit(), 4500);
   }
 
   frame(dt: number, nowSec: number): void {
@@ -233,6 +253,7 @@ export class Session {
     if (!this.gotFirst && !this.queue.some((s) => s.full)) return;
     this.applySnapshots(nowMs);
     this.alertCooldown -= dt;
+    if (this.opts.mission) this.hud.setMission(this.world.mission);
     // Eingabe/Kamera
     this.input.update(dt);
     // Fog
@@ -246,6 +267,9 @@ export class Session {
     // Rendering
     const alpha = (nowMs - this.world.lastSnapMs) / (100 / this.speed);
     const sel = new Set(this.selection.units);
+    const pc = this.world.proj.length / 8;
+    if (pc > this.lastProj + 1) this.audio?.shoot();
+    this.lastProj = pc;
     this.entities.consumeEvents();
     this.entities.update(dt, {
       alpha,
@@ -266,7 +290,11 @@ export class Session {
     if (this.hudTimer <= 0) {
       this.hudTimer = 0.2;
       this.hud.update(this.view, this.selection);
-      this.hud.setAbilities([], () => {}, this.view);
+      this.hud.setAbilities(
+        this.opts.extreme ? ABILITIES.map((a, i) => ({ id: a.id, name: a.name, cost: a.cost, cd: 0, hotkey: this.input.hotkeys[`ability${i + 1}` as 'ability1'] })) : [],
+        (id) => this.armAbility(id),
+        this.view,
+      );
     }
     this.hud.minimap.draw(
       nowSec,
@@ -286,6 +314,8 @@ export class Session {
     }
   }
   private fogTimer = 0;
+  private camInit = false;
+  private lastProj = 0;
 
   private initAfterFull(): void {
     const w = this.world;
@@ -297,7 +327,8 @@ export class Session {
     this.hud.minimap.refreshTerrain();
     if (setup.fog) this.fog = new FogOfWar(w.map.w, w.map.h);
     const me: PublicPlayer | undefined = w.players[this.me];
-    if (me) this.gs.cam.lookAt(me.keepX, me.keepY + 4);
+    if (me && !this.camInit) this.gs.cam.lookAt(me.keepX, me.keepY + 4);
+    this.camInit = true;
     this.applySettings();
     void BUILDINGS;
     void BT;

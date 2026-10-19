@@ -90,6 +90,8 @@ export class Hud {
   private abilityBar!: HTMLElement;
   private speedLabel!: HTMLElement;
   fpsEl!: HTMLElement;
+  private missionEl: HTMLElement | null = null;
+  private missionSig = '';
   me = 0;
   private extremeMode = false;
 
@@ -169,6 +171,30 @@ export class Hud {
     }
     bar.append(h('button', { text: 'Menü', onclick: () => this.actions.openMenu() }));
     this.root.append(bar);
+  }
+
+  /** Missionsziele anzeigen (nur bei Änderung neu aufbauen) */
+  setMission(m: import('@strongpoly/shared').MissionView | null): void {
+    if (!m) {
+      this.missionEl?.remove();
+      this.missionEl = null;
+      return;
+    }
+    const sig = JSON.stringify(m);
+    if (sig === this.missionSig) return;
+    const prevDone = this.missionSig ? (JSON.parse(this.missionSig) as typeof m).objectives.filter((o) => o.done).length : 0;
+    this.missionSig = sig;
+    if (!this.missionEl) {
+      this.missionEl = h('div', { class: 'panel mission' });
+      this.root.append(this.missionEl);
+    }
+    const el = this.missionEl;
+    clear(el);
+    el.append(h('h4', { text: `${m.name} – Stufe ${m.stage}/${m.stages}: ${m.title}` }));
+    for (const o of m.objectives) el.append(h('div', { class: o.done ? 'obj done' : 'obj', text: (o.done ? '✔ ' : '☐ ') + o.text }));
+    el.append(h('div', { class: 'crumb', text: m.hint }));
+    if (m.complete) el.append(h('b', { text: 'Mission erfüllt!', style: 'color:#f0c040' }));
+    void prevDone;
   }
 
   setSpeedLabel(s: number): void {

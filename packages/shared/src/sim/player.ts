@@ -45,7 +45,8 @@ export class PlayerState {
   /** zeitlich begrenzte Beliebtheits-Ereignisse */
   events: { label: string; value: number; until: number }[] = [];
   ai: unknown = null;
-  stats = { kills: 0, losses: 0, built: 0, goldEarned: 0 };
+  stats = { kills: 0, losses: 0, built: 0, goldEarned: 0, ever: new Int32Array(40) };
+  abilitiesUsed: number[] = [];
   /** gesetzt wenn der Spieler besiegt ist */
   defeatedTick = -1;
   /** Hilferufe */

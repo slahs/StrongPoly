@@ -117,6 +117,7 @@ export class EntityRenderer {
   private fires: THREE.InstancedMesh;
   private ladderMesh: THREE.InstancedMesh;
   private selBox: THREE.Mesh;
+  private bannerMesh: TypeMesh | null = null;
   private yS: Float32Array = new Float32Array(8192);
   private shadows = true;
   private flameT = 0;
@@ -183,6 +184,13 @@ export class EntityRenderer {
     this.ladderMesh.frustumCulled = false;
     this.group.add(this.ladderMesh);
 
+    const poleModel = new ModelBuilder()
+      .cyl(0.05, 0.07, 2.6, 5, 0, 0, 0, PAL.woodDark)
+      .box(0.7, 0.45, 0.04, 0.38, 2.05, 0, PAL.white, true)
+      .pyramid(0.08, 0.2, 0, 2.6, 0, PAL.gold)
+      .cyl(0.35, 0.4, 0.15, 6, 0, 0, 0, PAL.stoneDark)
+      .build();
+    this.bannerMesh = new TypeMesh(poleModel, this.group, 8, true);
     this.selBox = new THREE.Mesh(
       new THREE.BoxGeometry(1, 0.06, 1),
       new THREE.MeshBasicMaterial({ color: 0xffe070, transparent: true, opacity: 0.4, depthWrite: false }),
@@ -234,6 +242,7 @@ export class EntityRenderer {
     this.updateBuildings(o);
     this.updateUnits(dt, o);
     this.updateProjectiles(o);
+    this.updateBanners(o);
     this.fx.update(dt);
   }
 
@@ -445,6 +454,20 @@ export class EntityRenderer {
     this.ladderMesh.instanceMatrix.needsUpdate = true;
     void cy;
     void sy;
+  }
+
+  private neutral = new THREE.Color(0xf2ede0);
+  private updateBanners(o: RenderOpts): void {
+    const m = this.bannerMesh;
+    if (!m) return;
+    const b = this.world.banners;
+    m.begin();
+    for (let i = 0; i + 3 < b.length; i += 4) {
+      const owner = b[i + 2];
+      m.push(b[i], tileY(this.world, Math.floor(b[i]), Math.floor(b[i + 1])), b[i + 1], Math.sin(o.now * 1.5 + i) * 0.4, 1, owner >= 0 ? teamColors[owner % 8] : this.neutral);
+      if (b[i + 3] > 0 && Math.random() < 0.05) this.fx.effect('banner', b[i], b[i + 1], 0.5);
+    }
+    m.end();
   }
 
   private updateProjectiles(o: RenderOpts): void {

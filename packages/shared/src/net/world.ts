@@ -42,6 +42,8 @@ export class ClientWorld implements PlaceCtx {
   bldAt: Int32Array = new Int32Array(1);
   proj: Float32Array = new Float32Array(0);
   ladders: number[] = [];
+  banners: number[] = [];
+  mission: import('../sim/mission').MissionView | null = null;
   digMask: Uint8Array = new Uint8Array(1);
   /** geänderte Tiles seit letztem Abholen (für Renderer) */
   tileChanges: number[] = [];
@@ -183,6 +185,8 @@ export class ClientWorld implements PlaceCtx {
     }
     this.proj = snap.proj;
     this.ladders = snap.ladders;
+    this.banners = snap.banners ?? [];
+    if (snap.mission) this.mission = snap.mission;
     for (const e of snap.events) this.events.push(e);
   }
 

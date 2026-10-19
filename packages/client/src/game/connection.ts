@@ -9,6 +9,7 @@ export interface GameConnection {
   onInfo?: (i: { tickMs: number; tick: number; units: number }) => void;
   onError?: (m: string) => void;
   send(cmd: Command): void;
+  save?(): Promise<unknown>;
   setSpeed?(x: number): void;
   dev?(op: string, args: Record<string, number>): void;
   setPaused?(p: boolean): void;
@@ -26,7 +27,7 @@ export class LocalConnection implements GameConnection {
   onError?: (m: string) => void;
   playerId: number;
 
-  constructor(setup: GameSetup) {
+  constructor(setup: GameSetup, restore?: unknown) {
     this.playerId = setup.me;
     this.worker = new Worker(new URL('./sim.worker.ts', import.meta.url), { type: 'module' });
     this.worker.onmessage = (ev: MessageEvent<FromWorker>) => {
@@ -35,9 +36,13 @@ export class LocalConnection implements GameConnection {
       else if (m.t === 'me') this.onView(m.view);
       else if (m.t === 'info') this.onInfo?.(m);
       else if (m.t === 'error') this.onError?.(m.message);
+      else if (m.t === 'saved') {
+        this.saveResolve?.(m.save);
+        this.saveResolve = null;
+      }
     };
     this.worker.onerror = (e) => this.onError?.(e.message);
-    this.post({ t: 'start', setup });
+    this.post(restore ? { t: 'load', setup, state: restore } : { t: 'start', setup });
   }
 
   private post(m: ToWorker): void {
@@ -45,6 +50,13 @@ export class LocalConnection implements GameConnection {
   }
   send(cmd: Command): void {
     this.post({ t: 'cmd', cmd });
+  }
+  private saveResolve: ((s: unknown) => void) | null = null;
+  save(): Promise<unknown> {
+    return new Promise((res) => {
+      this.saveResolve = res;
+      this.post({ t: 'save' });
+    });
   }
   dev(op: string, args: Record<string, number>): void {
     this.post({ t: 'dev', op, args });

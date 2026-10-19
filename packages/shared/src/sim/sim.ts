@@ -27,6 +27,8 @@ import { updateProjectiles } from './combat';
 import { updateFire } from './fire';
 import { updateExtreme, ExtremeState } from './extreme';
 import { updateAi } from './ai/ai';
+import { AiController } from './ai/controller';
+import { AI_PROFILES } from '../data/ai';
 import { updateMission, MissionState } from './mission';
 
 export interface Ladder {
@@ -69,6 +71,8 @@ export class Sim {
   digCount = 0;
   extreme: ExtremeState | null = null;
   mission: MissionState | null = null;
+  /** Aufträge, die im nächsten Tick als Marschbefehl ausgeführt werden (z. B. Verstärkung) */
+  pendingOrders: { p: number; units: number[]; x: number; y: number }[] = [];
   winnerTeam = -1;
   troopLimit: number;
   /** Zufallsstream nur für nicht-kritische Dinge */
@@ -97,9 +101,10 @@ export class Sim {
     });
     this.nav.teamOf = this.teamOf;
     if (cfg.players.length > this.map.starts.length) throw new Error('Zu wenige Startpositionen');
-    this.setupPlayers();
+    if (cfg.restore) this.recountAll();
+    if (!cfg.restore) this.setupPlayers();
     if (cfg.extreme) this.extreme = new ExtremeState(this);
-    if (cfg.mission) this.mission = new MissionState(this, cfg.mission);
+    if (cfg.mission) this.mission = new MissionState(this, cfg.mission, !!cfg.restore);
   }
 
   private setupPlayers(): void {
@@ -114,8 +119,8 @@ export class Sim {
       this.recountStores(p.id);
       const m = this.cfg.startRes ?? 1;
       const give = (r: number, a: number) => this.addStock(p.id, r, Math.round(a * m));
-      give(R.Wood, 160);
-      give(R.Stone, 80);
+      give(R.Wood, 100);
+      give(R.Stone, 50);
       give(R.Apple, 90);
       give(R.Bread, 20);
       // Lord
@@ -142,6 +147,7 @@ export class Sim {
   spawnUnit(type: number, owner: number, x: number, y: number): number {
     const def = UNITS[type];
     const s = this.units.spawn(type, owner, x, y, def.hp);
+    if (s >= 0) this.players[owner].stats.ever[type]++;
     return s;
   }
 
@@ -378,6 +384,15 @@ export class Sim {
   /** Legt ein Gebäude ohne Prüfung an. */
   addBuilding(owner: number, type: number, x: number, y: number, rot: number): Building {
     const b = new Building(this.nextBid++, type, owner, x, y, rot);
+    this.registerBuilding(b);
+    if (b.def.solid) this.ejectUnits(b);
+    if (b.def.store || b.def.housing) this.recountStores(owner);
+    return b;
+  }
+
+  /** Trägt ein (neues oder geladenes) Gebäude in Karte und Navigation ein. */
+  registerBuilding(b: Building): void {
+    const { type, owner, x, y } = b;
     this.buildings.set(b.id, b);
     const m = this.map;
     const def = b.def;
@@ -400,9 +415,17 @@ export class Sim {
         this.markTile(i);
       }
     this.nav.bump();
-    if (def.solid) this.ejectUnits(b);
-    if (def.store || def.housing) this.recountStores(owner);
-    return b;
+  }
+
+  /** KI-Controller eines Spielers (erzeugt ihn bei Bedarf) */
+  ensureAi(p: number): AiController | null {
+    const pl = this.players[p];
+    if (pl.kind !== 'ai') return null;
+    if (!pl.ai) {
+      const prof = AI_PROFILES[(this.cfg.players[p].ai ?? p) % AI_PROFILES.length];
+      pl.ai = new AiController(this, p, prof, this.cfg.players[p].difficulty ?? 0);
+    }
+    return pl.ai as AiController;
   }
 
   private ejectUnits(b: Building): void {
@@ -556,6 +579,15 @@ export class Sim {
 
   checkWin(): void {
     if (this.gameOver) return;
+    if (this.mission) {
+      // In Missionen entscheiden nur die Missionsziele; fällt der eigene Lord, ist die Mission verloren
+      if (!this.players[0].alive) {
+        this.gameOver = true;
+        this.winnerTeam = -1;
+        this.emit({ e: 'win', team: -1 });
+      }
+      return;
+    }
     const teams = new Set<number>();
     for (const p of this.players) if (p.alive) teams.add(p.team);
     const humans = this.players.filter((p) => p.kind === 'human');
@@ -583,6 +615,8 @@ export class Sim {
       pf[k] += t1 - t0;
       t0 = t1;
     };
+    for (const o of this.pendingOrders) applyCommand(this, o.p, { c: 'move', units: o.units, x: o.x, y: o.y, attack: true });
+    this.pendingOrders.length = 0;
     this.spatial.rebuild(this);
     lap('spatial');
     updateAi(this);

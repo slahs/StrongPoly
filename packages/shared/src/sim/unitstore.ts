@@ -108,6 +108,16 @@ export class UnitStore {
     return s;
   }
 
+  /** Zählt lebende Slots und baut die Freiliste nach einem Laden neu auf */
+  rebuild(): void {
+    this.free = [];
+    this.count = 0;
+    for (let i = this.top - 1; i >= 0; i--) {
+      if (this.alive[i]) this.count++;
+      else this.free.push(i);
+    }
+  }
+
   kill(s: number): void {
     if (!this.alive[s]) return;
     this.alive[s] = 0;

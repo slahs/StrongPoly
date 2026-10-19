@@ -38,7 +38,7 @@ export class AiController {
   private plan: PlanStep[] | null = null;
   private planIdx = 0;
   private counts: Counts = {};
-  private wave = { phase: 0, index: 0, start: 0, ids: [] as number[], target: -1, nextAt: 0, stage: { x: 0, y: 0 }, launched: 0, siegeTargets: [] as number[] };
+  wave = { phase: 0, index: 0, start: 0, ids: [] as number[], target: -1, nextAt: 0, stage: { x: 0, y: 0 }, launched: 0, siegeTargets: [] as number[] };
   private garrisonIds = new Set<number>();
   private lastThreat = 0;
   private buildFail = new Map<number, number>();
@@ -75,11 +75,45 @@ export class AiController {
       () => this.defenseStep(sim),
       () => this.waveStep(sim),
       () => this.upkeepStep(sim),
+      () => this.abilityStep(sim),
     ];
     this.task = (this.task + 1) % tasks.length;
     if (this.task === 0) this.countBuildings(sim);
     if (!pl.alive) return;
     tasks[this.task]();
+  }
+
+  saveState(): {
+    task: number;
+    plan: PlanStep[] | null;
+    wave: AiController['wave'];
+    garrison: number[];
+    lastThreat: number;
+    buildFail: [number, number][];
+    castleDone: boolean;
+    retryAt: number;
+  } {
+    return {
+      task: this.task,
+      plan: this.plan ? this.plan.map((p) => ({ ...p })) : null,
+      wave: JSON.parse(JSON.stringify(this.wave)),
+      garrison: [...this.garrisonIds],
+      lastThreat: this.lastThreat,
+      buildFail: [...this.buildFail.entries()],
+      castleDone: this.castleDone,
+      retryAt: this.retryAt,
+    };
+  }
+
+  loadState(s: ReturnType<AiController['saveState']>): void {
+    this.task = s.task;
+    this.plan = s.plan ? s.plan.map((p) => ({ ...p })) : null;
+    this.wave = JSON.parse(JSON.stringify(s.wave));
+    this.garrisonIds = new Set(s.garrison);
+    this.lastThreat = s.lastThreat;
+    this.buildFail = new Map(s.buildFail);
+    this.castleDone = s.castleDone;
+    this.retryAt = s.retryAt;
   }
 
   // ------------------------------------------------------------------
@@ -893,6 +927,58 @@ export class AiController {
     this.garrisonIds.add(u.id(s));
     u.stance[s] = Stance.Hold;
     applyCommand(sim, this.p, { c: 'move', units: [u.id(s)], x: spot.x, y: spot.y });
+  }
+
+  // ---------------- Extreme-Fähigkeiten ----------------
+  private abilityStep(sim: Sim): void {
+    if (!sim.extreme) return;
+    const pl = sim.players[this.p];
+    if (pl.power < 15) return;
+    const u = sim.units;
+    const ready = (id: number) => pl.abilityCd[id] <= sim.tick;
+    const use = (id: number, x: number, y: number) => applyCommand(sim, this.p, { c: 'ability', id, x, y });
+    const { slots } = this.armyUnits(sim);
+    // Heilung: verwundete eigene Gruppe
+    if (ready(2) && pl.power >= 20) {
+      for (const s of slots) {
+        if (u.hp[s] < u.maxHp[s] * 0.5) {
+          let n = 0;
+          sim.spatial.query(u.x[s], u.y[s], 8, (o) => {
+            if (u.alive[o] && u.owner[o] === this.p && u.hp[o] < u.maxHp[o] * 0.7) n++;
+          });
+          if (n >= 4) return use(2, u.x[s], u.y[s]);
+        }
+      }
+    }
+    // Ziele: feindliche Ansammlungen nahe eigener Einheiten oder der Burg
+    let bestCluster = { n: 0, x: 0, y: 0 };
+    let siegeTarget: { x: number; y: number } | null = null;
+    const probes = slots.slice(0, 12);
+    probes.push(...[]);
+    const seen = new Set<number>();
+    const probeAround = (x: number, y: number, rad: number) => {
+      sim.spatial.query(x, y, rad, (e) => {
+        if (!u.alive[e] || !sim.isEnemy(this.p, u.owner[e]) || seen.has(e)) return;
+        seen.add(e);
+        if (u.type[e] >= U.Catapult && u.type[e] !== U.Mantlet) siegeTarget = { x: u.x[e], y: u.y[e] };
+        let n = 0;
+        sim.spatial.query(u.x[e], u.y[e], 5, (o) => {
+          if (u.alive[o] && sim.isEnemy(this.p, u.owner[o])) n++;
+        });
+        if (n > bestCluster.n) bestCluster = { n, x: u.x[e], y: u.y[e] };
+      });
+    };
+    for (const s of probes) probeAround(u.x[s], u.y[s], 14);
+    probeAround(this.kx, this.ky, 30);
+    if (siegeTarget && ready(3) && pl.power >= 55) {
+      const t = siegeTarget as { x: number; y: number };
+      return use(3, t.x, t.y);
+    }
+    if (bestCluster.n >= 8 && ready(3) && pl.power >= 75) return use(3, bestCluster.x, bestCluster.y);
+    if (bestCluster.n >= 6 && ready(0) && pl.power >= 25) return use(0, bestCluster.x, bestCluster.y);
+    // Verstärkung bei Bedrängnis
+    if (ready(1) && pl.power >= 55 && (bestCluster.n >= 10 || slots.length < 6)) return use(1, this.kx, this.ky);
+    if (pl.gold < 120 && ready(4) && pl.power >= 40) return use(4, this.kx, this.ky);
   }
 
   // ---------------- Haushalt ----------------

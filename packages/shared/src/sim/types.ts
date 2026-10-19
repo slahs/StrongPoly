@@ -58,6 +58,8 @@ export interface SimConfig {
   startRes?: number;
   /** Missionsskript */
   mission?: string;
+  /** Zustand wird anschließend per restoreSim geladen (kein Startaufbau) */
+  restore?: boolean;
 }
 
 export type SimEvent =

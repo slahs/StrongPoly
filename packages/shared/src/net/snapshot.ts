@@ -81,6 +81,9 @@ export interface Snapshot {
   tiles: Int32Array;
   proj: Float32Array;
   ladders: number[];
+  /** Fahnenstangen: x, y, Besitzer, Fortschritt (%) */
+  banners: number[];
+  mission?: import('../sim/mission').MissionView;
   events: SimEvent[];
   /** nur bei full */
   map?: {
@@ -304,6 +307,7 @@ export class SnapshotEncoder {
       tiles,
       proj: Float32Array.from(parr),
       ladders,
+      banners: sim.extreme ? sim.extreme.banners.flatMap((b) => [b.x, b.y, b.owner, Math.round(b.progress * 100)]) : [],
       events: sim.events.slice(),
     };
     if (full) {
@@ -326,6 +330,7 @@ export class SnapshotEncoder {
       for (let i = 0; i < m.n; i++) if (sim.digMask[i]) dm.push(i, packTile(sim, i));
       snap.tiles = Int32Array.from(dm);
     }
+    if (sim.mission && (full || sim.tick % 10 === 0)) snap.mission = sim.mission.view;
     if (sim.gameOver) snap.winner = sim.winnerTeam;
     return snap;
   }

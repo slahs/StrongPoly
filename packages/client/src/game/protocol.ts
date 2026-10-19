@@ -1,25 +1,11 @@
-import type { Command, MapGenParams, MapJson, PlayerSetup, PlayerView, Snapshot } from '@strongpoly/shared';
+import type { Command, PlayerView, Snapshot } from '@strongpoly/shared';
 
-/** Spielstart-Konfiguration (Singleplayer und Server gleichermaßen) */
-export interface GameSetup {
-  map: { gen: MapGenParams } | { json: MapJson };
-  players: PlayerSetup[];
-  seed: number;
-  startGold: number;
-  troopLimit: number;
-  fog: boolean;
-  extreme: boolean;
-  speed?: number;
-  mission?: string;
-  startRes?: number;
-  dev?: boolean;
-  /** Index des eigenen Spielers */
-  me: number;
-}
+export type { GameSetup } from '@strongpoly/shared';
+import type { GameSetup } from '@strongpoly/shared';
 
 export type ToWorker =
   | { t: 'start'; setup: GameSetup }
-  | { t: 'load'; save: unknown }
+  | { t: 'load'; setup: GameSetup; state: unknown }
   | { t: 'cmd'; cmd: Command }
   | { t: 'speed'; speed: number }
   | { t: 'pause'; paused: boolean }

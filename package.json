@@ -9,7 +9,7 @@
     "dev:server": "pnpm --filter @strongpoly/server dev",
     "build": "pnpm --filter @strongpoly/client build && pnpm --filter @strongpoly/server build",
     "start": "node packages/server/dist/server.mjs",
-    "test": "pnpm --filter @strongpoly/shared test",
+    "test": "pnpm -r --workspace-concurrency=1 test",
     "typecheck": "pnpm -r typecheck",
     "bench": "pnpm --filter @strongpoly/shared bench"
   },

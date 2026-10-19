@@ -1,5 +1,5 @@
 import { encode } from '@msgpack/msgpack';
-import { GameHost, generateMap, mapFromJson, Sim, SimConfig } from '@strongpoly/shared';
+import { GameHost, generateMap, mapFromJson, restoreSim, saveSim, Sim, SimConfig, SimSave } from '@strongpoly/shared';
 import type { FromWorker, GameSetup, ToWorker } from './protocol';
 
 interface WorkerCtx {
@@ -23,7 +23,7 @@ function sendSnap(snap: unknown): void {
   post({ t: 'snap', data }, [data.buffer]);
 }
 
-function buildSim(setup: GameSetup): Sim {
+function buildSim(setup: GameSetup, restore = false): Sim {
   const map = 'gen' in setup.map ? generateMap(setup.map.gen) : mapFromJson(setup.map.json);
   const cfg: SimConfig = {
     map,
@@ -35,6 +35,7 @@ function buildSim(setup: GameSetup): Sim {
     extreme: setup.extreme,
     mission: setup.mission,
     startRes: setup.startRes,
+    restore,
   };
   return new Sim(cfg);
 }
@@ -87,6 +88,15 @@ ctx.onmessage = (ev) => {
     switch (m.t) {
       case 'start':
         begin(buildSim(m.setup), m.setup);
+        break;
+      case 'load': {
+        const sim = buildSim(m.setup, true);
+        restoreSim(sim, m.state as SimSave);
+        begin(sim, m.setup);
+        break;
+      }
+      case 'save':
+        post({ t: 'saved', save: host ? saveSim(host.sim) : null });
         break;
       case 'cmd':
         host?.submit(me, m.cmd);

@@ -43,6 +43,14 @@ export class ProjStore {
     this.free.push(i);
     this.count--;
   }
+  rebuild(): void {
+    this.free = [];
+    this.count = 0;
+    for (let i = this.top - 1; i >= 0; i--) {
+      if (this.alive[i]) this.count++;
+      else this.free.push(i);
+    }
+  }
   x(i: number): number {
     return this.sx[i] + (this.ex[i] - this.sx[i]) * (this.t[i] / this.T[i]);
   }

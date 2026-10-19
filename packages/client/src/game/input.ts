@@ -307,8 +307,13 @@ export class InputController {
             const a = pl[0];
             const z = pl[pl.length - 1];
             s.send({ c: 'placeLine', type: def.id, x1: a.x, y1: a.y, x2: z.x, y2: z.y });
-          } else if (pl[0]?.valid) s.send({ c: 'place', type: def.id, x: pl[0].x, y: pl[0].y, rot: mode.rot });
-          else if (pl[0]) s.hud.toast('Hier kann nicht gebaut werden', true);
+          } else if (pl[0]?.valid) {
+            s.send({ c: 'place', type: def.id, x: pl[0].x, y: pl[0].y, rot: mode.rot });
+            s.audio?.build();
+          } else if (pl[0]) {
+            s.hud.toast('Hier kann nicht gebaut werden', true);
+            s.audio?.error();
+          }
         }
       }
       this.dragTile = null;

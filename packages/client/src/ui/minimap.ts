@@ -121,6 +121,12 @@ export class Minimap {
       ctx.fillStyle = '#' + PLAYER_COLORS[o % 8].toString(16).padStart(6, '0');
       ctx.fillRect(Math.floor(x * sx), Math.floor(y * sx), 2, 2);
     }
+    for (let i = 0; i + 3 < w.banners.length; i += 4) {
+      ctx.fillStyle = w.banners[i + 2] >= 0 ? '#' + PLAYER_COLORS[w.banners[i + 2] % 8].toString(16).padStart(6, '0') : '#ffffff';
+      ctx.fillRect(Math.floor(w.banners[i] * sx) - 2, Math.floor(w.banners[i + 1] * sx) - 2, 5, 5);
+      ctx.strokeStyle = '#000';
+      ctx.strokeRect(Math.floor(w.banners[i] * sx) - 2, Math.floor(w.banners[i + 1] * sx) - 2, 5, 5);
+    }
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 1;
     const half = (cam.size * sx) / 2;

@@ -31,6 +31,8 @@ export interface CastleTemplate {
 
 export interface AiProfile {
   id: number;
+  /** nicht in Auswahllisten (Missions-Gegner) */
+  hidden?: boolean;
   name: string;
   title: string;
   desc: string;
@@ -174,6 +176,32 @@ export const AI_PROFILES: AiProfile[] = [
     aid: { send: 0.2, request: 3 },
   },
 ];
+
+/** Missions-Gegner (nicht wählbar) */
+AI_PROFILES.push(
+  {
+    id: 9,
+    hidden: true,
+    name: 'Banditenhauptmann',
+    title: 'Der Plünderer',
+    desc: 'Kleine, frühe Überfälle (Tutorial).',
+    castle: { name: 'Lager', ring: 8, wall: BT.WallWood, doubleWall: false, corner: 0, towerEvery: 0, towerType: BT.TowerLookout, gate: BT.GateWood, gates: 1, stairs: false, moat: false, pits: false, cauldrons: 0, turret: 0, killingPits: false, garrison: 2 },
+    econ: { wood: 2, stone: 1, iron: 0, pitch: 0, food: 0.8, market: false, religion: 0, ale: false, goodThings: 0, badThings: 0, peasants: 24, tax: 2 },
+    army: { units: [[U.Spearman, 3], [U.Archer, 2]], siege: [], wave: 8, waveGrow: 3, firstAttack: 5 * T_MIN, waveInterval: 2 * T_MIN, aggression: 1, siegePer10: 0, ladders: 0, tunnelers: 0, assassins: 0, firethrowers: 0 },
+    aid: { send: 0, request: 99 },
+  },
+  {
+    id: 10,
+    hidden: true,
+    name: 'Wächter',
+    title: 'Der Zögerliche',
+    desc: 'Verteidigt nur (Tutorial).',
+    castle: { name: 'Wachfestung', ring: 9, wall: BT.WallLow, doubleWall: false, corner: BT.TowerLookout, towerEvery: 0, towerType: BT.TowerLookout, gate: BT.GateWood, gates: 1, stairs: true, moat: false, pits: false, cauldrons: 0, turret: 0, killingPits: false, garrison: 4 },
+    econ: { wood: 2, stone: 2, iron: 1, pitch: 0, food: 1, market: false, religion: 0, ale: false, goodThings: 0, badThings: 0, peasants: 30, tax: 1 },
+    army: { units: [[U.Spearman, 3], [U.Archer, 3], [U.Maceman, 2]], siege: [], wave: 999, waveGrow: 0, firstAttack: 9999 * T_MIN, waveInterval: 9999 * T_MIN, aggression: 0, siegePer10: 0, ladders: 0, tunnelers: 0, assassins: 0, firethrowers: 0 },
+    aid: { send: 0, request: 99 },
+  },
+);
 
 /** Bonus-Gold pro Spielmonat je Schwierigkeit (0 = fair, kein Cheat) */
 export const AI_DIFFICULTY_GOLD = [0, 40, 100, 200];

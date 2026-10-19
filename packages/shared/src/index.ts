@@ -1,8 +1,7 @@
 export * from './rng';
 export * from './data/palette';
 export * from './data/terrain';
-export * from './map/gamemap';
-export * from './map/mapgen';
+export * from './map';
 export * from './data/resources';
 export * from './data/balance';
 export * from './data/units';
@@ -20,3 +19,8 @@ export * from './net/world';
 export * from './net/host';
 export * from './sim/placement';
 export * from './data/ai';
+export * from './net/protocol';
+export * from './data/missions';
+export * from './data/extreme';
+export type { MissionView } from './sim/mission';
+export * from './sim/serialize';

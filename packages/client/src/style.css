@@ -101,3 +101,8 @@ input[type=range] { accent-color: var(--gold); }
 .crumb { color: var(--dim); font-size: 12px; }
 .tip { position: fixed; z-index: 60; padding: 6px 10px; background: #000d; border: 1px solid var(--edge2); border-radius: 4px; font-size: 12px; max-width: 260px; pointer-events: none; }
 .fps { position: absolute; right: 8px; bottom: 206px; font-size: 11px; color: #000a; z-index: 3; pointer-events: none; }
+
+.mission { position: absolute; left: 6px; top: 300px; width: 270px; padding: 8px 10px; z-index: 4; font-size: 13px; }
+.mission h4 { margin: 0 0 6px; color: var(--accent); font-size: 14px; }
+.mission .obj { padding: 1px 0; color: var(--text); }
+.mission .obj.done { color: #9be274; text-decoration: line-through; opacity: 0.8; }
