@@ -224,18 +224,19 @@ export class AiController {
     add(BT.Woodcutter, pr.econ.wood + (pl.stock[R.Wood] < 40 ? 2 : 0) + (t > 6000 && pl.stock[R.Wood] < 150 ? 1 : 0));
     add(BT.Quarry, pr.econ.stone, t > 1500);
     add(BT.Well, 1, c(BT.Hovel) >= 3);
-    // Militärbasis
+    // Militärbasis (Waffenbau wächst mit der Spieldauer, sonst bleibt die Armee klein)
+    const wk = t > 20000 ? 3 : t > 9000 ? 2 : 1;
     add(BT.Armory, 1, t > 2400 || peas > 14);
     add(BT.Barracks, 1, c(BT.Armory) > 0);
-    if (this.wantsUnit(U.Archer, U.Crossbowman)) add(BT.Fletcher, 1, c(BT.Barracks) > 0);
-    if (this.wantsUnit(U.Spearman, U.Pikeman)) add(BT.Poleturner, 1, c(BT.Barracks) > 0);
+    if (this.wantsUnit(U.Archer, U.Crossbowman)) add(BT.Fletcher, wk, c(BT.Barracks) > 0);
+    if (this.wantsUnit(U.Spearman, U.Pikeman)) add(BT.Poleturner, wk, c(BT.Barracks) > 0);
     if (this.usesIron()) add(BT.IronMine, pr.econ.iron, c(BT.Barracks) > 0);
-    if (this.wantsUnit(U.Maceman, U.Swordsman, U.Knight)) add(BT.Blacksmith, 1, c(BT.IronMine) > 0);
+    if (this.wantsUnit(U.Maceman, U.Swordsman, U.Knight)) add(BT.Blacksmith, wk, c(BT.IronMine) > 0);
     if (this.wantsUnit(U.Maceman)) {
       add(BT.DairyFarm, 1);
       add(BT.Tanner, 1, c(BT.DairyFarm) > 0);
     }
-    if (this.wantsUnit(U.Swordsman, U.Pikeman, U.Knight)) add(BT.Armorer, 1, c(BT.IronMine) > 0);
+    if (this.wantsUnit(U.Swordsman, U.Pikeman, U.Knight)) add(BT.Armorer, wk, c(BT.IronMine) > 0);
     if (this.wantsUnit(U.Knight)) add(BT.Stable, 1, c(BT.Barracks) > 0);
     if (pr.army.units.some(([u]) => UNITS[u].producer === 'merc')) add(BT.MercPost, 1, t > 1200);
     if (this.doctrine().siege.length) add(BT.EngineerGuild, 1, t > 5 * 600);
