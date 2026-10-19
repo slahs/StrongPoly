@@ -74,6 +74,7 @@ export class Sim {
   /** Zufallsstream nur für nicht-kritische Dinge */
   gameOver = false;
   deadUnits: number[] = [];
+  fireCache: { tick: number; list: Building[] } = { tick: -1, list: [] };
   /** Reservierte Bäume (Tile -> Einheiten-Handle) */
   reserved = new Map<number, number>();
 
@@ -164,9 +165,9 @@ export class Sim {
   rescueUnit(s: number): void {
     const u = this.units;
     if (u.layer[s] !== 0) return;
-    const team = this.teamOf[u.owner[s]];
+    const team = this.teamOf[u.owner[s]] | (UNITS[u.type[s]].climbs ? 8 : 0);
     const t = tileOf(this, u.x[s], u.y[s]);
-    if (this.nav.groundFree(t, team) || this.nav.ladder[t] & (1 << team)) return;
+    if (this.nav.groundFree(t, team) || this.nav.ladder[t] & (1 << (team & 7))) return;
     if (UNITS[u.type[s]].tunnels && u.state[s] === S.Tunnel) return;
     const w = this.map.w;
     const tx = t % w;
@@ -232,6 +233,13 @@ export class Sim {
     pl.stock[res] += take;
     pl.used[RES_INFO[res].store] += take;
     return take;
+  }
+
+  /** Ablieferung von Produktion (zählt in der Produktionsstatistik) */
+  deliver(p: number, res: number, amt: number): number {
+    const a = this.addStock(p, res, amt);
+    this.players[p].produced[res] += a;
+    return a;
   }
 
   takeStock(p: number, res: number, amt: number): number {

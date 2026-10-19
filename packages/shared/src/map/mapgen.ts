@@ -168,10 +168,12 @@ function stampBlob(m: GameMap, cx: number, cy: number, r: number, t: number, rng
     }
 }
 
-/** Standard-Startgebiet. Offsets relativ zum Keep-Mittelpunkt. */
+/** Standard-Startgebiet. Offsets sind zur Kartenmitte hin gespiegelt, damit alles im Spielfeld liegt. */
 function stampStart(m: GameMap, sx: number, sy: number, seed: number): void {
   const rng = new Rng(seed ^ 0x1234567);
   const lvl = 1;
+  const mx = sx <= m.w / 2 ? 1 : -1;
+  const my = sy <= m.h / 2 ? 1 : -1;
   for (let y = sy - START_RADIUS; y <= sy + START_RADIUS; y++)
     for (let x = sx - START_RADIUS; x <= sx + START_RADIUS; x++) {
       if (!m.inBounds(x, y)) continue;
@@ -182,13 +184,20 @@ function stampStart(m: GameMap, sx: number, sy: number, seed: number): void {
       m.height[i] = lvl;
       m.trees[i] = 0;
     }
-  // Oase (fruchtbar) westlich-südlich
-  stampBlob(m, sx - 8, sy + 6, 5, T.Oasis, rng, false);
-  stampBlob(m, sx + 8, sy + 6, 4, T.Oasis, rng, false);
-  // Vorkommen jenseits des Kernradius – an festen Offsets
-  stampRect(m, sx + 12, sy - 12, 5, 4, T.StoneDeposit);
-  stampRect(m, sx - 18, sy - 8, 4, 3, T.IronDeposit);
-  stampSwamp(m, sx + 4, sy + 20);
+  // Oasen (fruchtbar)
+  stampBlob(m, sx - 8 * mx, sy + 6 * my, 5, T.Oasis, rng, false);
+  stampBlob(m, sx + 8 * mx, sy + 6 * my, 4, T.Oasis, rng, false);
+  // Vorkommen jenseits des Kernradius
+  const rect = (dx: number, dy: number, w: number, h: number, t: number) => {
+    const ax = sx + dx * mx;
+    const ay = sy + dy * my;
+    const bx = sx + (dx + (w - 1)) * mx;
+    const by = sy + (dy + (h - 1)) * my;
+    stampRect(m, Math.min(ax, bx), Math.min(ay, by), w, h, t);
+  };
+  rect(12, -12, 5, 4, T.StoneDeposit);
+  rect(-18, -8, 4, 3, T.IronDeposit);
+  stampSwamp(m, sx + 4 * mx, sy + 20 * my);
   // Bäume (Ring-Wald, deterministisch aus Offsets)
   for (let y = sy - 22; y <= sy + 22; y++)
     for (let x = sx - 22; x <= sx + 22; x++) {
@@ -198,9 +207,11 @@ function stampStart(m: GameMap, sx: number, sy: number, seed: number): void {
       const i = m.idx(x, y);
       const t = m.terrain[i];
       if (t !== T.Steppe && t !== T.Oasis && t !== T.Desert) continue;
-      if (hash2(0xbeef, x - sx, y - sy) < 0.22 && fbm(0xcafe, (x - sx) * 0.15, (y - sy) * 0.15, 2) > 0.45) m.trees[i] = TREE_WOOD;
+      const ox = (x - sx) * mx;
+      const oy = (y - sy) * my;
+      if (hash2(0xbeef, ox, oy) < 0.22 && fbm(0xcafe, ox * 0.15, oy * 0.15, 2) > 0.45) m.trees[i] = TREE_WOOD;
     }
-  // Umgebung der Anlagen höhenmäßig einebnen (Radius etwas größer als Kern)
+  // Umgebung der Anlagen einebnen
   for (let y = sy - START_RADIUS - 6; y <= sy + START_RADIUS + 6; y++)
     for (let x = sx - START_RADIUS - 6; x <= sx + START_RADIUS + 6; x++) {
       if (!m.inBounds(x, y)) continue;

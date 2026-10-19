@@ -26,7 +26,7 @@ export const TAX_POP: Record<number, number> = { [-3]: 7, [-2]: 5, [-1]: 3, 0: 0
 
 /** Rationen 0..4: keine/halb/normal/extra/doppelt – Nahrung pro Bauer & Monat, Beliebtheit */
 export const RATION_NAMES = ['Keine', 'Halbe', 'Normale', 'Extra', 'Doppelte'];
-export const RATION_FOOD = [0, 0.5, 1, 1.5, 2];
+export const RATION_FOOD = [0, 0.25, 0.5, 0.75, 1];
 export const RATION_POP = [-8, -4, 0, 4, 8];
 /** Beliebtheit pro zusätzlicher Nahrungssorte (ab der zweiten) */
 export const VARIETY_POP = 1.5;

@@ -40,6 +40,7 @@ const setup: GameSetup = {
   fog: params.get('fog') === '1',
   extreme: false,
   me: 0,
+  dev: params.get('dev') === '1',
 };
 startSkirmish(setup);
 

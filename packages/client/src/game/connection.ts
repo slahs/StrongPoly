@@ -10,6 +10,7 @@ export interface GameConnection {
   onError?: (m: string) => void;
   send(cmd: Command): void;
   setSpeed?(x: number): void;
+  dev?(op: string, args: Record<string, number>): void;
   setPaused?(p: boolean): void;
   close(): void;
   readonly local: boolean;
@@ -44,6 +45,9 @@ export class LocalConnection implements GameConnection {
   }
   send(cmd: Command): void {
     this.post({ t: 'cmd', cmd });
+  }
+  dev(op: string, args: Record<string, number>): void {
+    this.post({ t: 'dev', op, args });
   }
   setSpeed(x: number): void {
     this.post({ t: 'speed', speed: x });

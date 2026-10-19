@@ -142,6 +142,7 @@ export function orderMove(sim: Sim, p: number, ids: number[], x: number, y: numb
     u.ax[s] = px;
     u.ay[s] = py;
     u.state[s] = attack ? S.AttackMove : S.Move;
+    u.flags[s] &= ~(8 | 32 | 64 | 16);
     u.targetKind[s] = 0;
     u.target[s] = 0;
     u.stuck[s] = 0;

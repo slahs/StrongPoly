@@ -12,6 +12,7 @@ export interface GameSetup {
   speed?: number;
   mission?: string;
   startRes?: number;
+  dev?: boolean;
   /** Index des eigenen Spielers */
   me: number;
 }
@@ -23,6 +24,7 @@ export type ToWorker =
   | { t: 'speed'; speed: number }
   | { t: 'pause'; paused: boolean }
   | { t: 'save' }
+  | { t: 'dev'; op: string; args: Record<string, number> }
   | { t: 'stop' };
 
 export type FromWorker =

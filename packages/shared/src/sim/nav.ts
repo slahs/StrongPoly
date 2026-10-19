@@ -67,6 +67,7 @@ export class Nav {
   /** Statisch begehbar (Terrain/Bäume/Gebäude), Torregel nach Team */
   groundFree(i: number, team: number): boolean {
     const k = this.kind[i];
+    team &= 7;
     if (k & NK.Gate && this.teamOf[this.owner[i] - 1] === team) return true;
     if (k & NK.Stairs) return true;
     if (k & NK.Solid) return false;
@@ -76,11 +77,11 @@ export class Nav {
   /** Eintrittskosten in Bodenknoten; <0 = unpassierbar. */
   private groundCost(i: number, team: number, breach: boolean): number {
     const k = this.kind[i];
+    team &= 7;
     if (k) {
       if (k & NK.Gate && this.teamOf[this.owner[i] - 1] === team) return 10;
       if (k & NK.Stairs) return 10;
       if (k & NK.Solid) {
-        if (this.ladder[i] & (1 << team)) return 20;
         if (breach && this.map.walkableTerrain(i) && this.teamOf[this.owner[i] - 1] !== team) {
           return k & NK.Gate ? 140 : 260;
         }
@@ -91,6 +92,14 @@ export class Nav {
     const sp = TERRAIN_SPEED[this.map.terrain[i]];
     if (!sp) return -1;
     return sp >= 1 ? 10 : Math.round(10 / sp);
+  }
+
+  /** Kann an diesem Mauer-Tile von der Seite hoch-/hinuntergeklettert werden? */
+  private sideClimb(i: number, team: number): boolean {
+    const k = this.kind[i];
+    if (!(k & NK.WallTop) || !(k & NK.Solid)) return false;
+    if (team >= 8) return true;
+    return (this.ladder[i] & (1 << team)) !== 0;
   }
 
   private topFree(i: number): boolean {
@@ -157,17 +166,31 @@ export class Nav {
             this.push(nd, sv);
           }
         }
-        // Übergänge Boden<->Krone
-        if (this.kind[t] & NK.Stairs || this.ladder[t] & (1 << team)) {
+        // Übergänge Boden<->Krone: Treppe (gleiches Tile)
+        if (this.kind[t] & NK.Stairs && this.topFree(t)) {
           const sv = t * 2 + 1;
-          if (this.topFree(t)) {
-            const nd = d + 8;
-            if (nd < dist[sv]) {
-              if (dist[sv] === 0x3fffffff) touched[nt++] = sv;
-              dist[sv] = nd;
-              dir[sv] = DIR_SWITCH;
-              this.push(nd, sv);
-            }
+          const nd = d + 8;
+          if (nd < dist[sv]) {
+            if (dist[sv] === 0x3fffffff) touched[nt++] = sv;
+            dist[sv] = nd;
+            dir[sv] = DIR_SWITCH;
+            this.push(nd, sv);
+          }
+        }
+        // Leiter/Klettern: vom Boden-Nachbartile auf die Mauerkrone
+        for (let k = 0; k < 4; k++) {
+          const nx = x + DX[k];
+          const ny = y + DY[k];
+          if (nx < 0 || ny < 0 || nx >= w || ny >= this.h) continue;
+          const wt = ny * w + nx;
+          if (!this.sideClimb(wt, team)) continue;
+          const sv = wt * 2 + 1;
+          const nd = d + 16;
+          if (nd < dist[sv]) {
+            if (dist[sv] === 0x3fffffff) touched[nt++] = sv;
+            dist[sv] = nd;
+            dir[sv] = 16 + opp(k);
+            this.push(nd, sv);
           }
         }
       } else {
@@ -189,15 +212,33 @@ export class Nav {
             this.push(nd, sv);
           }
         }
-        if (this.kind[t] & NK.Stairs || this.ladder[t] & (1 << team)) {
+        if (this.kind[t] & NK.Stairs) {
           const sv = t * 2;
-          const sc = this.groundCost(t, team, breach);
-          if (sc >= 0) {
+          if (this.groundCost(t, team, breach) >= 0) {
             const nd = d + 8;
             if (nd < dist[sv]) {
               if (dist[sv] === 0x3fffffff) touched[nt++] = sv;
               dist[sv] = nd;
               dir[sv] = DIR_SWITCH;
+              this.push(nd, sv);
+            }
+          }
+        }
+        // Abstieg über Leiter/Kletterstelle auf Boden-Nachbarn
+        if (this.sideClimb(t, team)) {
+          for (let k = 0; k < 4; k++) {
+            const nx = x + DX[k];
+            const ny = y + DY[k];
+            if (nx < 0 || ny < 0 || nx >= w || ny >= this.h) continue;
+            const g = ny * w + nx;
+            const gc = this.groundCost(g, team, false);
+            if (gc < 0 || gc >= 100) continue;
+            const sv = g * 2;
+            const nd = d + 16;
+            if (nd < dist[sv]) {
+              if (dist[sv] === 0x3fffffff) touched[nt++] = sv;
+              dist[sv] = nd;
+              dir[sv] = 16 + opp(k);
               this.push(nd, sv);
             }
           }
@@ -220,7 +261,7 @@ export class Nav {
    * Veraltete Felder werden weiterverwendet und mit Verzögerung aktualisiert.
    */
   getField(team: number, goalNode: number, breach: boolean, tick: number, limit = 0x3fffff00): Field | null {
-    const key = ((goalNode * 8 + team) * 2 + (breach ? 1 : 0)) * 2;
+    const key = ((goalNode * 16 + team) * 2 + (breach ? 1 : 0)) * 2;
     let f = this.fields.get(key);
     if (f) {
       f.lastUse = tick;

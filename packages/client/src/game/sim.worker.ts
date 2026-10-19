@@ -12,6 +12,7 @@ let me = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
 let last = 0;
 let tickCount = 0;
+let devEnabled = false;
 
 function post(m: FromWorker, transfer: Transferable[] = []): void {
   ctx.postMessage(m, transfer);
@@ -42,6 +43,7 @@ function begin(sim: Sim, setup: GameSetup): void {
   host = new GameHost(sim);
   host.speed = setup.speed ?? 1;
   me = setup.me;
+  devEnabled = !!setup.dev;
   sendSnap(host.fullSnapshot());
   post({ t: 'me', view: host.view(me) });
   last = performance.now();
@@ -63,6 +65,22 @@ function loop(): void {
   }
 }
 
+function devOp(sim: Sim, op: string, a: Record<string, number>): void {
+  if (op === 'spawn') {
+    for (let i = 0; i < (a.n ?? 1); i++) {
+      const cols = Math.max(1, Math.ceil(Math.sqrt(a.n ?? 1)));
+      const s = sim.spawnUnit(a.type, a.owner, a.x + (i % cols) * 0.7, a.y + Math.floor(i / cols) * 0.7);
+      if (s >= 0) {
+        sim.units.stance[s] = a.stance ?? 2;
+        sim.units.ax[s] = sim.units.x[s];
+        sim.units.ay[s] = sim.units.y[s];
+      }
+    }
+  } else if (op === 'gold') sim.players[a.owner ?? 0].gold += a.n ?? 1000;
+  else if (op === 'res') sim.addStock(a.owner ?? 0, a.res, a.n ?? 100);
+  else if (op === 'build') sim.addBuilding(a.owner ?? 0, a.type, a.x, a.y, a.rot ?? 0);
+}
+
 ctx.onmessage = (ev) => {
   const m = ev.data;
   try {
@@ -78,6 +96,9 @@ ctx.onmessage = (ev) => {
         break;
       case 'pause':
         if (host) host.paused = m.paused;
+        break;
+      case 'dev':
+        if (devEnabled && host) devOp(host.sim, m.op, m.args);
         break;
       case 'stop':
         if (timer) clearInterval(timer);

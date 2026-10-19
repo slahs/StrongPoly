@@ -357,7 +357,7 @@ export class Hud {
     if (b.t === BT.Campfire || b.t === BT.Hovel) btns.append(h('button', { text: 'Verwaltung', onclick: () => this.togglePopup('admin') }));
     if (b.hp < maxHp && def.hp > 0) btns.append(h('button', { text: 'Reparieren', onclick: () => this.actions.send({ c: 'repair', building: b.i }) }));
     if (b.t !== BT.Keep && b.t !== BT.Campfire) btns.append(h('button', { class: 'danger', text: 'Abreißen', onclick: () => this.actions.send({ c: 'demolish', ids: [b.i] }) }));
-    if (b.t === BT.PitchDitch || b.t === BT.Pit) void 0;
+    if (b.t === BT.PitchDitch) btns.append(h('button', { text: 'Entzünden', title: 'Benötigt einen Ingenieur in der Nähe', onclick: () => this.actions.send({ c: 'igniteDitch', x: b.x, y: b.y }) }));
     this.info.append(btns);
   }
 

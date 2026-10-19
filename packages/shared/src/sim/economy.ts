@@ -294,7 +294,7 @@ export function workerTick(sim: Sim, s: number): void {
       }
       b.out += rec.outAmt;
       b.cycles++;
-      if (rec.extra && b.cycles % rec.extra.every === 0) sim.addStock(b.owner, rec.extra.res, rec.extra.amt);
+      if (rec.extra && b.cycles % rec.extra.every === 0) sim.deliver(b.owner, rec.extra.res, rec.extra.amt);
       afterProduce(sim, s, b);
       break;
     }
@@ -385,7 +385,7 @@ export function workerTick(sim: Sim, s: number): void {
       const r = followGoal(sim, s, false, 0.8);
       if (r === MR.Arrived) {
         const res = u.carryRes[s];
-        const acc = sim.addStock(u.owner[s], res, u.carryAmt[s]);
+        const acc = sim.deliver(u.owner[s], res, u.carryAmt[s]);
         u.carryAmt[s] -= acc;
         if (u.carryAmt[s] > 0) {
           // Lager voll: kurz warten, dann abwerfen
@@ -418,7 +418,7 @@ export function workerTick(sim: Sim, s: number): void {
     case P.Wait: {
       u.timer[s] -= 1;
       if (u.timer[s] > 0) break;
-      const acc = sim.addStock(u.owner[s], u.carryRes[s], u.carryAmt[s]);
+      const acc = sim.deliver(u.owner[s], u.carryRes[s], u.carryAmt[s]);
       u.carryAmt[s] -= acc;
       if (u.carryAmt[s] > 0 && u.stuck[s] < 3) {
         u.stuck[s]++;
@@ -781,7 +781,7 @@ function oxTick(sim: Sim, s: number): void {
     case P.ToStore: {
       const r = followGoal(sim, s, false, 0.9);
       if (r === MR.Arrived) {
-        const acc = sim.addStock(u.owner[s], u.carryRes[s], u.carryAmt[s]);
+        const acc = sim.deliver(u.owner[s], u.carryRes[s], u.carryAmt[s]);
         u.carryAmt[s] -= acc;
         if (u.carryAmt[s] > 0) {
           u.sub[s] = P.Wait;

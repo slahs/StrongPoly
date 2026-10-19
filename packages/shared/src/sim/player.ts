@@ -11,6 +11,8 @@ export class PlayerState {
   alive = true;
   gold = 0;
   stock = new Int32Array(RES_COUNT);
+  /** Gesamtproduktion je Ware (Statistik) */
+  produced = new Int32Array(RES_COUNT);
   tax = 0;
   ration = 2;
   popularity = 60;

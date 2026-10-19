@@ -69,6 +69,12 @@ export class Spatial {
   }
 }
 
+/** Navigations-Team einer Einheit (Kletterer bekommen Bit 3) */
+export function unitTeam(sim: Sim, s: number): number {
+  const u = sim.units;
+  return sim.teamOf[u.owner[s]] | (UNITS[u.type[s]].climbs ? 8 : 0);
+}
+
 export function tileOf(sim: Sim, x: number, y: number): number {
   const m = sim.map;
   let tx = x | 0;
@@ -85,7 +91,7 @@ export function passable(sim: Sim, tile: number, layer: number, team: number): b
   const nav = sim.nav;
   if (layer === 1) return (nav.kind[tile] & NK.WallTop) !== 0;
   if (nav.groundFree(tile, team)) return true;
-  return (nav.ladder[tile] & (1 << team)) !== 0;
+  return (nav.ladder[tile] & (1 << (team & 7))) !== 0;
 }
 
 function heightOk(sim: Sim, a: number, b: number): boolean {
@@ -105,7 +111,7 @@ export function walkStep(sim: Sim, s: number, nx: number, ny: number, mul = 1): 
   const d = Math.sqrt(dx * dx + dy * dy);
   if (d < 1e-5) return true;
   const def = UNITS[u.type[s]];
-  const team = sim.teamOf[u.owner[s]];
+  const team = unitTeam(sim, s);
   const layer = u.layer[s];
   const ownTile = tileOf(sim, x, y);
   let sp = def.speed * mul;
@@ -170,7 +176,7 @@ export function followGoal(sim: Sim, s: number, breach: boolean, arrive = 0.5): 
   const dy = py - y;
   const d2 = dx * dx + dy * dy;
   if (goalLayer === layer && d2 <= arrive * arrive) return MR.Arrived;
-  const team = sim.teamOf[u.owner[s]];
+  const team = unitTeam(sim, s);
   const mapW = sim.map.w;
   const tile = tileOf(sim, x, y);
   const goalTile = goal >= 0 ? goal >> 1 : tile;
@@ -187,6 +193,20 @@ export function followGoal(sim: Sim, s: number, breach: boolean, arrive = 0.5): 
   if (dir === DIR_NONE) {
     if (node === goal) return walkStep(sim, s, px, py) ? MR.Moving : stuck(u, s);
     return MR.NoPath;
+  }
+  if (dir >= 16 && dir !== DIR_NONE) {
+    // Seitliche Kletterstelle: erst an die Kante laufen, dann Ebene wechseln und hinübersteigen
+    const k = dir - 16;
+    const tx0 = tile % mapW;
+    const ty0 = (tile / mapW) | 0;
+    const ex = tx0 + 0.5 + DX[k] * 0.38;
+    const ey = ty0 + 0.5 + DY[k] * 0.38;
+    if ((ex - x) * (ex - x) + (ey - y) * (ey - y) < 0.02) {
+      u.layer[s] = layer ^ 1;
+      walkStep(sim, s, tx0 + 0.5 + DX[k], ty0 + 0.5 + DY[k]);
+      return MR.Moving;
+    }
+    return walkStep(sim, s, ex, ey) ? MR.Moving : stuck(u, s);
   }
   if (dir === DIR_SWITCH) {
     const cx = (tile % mapW) + 0.5;
@@ -222,7 +242,7 @@ export function followGoal(sim: Sim, s: number, breach: boolean, arrive = 0.5): 
   const d2n = (cx - x) * (cx - x) + (cy - y) * (cy - y);
   if (d2n < 0.5) {
     const n2 = f.dir[nextTile * 2 + layer];
-    if (n2 !== DIR_NONE && n2 !== DIR_SWITCH) {
+    if (n2 < 8) {
       aimX = nxT + DX[n2] + 0.5;
       aimY = nyT + DY[n2] + 0.5;
       // nur nutzen, wenn Sichtlinie frei
@@ -288,7 +308,7 @@ export function separate(sim: Sim): void {
     const k = st === 0 || st === 5 ? 0.25 : 0.5;
     const nx = x + Math.max(-0.15, Math.min(0.15, px * k));
     const ny = y + Math.max(-0.15, Math.min(0.15, py * k));
-    const team = sim.teamOf[u.owner[s]];
+    const team = unitTeam(sim, s);
     const t0 = tileOf(sim, x, y);
     const t1 = tileOf(sim, nx, ny);
     if (nx < 0 || ny < 0 || nx >= sim.map.w || ny >= sim.map.h) continue;

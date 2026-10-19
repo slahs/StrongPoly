@@ -6,6 +6,7 @@ import {
   FEAR_MAX,
   GOOD_POP,
   INN_SERVES,
+  MARKET_PRICE_RECOVER,
   POP_INTERVAL,
   POP_STEPS_PER_MONTH,
   RATION_FOOD,
@@ -50,7 +51,11 @@ export function updatePopularity(sim: Sim): void {
   }
   for (const p of sim.players) {
     if (!p.alive) continue;
-    if (doInterval) applyInterval(sim, p.id);
+    if (doInterval) {
+      applyInterval(sim, p.id);
+      const k = 1 - Math.pow(1 - MARKET_PRICE_RECOVER, POP_INTERVAL);
+      for (let r = 0; r < p.priceMul.length; r++) p.priceMul[r] += (1 - p.priceMul[r]) * k;
+    }
     spawnAndLeave(sim, p.id);
   }
 }

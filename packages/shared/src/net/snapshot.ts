@@ -1,5 +1,6 @@
 import { UNIT_CAP, TICKS_PER_MONTH } from '../data/balance';
 import { BUILDINGS } from '../data/buildings';
+import { UNITS } from '../data/units';
 import type { Sim } from '../sim/sim';
 import { S } from '../sim/unitstore';
 import type { SimEvent } from '../sim/types';
@@ -203,7 +204,7 @@ export class SnapshotEncoder {
     dv.setUint8(o + 4, u.type[s]);
     const burning = u.burn[s] > 0 ? 1 : 0;
     const moving = u.state[s] === S.Move || u.state[s] === S.AttackMove || (u.state[s] === S.Attack && u.flags[s] & 1) || (u.state[s] === S.Work && u.goal[s] >= 0) ? 1 : 0;
-    dv.setUint8(o + 5, (u.owner[s] & 15) | (u.layer[s] << 4) | (burning << 5) | (moving << 6) | ((u.flags[s] & 2 ? 1 : 0) << 7));
+    dv.setUint8(o + 5, (u.owner[s] & 15) | (u.layer[s] << 4) | (burning << 5) | (moving << 6) | (((UNITS[u.type[s]].invisible && u.state[s] !== S.Attack) || (u.state[s] === S.Tunnel && u.sub[s] === 1) ? 1 : 0) << 7));
     dv.setInt16(o + 6, Math.round(u.x[s] * 16), true);
     dv.setInt16(o + 8, Math.round(u.y[s] * 16), true);
     dv.setUint8(o + 10, Math.max(1, Math.ceil((u.hp[s] / u.maxHp[s]) * 255)));

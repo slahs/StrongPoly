@@ -250,6 +250,8 @@ export class EntityRenderer {
       for (const m of this.bldMeshes) m?.begin();
       for (const b of w.buildings.values()) {
         const def = BUILDINGS[b.t];
+        // Fallen sind für Gegner unsichtbar
+        if ((b.t === BT.Pit || b.t === BT.KillingPit) && o.teamOfPlayer[b.o] !== o.myTeam) continue;
         const m = this.bldMesh(b.t);
         const cx = b.x + b.w / 2;
         const cz = b.y + b.h / 2;

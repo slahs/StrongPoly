@@ -421,6 +421,11 @@ export class InputController {
     if (!g) return;
     const tx = Math.floor(g.x);
     const ty = Math.floor(g.y);
+    // Tunnelgräber: Rechtsklick = unterirdisch zum Ziel graben
+    if (units.every((id) => w.type[w.slotOf(id)] === U.Tunneler)) {
+      s.send({ c: 'tunnel', units, x: g.x, y: g.y });
+      return;
+    }
     if (w.map.inBounds(tx, ty)) {
       const bid = w.bldAt[w.map.idx(tx, ty)];
       const b = bid ? w.buildings.get(bid) : null;
