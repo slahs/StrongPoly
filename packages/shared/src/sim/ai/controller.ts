@@ -238,7 +238,7 @@ export class AiController {
     if (this.wantsUnit(U.Swordsman, U.Pikeman, U.Knight)) add(BT.Armorer, 1, c(BT.IronMine) > 0);
     if (this.wantsUnit(U.Knight)) add(BT.Stable, 1, c(BT.Barracks) > 0);
     if (pr.army.units.some(([u]) => UNITS[u].producer === 'merc')) add(BT.MercPost, 1, t > 1200);
-    if (pr.army.siege.length) add(BT.EngineerGuild, 1, t > 5 * 600);
+    if (this.doctrine().siege.length) add(BT.EngineerGuild, 1, t > 5 * 600);
     if (pr.econ.pitch) add(BT.PitchRig, pr.econ.pitch, t > 3000);
     else if (pr.castle.cauldrons || pr.castle.killingPits) add(BT.PitchRig, 1, t > 4000);
     // Komfort
@@ -628,15 +628,16 @@ export class AiController {
     if (pr.army.tunnelers) special.push([U.Tunneler, pr.army.tunnelers]);
     if (pr.army.assassins) special.push([U.Assassin, pr.army.assassins]);
     if (pr.army.firethrowers) special.push([U.Firethrower, pr.army.firethrowers]);
-    const siegeWanted = Math.round((pr.army.siegePer10 * waveTarget) / 10);
+    const doc = this.doctrine();
+    const siegeWanted = Math.round((doc.siegePer10 * waveTarget) / 10);
     const siegeCount = Object.entries(counts).filter(([t]) => t >= String(U.Catapult)).reduce((a, [, n]) => a + n, 0);
     const nearWave = sim.tick >= this.wave.nextAt - 2400;
     if (nearWave) {
       for (const [type, n] of special) {
         if ((counts[type] ?? 0) < n && this.recruitOne(sim, type)) return;
       }
-      if (siegeCount < siegeWanted && pr.army.siege.length) {
-        const pick = pr.army.siege[(siegeCount + this.wave.index) % pr.army.siege.length][0];
+      if (siegeCount < siegeWanted && doc.siege.length) {
+        const pick = doc.siege[(siegeCount + this.wave.index) % doc.siege.length][0];
         if (this.recruitOne(sim, pick)) return;
       }
     }
@@ -734,6 +735,19 @@ export class AiController {
   }
 
   // ---------------- Wellen ----------------
+  /** Eskalation: scheitern Wellen, rüstet jeder Lord nach (Belagerung, Aggression, kürzere Pausen), damit Partien enden. */
+  private doctrine(): { siege: [number, number][]; siegePer10: number; aggression: number; interval: number } {
+    const a = this.profile.army;
+    const i = this.wave.index;
+    const siege: [number, number][] = a.siege.length ? a.siege : i >= 1 ? [[U.Ram, 2], [U.Catapult, 1]] : [];
+    return {
+      siege,
+      siegePer10: i >= 1 ? Math.max(a.siegePer10, Math.min(4, 1 + i)) : a.siegePer10,
+      aggression: Math.min(1, a.aggression + 0.1 * i),
+      interval: Math.max(1.5 * 600, a.waveInterval * Math.pow(0.85, i)),
+    };
+  }
+
   private waveStep(sim: Sim): void {
     const u = sim.units;
     const pr = this.profile;
@@ -749,9 +763,10 @@ export class AiController {
       const strength = free.filter((s) => u.type[s] < U.Catapult).length;
       if (strength < waveTarget * 0.85) return;
       // Belagerungsgerät abwarten (max. 3 Minuten Verzögerung)
-      const siegeWant = Math.round((pr.army.siegePer10 * waveTarget) / 10);
+      const doc = this.doctrine();
+      const siegeWant = Math.round((doc.siegePer10 * waveTarget) / 10);
       const siegeHave = free.filter((s) => u.type[s] >= U.Catapult).length;
-      if (siegeWant > 0 && siegeHave < Math.ceil(siegeWant * 0.6) && sim.tick < w.nextAt + 1800 && pr.army.siege.length) return;
+      if (siegeWant > 0 && siegeHave < Math.ceil(siegeWant * 0.6) && sim.tick < w.nextAt + 1800 && doc.siege.length) return;
       const enemy = this.pickEnemy(sim);
       if (enemy < 0) return;
       w.target = enemy;
@@ -762,7 +777,7 @@ export class AiController {
       const dy = this.ky - ek.cy;
       const d = Math.hypot(dx, dy) || 1;
       w.stage = { x: ek.cx + (dx / d) * Math.min(26, d * 0.5), y: ek.cy + (dy / d) * Math.min(26, d * 0.5) };
-      const take = Math.max(8, Math.round(free.length * pr.army.aggression));
+      const take = Math.max(8, Math.round(free.length * doc.aggression));
       w.ids = free.slice(0, take).map((s) => u.id(s));
       applyCommand(sim, this.p, { c: 'move', units: w.ids, x: w.stage.x, y: w.stage.y });
       for (const id of w.ids) {
@@ -806,7 +821,7 @@ export class AiController {
       w.ids = [];
       w.phase = 0;
       w.index++;
-      w.nextAt = sim.tick + pr.army.waveInterval;
+      w.nextAt = sim.tick + this.doctrine().interval;
     }
   }
 
