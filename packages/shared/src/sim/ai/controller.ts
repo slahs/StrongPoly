@@ -848,6 +848,14 @@ export class AiController {
         return;
       }
       if (sim.tick % 50 === 0) this.retargetAssault(sim);
+      // Nachschub: frisch ausgebildete Soldaten stoßen laufend zum Angriff (Dauerbelagerung statt Einzelwellen)
+      if (sim.tick % 300 === 0) {
+        const joined = free.filter((s) => !w.ids.includes(u.id(s)) && u.state[s] === S.Idle && u.type[s] !== U.Tunneler).map((s) => u.id(s));
+        if (joined.length >= 4) {
+          for (const id of joined) w.ids.push(id);
+          this.launchAssault(sim, joined);
+        }
+      }
       if (w.ids.length < Math.max(3, waveTarget * 0.18) || sim.tick - w.launched > 7000) w.phase = 3;
       return;
     }
@@ -909,7 +917,7 @@ export class AiController {
     return { gate, wall, tower, keep };
   }
 
-  private launchAssault(sim: Sim): void {
+  private launchAssault(sim: Sim, ids: number[] = this.wave.ids): void {
     const u = sim.units;
     const w = this.wave;
     const enemy = w.target;
@@ -918,7 +926,7 @@ export class AiController {
     if (!keep) return;
     const infantry: number[] = [];
     const jobs: { id: number; kind: 'attack'; target: number }[] = [];
-    for (const id of w.ids) {
+    for (const id of ids) {
       const s = u.slot(id);
       if (s < 0) continue;
       const t = u.type[s];
