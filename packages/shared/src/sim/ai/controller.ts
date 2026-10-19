@@ -195,8 +195,10 @@ export class AiController {
     // Steuern & Rationen
     pl.tax = pl.popularity > 75 ? Math.min(pr.econ.tax + 2, 5) : pl.popularity > 58 ? pr.econ.tax : pl.popularity > 45 ? 0 : -1;
     // Geldnot: Steuern anheben, solange die Beliebtheit es trägt (sonst bleibt die Armee klein)
-    if (pl.gold < 200 && pl.popularity > 42) pl.tax = Math.max(pl.tax, 1);
-    if (pl.gold < 80 && pl.popularity > 50) pl.tax = Math.max(pl.tax, 2);
+    // (unter 50 Beliebtheit wandern Bauern ab und keine kommen nach: nie darunter drücken)
+    if (pl.gold < 200 && pl.popularity > 56) pl.tax = Math.max(pl.tax, 1);
+    if (pl.gold < 80 && pl.popularity > 62) pl.tax = Math.max(pl.tax, 2);
+    if (pl.popularity < 52 && pl.peasants < pl.housing * 0.6) pl.tax = Math.min(pl.tax, -1);
     pl.ration = pl.foodShort ? 1 : pl.popularity < 50 ? 3 : 2;
 
     const peas = pl.peasants;
