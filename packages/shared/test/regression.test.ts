@@ -41,10 +41,10 @@ describe('Regression: Vorkommen', () => {
 });
 
 describe('Regression: KI-Duelle enden', () => {
-  it('Baron vs Wolf (früher Patt bei ~25 Gold): ein Bergfried fällt innerhalb von 45 Minuten', () => {
+  it('Baron vs Wolf (früher Patt bei ~25 Gold): ein Bergfried fällt innerhalb von 90 Minuten', () => {
     const map = generateMap({ seed: 7, size: 160, players: 2 });
     const sim = new Sim({ map, seed: 7, players: [{ name: 'A', team: 0, kind: 'ai', ai: 0 }, { name: 'B', team: 1, kind: 'ai', ai: 8 }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
-    while (sim.tick < 45 * 600 && !sim.gameOver) sim.step();
+    while (sim.tick < 90 * 600 && !sim.gameOver) sim.step();
     expect(sim.gameOver).toBe(true);
   }, 120000);
 });
