@@ -18,7 +18,9 @@ while (sim.tick < t1 * 600 && !sim.gameOver) {
     for (let s = 0; s < u.top; s++) if (u.alive[s] && u.owner[s] === 1) { const d = Math.hypot(u.x[s] - x, u.y[s] - y); if (d < best) { best = d; what = UNITS[u.type[s]].key; } }
     let bb = 1e9, bw = '';
     for (const q of sim.buildings.values()) if (q.owner === 1) { const d = Math.hypot(q.cx - x, q.cy - y); if (d < bb) { bb = d; bw = q.def.key; } }
-    rows.push(`${(sim.tick / 600).toFixed(1)}min ${UNITS[t].key} @${x.toFixed(0)},${y.toFixed(0)} dKeep=${Math.hypot(bk.cx - x, bk.cy - y).toFixed(0)} nearestEnemyUnit=${what}:${best.toFixed(1)} nearestEnemyBld=${bw}:${bb.toFixed(1)}`);
+    const killers: Record<string, number> = {};
+    for (let s2 = 0; s2 < u.top; s2++) if (u.alive[s2] && u.owner[s2] === 1 && u.targetKind[s2] === 1 && u.target[s2] === id) killers[UNITS[u.type[s2]].key] = (killers[UNITS[u.type[s2]].key] ?? 0) + 1;
+    rows.push(`killers=${JSON.stringify(killers)} ${(sim.tick / 600).toFixed(1)}min ${UNITS[t].key} @${x.toFixed(0)},${y.toFixed(0)} dKeep=${Math.hypot(bk.cx - x, bk.cy - y).toFixed(0)} nearestEnemyUnit=${what}:${best.toFixed(1)} nearestEnemyBld=${bw}:${bb.toFixed(1)}`);
   }
   prev = now;
 }

@@ -198,7 +198,7 @@ function updateDefenses(sim: Sim): void {
       }
       if ((sim.tick + b.id) % 3 !== 0) continue;
       const ballista = b.turret === 1;
-      const range = ballista ? 22 : 20;
+      const range = ballista ? 18 : 16;
       const minR = ballista ? 2 : 5;
       let best = -1;
       let bd = range * range;
