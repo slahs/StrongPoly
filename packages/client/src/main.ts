@@ -83,7 +83,8 @@ function launch(setup: GameSetup, online: boolean, n?: NetClient, missionId?: st
   session?.destroy();
   screens.hide();
   const mission = missionId ?? setup.mission;
-  const conn = online && n ? new RemoteConnection(n, setup.me) : new LocalConnection({ ...setup, mission, dev: new URLSearchParams(location.search).get('dev') === '1' }, restore);
+  setup = { ...setup, mission };
+  const conn = online && n ? new RemoteConnection(n, setup.me) : new LocalConnection({ ...setup, dev: new URLSearchParams(location.search).get('dev') === '1' }, restore);
   const s = new Session(gs, conn, ui, {
     setup,
     extreme: setup.extreme,

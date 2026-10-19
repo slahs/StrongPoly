@@ -219,14 +219,13 @@ export class Session {
         this.hud.minimap.patchTile(t);
       }
       this.world.tileChanges.length = 0;
-      this.handleEvents();
+      this.handleEvents(s.events);
       if (s.winner !== undefined && !this.ended) this.onEnd(s.winner);
     }
   }
 
-  private handleEvents(): void {
-    const w = this.world;
-    for (const e of w.events) {
+  private handleEvents(events: Snapshot['events']): void {
+    for (const e of events) {
       if (e.e === 'msg' && e.p === this.me) this.hud.toast(e.text);
       else if (e.e === 'alert' && e.p === this.me && this.alertCooldown <= 0) {
         this.alertCooldown = 6;

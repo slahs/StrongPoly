@@ -71,7 +71,6 @@ export class InputController {
     add(window, 'keydown', (e: KeyboardEvent) => this.onKey(e, true));
     add(window, 'keyup', (e: KeyboardEvent) => this.onKey(e, false));
     add(document, 'mouseleave', () => (this.mouse.inside = false));
-    add(document, 'mouseenter', () => (this.mouse.inside = true));
     add(window, 'blur', () => this.keys.clear());
   }
 
