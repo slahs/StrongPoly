@@ -632,7 +632,8 @@ export class AiController {
     let queued = 0;
     for (const b of sim.buildings.values()) if (b.owner === this.p) queued += b.queue.length;
     if (queued > 6) return;
-    const total = Object.values(counts).reduce((a, b) => a + b, 0) + queued;
+    // Belagerungsgerät zählt nicht zur Infanteriestärke (sonst verdrängt es die Soldaten und Wellen starten nie)
+    const total = Object.entries(counts).reduce((a, [t, n]) => a + (Number(t) < U.Catapult ? n : 0), 0) + queued;
     const waveTarget = this.waveTarget();
     // Ziel: Welle + Heimwache; Belagerung separat
     const want = waveTarget + pr.castle.garrison + 4;
