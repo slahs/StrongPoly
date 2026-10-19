@@ -633,7 +633,7 @@ export class AiController {
     if (pr.army.firethrowers) special.push([U.Firethrower, pr.army.firethrowers]);
     const doc = this.doctrine();
     const siegeWanted = Math.round((doc.siegePer10 * waveTarget) / 10);
-    const siegeCount = Object.entries(counts).filter(([t]) => t >= String(U.Catapult)).reduce((a, [, n]) => a + n, 0);
+    const siegeCount = Object.entries(counts).filter(([t]) => Number(t) >= U.Catapult).reduce((a, [, n]) => a + n, 0);
     const nearWave = sim.tick >= this.wave.nextAt - 2400;
     if (nearWave) {
       for (const [type, n] of special) {
@@ -764,7 +764,9 @@ export class AiController {
       // Standby: Zuhause sammeln
       if (sim.tick < w.nextAt) return;
       const strength = free.filter((s) => u.type[s] < U.Catapult).length;
-      if (strength < waveTarget * 0.85) return;
+      // Überfällige Welle: nach 5 Minuten Warten reicht die halbe Stärke (kein Dauer-Patt)
+      const overdue = sim.tick > w.nextAt + 5 * 600;
+      if (strength < waveTarget * (overdue ? 0.5 : 0.85)) return;
       // Belagerungsgerät abwarten (max. 3 Minuten Verzögerung)
       const doc = this.doctrine();
       const siegeWant = Math.round((doc.siegePer10 * waveTarget) / 10);
@@ -1014,6 +1016,25 @@ export class AiController {
     // Notkauf von Nahrung
     const food = pl.stock[R.Apple] + pl.stock[R.Cheese] + pl.stock[R.Meat] + pl.stock[R.Bread];
     if (this.cnt(BT.Market) > 0 && food < 30 && pl.gold > 250) applyCommand(sim, this.p, { c: 'trade', res: R.Bread, amount: 25, buy: true });
+    // Goldüberschuss in Waffen umsetzen, wenn die Werkstätten nicht hinterherkommen
+    else if (this.cnt(BT.Market) > 0 && pl.gold > 600) {
+      let best = -1;
+      let bs = Infinity;
+      for (const [u, w] of this.profile.army.units) {
+        for (const [r] of UNITS[u].cost.res ?? []) {
+          const s = pl.stock[r] / w;
+          if (pl.stock[r] < 6 && s < bs) {
+            bs = s;
+            best = r;
+          }
+        }
+      }
+      if (best >= 0) {
+        const price = RES_INFO[best].price * pl.priceMul[best];
+        const n = Math.min(6, Math.floor((pl.gold - 400) / price));
+        if (n > 0) applyCommand(sim, this.p, { c: 'trade', res: best, amount: n, buy: true });
+      }
+    }
     // Reparatur beschädigter Gebäude
     let n = 0;
     for (const b of sim.buildings.values()) {
