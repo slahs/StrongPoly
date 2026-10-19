@@ -793,7 +793,10 @@ export class AiController {
       const strength = free.filter((s) => u.type[s] < U.Catapult).length;
       // Überfällige Welle: nach 5 Minuten Warten reicht die halbe Stärke (kein Dauer-Patt)
       const overdue = sim.tick > w.nextAt + 5 * 600;
-      if (strength < waveTarget * (overdue ? 0.5 : 0.85)) return;
+      // Gegner geschwächt oder Spätphase: früher losschlagen (kein Dauer-Patt)
+      const superior = strength >= 10 && strength >= this.enemyArmy(sim) * 1.6;
+      const frac = sim.tick > LATE_GAME ? 0.4 : overdue ? 0.5 : 0.7;
+      if (strength < waveTarget * frac && !superior) return;
       // Belagerungsgerät abwarten (max. 3 Minuten Verzögerung)
       const doc = this.doctrine(sim.tick);
       const siegeWant = Math.round((doc.siegePer10 * waveTarget) / 10);
