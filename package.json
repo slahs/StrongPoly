@@ -1,0 +1,21 @@
+{
+  "name": "strongpoly",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"pnpm --filter @strongpoly/server dev\" \"pnpm --filter @strongpoly/client dev\"",
+    "dev:client": "pnpm --filter @strongpoly/client dev",
+    "dev:server": "pnpm --filter @strongpoly/server dev",
+    "build": "pnpm --filter @strongpoly/client build && pnpm --filter @strongpoly/server build",
+    "start": "node packages/server/dist/server.mjs",
+    "test": "pnpm --filter @strongpoly/shared test",
+    "typecheck": "pnpm -r typecheck",
+    "bench": "pnpm --filter @strongpoly/shared bench"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.6.3"
+  },
+  "packageManager": "pnpm@10.28.0"
+}
