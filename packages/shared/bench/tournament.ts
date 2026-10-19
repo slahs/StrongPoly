@@ -4,7 +4,7 @@
  * Ziel: ≥ 80 % der Partien enden mit Keep-Fall.
  */
 import { spawn } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { AI_PROFILES } from '../src';
 
 const seeds = Number(process.argv[2] ?? 3);
@@ -17,6 +17,13 @@ const jobs: Job[] = [];
 for (let i = 0; i < ids.length; i++)
   for (let j = i + 1; j < ids.length; j++)
     for (let s = 0; s < seeds; s++) jobs.push({ a: ids[i], b: ids[j], seed: 3 + s * 11 + ((i + j) % 5) });
+
+// RERUN=<vorheriges Ergebnis.json>: nur die damals nicht beendeten Partien wiederholen
+if (process.env.RERUN) {
+  const prev = JSON.parse(readFileSync(process.env.RERUN, 'utf8')) as { job: Job; ended: boolean }[];
+  jobs.length = 0;
+  for (const r of prev) if (!r.ended) jobs.push(r.job);
+}
 
 interface Res { job: Job; ended: boolean; min: number; text: string }
 const results: Res[] = [];

@@ -628,7 +628,7 @@ export class AiController {
     for (const b of sim.buildings.values()) if (b.owner === this.p) queued += b.queue.length;
     if (queued > 6) return;
     const total = Object.values(counts).reduce((a, b) => a + b, 0) + queued;
-    const waveTarget = pr.army.wave + pr.army.waveGrow * this.wave.index;
+    const waveTarget = this.waveTarget();
     // Ziel: Welle + Heimwache; Belagerung separat
     const want = waveTarget + pr.castle.garrison + 4;
     // Spezialeinheiten zuerst, wenn die nächste Welle naht
@@ -648,6 +648,8 @@ export class AiController {
       if (siegeCount < siegeWanted && doc.siege.length) {
         const pick = doc.siege[(siegeCount + this.wave.index) % doc.siege.length][0];
         if (this.recruitOne(sim, pick)) return;
+        // Gold für Belagerungsgerät sparen, statt es in billige Infanterie zu stecken (sonst bricht nie jemand eine Mauer)
+        if (pl.gold < UNITS[pick].cost.gold + 20 && this.cnt(BT.EngineerGuild) > 0) return;
       }
     }
     if (total >= want || pl.troops >= sim.troopLimit) return;
@@ -757,6 +759,19 @@ export class AiController {
     };
   }
 
+  /** Wellenstärke: wächst nur bis zur 5. Welle, sonst eilt die Anforderung der Armee davon und die KI greift nie mehr an */
+  private waveTarget(): number {
+    return this.profile.army.wave + this.profile.army.waveGrow * Math.min(this.wave.index, 5);
+  }
+
+  /** Streitkräfte (ohne Lord/Arbeiter) aller Gegner */
+  private enemyArmy(sim: Sim): number {
+    const u = sim.units;
+    let n = 0;
+    for (let s = 0; s < u.top; s++) if (u.alive[s] && u.type[s] >= ARMY_MIN && u.type[s] !== U.Lord && sim.isEnemy(this.p, u.owner[s])) n++;
+    return n;
+  }
+
   private waveStep(sim: Sim): void {
     const u = sim.units;
     const pr = this.profile;
@@ -765,7 +780,7 @@ export class AiController {
     // Garnison auf die Mauern
     this.garrisonStep(sim, slots);
     const free = slots.filter((s) => !this.garrisonIds.has(u.id(s)));
-    const waveTarget = pr.army.wave + pr.army.waveGrow * w.index;
+    const waveTarget = this.waveTarget();
     if (w.phase === 0) {
       // Standby: Zuhause sammeln
       if (sim.tick < w.nextAt) return;
