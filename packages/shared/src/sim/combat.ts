@@ -301,6 +301,8 @@ function findEnemyUnit(sim: Sim, s: number, radius: number, preferRanged = false
     if (ot === U.Peasant || ot === U.Ox) {
       // Bauern nur angreifen, wenn nichts anderes da (niedrige Priorität)
     }
+    // Belagerungswaffen verschwenden sich nicht an Fußtruppen: Autoziele sind nur feindliches Gerät
+    if (def.siege && !UNITS[ot].siege) return;
     if (UNITS[ot].invisible && u.state[o] !== S.Attack && !adjacentEnemyNear(sim, o)) return;
     if (u.state[o] === S.Tunnel) return;
     // Nahkämpfer erreichen Ziele auf anderer Ebene nur, wenn direkt benachbart
