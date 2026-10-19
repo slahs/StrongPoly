@@ -29,6 +29,9 @@ interface PlanStep {
 const ARMY_MIN = U.Archer;
 
 /** Eine KI: baut Burg aus Template, betreibt Wirtschaft, rekrutiert und greift in Wellen an. */
+/** Ab diesem Tick (40 Min) greift jede KI mit voller Aggression an, damit Partien nicht im Patt enden */
+const LATE_GAME = 40 * 600;
+
 export class AiController {
   readonly kx: number;
   readonly ky: number;
@@ -747,15 +750,15 @@ export class AiController {
 
   // ---------------- Wellen ----------------
   /** Eskalation: scheitern Wellen, rüstet jeder Lord nach (Belagerung, Aggression, kürzere Pausen), damit Partien enden. */
-  private doctrine(): { siege: [number, number][]; siegePer10: number; aggression: number; interval: number } {
+  private doctrine(tick = 0): { siege: [number, number][]; siegePer10: number; aggression: number; interval: number } {
     const a = this.profile.army;
     const i = this.wave.index;
     const siege: [number, number][] = a.siege.length ? a.siege : i >= 1 ? [[U.Ram, 2], [U.Catapult, 1]] : [];
     return {
       siege,
       siegePer10: i >= 1 ? Math.max(a.siegePer10, Math.min(4, 1 + i)) : a.siegePer10,
-      aggression: Math.min(1, a.aggression + 0.1 * i),
-      interval: Math.max(1.5 * 600, a.waveInterval * Math.pow(0.85, i)),
+      aggression: tick > LATE_GAME ? 1 : Math.min(1, a.aggression + 0.1 * i),
+      interval: Math.max(1.5 * 600, a.waveInterval * Math.pow(0.85, i) * (tick > LATE_GAME ? 0.6 : 1)),
     };
   }
 
@@ -789,7 +792,7 @@ export class AiController {
       const overdue = sim.tick > w.nextAt + 5 * 600;
       if (strength < waveTarget * (overdue ? 0.5 : 0.85)) return;
       // Belagerungsgerät abwarten (max. 3 Minuten Verzögerung)
-      const doc = this.doctrine();
+      const doc = this.doctrine(sim.tick);
       const siegeWant = Math.round((doc.siegePer10 * waveTarget) / 10);
       const siegeHave = free.filter((s) => u.type[s] >= U.Catapult).length;
       if (siegeWant > 0 && siegeHave < Math.ceil(siegeWant * 0.6) && sim.tick < w.nextAt + 1800 && doc.siege.length) return;
@@ -848,7 +851,7 @@ export class AiController {
       w.ids = [];
       w.phase = 0;
       w.index++;
-      w.nextAt = sim.tick + this.doctrine().interval;
+      w.nextAt = sim.tick + this.doctrine(sim.tick).interval;
     }
   }
 
