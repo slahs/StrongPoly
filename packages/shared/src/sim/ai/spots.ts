@@ -60,15 +60,17 @@ export function findSpot(sim: Sim, p: number, type: number, ax: number, ay: numb
     const near = Math.min(x0, Math.min(Math.abs(y - ky), Math.abs(y + h - 1 - ky)));
     void near;
     const spansBand = far >= ring - 1 && minCheb(x, y, w, h, kx, ky) <= ring + 3;
-    if (spansBand) continue;
+    // Vorkommen-Gebäude müssen auf das Vorkommen, auch wenn es im reservierten Ringband großer Burgen liegt
+    const onDeposit = def.placement === 'deposit';
+    if (spansBand && !onDeposit) continue;
     const inside = far < ring - 1;
-    if (rules.inside && !inside) continue;
+    if (rules.inside && !inside && !onDeposit) continue;
     if (rules.outside && inside) continue;
     // Kreuzkorridore frei halten (Wege zu den Toren)
-    if (d <= ring + 14 && (rectHitsBand(x, y, w, h, kx, 3, true) || rectHitsBand(x, y, w, h, ky, 3, false))) continue;
+    if (!onDeposit && d <= ring + 14 && (rectHitsBand(x, y, w, h, kx, 3, true) || rectHitsBand(x, y, w, h, ky, 3, false))) continue;
     if (storeRects.some(([x0, y0, x1, y1]) => x <= x1 && x + w - 1 >= x0 && y <= y1 && y + h - 1 >= y0)) continue;
     if (sim.checkPlace(p, type, x, y, 0, true)) continue;
-    if (rules.margin !== false && !def.store && !hasMargin(sim, x, y, w, h)) continue;
+    if (rules.margin !== false && !def.store && !onDeposit && !hasMargin(sim, x, y, w, h)) continue;
     return { x, y };
   }
   return null;

@@ -1043,8 +1043,10 @@ export class AiController {
     // Notkauf von Nahrung
     const food = pl.stock[R.Apple] + pl.stock[R.Cheese] + pl.stock[R.Meat] + pl.stock[R.Bread];
     if (this.cnt(BT.Market) > 0 && food < 30 && pl.gold > 250) applyCommand(sim, this.p, { c: 'trade', res: R.Bread, amount: 25, buy: true });
+    // Holzmangel (Wälder abgeholzt): ohne Holz entsteht weder Kaserne noch Mauer noch Waffe
+    if (this.cnt(BT.Market) > 0 && pl.stock[R.Wood] < 25 && pl.gold > 250) applyCommand(sim, this.p, { c: 'trade', res: R.Wood, amount: 25, buy: true });
     // Goldüberschuss in Waffen umsetzen, wenn die Werkstätten nicht hinterherkommen
-    else if (this.cnt(BT.Market) > 0 && pl.gold > 600) {
+    if (this.cnt(BT.Market) > 0 && pl.gold > 600) {
       let best = -1;
       let bs = Infinity;
       for (const [u, w] of this.profile.army.units) {
