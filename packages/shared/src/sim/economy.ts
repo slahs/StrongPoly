@@ -31,6 +31,8 @@ export const P = {
   WaitStore: 18,
 } as const;
 
+const WORK_LIMIT = 14 * 60;
+
 export function prodMul(sim: Sim, p: number): number {
   return 1 + FEAR_PROD_STEP * sim.players[p].fear;
 }
@@ -69,9 +71,9 @@ function updateBuildings(sim: Sim): void {
       }
     } else if (b.type === BT.OxTether) {
       b.workers = b.workers.filter((id) => sim.units.valid(id));
-      if (b.workers.length < 1) {
+      if (b.workers.length < 2) {
         b.spawnTimer += DT;
-        if (b.spawnTimer >= 5 && sim.players[b.owner].alive) {
+        if (b.spawnTimer >= (b.workers.length ? 40 : 5) && sim.players[b.owner].alive) {
           b.spawnTimer = 0;
           const e = sim.entryOf(b);
           const w = sim.map.w;
@@ -274,7 +276,7 @@ export function workerTick(sim: Sim, s: number): void {
 
   switch (sub) {
     case P.ToWork: {
-      const r = followGoal(sim, s, false, 0.8);
+      const r = followGoal(sim, s, false, 0.8, WORK_LIMIT);
       if (r === MR.Arrived) onArriveWork(sim, s, b);
       else if (r === MR.NoPath) {
         const e = sim.entryOf(b);
@@ -336,7 +338,7 @@ export function workerTick(sim: Sim, s: number): void {
       break;
     }
     case P.ToRes: {
-      const r = followGoal(sim, s, false, 0.8);
+      const r = followGoal(sim, s, false, 0.8, WORK_LIMIT);
       if (r === MR.Arrived) {
         u.sub[s] = P.Gather;
         const rec = prod!.recipes[0];
@@ -365,7 +367,6 @@ export function workerTick(sim: Sim, s: number): void {
         const amt = Math.min(prod!.recipes[0].outAmt, left);
         sim.map.trees[tile] = left - amt;
         sim.markTile(tile);
-        sim.nav.bump();
         releaseTree(sim, s);
         if (amt <= 0) {
           u.sub[s] = P.Search;
@@ -382,7 +383,7 @@ export function workerTick(sim: Sim, s: number): void {
       break;
     }
     case P.ToStore: {
-      const r = followGoal(sim, s, false, 0.8);
+      const r = followGoal(sim, s, false, 0.8, WORK_LIMIT);
       if (r === MR.Arrived) {
         const res = u.carryRes[s];
         const acc = sim.deliver(u.owner[s], res, u.carryAmt[s]);
@@ -431,7 +432,7 @@ export function workerTick(sim: Sim, s: number): void {
       break;
     }
     case P.ToFetch: {
-      const r = followGoal(sim, s, false, 0.8);
+      const r = followGoal(sim, s, false, 0.8, WORK_LIMIT);
       if (r === MR.Arrived) {
         const rec = prod!.recipes[Math.min(b.recipe, prod!.recipes.length - 1)];
         const [res, need] = rec.in[0];
@@ -641,7 +642,7 @@ function digTick(sim: Sim, s: number): void {
       u.state[s] = S.Idle;
       return;
     }
-    const r = followGoal(sim, s, false, 0.8);
+    const r = followGoal(sim, s, false, 0.8, WORK_LIMIT);
     if (r === MR.Arrived) {
       u.sub[s] = P.Dig;
       u.timer[s] = 4;
@@ -690,7 +691,7 @@ function repairTick(sim: Sim, s: number): void {
     return;
   }
   if (u.sub[s] === P.ToRepair) {
-    const r = followGoal(sim, s, false, 0.9);
+    const r = followGoal(sim, s, false, 0.9, WORK_LIMIT);
     if (r === MR.Arrived) {
       u.sub[s] = P.Repair;
       u.goal[s] = -1;
@@ -754,7 +755,7 @@ function oxTick(sim: Sim, s: number): void {
         u.sub[s] = P.OxSearch;
         return;
       }
-      const r = followGoal(sim, s, false, 0.9);
+      const r = followGoal(sim, s, false, 0.9, WORK_LIMIT);
       if (r === MR.Arrived) {
         const prod = q.def.prod!;
         const take = Math.min(q.out, prod.batch);
@@ -779,7 +780,7 @@ function oxTick(sim: Sim, s: number): void {
       return;
     }
     case P.ToStore: {
-      const r = followGoal(sim, s, false, 0.9);
+      const r = followGoal(sim, s, false, 0.9, WORK_LIMIT);
       if (r === MR.Arrived) {
         const acc = sim.deliver(u.owner[s], u.carryRes[s], u.carryAmt[s]);
         u.carryAmt[s] -= acc;

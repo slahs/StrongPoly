@@ -10,7 +10,7 @@ export function updateUnits(sim: Sim): void {
   for (let s = 0; s < u.top; s++) {
     if (!u.alive[s]) continue;
     const t = u.type[s];
-    if ((sim.tick + s) % 16 === 0) sim.rescueUnit(s);
+    if ((sim.tick + s) % 32 === 0) sim.rescueUnit(s);
     if (t === U.Peasant || t === U.Ox) {
       if (u.state[s] === S.Move) {
         const r = followGoal(sim, s, false, 0.6);

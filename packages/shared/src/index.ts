@@ -19,3 +19,4 @@ export * from './net/snapshot';
 export * from './net/world';
 export * from './net/host';
 export * from './sim/placement';
+export * from './data/ai';

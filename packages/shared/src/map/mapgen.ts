@@ -185,8 +185,8 @@ function stampStart(m: GameMap, sx: number, sy: number, seed: number): void {
       m.trees[i] = 0;
     }
   // Oasen (fruchtbar)
-  stampBlob(m, sx - 8 * mx, sy + 6 * my, 5, T.Oasis, rng, false);
-  stampBlob(m, sx + 8 * mx, sy + 6 * my, 4, T.Oasis, rng, false);
+  stampBlob(m, sx - 9 * mx, sy + 6 * my, 6, T.Oasis, rng, false);
+  stampBlob(m, sx + 9 * mx, sy + 7 * my, 5, T.Oasis, rng, false);
   // Vorkommen jenseits des Kernradius
   const rect = (dx: number, dy: number, w: number, h: number, t: number) => {
     const ax = sx + dx * mx;
@@ -195,10 +195,21 @@ function stampStart(m: GameMap, sx: number, sy: number, seed: number): void {
     const by = sy + (dy + (h - 1)) * my;
     stampRect(m, Math.min(ax, bx), Math.min(ay, by), w, h, t);
   };
-  rect(12, -12, 5, 4, T.StoneDeposit);
+  rect(11, -13, 7, 5, T.StoneDeposit);
   rect(-18, -8, 4, 3, T.IronDeposit);
   stampSwamp(m, sx + 4 * mx, sy + 20 * my);
-  // Bäume (Ring-Wald, deterministisch aus Offsets)
+  // Bäume (Ring-Wald, deterministisch aus Offsets); Umgebung der Vorkommen bleibt frei
+  const clearBoxes: [number, number, number, number][] = [];
+  const addBox = (dx: number, dy: number, w: number, h: number) => {
+    const ax = sx + dx * mx;
+    const ay = sy + dy * my;
+    const bx = sx + (dx + w - 1) * mx;
+    const by = sy + (dy + h - 1) * my;
+    clearBoxes.push([Math.min(ax, bx) - 4, Math.min(ay, by) - 4, Math.max(ax, bx) + 4, Math.max(ay, by) + 4]);
+  };
+  addBox(11, -13, 7, 5);
+  addBox(-18, -8, 4, 3);
+  addBox(4 - 5, 20 - 4, 11, 9);
   for (let y = sy - 22; y <= sy + 22; y++)
     for (let x = sx - 22; x <= sx + 22; x++) {
       if (!m.inBounds(x, y)) continue;
@@ -209,6 +220,7 @@ function stampStart(m: GameMap, sx: number, sy: number, seed: number): void {
       if (t !== T.Steppe && t !== T.Oasis && t !== T.Desert) continue;
       const ox = (x - sx) * mx;
       const oy = (y - sy) * my;
+      if (clearBoxes.some(([x0, y0, x1, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1)) continue;
       if (hash2(0xbeef, ox, oy) < 0.22 && fbm(0xcafe, ox * 0.15, oy * 0.15, 2) > 0.45) m.trees[i] = TREE_WOOD;
     }
   // Umgebung der Anlagen einebnen
@@ -221,6 +233,14 @@ function stampStart(m: GameMap, sx: number, sy: number, seed: number): void {
       if (m.terrain[i] === T.Water) m.terrain[i] = T.Steppe;
       if (m.terrain[i] === T.Rock) m.terrain[i] = T.Steppe;
     }
+  // Wege zu den Vorkommen sichern (Schneisen durch Fels/Wasser)
+  const center = (dx: number, dy: number, w: number, h: number) => ({
+    x: sx + (dx + (w - 1) / 2) * mx | 0,
+    y: sy + (dy + (h - 1) / 2) * my | 0,
+  });
+  for (const c of [center(11, -13, 7, 5), center(-18, -8, 4, 3), { x: sx + 4 * mx, y: sy + 20 * my }]) {
+    carveLine(m, { x: sx, y: sy }, c);
+  }
   smoothRegion(m, sx - 30, sy - 30, sx + 30, sy + 30);
 }
 

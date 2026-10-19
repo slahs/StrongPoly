@@ -40,6 +40,7 @@ export class Nav {
   private fields = new Map<number, Field>();
   private dist: Int32Array;
   private touched: Int32Array;
+  private costBuf: Int16Array;
   private heapK: Int32Array;
   private heapV: Int32Array;
   private heapN = 0;
@@ -56,12 +57,58 @@ export class Nav {
     this.ladder = new Uint8Array(this.n);
     this.dist = new Int32Array(this.n * 2).fill(0x3fffffff);
     this.touched = new Int32Array(this.n * 2);
+    this.costBuf = new Int16Array(this.n);
     this.heapK = new Int32Array(this.n * 8);
     this.heapV = new Int32Array(this.n * 8);
   }
 
   bump(): void {
     this.version++;
+  }
+
+  private regionCache = new Map<number, { version: number; tick: number; labels: Int32Array }>();
+
+  /** Zusammenhangskomponenten des begehbaren Bodens (4er-Nachbarschaft) für ein Team. */
+  regionLabels(team: number, tick: number): Int32Array {
+    let rc = this.regionCache.get(team);
+    if (rc && (rc.version === this.version || tick - rc.tick < 6)) return rc.labels;
+    if (!rc) {
+      rc = { version: 0, tick: 0, labels: new Int32Array(this.n) };
+      this.regionCache.set(team, rc);
+    }
+    const labels = rc.labels;
+    labels.fill(0);
+    const q = this.touched; // Scratch-Puffer wiederverwenden
+    const w = this.w;
+    const h = this.h;
+    const map = this.map;
+    let label = 0;
+    for (let start = 0; start < this.n; start++) {
+      if (labels[start] !== 0 || !this.groundFree(start, team)) continue;
+      label++;
+      let qh = 0;
+      let qt = 0;
+      q[qt++] = start;
+      labels[start] = label;
+      while (qh < qt) {
+        const i = q[qh++];
+        const x = i % w;
+        const y = (i / w) | 0;
+        for (let k = 0; k < 4; k++) {
+          const nx = x + DX[k];
+          const ny = y + DY[k];
+          if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+          const j = ny * w + nx;
+          if (labels[j] !== 0 || !this.groundFree(j, team)) continue;
+          if (Math.abs(map.height[j] - map.height[i]) > 1 && !((this.kind[i] | this.kind[j]) & (NK.Gate | NK.Stairs))) continue;
+          labels[j] = label;
+          q[qt++] = j;
+        }
+      }
+    }
+    rc.version = this.version;
+    rc.tick = tick;
+    return labels;
   }
 
   /** Statisch begehbar (Terrain/Bäume/Gebäude), Torregel nach Team */
@@ -120,6 +167,13 @@ export class Nav {
     const dir = field.dir;
     const w = this.w;
     const map = this.map;
+    const costBuf = this.costBuf;
+    costBuf.fill(-2);
+    const cc = (i: number): number => {
+      const v = costBuf[i];
+      if (v !== -2) return v;
+      return (costBuf[i] = this.groundCost(i, team, breach));
+    };
     this.heapN = 0;
     dist[goal] = 0;
     touched[nt++] = goal;
@@ -137,7 +191,7 @@ export class Nav {
       // Kosten, um u zu betreten, wo u = v (Ziel der Bewegung der Nachbarn)
       // Nachbarn s laufen nach v: Kosten = enterCost(v)
       if (layer === 0) {
-        const enter = this.groundCost(t, team, breach);
+        const enter = cc(t);
         if (enter < 0 && v !== goal) continue;
         const base = enter < 0 ? 10 : enter;
         for (let k = 0; k < 8; k++) {
@@ -146,14 +200,16 @@ export class Nav {
           if (nx < 0 || ny < 0 || nx >= w || ny >= this.h) continue;
           const s = ny * w + nx;
           // s muss stehbar sein (nicht-hart blockiert) – Durchbruchsknoten sind nur Zwischenziele
-          const sCost = this.groundCost(s, team, breach);
+          const sCost = cc(s);
           if (sCost < 0) continue;
           if (Math.abs(map.height[s] - map.height[t]) > 1 && !(this.kind[s] & (NK.Gate | NK.Stairs)) && !(this.kind[t] & (NK.Gate | NK.Stairs))) continue;
           if (k >= 4) {
             // keine Ecken schneiden
             const a = y * w + nx;
             const b = ny * w + x;
-            if (this.hard(a, team) || this.hard(b, team)) continue;
+            const ca = cc(a);
+            const cb = cc(b);
+            if (ca < 0 || ca >= 100 || cb < 0 || cb >= 100) continue;
           }
           // Einheit steht auf s und geht nach t (Durchbruchs-Tiles dienen als Zwischenknoten)
           const nd = d + (k < 4 ? base : Math.round(base * 1.4));
@@ -214,7 +270,7 @@ export class Nav {
         }
         if (this.kind[t] & NK.Stairs) {
           const sv = t * 2;
-          if (this.groundCost(t, team, breach) >= 0) {
+          if (cc(t) >= 0) {
             const nd = d + 8;
             if (nd < dist[sv]) {
               if (dist[sv] === 0x3fffffff) touched[nt++] = sv;
@@ -231,7 +287,7 @@ export class Nav {
             const ny = y + DY[k];
             if (nx < 0 || ny < 0 || nx >= w || ny >= this.h) continue;
             const g = ny * w + nx;
-            const gc = this.groundCost(g, team, false);
+            const gc = cc(g);
             if (gc < 0 || gc >= 100) continue;
             const sv = g * 2;
             const nd = d + 16;
@@ -263,9 +319,17 @@ export class Nav {
   getField(team: number, goalNode: number, breach: boolean, tick: number, limit = 0x3fffff00): Field | null {
     const key = ((goalNode * 16 + team) * 2 + (breach ? 1 : 0)) * 2;
     let f = this.fields.get(key);
+    if (f && f.limit < limit && this.computedThisTick < this.computeBudget) {
+      // größerer Suchradius angefordert
+      this.computedThisTick++;
+      this.compute(team, goalNode, breach, limit, f);
+      f.tick = tick;
+      f.lastUse = tick;
+      return f;
+    }
     if (f) {
       f.lastUse = tick;
-      if (f.version !== this.version && tick - f.tick >= 8 && this.computedThisTick < this.computeBudget) {
+      if (f.version !== this.version && tick - f.tick >= 12 && this.computedThisTick < this.computeBudget) {
         this.computedThisTick++;
         this.compute(team, goalNode, breach, f.limit, f);
         f.tick = tick;

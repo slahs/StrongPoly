@@ -27,6 +27,43 @@ describe('mapgen', () => {
       }
     expect(bad).toBe(0);
   });
+  it('Ressourcen sind von jedem Start aus erreichbar', () => {
+    for (const [seed, n] of [[5, 2], [7, 4], [11, 8], [3, 3]] as [number, number][]) {
+      const m = generateMap({ seed, size: n > 4 ? 200 : 128, players: n });
+      for (const st of m.starts) {
+        const seen = new Uint8Array(m.n);
+        const q = [m.idx(st.x, st.y)];
+        seen[q[0]] = 1;
+        for (let qi = 0; qi < q.length; qi++) {
+          const i = q[qi];
+          const x = i % m.w;
+          const y = (i / m.w) | 0;
+          for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const nx = x + dx;
+            const ny = y + dy;
+            if (!m.inBounds(nx, ny)) continue;
+            const j = m.idx(nx, ny);
+            if (seen[j] || !m.walkable(j) && m.terrain[j] !== T.StoneDeposit) continue;
+            if (!m.walkableTerrain(j) || Math.abs(m.height[j] - m.height[i]) > 1) continue;
+            seen[j] = 1;
+            q.push(j);
+          }
+        }
+        let stone = 0, iron = 0, pitch = 0;
+        for (let i = 0; i < m.n; i++) {
+          if (!seen[i]) continue;
+          const dist = Math.hypot((i % m.w) - st.x, ((i / m.w) | 0) - st.y);
+          if (dist > 32) continue;
+          if (m.terrain[i] === T.StoneDeposit) stone++;
+          if (m.terrain[i] === T.IronDeposit) iron++;
+          if (m.terrain[i] === T.PitchSpring) pitch++;
+        }
+        expect(stone, `Stein seed ${seed}`).toBeGreaterThanOrEqual(8);
+        expect(iron, `Eisen seed ${seed}`).toBeGreaterThanOrEqual(4);
+        expect(pitch, `Pech seed ${seed}`).toBeGreaterThanOrEqual(2);
+      }
+    }
+  });
   it('JSON round-trip', () => {
     const m = generateMap({ seed: 9, size: 96, players: 3 });
     const j = mapFromJson(JSON.parse(JSON.stringify(mapToJson(m))));

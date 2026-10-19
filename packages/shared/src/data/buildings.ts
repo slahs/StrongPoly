@@ -165,7 +165,7 @@ const bdefs: [number, P][] = [
   [BT.Granary, { key: 'granary', name: 'Kornspeicher', cat: 'food', w: 3, h: 3, hp: 600, cost: { wood: 8 }, wood: true, store: 'granary', height: 1.8, desc: 'Lagert Nahrung. Weitere Module müssen angrenzen.' }],
   [BT.Armory, { key: 'armory', name: 'Waffenkammer', cat: 'weapons', w: 3, h: 3, hp: 700, cost: { wood: 10 }, wood: true, store: 'armory', height: 1.8, desc: 'Lagert Waffen. Weitere Module müssen angrenzen.' }],
   [BT.Woodcutter, { key: 'woodcutter', name: 'Holzfäller', cat: 'industry', w: 2, h: 2, hp: 300, cost: { gold: 3, wood: 3 }, wood: true, workers: 1, prod: { mode: 'roam', target: 'tree', radius: 14, batch: 4, haul: 'worker', recipes: [rc('Holz', [], R.Wood, 4, 7)] }, height: 1.2 }],
-  [BT.Quarry, { key: 'quarry', name: 'Steinbruch', cat: 'industry', w: 3, h: 3, hp: 500, cost: { gold: 15, wood: 10 }, placement: 'deposit', terrain: 6, minTiles: 4, workers: 2, prod: { mode: 'local', batch: 6, haul: 'ox', recipes: [rc('Stein', [], R.Stone, 3, 12)] }, height: 1.6 }],
+  [BT.Quarry, { key: 'quarry', name: 'Steinbruch', cat: 'industry', w: 3, h: 3, hp: 500, cost: { gold: 15, wood: 10 }, placement: 'deposit', terrain: 6, minTiles: 4, workers: 2, prod: { mode: 'local', batch: 9, haul: 'ox', recipes: [rc('Stein', [], R.Stone, 3, 12)] }, height: 1.6 }],
   [BT.OxTether, { key: 'oxtether', name: 'Ochsengespann', cat: 'industry', w: 2, h: 2, hp: 250, cost: { gold: 6, wood: 5 }, wood: true, workers: 0, height: 1.0, desc: 'Ochsen bringen Stein vom Steinbruch zum Lager.' }],
   [BT.IronMine, { key: 'ironmine', name: 'Eisenmine', cat: 'industry', w: 3, h: 3, hp: 500, cost: { gold: 20, wood: 20 }, placement: 'deposit', terrain: 7, minTiles: 3, workers: 2, prod: { mode: 'local', batch: 4, haul: 'worker', recipes: [rc('Eisen', [], R.Iron, 2, 15)] }, height: 1.6 }],
   [BT.PitchRig, { key: 'pitchrig', name: 'Pechgrube', cat: 'industry', w: 2, h: 2, hp: 350, cost: { gold: 20, wood: 10 }, wood: true, placement: 'deposit', terrain: 8, minTiles: 2, workers: 1, prod: { mode: 'local', batch: 4, haul: 'worker', recipes: [rc('Pech', [], R.Pitch, 2, 15)] }, height: 1.4 }],
@@ -220,5 +220,7 @@ for (const [id, p] of bdefs) BUILDINGS[id] = b(id, p);
 
 export const BUILD_MENU: BuildingDef[] = BUILDINGS.filter((d) => d.id !== BT.Keep && d.id !== BT.Campfire);
 export const MAX_BUILDING_FOOTPRINT = 5;
-export const STORE_MODULE_CAP = 300;
+/** Kapazität pro Ware und Lagermodul */
+export const STORE_CAP_PER_MODULE = { stock: 150, granary: 150, armory: 60 } as const;
+export const STORE_MODULE_CAP = 150;
 export const HORSES_PER_STABLE = 4;

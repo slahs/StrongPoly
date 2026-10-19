@@ -163,7 +163,7 @@ export function clearLine(sim: Sim, x0: number, y0: number, x1: number, y1: numb
 /**
  * Folgt dem Flowfield zum Ziel u.goal und läuft zuletzt direkt zu (tx, ty).
  */
-export function followGoal(sim: Sim, s: number, breach: boolean, arrive = 0.5): number {
+export function followGoal(sim: Sim, s: number, breach: boolean, arrive = 0.5, limit = 0x3fffff00): number {
   const u = sim.units;
   const x = u.x[s];
   const y = u.y[s];
@@ -186,10 +186,16 @@ export function followGoal(sim: Sim, s: number, breach: boolean, arrive = 0.5): 
     return walkStep(sim, s, px, py) ? MR.Moving : stuck(u, s);
   }
   if (goal < 0) return walkStep(sim, s, px, py) ? MR.Moving : stuck(u, s);
-  const f = sim.nav.getField(team, goal, breach, sim.tick);
+  let f = sim.nav.getField(team, goal, breach, sim.tick, limit);
   if (!f) return MR.Waiting;
   const node = tile * 2 + layer;
-  const dir = f.dir[node];
+  let dir = f.dir[node];
+  if (dir === DIR_NONE && node !== goal && f.limit < 0x3fffff00) {
+    // außerhalb des begrenzten Suchradius: unbegrenzt nachladen
+    f = sim.nav.getField(team, goal, breach, sim.tick, 0x3fffff00);
+    if (!f) return MR.Waiting;
+    dir = f.dir[node];
+  }
   if (dir === DIR_NONE) {
     if (node === goal) return walkStep(sim, s, px, py) ? MR.Moving : stuck(u, s);
     return MR.NoPath;
@@ -223,14 +229,20 @@ export function followGoal(sim: Sim, s: number, breach: boolean, arrive = 0.5): 
   const nyT = ty + DY[dir];
   const nextTile = nyT * mapW + nxT;
   if (layer === 0) {
-    // Durchbruch: nächstes Tile ist ein feindliches, solides Gebäude
     const k = sim.nav.kind[nextTile];
     if (k & NK.Solid && !passable(sim, nextTile, 0, team)) {
-      const bid = sim.bldAt[nextTile];
-      if (bid) {
-        u.target[s] = bid;
-        u.targetKind[s] = 2;
-        return MR.Breach;
+      if (breach) {
+        // Durchbruch: nächstes Tile ist ein feindliches, solides Gebäude
+        const bid = sim.bldAt[nextTile];
+        if (bid) {
+          u.target[s] = bid;
+          u.targetKind[s] = 2;
+          return MR.Breach;
+        }
+      } else {
+        // Feld veraltet (neues Gebäude im Weg): Neuberechnung erzwingen
+        f.version = -1;
+        return MR.Waiting;
       }
     }
   }

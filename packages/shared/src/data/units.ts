@@ -39,11 +39,11 @@ export const A = { None: 0, Light: 1, Heavy: 2, Plate: 3, BldWood: 4, BldStone: 
 /** Schadensmultiplikator [Schadensart][Rüstungsklasse] */
 export const DMG_TABLE: number[][] = [
   // None Light Heavy Plate BldWood BldStone SiegeEng
-  [1.0, 0.8, 0.5, 0.4, 0.45, 0.08, 0.5], // Slash
-  [1.0, 0.75, 0.4, 0.3, 0.15, 0.0, 0.25], // Pierce
-  [1.0, 1.0, 0.9, 0.8, 0.6, 0.15, 0.8], // Blunt
+  [1.0, 0.8, 0.5, 0.4, 0.5, 0.12, 0.5], // Slash
+  [1.0, 0.75, 0.4, 0.3, 0.2, 0.03, 0.25], // Pierce
+  [1.0, 1.0, 0.9, 0.8, 0.7, 0.25, 0.8], // Blunt
   [1.2, 1.2, 1.2, 1.2, 1.3, 1.0, 1.0], // Siege
-  [1.2, 1.0, 0.8, 0.7, 2.0, 0.1, 1.5], // Fire
+  [1.2, 1.0, 0.8, 0.7, 2.0, 0.12, 1.5], // Fire
 ];
 
 export type ProjKind = 0 | 1 | 2 | 3 | 4 | 5;

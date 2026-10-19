@@ -8,7 +8,7 @@ import {
   SLOT_MASK,
   TICKS_PER_MONTH,
 } from '../data/balance';
-import { BT, BUILDINGS, BuildingDef, Cost, STORE_MODULE_CAP } from '../data/buildings';
+import { BT, BUILDINGS, BuildingDef, Cost, STORE_CAP_PER_MODULE } from '../data/buildings';
 import { R, RES_COUNT, RES_INFO, StoreKind } from '../data/resources';
 import { U, UNITS } from '../data/units';
 import { Building } from './building';
@@ -74,6 +74,8 @@ export class Sim {
   /** Zufallsstream nur für nicht-kritische Dinge */
   gameOver = false;
   deadUnits: number[] = [];
+  /** Profiling: kumulierte ms je System */
+  prof = { spatial: 0, ai: 0, economy: 0, units: 0, fire: 0, separate: 0, misc: 0 };
   fireCache: { tick: number; list: Building[] } = { tick: -1, list: [] };
   /** Reservierte Bäume (Tile -> Einheiten-Handle) */
   reserved = new Map<number, number>();
@@ -81,7 +83,7 @@ export class Sim {
   constructor(readonly cfg: SimConfig) {
     this.map = cfg.map.clone();
     this.nav = new Nav(this.map);
-    this.nav.computeBudget = 10;
+    this.nav.computeBudget = 4;
     this.spatial = new Spatial(this.map.w, this.map.h);
     this.bldAt = new Int32Array(this.map.n);
     this.digMask = new Uint8Array(this.map.n);
@@ -161,18 +163,40 @@ export class Sim {
     return this.spawnUnit(U.Peasant, p, cx, cy);
   }
 
-  /** Befreit Einheiten, die auf einem blockierten Boden-Tile stehen (z. B. nach Gebäudebau). */
+  /** Rezept eines Gebäudes setzen (KI-Hilfe, entspricht dem Befehl setRecipe) */
+  step_setRecipe(b: Building, recipe: number): void {
+    if (b.def.prod && recipe >= 0 && recipe < b.def.prod.recipes.length) {
+      b.recipe = recipe;
+      b.inBuf = 0;
+    }
+  }
+
+  /**
+   * Befreit Einheiten, die auf einem blockierten Boden-Tile stehen, und holt gestrandete
+   * Arbeiter (andere Region als das Lagerfeuer) zurück in die Heimatregion.
+   */
   rescueUnit(s: number): void {
     const u = this.units;
     if (u.layer[s] !== 0) return;
     const team = this.teamOf[u.owner[s]] | (UNITS[u.type[s]].climbs ? 8 : 0);
     const t = tileOf(this, u.x[s], u.y[s]);
-    if (this.nav.groundFree(t, team) || this.nav.ladder[t] & (1 << (team & 7))) return;
+    const worker = u.type[s] === U.Peasant || u.type[s] === U.Ox;
+    let homeLabel = 0;
+    let labels: Int32Array | null = null;
+    if (worker) {
+      labels = this.nav.regionLabels(team, this.tick);
+      const fire = this.buildings.get(this.players[u.owner[s]].campfireId);
+      if (fire) homeLabel = labels[this.map.idx(fire.x, fire.y)];
+    }
+    const blocked = !(this.nav.groundFree(t, team) || this.nav.ladder[t] & (1 << (team & 7)));
+    const stranded = worker && homeLabel !== 0 && labels![t] !== homeLabel;
+    if (!blocked && !stranded) return;
     if (UNITS[u.type[s]].tunnels && u.state[s] === S.Tunnel) return;
     const w = this.map.w;
     const tx = t % w;
     const ty = (t / w) | 0;
-    for (let r = 1; r < 12; r++) {
+    const maxR = stranded ? 30 : 12;
+    for (let r = 1; r < maxR; r++) {
       let best = -1;
       let bd = Infinity;
       for (let y = ty - r; y <= ty + r; y++)
@@ -180,6 +204,7 @@ export class Sim {
           if (Math.max(Math.abs(x - tx), Math.abs(y - ty)) !== r || !this.map.inBounds(x, y)) continue;
           const i = this.map.idx(x, y);
           if (!this.nav.groundFree(i, team) || this.nav.kind[i] & NK.Solid) continue;
+          if (homeLabel !== 0 && labels![i] !== homeLabel) continue;
           const d = (x - tx) ** 2 + (y - ty) ** 2;
           if (d < bd) {
             bd = d;
@@ -190,6 +215,10 @@ export class Sim {
         u.x[s] = (best % w) + 0.5;
         u.y[s] = ((best / w) | 0) + 0.5;
         u.goal[s] = -1;
+        if (stranded) {
+          // Auftrag neu beginnen
+          if (u.type[s] === U.Ox) u.sub[s] = 12;
+        }
         return;
       }
     }
@@ -204,7 +233,7 @@ export class Sim {
     for (const b of this.buildings.values()) {
       if (b.owner !== p) continue;
       const d = b.def;
-      if (d.store) pl.cap[d.store] += STORE_MODULE_CAP;
+      if (d.store) pl.cap[d.store] += STORE_CAP_PER_MODULE[d.store];
       if (d.housing) pl.housing += d.housing;
     }
     this.recountUsed(p);
@@ -220,10 +249,11 @@ export class Sim {
     for (const p of this.players) this.recountStores(p.id);
   }
 
+  /** Freier Platz für eine Ware (Kapazität gilt pro Ware) */
   freeSpace(p: number, res: number): number {
     const pl = this.players[p];
     const k: StoreKind = RES_INFO[res].store;
-    return Math.max(0, pl.cap[k] - pl.used[k]);
+    return Math.max(0, pl.cap[k] - pl.stock[res]);
   }
 
   addStock(p: number, res: number, amt: number): number {
@@ -450,15 +480,9 @@ export class Sim {
 
   private clampStock(p: number): void {
     const pl = this.players[p];
-    for (const kind of ['stock', 'granary', 'armory'] as StoreKind[]) {
-      let over = pl.used[kind] - pl.cap[kind];
-      if (over <= 0) continue;
-      for (let r = 0; r < RES_COUNT && over > 0; r++) {
-        if (RES_INFO[r].store !== kind) continue;
-        const d = Math.min(over, pl.stock[r]);
-        pl.stock[r] -= d;
-        over -= d;
-      }
+    for (let r = 0; r < RES_COUNT; r++) {
+      const cap = pl.cap[RES_INFO[r].store];
+      if (pl.stock[r] > cap) pl.stock[r] = cap;
     }
     this.recountUsed(p);
   }
@@ -474,14 +498,20 @@ export class Sim {
     }
   }
 
-  /** Zugangstile eines Gebäudes (Index) oder -1 */
+  /** Zugangstile eines Gebäudes (Index) oder -1. Bevorzugt die Heimatregion (Region des Lagerfeuers). */
   entryOf(b: Building): number {
     if (b.entryVer === this.nav.version) return b.entry;
     b.entryVer = this.nav.version;
     const m = this.map;
     const team = this.teamOf[b.owner];
+    const labels = this.nav.regionLabels(team, this.tick);
+    const pl = this.players[b.owner];
+    const fire = this.buildings.get(pl.campfireId);
+    const home = fire ? labels[m.idx(fire.x, fire.y)] : 0;
     let best = -1;
     let bd = Infinity;
+    let bestAny = -1;
+    let bdAny = Infinity;
     const px = b.cx;
     const py = b.y + b.h + 3;
     for (let yy = b.y - 1; yy <= b.y + b.h; yy++) {
@@ -492,14 +522,18 @@ export class Sim {
         const i = m.idx(xx, yy);
         if (!this.nav.groundFree(i, team) || this.nav.kind[i] & NK.Solid) continue;
         const d = (xx + 0.5 - px) ** 2 + (yy + 0.5 - py) ** 2;
-        if (d < bd) {
+        if (d < bdAny) {
+          bdAny = d;
+          bestAny = i;
+        }
+        if (home && labels[i] === home && d < bd) {
           bd = d;
           best = i;
         }
       }
     }
-    b.entry = best;
-    return best;
+    b.entry = best >= 0 ? best : bestAny;
+    return b.entry;
   }
 
   defeat(p: number): void {
@@ -542,16 +576,30 @@ export class Sim {
       if (!pl || !pl.alive) continue;
       applyCommand(this, pc.p, pc.cmd);
     }
+    const pf = this.prof;
+    let t0 = performance.now();
+    const lap = (k: keyof Sim['prof']) => {
+      const t1 = performance.now();
+      pf[k] += t1 - t0;
+      t0 = t1;
+    };
     this.spatial.rebuild(this);
+    lap('spatial');
     updateAi(this);
+    lap('ai');
     updateEconomy(this);
+    lap('economy');
     updateUnits(this);
+    lap('units');
     updateProjectiles(this);
     updateFire(this);
+    lap('fire');
     separate(this);
+    lap('separate');
     updatePopularity(this);
     if (this.extreme) updateExtreme(this);
     if (this.mission) updateMission(this);
+    lap('misc');
     this.tick++;
   }
 

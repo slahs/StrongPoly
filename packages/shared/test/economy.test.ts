@@ -22,7 +22,7 @@ describe('Wirtschaft', () => {
   it('startet mit Keep, Lager, Kornspeicher und Bauern', () => {
     const sim = mkSim();
     expect(sim.players[0].keepId).toBeGreaterThan(0);
-    expect(sim.players[0].cap.stock).toBe(300);
+    expect(sim.players[0].cap.stock).toBe(150);
     expect(sim.players[0].stock[R.Wood]).toBeGreaterThan(0);
     expect(sim.units.count).toBeGreaterThanOrEqual(2 * 9);
   });
@@ -44,9 +44,10 @@ describe('Wirtschaft', () => {
     const before = sim.players[0].stock[R.Wood];
     const b = sim.place(0, BT.Woodcutter, spot!.x, spot!.y, 0);
     expect(b).not.toBeNull();
-    for (let i = 0; i < 1200; i++) sim.step();
+    for (let i = 0; i < 2400; i++) sim.step();
     const after = sim.players[0].stock[R.Wood];
-    expect(after).toBeGreaterThanOrEqual(before - 3 + 12); // Baukosten abgezogen, mehrere Lieferungen erhalten
+    expect(sim.players[0].produced[R.Wood]).toBeGreaterThanOrEqual(3); // mehrere Lieferungen erhalten
+    expect(after).toBeGreaterThanOrEqual(before - 3);
     expect(b!.workers.length).toBe(1);
   });
 

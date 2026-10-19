@@ -665,7 +665,7 @@ function attackStateTick(sim: Sim, s: number, def: (typeof UNITS)[number]): void
         u.tx[s] = u.x[o];
         u.ty[s] = u.y[o];
         const t0 = u.target[s];
-        const r = followGoal(sim, s, true, range * 0.8);
+        const r = followGoal(sim, s, true, range * 0.8, 14 * 24);
         if (r === MR.Breach) {
           // eine Wand blockiert: Wand angreifen, danach Ziel wieder aufnehmen
           if (u.target[s] !== t0) {
