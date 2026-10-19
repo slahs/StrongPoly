@@ -101,8 +101,16 @@ export function orderMove(sim: Sim, p: number, ids: number[], x: number, y: numb
   if (!slots.length) return;
   const u = sim.units;
   const team = sim.teamOf[p];
-  const g = goalNodeAt(sim, x, y, team);
+  let g = goalNodeAt(sim, x, y, team);
   if (!g) return;
+  if (attack && g.node & 1) {
+    // Angriffsmarsch auf feindliche Mauerkrone/Keep: die Krone ist für Angreifer
+    // nicht begehbar. Ziel am Boden setzen, der Durchbruch-Flowfield führt dann
+    // durch Mauern und Tore bis an das Gebäude, das anschließend angegriffen wird.
+    const bid = sim.bldAt[g.node >> 1];
+    const b = bid ? sim.buildings.get(bid) : undefined;
+    if (b && sim.isEnemy(p, b.owner)) g = { node: g.node & ~1, px: g.px, py: g.py };
+  }
   if (queue) {
     for (const s of slots) {
       if (u.state[s] === S.Idle) continue;

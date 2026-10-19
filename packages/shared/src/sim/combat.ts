@@ -306,7 +306,13 @@ function findEnemyUnit(sim: Sim, s: number, radius: number, preferRanged = false
     // Nahkämpfer erreichen Ziele auf anderer Ebene nur, wenn direkt benachbart
     const d = (u.x[o] - x) ** 2 + (u.y[o] - y) ** 2;
     let score = d;
-    if (u.layer[o] !== myLayer && def.range < 3) score += 16;
+    if (u.layer[o] !== myLayer && def.range < 3) {
+      // Nahkämpfer: Schützen auf der Mauerkrone sind nur direkt benachbart erreichbar.
+      // Sonst nicht anvisieren, damit der Angriffsmarsch weiter zum Durchbruch läuft
+      // statt in einer Schleife aus Ziel wählen / unerreichbar / aufgeben zu hängen.
+      if (d > 2.25) return;
+      score += 16;
+    }
     if (ot === U.Peasant || ot === U.Ox) score += 25;
     if (preferRanged && UNITS[ot].range > 3) score -= 6;
     if (score < bd) {

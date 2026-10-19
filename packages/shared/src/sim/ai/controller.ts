@@ -230,7 +230,8 @@ export class AiController {
     add(BT.Barracks, 1, c(BT.Armory) > 0);
     if (this.wantsUnit(U.Archer, U.Crossbowman)) add(BT.Fletcher, wk, c(BT.Barracks) > 0);
     if (this.wantsUnit(U.Spearman, U.Pikeman)) add(BT.Poleturner, wk, c(BT.Barracks) > 0);
-    if (this.usesIron()) add(BT.IronMine, pr.econ.iron, c(BT.Barracks) > 0);
+    // Eisen wächst mit den Werkstätten mit (Schmied + Plattner brauchen 2–3 Eisen je Stück)
+    if (this.usesIron()) add(BT.IronMine, pr.econ.iron + (wk - 1), c(BT.Barracks) > 0);
     if (this.wantsUnit(U.Maceman, U.Swordsman, U.Knight)) add(BT.Blacksmith, wk, c(BT.IronMine) > 0);
     if (this.wantsUnit(U.Maceman)) {
       add(BT.DairyFarm, 1);
@@ -322,7 +323,8 @@ export class AiController {
       }
       return w;
     };
-    const score = (res: number) => need(res) * 10 - pl.stock[res];
+    // Waren, die das Profil nie verbraucht, nicht herstellen (sonst Holz/Eisen verschwendet)
+    const score = (res: number) => (need(res) > 0 ? need(res) * 10 - pl.stock[res] : -1e9);
     for (const b of sim.buildings.values()) {
       if (b.owner !== this.p || !b.def.prod || b.def.prod.recipes.length < 2) continue;
       let best = 0;

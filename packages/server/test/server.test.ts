@@ -162,7 +162,7 @@ describe('Server', () => {
     expect(Math.abs(a.world.buildings.size - b.world.buildings.size)).toBeLessThan(6);
     expect(a.world.buildings.size).toBeGreaterThan(30);
     // Server lebt
-    const health = await fetch(`http://localhost:${PORT}/healthz`).then((r) => r.json());
+    const health = await fetch(`http://localhost:${PORT}/healthz`).then((r) => r.json() as Promise<{ ok: boolean }>);
     expect(health.ok).toBe(true);
     a.ws.close();
     b.ws.close();
