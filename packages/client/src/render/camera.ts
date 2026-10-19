@@ -8,7 +8,7 @@ export class RtsCamera {
   tx = 100;
   tz = 100;
   yawIndex = 0;
-  private yaw = Math.PI / 4;
+  yaw = Math.PI / 4;
   dist = 38;
   private distTarget = 38;
   pitch = THREE.MathUtils.degToRad(52);
