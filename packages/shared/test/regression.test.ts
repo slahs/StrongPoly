@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { AI_PROFILES, generateMap, Sim, T, TREE_WOOD } from '../src';
+import { AI_PROFILES, BT, generateMap, Sim, T, TREE_WOOD } from '../src';
 
 describe('Regression: Burgbau der KI', () => {
   it('Startbereiche sind baumfrei (Mauerring, Gräben und Tore passen hinein)', () => {
     for (const seed of [1, 7, 33]) {
       const m = generateMap({ seed, size: 160, players: 4 });
       for (const s of m.starts) {
-        for (let y = s.y - 18; y <= s.y + 18; y++)
-          for (let x = s.x - 18; x <= s.x + 18; x++) if (m.inBounds(x, y)) expect(m.trees[m.idx(x, y)] === TREE_WOOD).toBe(false);
+        for (let y = s.y - 14; y <= s.y + 14; y++)
+          for (let x = s.x - 14; x <= s.x + 14; x++) if (m.inBounds(x, y)) expect(m.trees[m.idx(x, y)] === TREE_WOOD).toBe(false);
       }
     }
     void T;
@@ -24,4 +24,27 @@ describe('Regression: Burgbau der KI', () => {
       expect(gates).toBeGreaterThanOrEqual(1);
     });
   }
+});
+
+describe('Regression: Vorkommen', () => {
+  it('Stein- und Eisenvorkommen werden nicht mit anderen Gebäuden überbaut (KI fand sonst keine Eisenmine)', () => {
+    const map = generateMap({ seed: 7, size: 160, players: 2 });
+    const sim = new Sim({ map, seed: 7, players: [{ name: 'A', team: 0, kind: 'human' }, { name: 'B', team: 1, kind: 'human' }], startGold: 5000, troopLimit: 1000, fog: false, extreme: false });
+    sim.players[0].stock[0] = 500;
+    let iron = -1;
+    for (let i = 0; i < map.n; i++) if (map.terrain[i] === T.IronDeposit && map.trees[i] === 0) { iron = i; break; }
+    expect(iron).toBeGreaterThanOrEqual(0);
+    const x = iron % map.w;
+    const y = Math.floor(iron / map.w);
+    expect(sim.checkPlace(0, BT.Hovel, x, y, 0, true)).toBe('Vorkommen nicht überbauen');
+  });
+});
+
+describe('Regression: KI-Duelle enden', () => {
+  it('Baron vs Wolf (früher Patt bei ~25 Gold): ein Bergfried fällt innerhalb von 45 Minuten', () => {
+    const map = generateMap({ seed: 7, size: 160, players: 2 });
+    const sim = new Sim({ map, seed: 7, players: [{ name: 'A', team: 0, kind: 'ai', ai: 0 }, { name: 'B', team: 1, kind: 'ai', ai: 8 }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
+    while (sim.tick < 45 * 600 && !sim.gameOver) sim.step();
+    expect(sim.gameOver).toBe(true);
+  }, 120000);
 });

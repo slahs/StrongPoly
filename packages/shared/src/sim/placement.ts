@@ -56,6 +56,7 @@ export function checkPlaceRules(ctx: PlaceCtx, p: number, type: number, x: numbe
       }
       if (!m.walkableTerrain(i)) return 'Ungeeignetes Gelände';
       if (def.placement !== 'any' && def.placement !== 'water' && m.height[i] !== h0) return 'Gelände nicht eben';
+      if ((t === T.StoneDeposit || t === T.IronDeposit) && def.placement !== 'any' && def.terrain !== t) return 'Vorkommen nicht überbauen';
       if (t === T.Oasis) fertile++;
       if (def.terrain !== undefined && t === def.terrain) dep++;
       if (ctx.digMask[i]) return 'Graben geplant';

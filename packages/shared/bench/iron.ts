@@ -1,0 +1,13 @@
+import { BT, generateMap, Sim, T } from '../src';
+import { findSpot } from '../src/sim/ai/spots';
+const [a, seed] = [Number(process.argv[2] ?? 4), Number(process.argv[3] ?? 7)];
+const map = generateMap({ seed, size: 160, players: 2 });
+const sim = new Sim({ map, seed, players: [{ name: 'A', team: 0, kind: 'ai', ai: 0 }, { name: 'B', team: 1, kind: 'ai', ai: a }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
+while (sim.tick < 9000) sim.step();
+const ai: any = (sim.players[1] as any).ai;
+const an = ai.depositAnchor(sim, T.IronDeposit);
+console.log('anchor', an, 'keep', ai.kx, ai.ky);
+const spot = findSpot(sim, 1, BT.IronMine, an.x, an.y, ai.rules({}));
+console.log('spot inside/any', spot, 'outside', findSpot(sim, 1, BT.IronMine, an.x, an.y, ai.rules({ inside: false, outside: true })));
+console.log('check at anchor', sim.checkPlace(1, BT.IronMine, an.x, an.y, 0), 'buildFail', [...ai.buildFail.entries()]);
+for (let y = an.y - 4; y <= an.y + 4; y++) console.log(String(y).padStart(3), Array.from({ length: 13 }, (_, i) => { const x = an.x - 6 + i; const k = y * 0 + sim.map.idx(x, y); return `${sim.map.terrain[k] === T.IronDeposit ? 'I' : sim.map.terrain[k] === T.Water ? 'w' : '.'}${sim.map.trees[k] ? 't' : sim.bldAt[k] ? 'B' : ' '}`; }).join(''));

@@ -191,10 +191,14 @@ export class AiController {
     const t = sim.tick;
     // Steuern & Rationen
     pl.tax = pl.popularity > 75 ? Math.min(pr.econ.tax + 2, 5) : pl.popularity > 58 ? pr.econ.tax : pl.popularity > 45 ? 0 : -1;
+    // Geldnot: Steuern anheben, solange die Beliebtheit es trägt (sonst bleibt die Armee klein)
+    if (pl.gold < 200 && pl.popularity > 42) pl.tax = Math.max(pl.tax, 1);
+    if (pl.gold < 80 && pl.popularity > 50) pl.tax = Math.max(pl.tax, 2);
     pl.ration = pl.foodShort ? 1 : pl.popularity < 50 ? 3 : 2;
 
     const peas = pl.peasants;
-    const housingWant = Math.ceil((pr.econ.peasants - 8) / 8);
+    // Die Bevölkerung wächst mit der Spieldauer (mehr Steuern und Arbeiter, sonst erstarrt die Partie)
+    const housingWant = Math.ceil((pr.econ.peasants - 8) / 8) + Math.min(6, Math.floor(sim.tick / 9000));
     const sequence: [number, number, boolean?][] = [];
     const add = (type: number, target: number, cond = true) => sequence.push([type, target, cond]);
 
@@ -225,7 +229,8 @@ export class AiController {
     add(BT.Quarry, pr.econ.stone, t > 1500);
     add(BT.Well, 1, c(BT.Hovel) >= 3);
     // Militärbasis (Waffenbau wächst mit der Spieldauer, sonst bleibt die Armee klein)
-    const wk = t > 20000 ? 3 : t > 9000 ? 2 : 1;
+    const wood = pl.stock[R.Wood];
+    const wk = t > 20000 && wood > 220 ? 3 : t > 9000 && wood > 120 ? 2 : 1;
     add(BT.Armory, 1, t > 2400 || peas > 14);
     add(BT.Barracks, 1, c(BT.Armory) > 0);
     if (this.wantsUnit(U.Archer, U.Crossbowman)) add(BT.Fletcher, wk, c(BT.Barracks) > 0);
