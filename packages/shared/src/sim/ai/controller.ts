@@ -565,7 +565,8 @@ export class AiController {
         break;
       } else {
         // Bäume/Gelände: später erneut versuchen
-        if (++st.skip > 6) st.done = true;
+        // Tore/Türme sind tragend für den Ring: länger warten, bevor Mauerstücke ihre Stelle füllen
+        if (++st.skip > (def.gate ? 120 : 6)) st.done = true;
       }
     }
     if (pending === 0) {

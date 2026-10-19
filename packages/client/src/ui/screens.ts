@@ -23,6 +23,7 @@ import { clear, h, hex } from './dom';
 export interface AppHooks {
   startSkirmish(setup: GameSetup): void;
   startOnline(net: NetClient, me: number, setup: GameSetup): void;
+  clearResume(): void;
   startMission(index: number): void;
   openEditor(): void;
   loadGame(slot: string): void;
@@ -278,6 +279,37 @@ export class Screens {
   }
 
   // ---------------- Online ----------------
+  /** Nach Seiten-Neuladen: zurück in die laufende Online-Partie (der Server hält den Slot per Token). */
+  resumeOnline(url: string, name: string): void {
+    this.onlineName = name;
+    this.show([h('h2', { text: 'Verbinde erneut…' }), h('div', { class: 'crumb', text: 'Rückkehr in die laufende Partie' })]);
+    this.net?.close();
+    const net = new NetClient();
+    this.net = net;
+    let resumed = false;
+    net.onControl = (m) => {
+      if (m.t === 'welcome') resumed = !!m.resumed;
+      this.onNetMsg(m);
+    };
+    net.onClose = () => {};
+    net
+      .connect(url, name)
+      .then(() => {
+        // Keine laufende Partie mehr: Marke löschen und in die Lobby
+        window.setTimeout(() => {
+          if (!resumed && !this.playing) {
+            this.hooks.clearResume();
+            this.lobbyView();
+          }
+        }, 1500);
+      })
+      .catch(() => {
+        this.hooks.clearResume();
+        this.lastError = 'Die Partie ist nicht mehr erreichbar.';
+        this.main();
+      });
+  }
+
   online(): void {
     const status = h('div', { class: 'crumb', text: this.lastError });
     const nameIn = h('input', { type: 'text', value: this.onlineName, maxLength: 24 });

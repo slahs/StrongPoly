@@ -65,7 +65,7 @@ export function findSpot(sim: Sim, p: number, type: number, ax: number, ay: numb
     if (rules.inside && !inside) continue;
     if (rules.outside && inside) continue;
     // Kreuzkorridore frei halten (Wege zu den Toren)
-    if (d <= ring + 14 && (rectHitsBand(x, y, w, h, kx, 1, true) || rectHitsBand(x, y, w, h, ky, 1, false))) continue;
+    if (d <= ring + 14 && (rectHitsBand(x, y, w, h, kx, 3, true) || rectHitsBand(x, y, w, h, ky, 3, false))) continue;
     if (storeRects.some(([x0, y0, x1, y1]) => x <= x1 && x + w - 1 >= x0 && y <= y1 && y + h - 1 >= y0)) continue;
     if (sim.checkPlace(p, type, x, y, 0, true)) continue;
     if (rules.margin !== false && !def.store && !hasMargin(sim, x, y, w, h)) continue;

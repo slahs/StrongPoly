@@ -13,8 +13,9 @@ export class NetClient {
   onSnapshot: (s: Snapshot) => void = () => {};
   onView: (v: PlayerView) => void = () => {};
   onClose: (wasInGame: boolean) => void = () => {};
+  onResumed: () => void = () => {};
   inGame = false;
-  private url = '';
+  url = '';
   private reconnecting = false;
   private closedByUs = false;
   private pingTimer: ReturnType<typeof setInterval> | null = null;
@@ -65,6 +66,7 @@ export class NetClient {
               settled = true;
               resolve();
             }
+            if (m.resumed && this.inGame) this.onResumed();
           } else if (m.t === 'pong') this.latency = performance.now() - m.n;
           this.onControl(m);
         } else if (type === FRAME.Snapshot) this.onSnapshot(body as Snapshot);

@@ -41,7 +41,23 @@ const hooks = {
     // Wiederverbindung: Sitzung läuft weiter, der Server schickt nur einen neuen Voll-Snapshot
     if (session && !session.conn.local && net === n) return;
     net = n;
+    try {
+      localStorage.setItem('strongpoly.resume', JSON.stringify({ url: n.url, name: n.name, at: Date.now() }));
+    } catch {
+      /* ignorieren */
+    }
+    n.onResumed = () => session?.hud.toast('Wieder verbunden');
+    n.onClose = (inGame) => {
+      if (inGame) session?.hud.toast('Verbindung verloren – verbinde neu…', true);
+    };
     launch({ ...setup, me }, true, n);
+  },
+  clearResume: () => {
+    try {
+      localStorage.removeItem('strongpoly.resume');
+    } catch {
+      /* ignorieren */
+    }
   },
   startMission: (i: number) => {
     const m = MISSIONS[i];
@@ -131,16 +147,25 @@ function exitToMenu(): void {
   hooks.quitGame = null;
   if (wasOnline && net && net.connected) {
     // Raum bleibt bestehen: zurück zur Lobby (Server setzt den Raum nach dem Spiel zurück)
+    hooks.clearResume();
     screens.returnToLobby(net);
     return;
   }
   net?.close();
   net = null;
+  hooks.clearResume();
   screens.playing = false;
   screens.main();
 }
 
 screens.main();
+try {
+  const r = JSON.parse(localStorage.getItem('strongpoly.resume') ?? 'null') as { url: string; name: string; at: number } | null;
+  if (r && Date.now() - r.at < 6 * 3600 * 1000) screens.resumeOnline(r.url, r.name);
+  else if (r) hooks.clearResume();
+} catch {
+  /* ignorieren */
+}
 const params = new URLSearchParams(location.search);
 if (params.get('quick') === '1') {
   // Schnellstart für Entwicklung/Tests
@@ -172,4 +197,5 @@ function frame(now: number): void {
 }
 requestAnimationFrame(frame);
 (window as unknown as Record<string, unknown>).session = () => session;
+(window as unknown as Record<string, unknown>).net = () => net;
 void h;

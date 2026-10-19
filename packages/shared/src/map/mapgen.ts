@@ -15,6 +15,8 @@ export interface MapGenParams {
 }
 
 const START_RADIUS = 15;
+/** Halbkantenlänge des baumfreien Quadrats um jeden Start (größter KI-Mauerring + Graben) */
+const START_CLEAR = 18;
 
 /** Generiert eine Karte prozedural. Startpositionen liegen auf einem Ring und besitzen identische Ressourcen. */
 export function generateMap(p: MapGenParams): GameMap {
@@ -184,6 +186,9 @@ function stampStart(m: GameMap, sx: number, sy: number, seed: number): void {
       m.height[i] = lvl;
       m.trees[i] = 0;
     }
+  // Burgbaufläche (Mauerring, Gräben, Tore) baumfrei: quadratisch, damit auch die Ecken frei sind
+  for (let y = sy - START_CLEAR; y <= sy + START_CLEAR; y++)
+    for (let x = sx - START_CLEAR; x <= sx + START_CLEAR; x++) if (m.inBounds(x, y)) m.trees[m.idx(x, y)] = 0;
   // Oasen (fruchtbar)
   stampBlob(m, sx - 9 * mx, sy + 6 * my, 6, T.Oasis, rng, false);
   stampBlob(m, sx + 9 * mx, sy + 7 * my, 5, T.Oasis, rng, false);
@@ -210,11 +215,12 @@ function stampStart(m: GameMap, sx: number, sy: number, seed: number): void {
   addBox(11, -13, 7, 5);
   addBox(-18, -8, 4, 3);
   addBox(4 - 5, 20 - 4, 11, 9);
-  for (let y = sy - 22; y <= sy + 22; y++)
-    for (let x = sx - 22; x <= sx + 22; x++) {
+  // (innerhalb des quadratischen Burgbereichs wachsen keine Bäume)
+  for (let y = sy - 26; y <= sy + 26; y++)
+    for (let x = sx - 26; x <= sx + 26; x++) {
       if (!m.inBounds(x, y)) continue;
       const d = Math.hypot(x - sx, y - sy);
-      if (d < 9 || d > 22) continue;
+      if (d < 9 || d > 26 || Math.max(Math.abs(x - sx), Math.abs(y - sy)) <= START_CLEAR) continue;
       const i = m.idx(x, y);
       const t = m.terrain[i];
       if (t !== T.Steppe && t !== T.Oasis && t !== T.Desert) continue;
