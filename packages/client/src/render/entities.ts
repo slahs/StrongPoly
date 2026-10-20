@@ -3,7 +3,7 @@ import { BUILDINGS, BT, BuildingDef, ClientWorld, PAL, PLAYER_COLORS, PROJ, U, U
 import type { ClientBuilding } from '@strongpoly/shared';
 import { FxSystem, BillboardLayer } from './fx';
 import { TypeMesh, teamTable } from './instanced';
-import { AF } from './materials';
+import { AF, GFX } from './materials';
 import { buildBuildingModel, wallParts, WALL_JOIN, WALL_TYPES } from './models_buildings';
 import { arrowGeo, flameGeo, foundationGeo, rubbleGeo, scaffoldGeo, stoneGeo } from './models_misc';
 import {
@@ -21,17 +21,22 @@ import {
 } from './models_units';
 import { ModelBuilder } from './builder';
 import { QualityCfg, qualityOf } from './quality';
+import { UnitMotion } from './motion';
 import { groundYAt, RES_COLORS, tileY } from './util';
 import { EMITTERS } from './work_fx';
 
 const TEAM = teamTable(PLAYER_COLORS);
 const NEUTRAL = new THREE.Color(0xf2ede0);
 const RANGED: boolean[] = UNITS.map((d) => d.proj !== PROJ.None && d.range > 2);
-const SIEGE: boolean[] = UNITS.map((d) => d.side === 'siege');
 const PI2 = Math.PI * 2;
-
+const SIEGE: boolean[] = UNITS.map((d) => d.side === 'siege');
 export interface RenderOpts {
+  /** Anteil des laufenden Ticks seit dem neuesten Snapshot (Projektile, Bauzeit) */
   alpha: number;
+  /** Darstellungszeit in Sim-Ticks (Positionshistorie der Einheiten); ohne Angabe: prev/cur mit `alpha` */
+  tickF?: number;
+  /** Pause: Einheiten bewegen sich und animieren nicht weiter */
+  paused?: boolean;
   now: number;
   camYaw: number;
   selected: Set<number>;
@@ -135,7 +140,9 @@ export class EntityRenderer {
   private edgeCache = new Map<number, THREE.BufferGeometry>();
   private hoverId = -1;
   private yS: Float32Array = new Float32Array(8192);
-  private faceS: Float32Array = new Float32Array(8192);
+  /** Darstellungspose der Einheiten (Position, Blickrichtung, Gehphase) */
+  readonly motion = new UnitMotion();
+  private lastNowU = 0;
   private seenId: Int32Array = new Int32Array(8192);
   private shadows = true;
   private q: QualityCfg = qualityOf('medium');
@@ -345,6 +352,13 @@ export class EntityRenderer {
       }
     }
     for (const d of w.deaths) {
+      // der Leichnam fällt dort, wo die Einheit zuletzt gezeichnet wurde (nicht an der Sim-Position, die der Darstellung voraus ist)
+      const sl = d.id & SLOT_MASK;
+      if (this.motion.valid(sl, d.id)) {
+        d.x = this.motion.x[sl];
+        d.y = this.motion.y[sl];
+        d.face = this.motion.face[sl];
+      }
       if (!this.visibleAt(d.x, d.y)) continue;
       const gy = tileY(w, Math.floor(d.x), Math.floor(d.y));
       if (UNIT_CORPSE[d.type] && d.type !== U.Ox) {
@@ -730,7 +744,12 @@ export class EntityRenderer {
     const w = this.world;
     for (const m of this.unitMeshes) m?.begin();
     for (const m of this.cargoMeshes.values()) m.begin();
-    const a = Math.min(1.15, o.alpha);
+    this.motion.update(w, { tickF: o.tickF, alpha: o.alpha, dt, paused: !!o.paused, walkW: UNIT_WALK_W });
+    const mo = this.motion;
+    // Shader-Zeit dieses Frames (GameScene.render setzt sie danach auf now − t0)
+    if (this.lastNowU === 0) this.lastNowU = o.now;
+    const uT = GFX.uTime.value + (o.now - this.lastNowU);
+    this.lastNowU = o.now;
     const ringArr = this.ringMesh.instanceMatrix.array as Float32Array;
     const ringCol = (this.ringMesh.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
     let rings = 0;
@@ -751,12 +770,9 @@ export class EntityRenderer {
     const flagsA = w.flags;
     const auxA = w.aux;
     const hpA = w.hp;
-    const faceA = w.face;
     const carryA = w.carry;
     const yS = this.yS;
-    const faceS = this.faceS;
     const seen = this.seenId;
-    const fk = Math.min(1, dt * 12);
     const yk = Math.min(1, dt * 14);
     let drawn = 0;
     for (let s = 0; s < w.top; s++) {
@@ -765,8 +781,8 @@ export class EntityRenderer {
       const type = types[s];
       const owner = owners[s];
       const mine = o.teamOfPlayer[owner] === o.myTeam;
-      const x = w.prevX[s] + (w.curX[s] - w.prevX[s]) * a;
-      const y = w.prevY[s] + (w.curY[s] - w.prevY[s]) * a;
+      const x = mo.x[s];
+      const y = mo.y[s];
       const fl = flagsA[s];
       if (!mine) {
         if (o.visible && !o.visible(x, y)) continue;
@@ -779,34 +795,28 @@ export class EntityRenderer {
         const b = bi ? w.buildings.get(bi) : undefined;
         if (b) gy += BUILDINGS[b.t].height;
       }
-      // Höhe und Blickrichtung weich nachführen (neue Einheit: sofort setzen)
+      // Höhe weich nachführen (neue Einheit: sofort setzen); Blickrichtung und Gehphase liefert UnitMotion
       let ny: number;
-      let face: number;
       if (seen[s] !== id) {
         seen[s] = id;
         ny = gy;
-        face = faceA[s];
-      } else {
-        ny = yS[s] + (gy - yS[s]) * yk;
-        face = faceS[s];
-        let d = faceA[s] - face;
-        if (d > Math.PI) d -= PI2;
-        else if (d < -Math.PI) d += PI2;
-        face += d * fk;
-      }
+      } else ny = yS[s] + (gy - yS[s]) * yk;
       yS[s] = ny;
-      faceS[s] = face;
+      const face = mo.face[s];
       const def = UNITS[type];
       const sc = UNIT_SCALE[type];
       if (hasCam && !this.inView(x, ny + 0.5, y, 1.6 + sc)) continue;
       drawn++;
       let af = 0;
       const ax = auxA[s];
-      if (fl & 4) af |= AF.Move;
+      // Schrittanimation aus der tatsächlichen Bewegung (nicht aus dem Sim-Zustand)
+      if (mo.walk[s]) af |= AF.Move;
       if (ax & 1) af |= RANGED[type] ? AF.Shoot : AF.Melee;
       if (ax & 2) af |= AF.Work;
       const tm = this.unitMesh(type);
-      const phase = (s * 0.61803) % 1;
+      let phase = (s * 0.61803) % 1;
+      // Gehphase: der Shader rechnet uTime·Frequenz + phase·2π, daher die gewünschte Phase um uTime·Frequenz verschieben
+      if (mo.walk[s] && !(af & (AF.Melee | AF.Shoot | AF.Work))) phase = (mo.gait[s] - uT * UNIT_WALK_W[type]) / PI2;
       tm.push(x, ny, y, face, sc, sc, owner, phase, af, UNIT_WALK_W[type], af & AF.Work ? 1.1 : UNIT_CYCLE[type]);
       if (useBlob) blob.push(x, ny + 0.025, y, Math.max(0.5, def.radius * 2.3) * sc, 0, 0, 0, SIEGE[type] ? 0.32 : 0.3);
       const sel = o.selected.has(id);

@@ -16,6 +16,7 @@ export * from './sim/orders';
 export { P as WorkerPhase } from './sim/economy';
 export * from './net/snapshot';
 export * from './net/world';
+export * from './net/interp';
 export * from './net/host';
 export * from './sim/placement';
 export * from './data/ai';

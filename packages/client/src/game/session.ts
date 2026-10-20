@@ -8,6 +8,7 @@ import {
   Snapshot,
   PLAYER_COLORS,
   PublicPlayer,
+  RenderClock,
 } from '@strongpoly/shared';
 import { EntityRenderer } from '../render/entities';
 import { GhostRenderer } from '../render/ghost';
@@ -55,7 +56,11 @@ export class Session {
   me: number;
   speed = 1;
   paused = false;
-  private queue: Snapshot[] = [];
+  /** eingetroffene Snapshots mit Ankunftszeit (ms), werden einmal je Frame verarbeitet */
+  private queue: { s: Snapshot; at: number }[] = [];
+  /** gleichmäßige Darstellungsuhr in Sim-Ticks (Interpolation der Einheiten) */
+  readonly clock = new RenderClock();
+  private lastFrameSec = 0;
   private view: PlayerView | null = null;
   private hudTimer = 0;
   private fpsAcc = { frames: 0, t: 0, fps: 0 };
@@ -140,7 +145,7 @@ export class Session {
       this.hud.toast('Formation geändert');
     };
     this.input = new InputController(this);
-    conn.onSnapshot = (s) => this.queue.push(s);
+    conn.onSnapshot = (s) => this.queue.push({ s, at: performance.now() });
     conn.onView = (v) => {
       this.view = v;
       this.world.applyMe(v);
@@ -373,12 +378,14 @@ export class Session {
   private applySnapshots(nowMs: number): void {
     const q = this.queue;
     this.queue = [];
-    for (const s of q) {
+    for (const { s, at } of q) {
       this.world.apply(s, nowMs);
       if (s.full) {
+        // Start oder Reconnect: Positionshistorie (ClientWorld) und Darstellungsuhr neu aufsetzen; die Posen bleiben, damit nichts springt
+        this.clock.reset(s.tick);
         this.initAfterFull();
         this.gotFirst = true;
-      }
+      } else this.clock.onSnapshot(s.tick, nowMs - at, this.speed, at);
       for (const t of this.world.tileChanges) {
         if (t < 0) continue;
         this.gs.terrain?.markTile(t % this.world.map.w, (t / this.world.map.w) | 0);
@@ -430,7 +437,11 @@ export class Session {
 
   frame(dt: number, nowSec: number): void {
     const nowMs = nowSec * 1000;
-    if (!this.gotFirst && !this.queue.some((s) => s.full)) return;
+    if (!this.gotFirst && !this.queue.some((q) => q.s.full)) return;
+    // echte Frame-Zeit (main.ts begrenzt dt auf 0,1 s; die Uhr braucht auch lange Frames, um Rückstand zu vermeiden)
+    const real = this.lastFrameSec ? Math.max(0, Math.min(1, nowSec - this.lastFrameSec)) : dt;
+    this.lastFrameSec = nowSec;
+    this.clock.advance(real, this.speed, this.paused);
     this.applySnapshots(nowMs);
     this.alertCooldown -= dt;
     this.advisorTimer -= dt;
@@ -463,7 +474,7 @@ export class Session {
     }
     this.updateHover(dt);
     // Rendering
-    const alpha = (nowMs - this.world.lastSnapMs) / (100 / this.speed);
+    const alpha = this.clock.alpha;
     const sel = new Set(this.selection.units);
     const pc = this.world.proj.length / 8;
     this.lastProj = pc;
@@ -472,6 +483,8 @@ export class Session {
     this.entities.consumeEvents();
     this.entities.update(dt, {
       alpha,
+      tickF: this.clock.render,
+      paused: this.paused,
       now: nowSec,
       camYaw: this.gs.cam.yaw,
       selected: sel,
