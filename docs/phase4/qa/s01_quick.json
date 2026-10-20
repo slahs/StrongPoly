@@ -1,0 +1,19 @@
+{
+  "name": "s01_quick",
+  "base": "http://127.0.0.1:5567",
+  "query": "quick=1&size=128",
+  "at": "2026-10-20T19:20:43.949Z",
+  "checks": [
+    {
+      "label": "?quick=1 startet ein Gefecht mit Bergfrieden",
+      "ok": true,
+      "extra": "26"
+    }
+  ],
+  "console": [],
+  "notes": {},
+  "data": {},
+  "passed": 1,
+  "failed": 0,
+  "consoleClean": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "s11_online_b",
+  "base": "http://127.0.0.1:5533",
+  "query": "",
+  "at": "2026-10-20T18:46:56.475Z",
+  "checks": [],
+  "console": [],
+  "notes": {},
+  "data": {},
+  "passed": 0,
+  "failed": 0,
+  "consoleClean": true
+}

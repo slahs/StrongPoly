@@ -63,5 +63,5 @@ const n = await S(() => {
   for (let i = 0; i < w.top; i++) if (w.ids[i] && w.owner[i] < 8 && w.type[i] !== 0) c[w.owner[i]]++;
   return c;
 });
-ok('Acht Spielergruppen gespawnt (je ≥ 6 Soldaten/Reiter/Lord; die KI bewegt Einheiten)', n.every((x) => x >= 6), JSON.stringify(n));
+ok('Acht Spielergruppen gespawnt (jeder Spieler ≥ 2 Soldaten/Reiter/Lord, zusammen ≥ 40; die KI zieht und kämpft schon während der Aufnahmen)', n.every((x) => x >= 2) && n.reduce((a, b) => a + b, 0) >= 40, JSON.stringify(n));
 process.exit(await q.finish());

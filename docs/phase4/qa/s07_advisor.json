@@ -1,0 +1,114 @@
+{
+  "name": "s07_advisor",
+  "base": "http://127.0.0.1:5569",
+  "query": "quick=1&dev=1&size=128&seed=1&lang=de",
+  "at": "2026-10-20T18:41:35.869Z",
+  "checks": [
+    {
+      "label": "Ruhephase: keine Beratermeldung",
+      "ok": true,
+      "extra": "[]"
+    },
+    {
+      "label": "Genau eine Holz-Meldung bei Knappheit",
+      "ok": true,
+      "extra": "n=1"
+    },
+    {
+      "label": "Meldung hat Zeilenschlüssel und nennt den Bestand",
+      "ok": true,
+      "extra": "advisor.res.low.noprod.1 / Holz geht zur Neige, nur noch 18 im Lager, und kein Gebäude liefert Nachschub. Wir brauchen eine Produktion."
+    },
+    {
+      "label": "Text ist im Beraterpanel sichtbar",
+      "ok": true,
+      "extra": "[\"0s\\nHolz geht zur Neige, nur noch 18 im Lager, und kein Gebäude liefert Nachschub. Wir brauchen eine Produktion.\",\"1m\\nDie Burg wächst: 24 Bauern leben nun hier.\"]"
+    },
+    {
+      "label": "Stimme ausgelöst (Clip oder Ersatz) mit demselben Text",
+      "ok": true,
+      "extra": "[{\"key\":\"advisor.dev.grow.1\",\"text\":\"Die Burg wächst: 24 Bauern leben nun hier.\",\"mode\":\"tts\",\"voice\":\"advisor\",\"lang\":\"de\",\"at\":32867},{\"key\":\"advisor.res.low.noprod.1\",\"text\":\"Holz geht zur Neige, nur noch 18 im Lager, und kein Gebäude liefert Nachschub. Wir brauchen eine Produktion.\",\"mode\":\"tts\",\"voice\":\"advisor\",\"lang\":\"de\",\"at\":56027}]"
+    },
+    {
+      "label": "Beraterzeile mit Zahl läuft über den Ersatz (Browser-Stimme) oder als Clip – nie stumm",
+      "ok": true,
+      "extra": "[\"tts\",\"tts\"]"
+    },
+    {
+      "label": "Keine Wiederholung nach 12 s real (48 s Spielzeit)",
+      "ok": true,
+      "extra": "n=1"
+    },
+    {
+      "label": "Bei Leerstand genau eine zusätzliche, verschärfte Meldung (kritisch/alarmiert)",
+      "ok": true,
+      "extra": "[{\"t\":3390,\"e\":\"res.empty\",\"text\":\"Kein Holz mehr, Herr! Bau und Handwerk müssen warten.\",\"key\":\"advisor.res.empty.1\",\"prio\":1,\"x\":68.5,\"y\":109.5,\"b\":2}]"
+    },
+    {
+      "label": "Es sind genau zwei Holz-Meldungen (knapp, leer)",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Zweite Meldung wurde ebenfalls gesprochen",
+      "ok": true,
+      "extra": "2 -> 4"
+    },
+    {
+      "label": "Klick auf die Meldung bewegt die Kamera zum Ort",
+      "ok": true,
+      "extra": "[{\"x\":10,\"z\":10},{\"x\":68.5,\"z\":109.5}]"
+    },
+    {
+      "label": "Wiederholen-Knopf spricht den letzten Hinweis erneut",
+      "ok": true,
+      "extra": "4 -> 5"
+    },
+    {
+      "label": "Alt+H spricht den letzten Hinweis erneut",
+      "ok": true,
+      "extra": "5 -> 6"
+    },
+    {
+      "label": "Sprachschalter kippt die Einstellung und speichert sie",
+      "ok": true,
+      "extra": "true -> false"
+    },
+    {
+      "label": "Nahrung: Vorwarnung kommt vor dem Hunger",
+      "ok": true,
+      "extra": "[\"dev.grow\",\"res.low.noprod\",\"housing.full\",\"res.empty\",\"food.low.noprod\",\"res.recovered\",\"storage.full\",\"food.empty\"]"
+    },
+    {
+      "label": "Hunger genau einmal und kritisch",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Hunger-Meldung wurde gesprochen",
+      "ok": true,
+      "extra": "[{\"key\":\"advisor.storage.full.1\",\"text\":\"Das Lager ist voll. Baut ein weiteres Modul an, sonst geht Ware verloren.\",\"mode\":\"clip\",\"voice\":\"advisor\",\"lang\":\"de\",\"at\":127839},{\"key\":\"advisor.food.empty.1\",\"text\":\"Hunger, Herr! Die Bauern haben nichts mehr zu essen.\",\"mode\":\"clip\",\"voice\":\"advisor\",\"lang\":\"de\",\"at\":133866}]"
+    },
+    {
+      "label": "Zahlenfreie Beraterzeilen (Hunger, Lager voll) wurden als vorab erzeugter Clip gesprochen",
+      "ok": true,
+      "extra": "[[\"advisor.dev.grow.1\",\"tts\"],[\"advisor.res.low.noprod.1\",\"tts\"],[\"advisor.housing.full.1\",\"tts\"],[\"advisor.res.empty.1\",\"clip\"],[\"advisor.res.empty.1\",\"clip\"],[\"advisor.res.empty.1\",\"clip\"],[\"advisor.food.low.noprod.1\",\"tts\"],[\"advisor.res.recovered.1\",\"clip\"],[\"advisor.storage.full.1\",\"clip\"],[\"advisor.food.empty.1\",\"clip\"]]"
+    },
+    {
+      "label": "Berater nicht zugespammt (insgesamt < 15 Meldungen in dieser Partie)",
+      "ok": true,
+      "extra": "8"
+    }
+  ],
+  "console": [],
+  "notes": {
+    "beraterstimme_holz": [
+      "tts"
+    ],
+    "untertitel_beim_berater": "Hofberater: Holz geht zur Neige, nur noch 18 im Lager, und kein Gebäude liefert Nachschub. Wir brauchen eine Produktion."
+  },
+  "data": {},
+  "passed": 19,
+  "failed": 0,
+  "consoleClean": true
+}

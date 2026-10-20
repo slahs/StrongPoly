@@ -1,0 +1,5 @@
+{
+  "ok": true,
+  "text": "StrongPoly braucht WebGL 2, aber der Browser stellt es nicht bereit. Bitte Hardwarebeschleunigung aktivieren bzw. einen aktuellen Browser verwenden (Safari 15 oder neuer, Chrome, Edge, Firefox) und die Seite neu laden. Technische Meldung: Error creating WebGL context.",
+  "pageErrors": 1
+}

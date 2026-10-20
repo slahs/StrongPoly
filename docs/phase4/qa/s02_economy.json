@@ -1,0 +1,198 @@
+{
+  "name": "s02_economy",
+  "base": "http://127.0.0.1:5558",
+  "query": "quick=1&dev=1&size=128&seed=3",
+  "at": "2026-10-20T18:34:04.949Z",
+  "checks": [
+    {
+      "label": "Alle Gebäude platziert",
+      "ok": true,
+      "extra": "10/10"
+    },
+    {
+      "label": "Holzfäller liefert Holz ins Lager (Bestand steigt, keine weiteren Ausgaben)",
+      "ok": true,
+      "extra": "43 -> 55"
+    },
+    {
+      "label": "Gebäude stehen sofort im Snapshot (Abstand zur Platzierung höchstens 3 s Spielzeit, Raster ~1 s)",
+      "ok": true,
+      "extra": "[6,6,12,7,14,7,15,7,15,7]"
+    },
+    {
+      "label": "Arbeiter ziehen ein (alle 6 Innenbetriebe werden besetzt)",
+      "ok": true,
+      "extra": "6/6"
+    },
+    {
+      "label": "Einzug dauert nur Laufweg/Arbeiterpool (höchstens 60 s Spielzeit), nie bis zum Ende der Animation gekoppelt",
+      "ok": true,
+      "extra": "[]"
+    },
+    {
+      "label": "Baufortschritt endet bei 1 für alle Gebäude",
+      "ok": true,
+      "extra": "[1,1,1,1,1,1,1,1,1,1]"
+    },
+    {
+      "label": "Produktion beginnt (Fortschritt/Ausgabe > 0) bei mindestens 5 von 7",
+      "ok": true,
+      "extra": "6/7"
+    },
+    {
+      "label": "Mühle für die Bildserie platzierbar",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Bauanimation zeigt Zwischenstufen (mindestens 3 verschiedene Fortschritte zwischen 0 und 1)",
+      "ok": true,
+      "extra": "[{\"age\":3,\"prog\":0.095},{\"age\":14,\"prog\":0.357},{\"age\":23,\"prog\":0.571},{\"age\":32,\"prog\":0.786},{\"age\":42,\"prog\":1}]"
+    }
+  ],
+  "console": [],
+  "notes": {
+    "einzug_waehrend_bauanimation": "0 von 6 Gebäuden: Arbeiter drin, solange die Animation noch läuft",
+    "stock_nach_600_ticks": [
+      55,
+      150,
+      150,
+      150,
+      150,
+      150,
+      154,
+      150,
+      151,
+      132,
+      6,
+      0,
+      24,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "data": {
+    "economy": [
+      {
+        "Gebäude": "Stockpile",
+        "Platziert": 130,
+        "im Snapshot nach (Ticks)": 6,
+        "Arbeiter drin nach (s)": null,
+        "Produktion/Ausgabe nach (s)": null,
+        "Baufortschritt bei Einzug": null,
+        "max. Fortschritt": 1
+      },
+      {
+        "Gebäude": "Woodcutter",
+        "Platziert": 162,
+        "im Snapshot nach (Ticks)": 6,
+        "Arbeiter drin nach (s)": null,
+        "Produktion/Ausgabe nach (s)": null,
+        "Baufortschritt bei Einzug": null,
+        "max. Fortschritt": 1
+      },
+      {
+        "Gebäude": "Quarry",
+        "Platziert": 192,
+        "im Snapshot nach (Ticks)": 12,
+        "Arbeiter drin nach (s)": 8,
+        "Produktion/Ausgabe nach (s)": 8,
+        "Baufortschritt bei Einzug": 1,
+        "max. Fortschritt": 1
+      },
+      {
+        "Gebäude": "WheatFarm",
+        "Platziert": 223,
+        "im Snapshot nach (Ticks)": 7,
+        "Arbeiter drin nach (s)": 8.6,
+        "Produktion/Ausgabe nach (s)": 10.1,
+        "Baufortschritt bei Einzug": 1,
+        "max. Fortschritt": 1
+      },
+      {
+        "Gebäude": "Mill",
+        "Platziert": 258,
+        "im Snapshot nach (Ticks)": 14,
+        "Arbeiter drin nach (s)": 29.6,
+        "Produktion/Ausgabe nach (s)": 29.6,
+        "Baufortschritt bei Einzug": 1,
+        "max. Fortschritt": 1
+      },
+      {
+        "Gebäude": "Bakery",
+        "Platziert": 294,
+        "im Snapshot nach (Ticks)": 7,
+        "Arbeiter drin nach (s)": 31.5,
+        "Produktion/Ausgabe nach (s)": 31.5,
+        "Baufortschritt bei Einzug": 1,
+        "max. Fortschritt": 1
+      },
+      {
+        "Gebäude": "Market",
+        "Platziert": 331,
+        "im Snapshot nach (Ticks)": 15,
+        "Arbeiter drin nach (s)": 4.2,
+        "Produktion/Ausgabe nach (s)": null,
+        "Baufortschritt bei Einzug": 1,
+        "max. Fortschritt": 1
+      },
+      {
+        "Gebäude": "AppleOrchard",
+        "Platziert": 366,
+        "im Snapshot nach (Ticks)": 7,
+        "Arbeiter drin nach (s)": 8,
+        "Produktion/Ausgabe nach (s)": 8,
+        "Baufortschritt bei Einzug": 1,
+        "max. Fortschritt": 1
+      },
+      {
+        "Gebäude": "DairyFarm",
+        "Platziert": 402,
+        "im Snapshot nach (Ticks)": 15,
+        "Arbeiter drin nach (s)": 15.2,
+        "Produktion/Ausgabe nach (s)": 15.2,
+        "Baufortschritt bei Einzug": 1,
+        "max. Fortschritt": 1
+      },
+      {
+        "Gebäude": "Hovel",
+        "Platziert": 439,
+        "im Snapshot nach (Ticks)": 7,
+        "Arbeiter drin nach (s)": null,
+        "Produktion/Ausgabe nach (s)": null,
+        "Baufortschritt bei Einzug": null,
+        "max. Fortschritt": 1
+      }
+    ],
+    "buildSeries": [
+      {
+        "age": 3,
+        "prog": 0.095
+      },
+      {
+        "age": 14,
+        "prog": 0.357
+      },
+      {
+        "age": 23,
+        "prog": 0.571
+      },
+      {
+        "age": 32,
+        "prog": 0.786
+      },
+      {
+        "age": 42,
+        "prog": 1
+      }
+    ]
+  },
+  "passed": 9,
+  "failed": 0,
+  "consoleClean": true
+}

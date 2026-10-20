@@ -1,0 +1,172 @@
+{
+  "name": "s14_missions",
+  "base": "http://127.0.0.1:5504",
+  "query": "",
+  "at": "2026-10-20T19:25:35.208Z",
+  "checks": [
+    {
+      "label": "Mission 1 startet und läuft (Ticks laufen)",
+      "ok": true,
+      "extra": "10 -> 615"
+    },
+    {
+      "label": "Mission 1: keine Konsolenfehler/-warnungen",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Mission 1: Berater nicht zugespammt (≤ 8 Meldungen in 20 s)",
+      "ok": true,
+      "extra": "2"
+    },
+    {
+      "label": "Mission 2 startet und läuft (Ticks laufen)",
+      "ok": true,
+      "extra": "5 -> 612"
+    },
+    {
+      "label": "Mission 2: keine Konsolenfehler/-warnungen",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Mission 2: Berater nicht zugespammt (≤ 8 Meldungen in 20 s)",
+      "ok": true,
+      "extra": "2"
+    },
+    {
+      "label": "Mission 3 startet und läuft (Ticks laufen)",
+      "ok": true,
+      "extra": "5 -> 425"
+    },
+    {
+      "label": "Mission 3: keine Konsolenfehler/-warnungen",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Mission 3: Berater nicht zugespammt (≤ 8 Meldungen in 20 s)",
+      "ok": true,
+      "extra": "2"
+    },
+    {
+      "label": "Mission 4 startet und läuft (Ticks laufen)",
+      "ok": true,
+      "extra": "4 -> 616"
+    },
+    {
+      "label": "Mission 4: keine Konsolenfehler/-warnungen",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Mission 4: Berater nicht zugespammt (≤ 8 Meldungen in 20 s)",
+      "ok": true,
+      "extra": "2"
+    },
+    {
+      "label": "Mission 5 startet und läuft (Ticks laufen)",
+      "ok": true,
+      "extra": "6 -> 236"
+    },
+    {
+      "label": "Mission 5: keine Konsolenfehler/-warnungen",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Mission 5: Berater nicht zugespammt (≤ 8 Meldungen in 20 s)",
+      "ok": true,
+      "extra": "2"
+    }
+  ],
+  "console": [],
+  "notes": {},
+  "data": {
+    "missions": [
+      {
+        "mission": 1,
+        "start": {
+          "tick": 10,
+          "bld": 6,
+          "mission": "Das erste Lager",
+          "goals": null
+        },
+        "end": {
+          "tick": 615,
+          "bld": 6,
+          "adv": 2,
+          "goalsDone": null,
+          "over": false
+        }
+      },
+      {
+        "mission": 2,
+        "start": {
+          "tick": 5,
+          "bld": 6,
+          "mission": "Brot und Bier",
+          "goals": null
+        },
+        "end": {
+          "tick": 612,
+          "bld": 6,
+          "adv": 2,
+          "goalsDone": null,
+          "over": false
+        }
+      },
+      {
+        "mission": 3,
+        "start": {
+          "tick": 5,
+          "bld": 12,
+          "mission": "Wehrhafte Mauern",
+          "goals": null
+        },
+        "end": {
+          "tick": 425,
+          "bld": 24,
+          "adv": 2,
+          "goalsDone": null,
+          "over": false
+        }
+      },
+      {
+        "mission": 4,
+        "start": {
+          "tick": 4,
+          "bld": 13,
+          "mission": "Der Sturm auf die Burg",
+          "goals": null
+        },
+        "end": {
+          "tick": 616,
+          "bld": 28,
+          "adv": 2,
+          "goalsDone": null,
+          "over": false
+        }
+      },
+      {
+        "mission": 5,
+        "start": {
+          "tick": 6,
+          "bld": 12,
+          "mission": "Extreme!",
+          "goals": null
+        },
+        "end": {
+          "tick": 236,
+          "bld": 18,
+          "adv": 2,
+          "goalsDone": null,
+          "over": false
+        }
+      }
+    ]
+  },
+  "passed": 15,
+  "failed": 0,
+  "consoleClean": true
+}

@@ -1,0 +1,126 @@
+{
+  "quality": "medium",
+  "viewport": "1280x720",
+  "scenes": {
+    "early": {
+      "calls": 51,
+      "triangles": 196121,
+      "geometries": 56,
+      "textures": 4,
+      "programs": 21,
+      "decorMs": 44.600000001490116,
+      "decorInstances": 3674,
+      "desc": "früher Wirtschaftsaufbau: Bergfried, Lager, Holzfäller, Hütten, wenige Bauern"
+    },
+    "town": {
+      "calls": 85,
+      "triangles": 504224,
+      "geometries": 90,
+      "textures": 4,
+      "programs": 21,
+      "decorMs": 53,
+      "decorInstances": 9524,
+      "desc": "dicht bebaute Siedlung mit Märkten, Werkstätten, Feldern, Kirche und vielen Bauern"
+    },
+    "castle": {
+      "calls": 77,
+      "triangles": 443548,
+      "geometries": 83,
+      "textures": 4,
+      "programs": 21,
+      "decorMs": 66.59999999776483,
+      "decorInstances": 9820,
+      "desc": "große Steinburg mit Ring- und Außenmauer, Ecktürmen, Torhaus, Graben und Hofgebäuden"
+    },
+    "siege": {
+      "calls": 89,
+      "triangles": 461484,
+      "geometries": 92,
+      "textures": 4,
+      "programs": 22,
+      "decorMs": 54.100000001490116,
+      "decorInstances": 7572,
+      "desc": "Belagerung: Burg mit Verteidigern, mehrere hundert Angreifer mit Rammböcken, Belagerungstürmen, Katapulten"
+    },
+    "figures": {
+      "calls": 58,
+      "triangles": 138023,
+      "geometries": 62,
+      "textures": 4,
+      "programs": 18,
+      "decorMs": 52.399999998509884,
+      "decorInstances": 2581,
+      "desc": "Detailansicht: Zivilisten und Soldaten in Ruhe, beim Gehen, im Kampf und bei der Arbeit"
+    },
+    "engines": {
+      "calls": 45,
+      "triangles": 168849,
+      "geometries": 51,
+      "textures": 4,
+      "programs": 18,
+      "decorMs": 46.5,
+      "decorInstances": 4114,
+      "desc": "Belagerungsgerät aus der Nähe: Katapult, Trebuchet, Rammbock, Belagerungsturm, Setzschild, Feuerballista"
+    },
+    "map": {
+      "calls": 77,
+      "triangles": 498315,
+      "geometries": 82,
+      "textures": 4,
+      "programs": 21,
+      "decorMs": 41.400000002235174,
+      "decorInstances": 9436,
+      "desc": "Übersicht einer vollständigen Spielkarte (160x160, 4 Spieler) mit Startsiedlungen"
+    },
+    "ground": {
+      "calls": 43,
+      "triangles": 129138,
+      "geometries": 48,
+      "textures": 4,
+      "programs": 21,
+      "decorMs": 31.800000000745058,
+      "decorInstances": 2046,
+      "desc": "Nahansicht Boden: Steppe, Oase, Wüste, Übergänge, Wege und Feld bei den ersten Gebäuden"
+    },
+    "forest": {
+      "calls": 37,
+      "triangles": 163186,
+      "geometries": 43,
+      "textures": 4,
+      "programs": 16,
+      "decorMs": 46,
+      "decorInstances": 4206,
+      "desc": "Nahansicht Wald: dichteste Baumgruppe der Karte"
+    },
+    "water": {
+      "calls": 39,
+      "triangles": 167493,
+      "geometries": 45,
+      "textures": 4,
+      "programs": 16,
+      "decorMs": 40,
+      "decorInstances": 3819,
+      "desc": "Nahansicht Wasser: Gewässer mit Ufer und Schaum, Graben mit Pech"
+    },
+    "coast": {
+      "calls": 46,
+      "triangles": 286666,
+      "geometries": 52,
+      "textures": 4,
+      "programs": 16,
+      "decorMs": 51,
+      "decorInstances": 8699,
+      "desc": "Küste und Klippen aus mittlerer Entfernung"
+    },
+    "deposits": {
+      "calls": 39,
+      "triangles": 101594,
+      "geometries": 45,
+      "textures": 4,
+      "programs": 19,
+      "decorMs": 31.5,
+      "decorInstances": 2403,
+      "desc": "Rohstoffvorkommen: Steinbruch auf dem Steinvorkommen, daneben Eisen und Pech"
+    }
+  }
+}

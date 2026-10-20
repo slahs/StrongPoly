@@ -1,0 +1,13 @@
+{
+  "name": "s06_clips",
+  "base": "http://127.0.0.1:5542",
+  "query": "lang=de",
+  "at": "2026-10-20T19:43:42.101Z",
+  "checks": [],
+  "console": [],
+  "notes": {},
+  "data": {},
+  "passed": 0,
+  "failed": 0,
+  "consoleClean": true
+}

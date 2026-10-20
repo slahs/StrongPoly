@@ -1,0 +1,128 @@
+{
+  "name": "s12_quality",
+  "base": "http://127.0.0.1:5537",
+  "query": "quick=1&dev=1&size=128&seed=1",
+  "at": "2026-10-20T19:05:39.065Z",
+  "checks": [
+    {
+      "label": "Grafikstufe medium zur Laufzeit gesetzt",
+      "ok": true,
+      "extra": "medium"
+    },
+    {
+      "label": "Grafikstufe high zur Laufzeit gesetzt",
+      "ok": true,
+      "extra": "high"
+    },
+    {
+      "label": "Grafikstufe low zur Laufzeit gesetzt",
+      "ok": true,
+      "extra": "low"
+    },
+    {
+      "label": "Grafikstufe medium zur Laufzeit gesetzt",
+      "ok": true,
+      "extra": "medium"
+    },
+    {
+      "label": "Draw-Calls in allen Stufen/Ansichten unter 250",
+      "ok": true,
+      "extra": "[[66,61],[78,57],[56,50],[63,60]]"
+    },
+    {
+      "label": "Nach vier Wechseln keine zusätzlichen Geometrien/Texturen gegenüber der ersten Mittelstufe (Entsorgung beim Umschalten)",
+      "ok": true,
+      "extra": "Geometrien 98 -> 92, Texturen 4 -> 4"
+    },
+    {
+      "label": "Niedrig zeichnet weniger Dreiecke als Hoch (Fernansicht)",
+      "ok": true,
+      "extra": "192443 vs 450787"
+    }
+  ],
+  "console": [],
+  "notes": {},
+  "data": {
+    "table": [
+      {
+        "stufe": "medium",
+        "fern": {
+          "calls": 66,
+          "tris": 320895,
+          "geos": 98,
+          "tex": 4,
+          "programs": 24,
+          "quality": "medium"
+        },
+        "nah": {
+          "calls": 61,
+          "tris": 190167,
+          "geos": 98,
+          "tex": 4,
+          "programs": 24,
+          "quality": "medium"
+        }
+      },
+      {
+        "stufe": "high",
+        "fern": {
+          "calls": 78,
+          "tris": 450787,
+          "geos": 103,
+          "tex": 4,
+          "programs": 26,
+          "quality": "high"
+        },
+        "nah": {
+          "calls": 57,
+          "tris": 192901,
+          "geos": 103,
+          "tex": 4,
+          "programs": 26,
+          "quality": "high"
+        }
+      },
+      {
+        "stufe": "low",
+        "fern": {
+          "calls": 56,
+          "tris": 192443,
+          "geos": 89,
+          "tex": 4,
+          "programs": 42,
+          "quality": "low"
+        },
+        "nah": {
+          "calls": 50,
+          "tris": 132422,
+          "geos": 89,
+          "tex": 4,
+          "programs": 42,
+          "quality": "low"
+        }
+      },
+      {
+        "stufe": "medium",
+        "fern": {
+          "calls": 63,
+          "tris": 265365,
+          "geos": 91,
+          "tex": 4,
+          "programs": 42,
+          "quality": "medium"
+        },
+        "nah": {
+          "calls": 60,
+          "tris": 149191,
+          "geos": 92,
+          "tex": 4,
+          "programs": 42,
+          "quality": "medium"
+        }
+      }
+    ]
+  },
+  "passed": 7,
+  "failed": 0,
+  "consoleClean": true
+}

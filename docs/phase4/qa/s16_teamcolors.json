@@ -1,0 +1,19 @@
+{
+  "name": "s16_teamcolors",
+  "base": "http://127.0.0.1:5537",
+  "query": "dev=1",
+  "at": "2026-10-20T20:14:13.346Z",
+  "checks": [
+    {
+      "label": "Acht Spielergruppen gespawnt (jeder Spieler ≥ 2 Soldaten/Reiter/Lord, zusammen ≥ 40; die KI zieht und kämpft schon während der Aufnahmen)",
+      "ok": true,
+      "extra": "[7,10,8,7,8,9,7,11]"
+    }
+  ],
+  "console": [],
+  "notes": {},
+  "data": {},
+  "passed": 1,
+  "failed": 0,
+  "consoleClean": true
+}

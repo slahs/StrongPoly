@@ -1,0 +1,152 @@
+{
+  "name": "s04_castle_fast_legacy",
+  "base": "http://127.0.0.1:5577",
+  "query": "quick=1&dev=1&size=128&seed=6&motiondebug&motionlegacy=1",
+  "at": "2026-10-20T18:57:46.882Z",
+  "checks": [
+    {
+      "label": "Ebene Fläche für die Burg gefunden",
+      "ok": true,
+      "extra": "{\"sc\":52.2549980015984,\"x0\":53,\"y0\":89,\"rw\":24,\"rh\":18,\"bad\":1}"
+    },
+    {
+      "label": "Mauern entstehen als zusammenhängender Zug (≥ 20 Stücke aus vier Linien, alle fertig)",
+      "ok": true,
+      "extra": "{\"tick\":116,\"walls\":25,\"done\":25,\"part\":0}"
+    },
+    {
+      "label": "Mauerwelle zeigt Zwischenzustände (Stücke teils fertig, teils im Bau)",
+      "ok": true,
+      "extra": "[{\"tick\":97,\"walls\":0,\"done\":0,\"part\":0},{\"tick\":103,\"walls\":25,\"done\":0,\"part\":25},{\"tick\":103,\"walls\":25,\"done\":0,\"part\":25},{\"tick\":104,\"walls\":25,\"done\":0,\"part\":25},{\"tick\":109,\"walls\":25,\"done\":8,\"part\":17},{\"tick\":110,\"walls\":25,\"done\":12,\"part\":13},{\"tick\":111,\"walls\":25,\"done\":20,\"part\":5},{\"tick\":116,\"walls\":25,\"done\":25,\"part\":0}]"
+    },
+    {
+      "label": "Burg steht: 4 große Türme, 3 Wachtürme, Tor, Treppen",
+      "ok": true,
+      "extra": "{\"0\":1,\"1\":1,\"2\":3,\"3\":1,\"4\":1,\"39\":25,\"41\":3,\"42\":4,\"44\":1,\"46\":2,\"53\":1}"
+    },
+    {
+      "label": "Geschütz auf Großem Turm gesetzt",
+      "ok": true,
+      "extra": "[1,0,0,0]"
+    },
+    {
+      "label": "24 Soldaten im Hof",
+      "ok": true,
+      "extra": "24"
+    },
+    {
+      "label": "Truppen passieren das Torhaus nach außen (≥ 16 von 24 binnen 70 s Realzeit bei 2-facher Geschwindigkeit)",
+      "ok": true,
+      "extra": "20/24"
+    },
+    {
+      "label": "Truppen passieren das Torhaus nach innen",
+      "ok": true,
+      "extra": "23/24"
+    },
+    {
+      "label": "Mindestens ein Teil der Truppen erreicht die Mauerkrone über die Treppe",
+      "ok": true,
+      "extra": "22/24"
+    },
+    {
+      "label": "Bewegung über Tor/Treppe: Sprünge < 3 %, Rückwärtsschritte < 3 %",
+      "ok": true,
+      "extra": "Sprung 0.03 %, rückwärts 0.05 %"
+    }
+  ],
+  "console": [],
+  "notes": {},
+  "data": {
+    "wallWave": [
+      {
+        "tick": 97,
+        "walls": 0,
+        "done": 0,
+        "part": 0
+      },
+      {
+        "tick": 103,
+        "walls": 25,
+        "done": 0,
+        "part": 25
+      },
+      {
+        "tick": 103,
+        "walls": 25,
+        "done": 0,
+        "part": 25
+      },
+      {
+        "tick": 104,
+        "walls": 25,
+        "done": 0,
+        "part": 25
+      },
+      {
+        "tick": 109,
+        "walls": 25,
+        "done": 8,
+        "part": 17
+      },
+      {
+        "tick": 110,
+        "walls": 25,
+        "done": 12,
+        "part": 13
+      },
+      {
+        "tick": 111,
+        "walls": 25,
+        "done": 20,
+        "part": 5
+      },
+      {
+        "tick": 116,
+        "walls": 25,
+        "done": 25,
+        "part": 0
+      }
+    ],
+    "motion": {
+      "frames": 455,
+      "moveFrames": 3980,
+      "ratioP50": 0.9479309916496277,
+      "ratioP95": 1.2752653360366821,
+      "ratioP99": 1.4038662910461426,
+      "ratioMax": 3.039498805999756,
+      "jumpPct": 0.02512562814070352,
+      "haltPct": 0.25125628140703515,
+      "backPct": 0.05025125628140704,
+      "reversalsPerMin": 1.2087647045219194,
+      "turnP95": 121.87500762939453,
+      "turnMax": 981.4612426757812,
+      "degPerTile": 24.25422022069373,
+      "idleDriftMean": 0,
+      "idleDriftP95": 0,
+      "marchInPlacePct": 0.02512562814070352,
+      "slidePct": 0.7537688442211056,
+      "strideCV": 0
+    },
+    "cross": [
+      {
+        "label": "durch das Tor hinaus",
+        "hit": 20,
+        "secs": 110.8
+      },
+      {
+        "label": "durch das Tor herein",
+        "hit": 23,
+        "secs": 6.2
+      },
+      {
+        "label": "Treppe hinauf auf die Mauerkrone",
+        "hit": 22,
+        "secs": 8
+      }
+    ]
+  },
+  "passed": 10,
+  "failed": 0,
+  "consoleClean": true
+}

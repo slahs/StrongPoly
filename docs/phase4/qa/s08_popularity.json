@@ -1,0 +1,151 @@
+{
+  "name": "s08_popularity",
+  "base": "http://127.0.0.1:5523",
+  "query": "quick=1&dev=1&size=128&seed=1&lang=de",
+  "at": "2026-10-20T18:43:55.821Z",
+  "checks": [
+    {
+      "label": "Hover nennt Steuern als Faktor",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Hover zeigt den Hinweistext zur Hauptursache",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Hover nennt die Änderung pro Monat (Zeiteinheit)",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Detailansicht: Steuern −8 als Hauptbelastung",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Detailansicht: Prognose „pro Monat“ und Handlungshinweis",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Zahl der Detailansicht = Beliebtheit der Sim",
+      "ok": true,
+      "extra": "53.7 vs 53.75"
+    },
+    {
+      "label": "Spiel läuft bei offener Detailansicht weiter (nicht modal)",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Esc schließt die Detailansicht",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Taste L öffnet die Detailansicht",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Bergfried-Panel: gleiche Beliebtheit wie Kopfleiste/Sim",
+      "ok": true,
+      "extra": "49"
+    },
+    {
+      "label": "Bergfried-Panel: gleiche Änderung pro Monat wie Sim",
+      "ok": true,
+      "extra": "−6,5 vs −6,5"
+    },
+    {
+      "label": "Kopfleiste zeigt fallende Tendenz (▼)",
+      "ok": true,
+      "extra": "49 ▼6,5"
+    },
+    {
+      "label": "Berater meldet den Beliebtheitsabfall (Ursache Steuern)",
+      "ok": true,
+      "extra": "[{\"t\":688,\"e\":\"pop.falling.tax\",\"text\":\"Euer Volk murrt, mein Lord. Die Steuern sind zu hoch, die Beliebtheit sinkt. In etwa 40 s fällt sie unter 50.\",\"prio\":1},{\"t\":1141,\"e\":\"pop.leaving.tax\",\"text\":\"Bauern verlassen die Burg! Die Steuern sind der Hauptgrund. Die Beliebtheit liegt bei 48.\",\"prio\":2}]"
+    },
+    {
+      "label": "Meldung nennt dieselbe Ursache wie die Detailansicht",
+      "ok": true,
+      "extra": "[\"Euer Volk murrt, mein Lord. Die Steuern sind zu hoch, die Beliebtheit sinkt. In etwa 40 s fällt sie unter 50.\",\"Bauern verlassen die Burg! Die Steuern sind der Hauptgrund. Die Beliebtheit liegt bei 48.\"]"
+    },
+    {
+      "label": "Keine Beliebtheitsmeldung doppelt in kurzer Folge",
+      "ok": true,
+      "extra": "2"
+    },
+    {
+      "label": "Nach Steuersenkung + Extra-Rationen: Beliebtheit steigt (Tendenz ▲/positiv)",
+      "ok": true,
+      "extra": "10.50"
+    },
+    {
+      "label": "Detailansicht listet Rationen und Bestechung (Steuern gesenkt) als positive Faktoren mit Vorzeichen",
+      "ok": true,
+      "extra": "Beliebtheit | ✕ | 49 / 100 | Das Volk murrt | ▲ steigt um 10,5 pro Monat | Eure Bestechungsgelder stimmen das Volk freundlich. | ENTWICKLUNG | +10,5 pro Monat (+10,5 / 0) | in einem Monat etwa 59 | in drei Monaten etwa 80 | ab 50 in etwa 10 s | Abwanderung: ein Bauer alle 4 s | Die Beliebtheit näher"
+    }
+  ],
+  "console": [],
+  "notes": {
+    "faktoren_sim": [
+      {
+        "key": "ration",
+        "label": "Rationen",
+        "value": 0
+      },
+      {
+        "key": "variety",
+        "label": "Nahrungsvielfalt",
+        "value": 1.5
+      },
+      {
+        "key": "tax",
+        "label": "Steuern",
+        "value": -8
+      },
+      {
+        "key": "ale",
+        "label": "Bier",
+        "value": 0
+      },
+      {
+        "key": "religion",
+        "label": "Religion",
+        "value": 0
+      },
+      {
+        "key": "good",
+        "label": "Gute Dinge",
+        "value": 0
+      },
+      {
+        "key": "bad",
+        "label": "Schlechte Dinge",
+        "value": 0
+      },
+      {
+        "key": "crowd",
+        "label": "Überfüllung",
+        "value": 0
+      }
+    ],
+    "detail_zahlen": [
+      "−6,5",
+      "+1,5",
+      "−8",
+      "−1,1",
+      "+1,5",
+      "−8",
+      "−6,5"
+    ]
+  },
+  "data": {},
+  "passed": 17,
+  "failed": 0,
+  "consoleClean": true
+}

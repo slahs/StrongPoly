@@ -1,0 +1,168 @@
+{
+  "name": "s05_units",
+  "base": "http://127.0.0.1:5557",
+  "query": "quick=1&dev=1&size=128&seed=1",
+  "at": "2026-10-20T19:57:48.309Z",
+  "checks": [
+    {
+      "label": "16 Schwertkämpfer, 9 Bogenschützen, 4 Ritter gespawnt",
+      "ok": true,
+      "extra": "16"
+    },
+    {
+      "label": "Einzelklick wählt genau die Einheit",
+      "ok": true,
+      "extra": "[8214]"
+    },
+    {
+      "label": "Rahmenauswahl erfasst die Truppen (≥ 25 von 29)",
+      "ok": true,
+      "extra": "30"
+    },
+    {
+      "label": "Taste Y wählt alle Truppen (29 Soldaten + Lord)",
+      "ok": true,
+      "extra": "30"
+    },
+    {
+      "label": "Rechtsklick sendet Marschbefehl (Frei)",
+      "ok": true,
+      "extra": "{\"c\":\"move\",\"units\":30,\"x\":73.10341758638181,\"y\":112.96223380061798,\"queue\":false,\"attack\":false,\"formation\":0}"
+    },
+    {
+      "label": "Truppe erreicht das Ziel (Frei), ≥ 24 von 29 im Umkreis 9",
+      "ok": true,
+      "extra": "27/29"
+    },
+    {
+      "label": "Rechtsklick sendet Marschbefehl (Linie)",
+      "ok": true,
+      "extra": "{\"c\":\"move\",\"units\":30,\"x\":73.10341758638181,\"y\":112.96223380061798,\"queue\":false,\"attack\":false,\"formation\":1}"
+    },
+    {
+      "label": "Truppe erreicht das Ziel (Linie), ≥ 24 von 29 im Umkreis 9",
+      "ok": true,
+      "extra": "29/29"
+    },
+    {
+      "label": "Rechtsklick sendet Marschbefehl (Block)",
+      "ok": true,
+      "extra": "{\"c\":\"move\",\"units\":30,\"x\":73.10341758638181,\"y\":112.96223380061798,\"queue\":false,\"attack\":false,\"formation\":2}"
+    },
+    {
+      "label": "Truppe erreicht das Ziel (Block), ≥ 24 von 29 im Umkreis 9",
+      "ok": true,
+      "extra": "29/29"
+    },
+    {
+      "label": "Rechtsklick sendet Marschbefehl (Keil)",
+      "ok": true,
+      "extra": "{\"c\":\"move\",\"units\":30,\"x\":73.10341758638181,\"y\":112.96223380061798,\"queue\":false,\"attack\":false,\"formation\":3}"
+    },
+    {
+      "label": "Truppe erreicht das Ziel (Keil), ≥ 24 von 29 im Umkreis 9",
+      "ok": true,
+      "extra": "29/29"
+    },
+    {
+      "label": "Linie ist flacher als Block (Seitenverhältnis Breite/Tiefe größer)",
+      "ok": true,
+      "extra": "[{\"angekommen\":29,\"breite\":1,\"tiefe\":0.71},{\"angekommen\":29,\"breite\":0.88,\"tiefe\":0.68}]"
+    },
+    {
+      "label": "P schaltet den Patrouillen-Modus ein",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Patrouille sendet patrol-Befehl",
+      "ok": true,
+      "extra": "{\"c\":\"patrol\",\"units\":30,\"x\":66.78577990426272,\"y\":106.6453914169455}"
+    },
+    {
+      "label": "Patrouille: Truppe wendet mindestens einmal und pendelt",
+      "ok": true,
+      "extra": "Wendungen 12, Spanne 8.1"
+    },
+    {
+      "label": "F schaltet den Angriffsmarsch-Modus ein",
+      "ok": true,
+      "extra": "attackMove"
+    },
+    {
+      "label": "Angriffsmarsch sendet move mit attack=true",
+      "ok": true,
+      "extra": "{\"c\":\"move\",\"units\":30,\"x\":67.41232002234379,\"y\":120.95481512150337,\"attack\":true,\"formation\":3}"
+    },
+    {
+      "label": "X sendet stop, H/V/B senden Haltung 0/1/2",
+      "ok": true,
+      "extra": "[\"stop\",\"stance0\",\"stance1\",\"stance2\"]"
+    },
+    {
+      "label": "Alt+H sendet keinen Haltungsbefehl (Berater-Hotkey kollidiert nicht mit Halten)",
+      "ok": true,
+      "extra": "[]"
+    },
+    {
+      "label": "Alt+W (Waffenkammer anwählen) schwenkt die Kamera nicht mit",
+      "ok": true,
+      "extra": "[{\"x\":67,\"z\":124},{\"x\":67,\"z\":124}]"
+    }
+  ],
+  "console": [],
+  "notes": {},
+  "data": {
+    "formationShape": {
+      "Frei": {
+        "angekommen": 27,
+        "breite": 2.66,
+        "tiefe": 1.08
+      },
+      "Linie": {
+        "angekommen": 29,
+        "breite": 1,
+        "tiefe": 0.71
+      },
+      "Block": {
+        "angekommen": 29,
+        "breite": 0.88,
+        "tiefe": 0.68
+      },
+      "Keil": {
+        "angekommen": 29,
+        "breite": 1.67,
+        "tiefe": 1.24
+      }
+    },
+    "patrolY": [
+      3.1,
+      10.6,
+      10.9,
+      3.9,
+      5.8,
+      11.2,
+      8.5,
+      3.3,
+      8.1,
+      10.7,
+      6.1,
+      4.7,
+      9.1,
+      9.3,
+      5.7,
+      6.5,
+      8.8,
+      7.7,
+      6.4,
+      7.4,
+      9,
+      5.9,
+      7.6,
+      8.5
+    ]
+  },
+  "passed": 21,
+  "failed": 0,
+  "consoleClean": true
+}

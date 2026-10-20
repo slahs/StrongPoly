@@ -1,0 +1,152 @@
+{
+  "name": "s04_castle_fast",
+  "base": "http://127.0.0.1:5520",
+  "query": "quick=1&dev=1&size=128&seed=6&motiondebug",
+  "at": "2026-10-20T18:54:27.721Z",
+  "checks": [
+    {
+      "label": "Ebene Fläche für die Burg gefunden",
+      "ok": true,
+      "extra": "{\"sc\":52.2549980015984,\"x0\":53,\"y0\":89,\"rw\":24,\"rh\":18,\"bad\":1}"
+    },
+    {
+      "label": "Mauern entstehen als zusammenhängender Zug (≥ 20 Stücke aus vier Linien, alle fertig)",
+      "ok": true,
+      "extra": "{\"tick\":110,\"walls\":25,\"done\":25,\"part\":0}"
+    },
+    {
+      "label": "Mauerwelle zeigt Zwischenzustände (Stücke teils fertig, teils im Bau)",
+      "ok": true,
+      "extra": "[{\"tick\":90,\"walls\":0,\"done\":0,\"part\":0},{\"tick\":96,\"walls\":25,\"done\":0,\"part\":25},{\"tick\":96,\"walls\":25,\"done\":0,\"part\":25},{\"tick\":97,\"walls\":25,\"done\":0,\"part\":25},{\"tick\":103,\"walls\":25,\"done\":12,\"part\":13},{\"tick\":104,\"walls\":25,\"done\":20,\"part\":5},{\"tick\":105,\"walls\":25,\"done\":23,\"part\":2},{\"tick\":110,\"walls\":25,\"done\":25,\"part\":0}]"
+    },
+    {
+      "label": "Burg steht: 4 große Türme, 3 Wachtürme, Tor, Treppen",
+      "ok": true,
+      "extra": "{\"0\":1,\"1\":1,\"2\":3,\"3\":1,\"4\":1,\"39\":25,\"41\":3,\"42\":4,\"44\":1,\"46\":2,\"53\":1}"
+    },
+    {
+      "label": "Geschütz auf Großem Turm gesetzt",
+      "ok": true,
+      "extra": "[1,0,0,0]"
+    },
+    {
+      "label": "24 Soldaten im Hof",
+      "ok": true,
+      "extra": "24"
+    },
+    {
+      "label": "Truppen passieren das Torhaus nach außen (≥ 16 von 24 binnen 70 s Realzeit bei 2-facher Geschwindigkeit)",
+      "ok": true,
+      "extra": "19/24"
+    },
+    {
+      "label": "Truppen passieren das Torhaus nach innen",
+      "ok": true,
+      "extra": "24/24"
+    },
+    {
+      "label": "Mindestens ein Teil der Truppen erreicht die Mauerkrone über die Treppe",
+      "ok": true,
+      "extra": "22/24"
+    },
+    {
+      "label": "Bewegung über Tor/Treppe: Sprünge < 3 %, Rückwärtsschritte < 3 %",
+      "ok": true,
+      "extra": "Sprung 0.00 %, rückwärts 0.83 %"
+    }
+  ],
+  "console": [],
+  "notes": {},
+  "data": {
+    "wallWave": [
+      {
+        "tick": 90,
+        "walls": 0,
+        "done": 0,
+        "part": 0
+      },
+      {
+        "tick": 96,
+        "walls": 25,
+        "done": 0,
+        "part": 25
+      },
+      {
+        "tick": 96,
+        "walls": 25,
+        "done": 0,
+        "part": 25
+      },
+      {
+        "tick": 97,
+        "walls": 25,
+        "done": 0,
+        "part": 25
+      },
+      {
+        "tick": 103,
+        "walls": 25,
+        "done": 12,
+        "part": 13
+      },
+      {
+        "tick": 104,
+        "walls": 25,
+        "done": 20,
+        "part": 5
+      },
+      {
+        "tick": 105,
+        "walls": 25,
+        "done": 23,
+        "part": 2
+      },
+      {
+        "tick": 110,
+        "walls": 25,
+        "done": 25,
+        "part": 0
+      }
+    ],
+    "motion": {
+      "frames": 438,
+      "moveFrames": 3833,
+      "ratioP50": 0.9444738626480103,
+      "ratioP95": 1.2027417421340942,
+      "ratioP99": 1.322601318359375,
+      "ratioMax": 1.6996418237686157,
+      "jumpPct": 0,
+      "haltPct": 2.0349595617010174,
+      "backPct": 0.8348552048004174,
+      "reversalsPerMin": 1.6329344303984534,
+      "turnP95": 114.01307678222656,
+      "turnMax": 401.0704650878906,
+      "degPerTile": 24.165197526074717,
+      "idleDriftMean": 0,
+      "idleDriftP95": 0,
+      "marchInPlacePct": 0,
+      "slidePct": 0,
+      "strideCV": 0.34409821886452435
+    },
+    "cross": [
+      {
+        "label": "durch das Tor hinaus",
+        "hit": 19,
+        "secs": 110
+      },
+      {
+        "label": "durch das Tor herein",
+        "hit": 24,
+        "secs": 6.3
+      },
+      {
+        "label": "Treppe hinauf auf die Mauerkrone",
+        "hit": 22,
+        "secs": 10.1
+      }
+    ]
+  },
+  "passed": 10,
+  "failed": 0,
+  "consoleClean": true
+}

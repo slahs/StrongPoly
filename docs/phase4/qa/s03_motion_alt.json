@@ -1,0 +1,54 @@
+{
+  "name": "s03_motion_alt",
+  "base": "http://127.0.0.1:5511",
+  "query": "quick=1&dev=1&seed=3&size=96&motiondebug&motionlegacy=1",
+  "at": "2026-10-20T18:37:16.300Z",
+  "checks": [
+    {
+      "label": "alt: Bauern vorhanden",
+      "ok": true,
+      "extra": "{\"peasants\":42,\"nichtLeerlauf\":12}"
+    },
+    {
+      "label": "alt: genug gemessene Bewegungsbilder",
+      "ok": true,
+      "extra": "2062"
+    }
+  ],
+  "console": [],
+  "notes": {
+    "bauern": {
+      "peasants": 42,
+      "nichtLeerlauf": 12
+    }
+  },
+  "data": {
+    "report": {
+      "frames": 275,
+      "moveFrames": 2062,
+      "ratioP50": 0.9191176295280457,
+      "ratioP95": 1.3550212383270264,
+      "ratioP99": 1.4495513439178467,
+      "ratioMax": 1.6654255390167236,
+      "jumpPct": 0,
+      "haltPct": 0,
+      "backPct": 0,
+      "reversalsPerMin": 3.0334028207275825,
+      "turnP95": 161.10877990722656,
+      "turnMax": 741.4005126953125,
+      "degPerTile": 24.694877844845305,
+      "idleDriftMean": 0,
+      "idleDriftP95": 0,
+      "marchInPlacePct": 0,
+      "slidePct": 0.7274490785645005,
+      "strideCV": 0,
+      "frames_total": 275,
+      "fps": 4.4,
+      "frameP50": 233,
+      "tick": 796
+    }
+  },
+  "passed": 2,
+  "failed": 0,
+  "consoleClean": true
+}

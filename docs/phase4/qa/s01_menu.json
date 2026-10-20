@@ -1,0 +1,68 @@
+{
+  "name": "s01_menu",
+  "base": "http://127.0.0.1:5552",
+  "query": "",
+  "at": "2026-10-20T19:20:13.971Z",
+  "checks": [
+    {
+      "label": "Hauptmenü zeigt „Gefecht gegen KI“",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Partie läuft (Ticks laufen)",
+      "ok": true,
+      "extra": "569"
+    },
+    {
+      "label": "Drei Spieler (Mensch + 2 KI) im Spiel",
+      "ok": true,
+      "extra": "3"
+    },
+    {
+      "label": "Bergfriede stehen, Bauern laufen",
+      "ok": true,
+      "extra": "{\"tick\":569,\"players\":3,\"buildings\":50,\"units\":93,\"hud\":true,\"view\":{\"gold\":1500,\"peasants\":24}}"
+    },
+    {
+      "label": "HUD vorhanden",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "KI-Lords haben nach 90 s Spielzeit weitergebaut",
+      "ok": true,
+      "extra": "[6,27,26]"
+    }
+  ],
+  "console": [],
+  "notes": {
+    "longtasks_ms": [
+      315,
+      101,
+      77,
+      2298,
+      1583,
+      1279,
+      727,
+      808,
+      785,
+      879,
+      903,
+      752,
+      907,
+      965,
+      815,
+      688,
+      763,
+      834,
+      947,
+      927,
+      948
+    ]
+  },
+  "data": {},
+  "passed": 6,
+  "failed": 0,
+  "consoleClean": true
+}

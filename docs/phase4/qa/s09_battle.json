@@ -1,0 +1,257 @@
+{
+  "name": "s09_battle",
+  "base": "http://127.0.0.1:5504",
+  "query": "quick=1&dev=1&size=128&seed=1&lang=de",
+  "at": "2026-10-20T20:00:53.193Z",
+  "checks": [
+    {
+      "label": "Ebene Fläche für das Schlachtfeld gefunden",
+      "ok": true,
+      "extra": "{\"sc\":262.0650161022178,\"x0\":7,\"y0\":67,\"rw\":44,\"rh\":22,\"bad\":33}"
+    },
+    {
+      "label": "Mehrere Hundert Soldaten je Seite (≥ 300 + 12)",
+      "ok": true,
+      "extra": "[309,313,0]"
+    },
+    {
+      "label": "Es wird gekämpft: Verluste auf beiden Seiten",
+      "ok": true,
+      "extra": "[309,313,0] -> [153,1,0]"
+    },
+    {
+      "label": "Atmosphäre/Musik wechseln in die Schlachtstimmung",
+      "ok": true,
+      "extra": "[\"build\",\"battle\",\"battle\",\"battle\",\"battle\",\"battle\"]"
+    },
+    {
+      "label": "Kein Übersteuern am Bus (Spitze ≤ 1,0, höchstens 2 Messpunkte ≥ 0,99)",
+      "ok": true,
+      "extra": "Spitze 0.845, Clips 0/46"
+    },
+    {
+      "label": "Keine Soundwand: gleichzeitige Effekt-Stimmen begrenzt (≤ 32) und Effektivwert am Bus ≤ 0,45 bei allen Reglern auf Maximum",
+      "ok": true,
+      "extra": "Stimmen 1, RMS 0.298"
+    },
+    {
+      "label": "Einheitenstimmen: nie mehr als 2 zugleich im Gefecht",
+      "ok": true,
+      "extra": "2"
+    },
+    {
+      "label": "Kampfeffekte: Pfeile/Geschosse und Partikel sichtbar im Spiel",
+      "ok": true,
+      "extra": "{\"corpsesMax\":52,\"projectilesMax\":35,\"particlesMax\":1463}"
+    },
+    {
+      "label": "Leichen liegen sichtbar (gleichzeitig > 20, begrenzt durch die Stufe)",
+      "ok": true,
+      "extra": "{\"corpsesMax\":52,\"projectilesMax\":35,\"particlesMax\":1463}"
+    },
+    {
+      "label": "Draw-Calls der Schlacht unter 200",
+      "ok": true,
+      "extra": "[63,68,66,61,54,52]"
+    }
+  ],
+  "console": [],
+  "notes": {
+    "klaenge_gespielt": {
+      "uiClick": 1,
+      "arrowHit": 49,
+      "arrowShot": 48,
+      "swordHit": 37,
+      "gong": 2
+    },
+    "klaenge_verworfen_limiter": 7171,
+    "effekte": {
+      "corpsesMax": 52,
+      "projectilesMax": 35,
+      "particlesMax": 1463
+    }
+  },
+  "data": {
+    "series": [
+      {
+        "c": [
+          286,
+          297,
+          0
+        ],
+        "tick": 208,
+        "calls": 63,
+        "tris": 488645,
+        "mood": "build",
+        "voices": 0,
+        "ambience": {
+          "wind": 0.5350877539617664,
+          "rustle": 0.019298129999670056,
+          "water": 0.21681662279034192,
+          "waterPan": 0.24229212801378763,
+          "murmur": 0.1388898082649349,
+          "fire": 0,
+          "firePan": 0,
+          "din": 0.40293900802613514,
+          "dinPan": -0.012355900987698148,
+          "birdsPerMin": 0.5551894377791556,
+          "master": 0.9445502309513413
+        },
+        "corpses": 40,
+        "projectiles": 35,
+        "particles": 1129
+      },
+      {
+        "c": [
+          242,
+          219,
+          0
+        ],
+        "tick": 291,
+        "calls": 68,
+        "tris": 448167,
+        "mood": "battle",
+        "voices": 0,
+        "ambience": {
+          "wind": 0.4765598296193571,
+          "rustle": 0.01615825950024891,
+          "water": 0.2546610164855033,
+          "waterPan": 0.251607712320304,
+          "murmur": 0.13000461123237017,
+          "fire": 0,
+          "firePan": 0,
+          "din": 0.6483771706367827,
+          "dinPan": -0.016675597649355965,
+          "birdsPerMin": 0,
+          "master": 0.9273447482812917
+        },
+        "corpses": 52,
+        "projectiles": 10,
+        "particles": 1463
+      },
+      {
+        "c": [
+          176,
+          83,
+          0
+        ],
+        "tick": 438,
+        "calls": 66,
+        "tris": 365578,
+        "mood": "battle",
+        "voices": 0,
+        "ambience": {
+          "wind": 0.42420429464809717,
+          "rustle": 0.01136639475418099,
+          "water": 0.26972856078331287,
+          "waterPan": 0.25755322824130494,
+          "murmur": 0.10597007290168028,
+          "fire": 0,
+          "firePan": 0,
+          "din": 0.8351374055139159,
+          "dinPan": -0.019432571815519193,
+          "birdsPerMin": 0,
+          "master": 0.9245194320953748
+        },
+        "corpses": 31,
+        "projectiles": 31,
+        "particles": 1366
+      },
+      {
+        "c": [
+          153,
+          1,
+          0
+        ],
+        "tick": 585,
+        "calls": 61,
+        "tris": 251097,
+        "mood": "battle",
+        "voices": 0,
+        "ambience": {
+          "wind": 0.34975632542578294,
+          "rustle": 0.009437133559499685,
+          "water": 0.17961634474434188,
+          "waterPan": -0.6521118514167508,
+          "murmur": 0.028388744506553994,
+          "fire": 0,
+          "firePan": 0,
+          "din": 0.42615964884112245,
+          "dinPan": -0.02101159051064862,
+          "birdsPerMin": 0,
+          "master": 0.9831580087953466
+        },
+        "corpses": 6,
+        "projectiles": 0,
+        "particles": 418
+      },
+      {
+        "c": [
+          153,
+          1,
+          0
+        ],
+        "tick": 710,
+        "calls": 54,
+        "tris": 175566,
+        "mood": "battle",
+        "voices": 0,
+        "ambience": {
+          "wind": 0.3062058007496101,
+          "rustle": 0.00865045097809234,
+          "water": 0.032347522824572206,
+          "waterPan": -0.1174403311007245,
+          "murmur": 0.005112594637162786,
+          "fire": 0,
+          "firePan": 0,
+          "din": 0.08896085224658998,
+          "dinPan": -0.02138343576771893,
+          "birdsPerMin": 0,
+          "master": 0.9969668868627785
+        },
+        "corpses": 0,
+        "projectiles": 0,
+        "particles": 170
+      },
+      {
+        "c": [
+          153,
+          1,
+          0
+        ],
+        "tick": 776,
+        "calls": 52,
+        "tris": 174040,
+        "mood": "battle",
+        "voices": 0,
+        "ambience": {
+          "wind": 0.2999164341555414,
+          "rustle": 0.008536841895666152,
+          "water": 0.011079636482968627,
+          "waterPan": -0.04022552775036833,
+          "murmur": 0.0017511600616758412,
+          "fire": 0,
+          "firePan": 0,
+          "din": 0.030470769259603576,
+          "dinPan": -0.02143713595056105,
+          "birdsPerMin": 0,
+          "master": 0.9989611015608711
+        },
+        "corpses": 0,
+        "projectiles": 0,
+        "particles": 123
+      }
+    ],
+    "level": {
+      "peak": 0.8446829319000244,
+      "rmsMax": 0.2977646861594325,
+      "clip": 0,
+      "samples": 46,
+      "maxConcurrentEffects": 1,
+      "maxConcurrentVoices": 2
+    }
+  },
+  "passed": 10,
+  "failed": 0,
+  "consoleClean": true
+}

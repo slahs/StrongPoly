@@ -1,0 +1,102 @@
+{
+  "name": "s11_online",
+  "base": "http://127.0.0.1:5533",
+  "query": "",
+  "at": "2026-10-20T18:46:56.107Z",
+  "checks": [
+    {
+      "label": "Beide Clients laufen im selben Spiel (3 Spieler, gleiche Gebäude bis Tick T, Ticks dicht beieinander)",
+      "ok": true,
+      "extra": "T=51 [{\"n\":19,\"h\":347083,\"tick\":84},{\"n\":19,\"h\":347083,\"tick\":86}]"
+    },
+    {
+      "label": "Verschiedene Spieler (me)",
+      "ok": true,
+      "extra": "0 1"
+    },
+    {
+      "label": "Alice sieht Bobs neue Gebäude (gleiche Gebäude bis Tick T wie Bob)",
+      "ok": true,
+      "extra": "T=123 [{\"n\":24,\"h\":449355,\"tick\":163},{\"n\":24,\"h\":449355,\"tick\":161}]"
+    },
+    {
+      "label": "Nach dem Trennen verbindet Bob automatisch neu und spielt weiter (Ticks laufen)",
+      "ok": true,
+      "extra": "259 -> 369"
+    },
+    {
+      "label": "Gebäude nach dem Wiederverbinden gleich (keine verlorenen/doppelten Gebäude)",
+      "ok": true,
+      "extra": "T=347 [{\"n\":31,\"h\":711848,\"tick\":383},{\"n\":31,\"h\":711848,\"tick\":385}]"
+    },
+    {
+      "label": "Keine Baustufe fällt nach dem Reconnect zurück (kein Neubau fertiger Gebäude)",
+      "ok": true,
+      "extra": "[]"
+    },
+    {
+      "label": "Nach dem Reconnect zeigt kein vor dem Trennen gesetztes Gebäude eine Bauanimation",
+      "ok": true,
+      "extra": "{\"rebuilding\":[381],\"trennTick\":259,\"preTick\":187}"
+    },
+    {
+      "label": "Nach hartem Offline wieder verbunden, Ticks laufen",
+      "ok": true,
+      "extra": "369 -> 556"
+    },
+    {
+      "label": "Nach Seiten-Neuladen kehrt Bob automatisch in die laufende Partie zurück (gleiche Gebäude bis Tick T)",
+      "ok": true,
+      "extra": "{\"tick\":683,\"bld\":38,\"units\":90,\"me\":1,\"net\":true,\"building\":0,\"players\":3} T=656 [{\"n\":38,\"h\":103850,\"tick\":691},{\"n\":38,\"h\":103850,\"tick\":693}]"
+    },
+    {
+      "label": "Nach dem Neuladen keine Neubau-Animation vorhandener Gebäude (nur neu gesetzte)",
+      "ok": true,
+      "extra": "[]"
+    },
+    {
+      "label": "Bewegung nach dem Reconnect: keine großen Sprünge (< 6 %, Richtwert bei sehr wenigen Bildern)",
+      "ok": true,
+      "extra": "Sprung 0.00 %, Halt 2.37 %, rückw. 0.59 %, 22 Bilder"
+    },
+    {
+      "label": "Nach dem Reconnect: Sprachsystem antwortet wieder und die Beraterlogik läuft",
+      "ok": true,
+      "extra": "Zeilen 0 -> 1, angenommen true"
+    },
+    {
+      "label": "Alice spielt ungestört weiter (verbunden, Ticks laufen)",
+      "ok": true,
+      "extra": ""
+    }
+  ],
+  "console": [],
+  "notes": {
+    "bewegung_nach_reconnect": "Sprung 0.00 %, Halt 2.37 %, rückw. 0.59 %, 22 Bilder"
+  },
+  "data": {
+    "motionAfterReconnect": {
+      "frames": 22,
+      "moveFrames": 169,
+      "ratioP50": 0.9558954834938049,
+      "ratioP95": 1.1737498044967651,
+      "ratioP99": 1.2767757177352905,
+      "ratioMax": 1.2866665124893188,
+      "jumpPct": 0,
+      "haltPct": 2.366863905325444,
+      "backPct": 0.591715976331361,
+      "reversalsPerMin": 0.7624140060535658,
+      "turnP95": 116.08145141601562,
+      "turnMax": 401.0704650878906,
+      "degPerTile": 25.18734182420424,
+      "idleDriftMean": 4.1300419221789334e-8,
+      "idleDriftP95": 0,
+      "marchInPlacePct": 0,
+      "slidePct": 0,
+      "strideCV": 0.015666483237026622
+    }
+  },
+  "passed": 13,
+  "failed": 0,
+  "consoleClean": true
+}

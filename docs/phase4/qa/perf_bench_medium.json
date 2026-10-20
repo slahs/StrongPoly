@@ -1,0 +1,195 @@
+{
+ "scene": "bench",
+ "quality": "medium",
+ "totalMs": 5357,
+ "top": [
+  {
+   "fn": "tick bench.js:206",
+   "ms": 502.8,
+   "pct": 9.4
+  },
+  {
+   "fn": "updateBuffer scene.js:8869",
+   "ms": 396.9,
+   "pct": 7.4
+  },
+  {
+   "fn": "update scene.js:27799",
+   "ms": 359,
+   "pct": 6.7
+  },
+  {
+   "fn": "updateUnits scene.js:28698",
+   "ms": 331,
+   "pct": 6.2
+  },
+  {
+   "fn": "onFirstUse scene.js:12889",
+   "ms": 227,
+   "pct": 4.2
+  },
+  {
+   "fn": "push scene.js:21992",
+   "ms": 141.9,
+   "pct": 2.6
+  },
+  {
+   "fn": "loop bench.js:651",
+   "ms": 140.9,
+   "pct": 2.6
+  },
+  {
+   "fn": "bindVertexArrayObject scene.js:9913",
+   "ms": 133.1,
+   "pct": 2.5
+  },
+  {
+   "fn": "WebGLRenderer.renderBufferDirect scene.js:18111",
+   "ms": 121.5,
+   "pct": 2.3
+  },
+  {
+   "fn": "variantFor scene.js:28262",
+   "ms": 121,
+   "pct": 2.3
+  },
+  {
+   "fn": "(garbage collector) (nativ):0",
+   "ms": 87.5,
+   "pct": 1.6
+  },
+  {
+   "fn": "lattice scene.js:21130",
+   "ms": 80.6,
+   "pct": 1.5
+  },
+  {
+   "fn": "update scene.js:11607",
+   "ms": 70.6,
+   "pct": 1.3
+  },
+  {
+   "fn": "setProgram scene.js:18647",
+   "ms": 64.9,
+   "pct": 1.2
+  },
+  {
+   "fn": "update scene.js:8918",
+   "ms": 60.7,
+   "pct": 1.1
+  },
+  {
+   "fn": "needsUpdate scene.js:9960",
+   "ms": 60.5,
+   "pct": 1.1
+  },
+  {
+   "fn": "getParameters scene.js:13065",
+   "ms": 59.5,
+   "pct": 1.1
+  },
+  {
+   "fn": "vert scene.js:30747",
+   "ms": 50.8,
+   "pct": 0.9
+  },
+  {
+   "fn": "projectObject scene.js:18390",
+   "ms": 49.5,
+   "pct": 0.9
+  },
+  {
+   "fn": "inView scene.js:28382",
+   "ms": 47.4,
+   "pct": 0.9
+  },
+  {
+   "fn": "compose scene.js:4925",
+   "ms": 47.2,
+   "pct": 0.9
+  },
+  {
+   "fn": "styleLast scene.js:22044",
+   "ms": 47.1,
+   "pct": 0.9
+  },
+  {
+   "fn": "setValueM4 scene.js:11814",
+   "ms": 43.4,
+   "pct": 0.8
+  },
+  {
+   "fn": "arraysEqual scene.js:11705",
+   "ms": 42.4,
+   "pct": 0.8
+  },
+  {
+   "fn": "updateMatrixWorld scene.js:5606",
+   "ms": 42.2,
+   "pct": 0.8
+  }
+ ],
+ "files": [
+  {
+   "file": "scene.js",
+   "ms": 4534.6,
+   "pct": 84.7
+  },
+  {
+   "file": "bench.js",
+   "ms": 678.1,
+   "pct": 12.7
+  },
+  {
+   "file": "(nativ)",
+   "ms": 136.8,
+   "pct": 2.6
+  },
+  {
+   "file": "voices-DHw2d-Ik.js",
+   "ms": 4.9,
+   "pct": 0.1
+  },
+  {
+   "file": "index.js",
+   "ms": 1.8,
+   "pct": 0
+  },
+  {
+   "file": "extensions::SafeBuiltins",
+   "ms": 0.6,
+   "pct": 0
+  }
+ ],
+ "bench": {
+  "fps": 59.8025218893204,
+  "avgMs": 16.72170283806344,
+  "p95Ms": 16.700000000000728,
+  "p99Ms": 16.80000000000109,
+  "cpuAvgMs": 4.821368948247079,
+  "cpuP95Ms": 6.5,
+  "updateMs": 2.2146911518290664,
+  "renderMs": 2.606677796418012,
+  "parts": {
+   "buildings": 0.02654424038574174,
+   "units": 1.7373956594933353,
+   "corpses": 0.12704507506550453,
+   "proj": 0.06611018367920177,
+   "emit": 0.006844741237879993,
+   "fx": 0.1926544239380722
+  },
+  "calls": 82,
+  "triangles": 982477,
+  "units": 2002,
+  "unitsDrawn": 1654,
+  "projectiles": 152,
+  "particles": 1543,
+  "quality": "medium",
+  "nodraw": true,
+  "secs": 10,
+  "frames": 599,
+  "viewport": "1280x720",
+  "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "done": true
+ }
+}

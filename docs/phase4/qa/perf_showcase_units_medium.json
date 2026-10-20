@@ -1,0 +1,160 @@
+{
+ "scene": "showcase_units",
+ "quality": "medium",
+ "totalMs": 2644,
+ "top": [
+  {
+   "fn": "updateBuffer scene.js:8869",
+   "ms": 282,
+   "pct": 10.7
+  },
+  {
+   "fn": "onFirstUse scene.js:12889",
+   "ms": 192,
+   "pct": 7.3
+  },
+  {
+   "fn": "(garbage collector) (nativ):0",
+   "ms": 84,
+   "pct": 3.2
+  },
+  {
+   "fn": "WebGLRenderer.renderBufferDirect scene.js:18111",
+   "ms": 74,
+   "pct": 2.8
+  },
+  {
+   "fn": "loop bench.js:651",
+   "ms": 71.9,
+   "pct": 2.7
+  },
+  {
+   "fn": "vert scene.js:30747",
+   "ms": 68.4,
+   "pct": 2.6
+  },
+  {
+   "fn": "lattice scene.js:21130",
+   "ms": 64.4,
+   "pct": 2.4
+  },
+  {
+   "fn": "updateUnits scene.js:28698",
+   "ms": 56.6,
+   "pct": 2.1
+  },
+  {
+   "fn": "bindVertexArrayObject scene.js:9913",
+   "ms": 54.4,
+   "pct": 2.1
+  },
+  {
+   "fn": "getParameters scene.js:13065",
+   "ms": 49.7,
+   "pct": 1.9
+  },
+  {
+   "fn": "needsUpdate scene.js:9960",
+   "ms": 46.2,
+   "pct": 1.7
+  },
+  {
+   "fn": "setProgram scene.js:18647",
+   "ms": 41.6,
+   "pct": 1.6
+  },
+  {
+   "fn": "Float32BufferAttribute scene.js:7135",
+   "ms": 38.4,
+   "pct": 1.5
+  },
+  {
+   "fn": "projectObject scene.js:18390",
+   "ms": 38.3,
+   "pct": 1.4
+  },
+  {
+   "fn": "update scene.js:8918",
+   "ms": 34.5,
+   "pct": 1.3
+  },
+  {
+   "fn": "renderObject scene.js:14321",
+   "ms": 33.4,
+   "pct": 1.3
+  },
+  {
+   "fn": "periodicNoise scene.js:21140",
+   "ms": 32.8,
+   "pct": 1.2
+  },
+  {
+   "fn": "corner scene.js:30973",
+   "ms": 30.3,
+   "pct": 1.1
+  },
+  {
+   "fn": "requestAnimationFrame (nativ):0",
+   "ms": 28,
+   "pct": 1.1
+  },
+  {
+   "fn": "getProgram scene.js:18558",
+   "ms": 27,
+   "pct": 1
+  },
+  {
+   "fn": "updateMatrixWorld scene.js:5606",
+   "ms": 25,
+   "pct": 0.9
+  },
+  {
+   "fn": "flush scene.js:25698",
+   "ms": 24.7,
+   "pct": 0.9
+  },
+  {
+   "fn": "arraysEqual scene.js:11705",
+   "ms": 24.2,
+   "pct": 0.9
+  },
+  {
+   "fn": "render scene.js:31579",
+   "ms": 22,
+   "pct": 0.8
+  },
+  {
+   "fn": "update scene.js:11607",
+   "ms": 21.7,
+   "pct": 0.8
+  }
+ ],
+ "files": [
+  {
+   "file": "scene.js",
+   "ms": 2428.2,
+   "pct": 91.8
+  },
+  {
+   "file": "(nativ)",
+   "ms": 121.3,
+   "pct": 4.6
+  },
+  {
+   "file": "bench.js",
+   "ms": 87.9,
+   "pct": 3.3
+  },
+  {
+   "file": "voices-DHw2d-Ik.js",
+   "ms": 4.5,
+   "pct": 0.2
+  },
+  {
+   "file": "index.js",
+   "ms": 1.9,
+   "pct": 0.1
+  }
+ ],
+ "bench": null
+}

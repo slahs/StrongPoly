@@ -284,9 +284,84 @@ Nicht verifiziert (offen, weil hier kein Safari/M3 vorhanden): Shader-Kompilierz
 - Offen/ehrlich: Feuerknistern im Browser nicht live ausgelöst (nur Offline-Render und Logiktest); Klangbalance nur über Pegelmessung abgestimmt, nicht nach Gehör; Vogelrufe im Browser-Lauf wegen Software-GL (≈ 1 FPS, Soundscape-Zeit läuft langsamer) nur einmal gehört/gezählt, Rate per Test belegt.
 
 ## 4H Abnahme
-- [ ] Browser-Szenarien 1–12
-- [ ] Performance dokumentiert, Safari-Anleitung
-- [ ] README, Abschlussbericht
+
+Stand: Abnahme im echten Browser (Chromium 141, Software-GL/SwiftShader, 4 Kerne, kein Safari, keine echte GPU) auf dem zusammengeführten Stand. Skripte `scripts/qa/` (Aufruf und Übersicht: README „Abnahme-Skripte“), Ergebnisse je Szenario `docs/phase4/qa/<name>.json` (Prüfungen, Konsolenmeldungen, Messwerte), Bilder `docs/phase4/qa/<name>/`, Vorher/Nachher `docs/phase4/COMPARE.md`. Alle Szenarien liefen mit sauberer Konsole (außer den bekannten Software-GL-Hinweisen: 0 Meldungen in allen Läufen).
+
+- [x] Browser-Szenarien 1–12 + Tutorial-Missionen praktisch durchgespielt (Tabelle unten), Befunde protokolliert und behoben (Abschnitt „Befunde 4H“)
+- [x] Performance dokumentiert (Chromium/SwiftShader, Hotspots, Speicher), Safari-Anleitung im README, Safari-Risiken statisch geprüft (unten)
+- [x] README ergänzt (Mac/Safari-Anleitung, Abnahme-Skripte, Hotkeys auf dem Mac), `docs/phase4/COMPARE.md`
+- [ ] **offen, nicht verifiziert:** Messung auf echter GPU/Safari (60 FPS bei 2.000 Einheiten ist NICHT nachgewiesen), Klang nach Gehör (nur Pegel, Dekodierung und Rücktranskription gemessen), Live-Test auf dem MacBook Air M3 (Safari-Shader-Kompilierzeit, Hänger beim Start, Farbwirkung auf dem Display)
+
+### Ergebnis der Browser-Szenarien
+
+| # | Szenario | Ergebnis | Beleg (`docs/phase4/qa/`) |
+| --- | --- | --- | --- |
+| 1 | Gefecht gegen KI (Hauptmenü und `?quick=1`) | bestanden: Menü → Setup → Spiel, 3 Spieler, HUD, KI baut weiter (6/24/22 Gebäude nach 90 s) | `s01_start.json`, `s01_menu/*.jpg` |
+| 2 | Wirtschaftsgebäude, Bauanimation, Sofortbau | bestanden: 10 Gebäude über den echten Befehlsweg; im Snapshot nach ≤ 1,9 s Beobachtungsraster (`n` = Platzierungs-Tick), Arbeiter ziehen nach 4–32 s ein (Laufweg/Arbeiterpool, nie an die Animation gekoppelt), Fortschritt 0 → 1; Bildserie Mühle bei 0,25× (Alter 3/14/23/32/42 Ticks = Fortschritt 0,10/0,36/0,57/0,79/1,0); Sim-Test `shared/test/instant_build.test.ts` | `s02_economy.json`, `s02_economy/bau_muehle_*.jpg`, `siedlung_*.jpg` |
+| 3 | Bauern bei der Arbeit, Bewegung | Kennzahlen erfasst, **aber bei 4 FPS (Software-GL) nur eingeschränkt aussagekräftig**: Sprünge 0 %, Stehende ruhen (Drift 0,000 t/s), Gehen ohne Weg 0 %, Gleiten 0 % (alt 0,7 %); Halt/Rückwärts neu 1,7/0,9 % gegen alt 0,0/0,0 % – bei Bildabständen von ~250 ms (> Puffer von 100–300 ms) arbeitet die Interpolation naturgemäß schlechter. Das headless-Labor (30 FPS) zeigt den Unterschied klar zugunsten des neuen Modells (Tabelle unten). Echte 60-FPS-Aufnahme in Safari fehlt | `s03_motion.md`, `s03_motion_*.json` |
+| 4 | Burg mit Mauern, Torhaus, Türmen, Treppen, Geschütz; Truppen über Tor/Treppe/Mauer | bestanden: 4 Rundtürme, 3 Wachtürme, Steintor, 2 Treppen, Ballista auf dem Turm; Mauerwelle (25 Stücke in ~2 s Spielzeit, im Lauf `--fast` mit Zwischenständen 0/25 → 8 → 12 → 25 fertig); 24 Soldaten durch das Tor hinaus (21/24 in 70 s), hinein (24/24), über die Treppe auf die Mauerkrone (23/24); Bewegung über Tor/Treppe bei 8 FPS: Sprünge 0,0 %, Rückwärts 0,8 %, Halt 2,0 % (alt: 0,0/0,05/0,25 %) | `s04_castle*.json`, `s04_castle/5_auf_der_mauer.jpg`, `6_treppe_nah.jpg` |
+| 5 | Auswahl, Rahmen, Formationen, Angriffsmarsch, Patrouille | bestanden (nach Behebung zweier Testfehler): Einzelklick, Rahmen (30/30), Y, Rechtsklick-Marsch in Frei/Linie/Block/Keil (Aufstellungen unterscheiden sich messbar: Breite/Tiefe 2,6/1,1, 1,0/0,7, 0,9/0,7, 1,5/1,2), Angriffsmarsch (`move attack`), Patrouille (13 Wendungen, Spanne 8,6 Felder), Stopp/Halten/Defensiv/Aggressiv; Alt+H löst kein „Halten“ aus, Alt+W schwenkt die Kamera nicht mehr | `s05_units.json`, `s05_units/3_marsch_*.jpg` |
+| 6 | Gesprochene Einheitenantworten | bestanden: kein Ton vor der ersten Geste (Autoplay, Konsole sauber), danach Kontext „running“; alle 498 deutschen Clips dekodiert (953 s, Spitze ≤ 0,81, −22,5 … −19,5 dB RMS, 0 Probleme); Auswahl/Befehle sprechen Clips, gleiche Auswahl und 12 Wechsel in 1,2 s erzeugen höchstens 1 Zeile (Rest „global-gap“), Massenbefehl an 14 Einheiten 1 Zeile; Untertitel an/aus, Regler „Einheitenstimmen“ wirkt und wird gespeichert, M stumm; Aufnahme am Bus (MediaRecorder) je Rolle (20 Sprecher + Berater) und Rücktranskription mit Whisper small: 10–12 von 21 Zeilen mit Wortfehlerrate ≤ 0,5, 4–6 fehlerfrei, Mittel 0,45–0,55 (zufällige Zeilenwahl, Whisper halluziniert bei 1–3-Wort-Zurufen; die rohen Clips erreichten in 4D 0,22) | `s06_voices.json`, `s06_voices/rec/*.webm`, `rec/stt.json` |
+| 7 | Ressourcenmangel → Berater | bestanden: Holz knapp → genau 1 Meldung (Text sichtbar, Stimme ausgelöst), keine Wiederholung nach 48 s Spielzeit, bei Leerstand genau 1 zusätzliche; Klick springt zum Ort; ↻ und Alt+H sprechen erneut; Sprachschalter; Hunger: Vorwarnung → „food.empty“ genau einmal (kritisch, als Clip); insgesamt 8 Meldungen. **Zeilen mit eingesetzten Zahlen sprechen über die Browser-Stimme** (Ersatz), nur zahlenfreie Zeilen als Clip | `s07_advisor.json`, `s07_advisor/*.jpg` |
+| 8 | Beliebtheit → Hover/Detail | bestanden: Steuern 4 → Hover und Detailansicht (Klick/L) nennen Steuern −8 (Hauptbelastung), Prognose pro Monat, Hinweistext; Zahlen = Sim = Bergfried-Panel (53,7 / −6,5 pro Monat); Berater meldet „pop.falling.tax“ und „pop.leaving.tax“ mit derselben Ursache; Gegenprobe Steuern −2 + Extra-Rationen → positive Faktoren (+5, +4) | `s08_popularity.json`, `s08_popularity/2_detail.jpg` |
+| 9 | Schlacht mit mehreren Hundert Soldaten | bestanden (Endlauf nach B8): 309 gegen 313 Soldaten (+ 12 Ritter je Seite), Verluste auf beiden Seiten (309 → 153), Draw-Calls 52–68, Stimmung wechselt auf „battle“, Spitze am Bus 0,85 (kein Übersteuern, 0 Clip-Ereignisse), Effektivwert 0,30 bei allen Reglern auf Maximum, höchstens 2 Einheitenstimmen zugleich, bis zu 52 Leichen, 35 Geschosse, ~1.460 Partikel gleichzeitig; Bogenschützen nun mit Teamfarbe vorne sichtbar | `s09_battle.json`, `s09_battle/*.jpg` |
+| 10 | Speichern/Laden | bestanden: Spielstand in IndexedDB, nach dem Laden gleiche Gebäude (16/16 inkl. Platzierungs-Tick), gleiche Einheiten, gleiche Höhenprüfsumme, **keine Bauanimation vorhandener Gebäude**, Berufsfiguren erkannt, Musik/Umgebung laufen, Bewegung ruhig (Sprünge 0 %) | `s10_saveload.json` |
+| 11 | Multiplayer, Reconnect | bestanden: Server (`packages/server/dist`) + 2 Clients + KI; Gebäude beider Clients bis Tick T gleich (Prüfsumme); Trennen (WebSocket), hartes Offline, Neuladen → automatische Rückkehr, Gebäude/Baustufen korrekt, keine Neubau-Animation vor dem Trennen gesetzter Gebäude, Stimmen/Berater laufen; Server-Test 2 Menschen + 4 KI grün | `s11_online.json` |
+| 12 | Grafikstufen Nah/Fern, Wechsel zur Laufzeit | bestanden: Mittel → Hoch → Niedrig → Mittel über das Optionsmenü ohne Fehler (Draw-Calls 50–78, Dreiecke 130–455k, Geometrien stabil); `scripts/shots.mjs --check` für Niedrig/Mittel/Hoch über alle 12 Szenen: Konsole sauber | `s12_quality.json`, `s12_shots_*.json` |
+| – | Tutorial-Missionen 1–5 | bestanden: alle starten und laufen 20 s Zufallsbedienung bei 3×, keine Konsolenmeldung, Berater 2 Meldungen je Mission | `s14_missions.json` |
+| – | Speicher beim Spielende (dreimal starten/beenden) | bestanden nach Behebung zweier Lecks (B6): Geometrien 38, Texturen 4, Programme 24, Szenenobjekte 82, Listener 17, DOM-Knoten 175 – alle konstant, Heap 58 → 63 → 63 MB | `s13_leaks.json` |
+| – | WebGL 2 fehlt | bestanden: Erklärung statt leerer Seite | `s15_nowebgl/meldung.jpg` |
+
+Messlabor Bewegung (headless, `cd packages/client && ../shared/node_modules/.bin/tsx bench/motion.ts all local30 all`, Profil 30 FPS): alle sechs Szenen neu gegenüber alt – Sprünge 0,00–0,01 % (alt 2,3–6,0 %), Halt 0,07–0,45 % (alt 8,4–10,0 %), Rückwärts ≤ 0,42 % (alt 2,4–3,5 %), Richtungsumkehr 0,0–3,2/min (alt 68–93/min).
+
+### Befunde 4H
+
+| Nr | Befund | Ursache / Zahlen | Behebung | Regressionstest |
+| --- | --- | --- | --- | --- |
+| B1 | Alt-Hotkeys schwenken die Kamera mit; auf dem Mac bleibt die Kamera nach Cmd+Taste hängen | gehaltene Tasten wurden ohne Modifikator-Prüfung gemerkt: `Alt+S` (Lager anwählen) und `Alt+W` (Waffenkammer) zählten als Schwenktasten S/W; macOS sendet bei gehaltener Cmd-Taste kein `keyup` der Buchstabentaste | `tracksHeldKey` (`game/hotkeys.ts`), Meta-Loslassen leert gehaltene Tasten | `client/test/hotkeys.test.ts` (scheitert vorher mangels Funktion/Regel: genau `KeyS`/`KeyW` teilen Alt- und Schwenkbelegung); Browser: `s05` „Alt+W schwenkt die Kamera nicht mit“ (Nachher-Prüfung; eine Vorher-Messung im Browser liegt nicht vor, der Fehler ist aus Code und Test belegt) |
+| B2 | Füße gleiten gegenüber dem Körper | Schrittlänge je halber Phase π·v/W gegen Fußhub 2·Beinlänge·sin 0,66: Verhältnis 1,18–1,41 (Median 1,25) bei `W = 3 + 4,2·v`; Gehphase ist an die gezeichnete Geschwindigkeit gekoppelt (4A), aber die Frequenz war zu niedrig für die Schrittweite | `UNIT_WALK_W`: Faktor 4,2 → 4,8 (Fußvolk): Verhältnis 1,10–1,17 für normale Typen, schnelle Typen bleiben wegen der Obergrenze 14 rad/s bei ≤ 1,4 | `client/test/unit_gait.test.ts` (Median ≤ 1,2, alle 0,8–1,45; vorher Median 1,25 → rot) |
+| B3 | Mac/Safari: Strg+Klick ohne Wirkung, Trackpad-Pinch skaliert die Seite, Mausrad in Zeilen-Einheiten zoomt kaum, keine Entf-Taste | nur Taste 2 war „Rechtsklick“; Safari-Gesten-Ereignisse nicht abgefangen; `deltaMode` ignoriert; „Abreißen“ lag nur auf `Delete` | `game/pointer.ts` (`isSecondaryClick`, `wheelPixels`), Gesten-Zoom in `input.ts`, Backspace-Alias (`comboAliases`) | `client/test/pointer.test.ts`, `hotkeys.test.ts` |
+| B4 | Ohne WebGL 2 bleibt die Seite leer | `new WebGLRenderer` wirft, nichts erklärt es | `main.ts` zeigt eine Erklärung (Hardwarebeschleunigung/Browser) | Browser: `s15_nowebgl` (Chromium mit `--disable-3d-apis`) |
+| B5 | Speichern scheitert still (Safari privat/blockierter Speicher) | `saves.save(...).then(...)` ohne Fehlerpfad (ungefangene Promise-Ablehnung, kein „gespeichert“) | Fehlermeldung „Speichern nicht möglich“, Laden fängt Fehler | keiner (IndexedDB-Sperre im Headless-Lauf nicht nachstellbar) |
+| B6 | Speicher/Listener wachsen mit jedem Spiel | (1) `hud.ts` hängte pro Sitzung einen anonymen `pointerup`-Listener ans Fenster und entfernte ihn nie (hielt Hud und Welt im Speicher); (2) `MotionDebug` hängte Canvas + Textfeld in `#ui`, ohne sie zu entfernen. Messung vorher (3 Spiele): Listener 18 → 19 → 20, DOM-Knoten 177 → 179 → 181, JS-Heap 64 → 77 → 84 MB | benannte Handler, Entfernen in `Hud.destroy`, `MotionDebug.destroy` in `Session.destroy`, Debug-Hooks löschen | `client/test/leaks_source.test.ts` (3 Tests; vorher rot: anonymer Listener vorhanden), Browser `s13_leaks`: nachher 17/17/17, 175/175/175, Heap 58 → 63 → 63 MB |
+| B7 | Prüfhilfe: `window.__place(type, x, y, rot)` (Platzierungsregeln der Sim für die Skripte) | kein Fehler, nur Werkzeug | `game/session.ts` | – |
+| B8 | Spielerfarbe der Bogenschützen nur am Köcher auf dem Rücken: in der RTS-Ansicht (Blick auf Brust/Kopf) sind Archer-Massen beider Seiten nicht zu unterscheiden | Browser-Experiment `s16_teamcolors` (acht Spieler nebeneinander, mittel): Bogenschützen aller Farben wirken gleich grün; Flächenanteil Teamfarbe vorne oberhalb der Hüfte = 0,00 % | Waffenrock-Fläche (2 Dreiecke) in Teamfarbe vorne, Dreieckbudget 400 bleibt eingehalten | `client/test/unit_team_front.test.ts` (vorher rot für Bogenschützen: 0,00 %) |
+
+Beobachtungen, die **nicht** geändert wurden (mit Begründung):
+
+- **Beraterstimme:** von 52 Zeilenvorlagen haben 8 keinen Platzhalter und 9 genau einen endlichen Namensplatzhalter (Ware/Lager/Gebäude → je Wert ein Clip, 171 Clips); **35 Vorlagen mit Zahlen/freien Namen (z. B. „nur noch 18 im Lager“) sprechen über die Browser-Stimme** (Qualität je Browser/System, auf dem Mac die macOS-Stimme) statt über das Clip-Paket. Test `advisor_voice_clips.test.ts` stellt sicher, dass alle vorab vertonbaren Zeilen Clips haben (deutsch und englisch; keine Lücke gefunden, nichts neu zu erzeugen). Lösung später: Satzbausteine/Zahlwörter einzeln vertonen.
+- **Verständlichkeit der Clips im Spiel:** Rücktranskription des Bus-Ausgangs (Opus-Aufnahme, Whisper small) mittlere Wortfehlerrate 0,45–0,55 gegenüber 0,22 bei den rohen Clips – Whisper ist bei Ein- bis Dreiwort-Zurufen pessimistisch, ein Hörtest durch Menschen fehlt (offen).
+- **Bewegung bei sehr niedriger Bildrate:** unter Software-GL (4–8 FPS) zeigt das neue Modell geringfügig mehr Halt-/Rückwärtsbilder als das alte (Browser `s03`, `s04 --fast`); im Messlabor bei 30 FPS ist es durchweg deutlich besser. Bei < 10 FPS überschreitet der Bildabstand den Interpolationspuffer; auf einem MacBook sollte das nicht auftreten, ist aber ungemessen.
+- **Erster Spielstart:** das erste Bild dauert unter SwiftShader ≈ 1,3 s (21 Programme werden kompiliert, `onFirstUse` ≈ 0,7 s von 1,8 s CPU in den ersten 12 s); danach kommen nur 3 Programme hinzu (nach 4 s: 24) und bleiben bei 24, auch nachdem alle 26 Einheiten- und 32 Gebäudetypen im Bild waren. Das erstmalige Modellbauen kostet pro Typ wenige ms (alle 57 Gebäudetypen zusammen ≈ 0,3 s CPU im Profil). Deshalb kein Vorwärmen eingebaut; unter Safari (ANGLE/Metal) ist die Kompilierzeit offen.
+- **Programme wachsen beim Stufenwechsel** (24 → 39 nach Mittel → Hoch → Niedrig → Mittel): three.js behält die alten Programme; Geometrien/Texturen bleiben stabil, harmlos.
+- **Partikel/Billboards** (`fx.ts`) laufen bewusst ohne Tonemapping/Farbkorrektur (eigene Fragment-Shader, Farben direkt); in den Bildern kein Farbbruch zu Figuren/Gebäuden/Gelände sichtbar.
+- **Kartenrand** außerhalb der Karte ist einfarbiger Dunst (hell, in Randansichten sichtbar weiß); kein Himmel/Horizont (bekannt aus 4B).
+- `checkClips` braucht neben einem laufenden Spiel unter Software-GL 7 Minuten, auf der Menüseite 6 s – nur Messartefakt.
+
+### Zahlen (Chromium 141, SwiftShader, Intel Xeon 2,8 GHz × 4, 1280×720, Pixel-Ratio 1, Kamera 36, 2.000 Einheiten)
+
+| Stufe | FPS (Software-GL) | JS Ø ms voll | JS Ø ms ohne Raster (`nodraw=1`) | JS p95 ms (ohne Raster) | Draw-Calls | Dreiecke | Einheiten (gezeichnet) | Partikel |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Niedrig | 1,0 | 5,6 | 3,7 | 4,9 | 67 | 464k | 2002 (1642) | 484 |
+| Mittel | 0,5 | 8,8 | 4,4 | 5,9 | 83 | 950k | 2002 (1712) | 1492 |
+| Hoch | 0,4 | 9,0 | 4,1 | 5,7 | 84 | 1124k | 2002 (1720) | 2790 |
+
+Rohdaten `docs/phase4/qa/bench-fps.md` / `.json` (`node scripts/bench-fps.mjs --units=2000 --secs=15 --warm=4 --dist=36`). „JS voll“ enthält bei Software-GL Befehlsaufbau und Treiberarbeit des Rasterizers; die Zielgröße zählt ohne Raster.
+
+- Ziel Mittel JS-Zeit ≤ 8 ms (gemessen mit `nodraw=1`): **erreicht** (siehe Tabelle; in der Software-GL-Umgebung). Draw-Calls < 150: **erreicht**. **60 FPS: nicht erreicht und mit Software-GL nicht beurteilbar** (0,5–1,1 FPS sind reine Rasterizer-Zeit); nur eine Messung auf echter GPU/Safari kann das klären.
+- Hotspots (CPU-Profil `nodraw=1`, Mittel, `scripts/qa/perf_profile.mjs`, `docs/phase4/qa/perf_*.json`): `tick` der synthetischen Bench-Welt 10 %, `updateBuffer` (three, Puffer-Hochladen) 7 %, `update` der Instanzen 6 %, `updateUnits` 5,5 %, `variantFor/unitVariant` 3 %; nichts, was eine Optimierung nahelegt – bewusst nicht angefasst.
+- Szenen im Spiel (Mittel, 1280×720): Draw-Calls 50–78, Dreiecke 130–490k, Programme 24 (Mittel) / 26 (Hoch).
+
+### Safari-/macOS-Risiken (statische Prüfung des Codes, Stand 4H)
+
+Gefunden und behoben: B1 (Cmd/Alt-Tasten), B3 (Strg+Klick, Pinch, Backspace, `deltaMode`), B4 (WebGL 2 fehlt), B5 (IndexedDB gesperrt). Geprüft ohne Befund:
+
+- **WebGL/Shader:** three.js r170 (WebGL 2 Pflicht); alle eigenen Shader nutzen nur GLSL-ES-3.00-Kern (`dFdx/dFdy`, `mod`, `smoothstep`, keine Erweiterungen; `getExtension` kommt nur in `bench.ts` für die GPU-Bezeichnung vor); keine Float-Texturen, keine Render-Targets außer Schattenkarten; Anisotropie optional (`getMaxAnisotropy()` kann 0 sein → 1); Pixel-Ratio-Deckel 1/1,5/2.
+- **Workers/APIs:** Sim-Worker als Modul-Worker (`new Worker(new URL(...), { type: 'module' })`, Safari ≥ 15); Bundle-Ziel `es2022` mit Top-Level-Await (Safari ≥ 15); kein `OffscreenCanvas`, `structuredClone`, `SharedArrayBuffer`, `findLast`/`at()`/`Object.hasOwn`, keine Regex-Lookbehind, keine Klassen-Static-Blöcke, kein `MediaRecorder` im Spiel (nur in den QA-Skripten), kein `backdrop-filter`/`:has`/`dvh` im CSS.
+- **Audio:** `AudioContext` mit `webkitAudioContext`-Rückfall, Kontext erst nach der ersten Geste (`userActivation`-Prüfung), Zustand „interrupted“ behandelt; verwendet werden `createStereoPanner`, Biquad, Kompressor, BufferSource (Safari ≥ 14.1), kein `AudioWorklet`, kein `cancelAndHoldAtTime`; Clips MP3 (Safari dekodiert MP3), `decodeAudioData` in Promise-Form.
+- **Sprachausgabe:** `speechSynthesis` nur nach Geste; Stimmenwahl über Sprachpräfix `de`/`en` (Safari liefert `de-DE`, iOS `de_DE`), `getVoices()` erst zur Sprechzeit (Safari füllt die Liste asynchron: leer → Standardstimme der Sprache über `utterance.lang`), Namenshinweise für macOS-Stimmen (Anna, Markus, Petra, Yannick …).
+- **Speicher:** `localStorage` überall in try/catch; IndexedDB-Fehler melden (B5).
+- **Offen (nur auf dem Mac prüfbar):** Kompilierzeit der 24–26 Programme über ANGLE/Metal beim ersten Bild, tatsächliche FPS/Frame-Zeiten, Verhalten der Anisotropie, Farbwirkung (P3-Display), Autoplay-Verhalten der installierten Safari-Version, Qualität der macOS-Stimmen für die Berater-Zeilen mit Zahlen.
 
 ## 4B-Menschen (Figuren und Einheiten)
 
@@ -318,4 +393,4 @@ Der JS-Mehraufwand liegt in der Einheiten-Aktualisierung (Beruf, Variation, Nah/
 **Offen:** Hochwertigere Gesichter/Frisuren erst bei sehr naher Kamera sichtbar; Feintuning der LOD-Grenzen (32/46 Tiles) auf echter GPU; Safari/Mac-Messung steht aus; Bewegungs-Agent: Gehphase an echte Geschwindigkeit koppeln wirkt auf `iAnim.z` (Rad-Drehgeschwindigkeit nutzt `UNIT_WALK_W` und Radius).
 
 ## Befunde
-(laufend ergänzen)
+Die Befunde der Abnahme stehen oben unter „Befunde 4H“.

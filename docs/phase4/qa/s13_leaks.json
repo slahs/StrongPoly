@@ -1,0 +1,319 @@
+{
+  "name": "s13_leaks",
+  "base": "http://127.0.0.1:5532",
+  "query": "",
+  "at": "2026-10-20T18:32:05.273Z",
+  "checks": [
+    {
+      "label": "Runde 1: Hauptmenü nach dem Beenden",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Runde 2: Hauptmenü nach dem Beenden",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Runde 3: Hauptmenü nach dem Beenden",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "Geometrien wachsen nach Runde 1 nicht mehr",
+      "ok": true,
+      "extra": "38 -> 38"
+    },
+    {
+      "label": "Texturen wachsen nach Runde 1 nicht mehr",
+      "ok": true,
+      "extra": "4 -> 4"
+    },
+    {
+      "label": "Shader-Programme wachsen nach Runde 1 nicht mehr",
+      "ok": true,
+      "extra": "24 -> 24"
+    },
+    {
+      "label": "Szenenobjekte wachsen nach Runde 1 nicht mehr",
+      "ok": true,
+      "extra": "82 -> 82"
+    },
+    {
+      "label": "Keine hängenden Listener an Fenster/Dokument (kein Zuwachs nach Runde 1)",
+      "ok": true,
+      "extra": "17 -> 17"
+    },
+    {
+      "label": "JS-Heap wächst nach Runde 1 höchstens um 12 MB (Rauschen/Caches)",
+      "ok": true,
+      "extra": "58 -> 63.4 MB"
+    },
+    {
+      "label": "DOM-Knoten wachsen nach Runde 1 nicht (Overlays/Panels werden entfernt; Toleranz 3)",
+      "ok": true,
+      "extra": "175 -> 175"
+    }
+  ],
+  "console": [],
+  "notes": {},
+  "data": {
+    "rows": [
+      {
+        "label": "Runde 1 im Spiel",
+        "geometries": 70,
+        "textures": 4,
+        "programs": 24,
+        "sceneObjects": 131,
+        "heapMB": 61,
+        "listeners": 28,
+        "audioCtx": "running",
+        "voicesActive": 0,
+        "domNodes": 1082,
+        "lsBy": {
+          "window.resize": 2,
+          "window.pointerdown": 1,
+          "window.keydown": 2,
+          "window.touchend": 0,
+          "window.mousedown": 0,
+          "document.visibilitychange": 1,
+          "document.pointerdown": 1,
+          "document.pointerover": 1,
+          "window.blur": 2,
+          "window.wheel": 1,
+          "window.pointerup": 2,
+          "window.mousemove": 3,
+          "window.mouseup": 3,
+          "window.keyup": 1,
+          "document.mouseleave": 1,
+          "window.__playwright_global_listeners_check__": 1,
+          "window.touchstart": 1,
+          "window.touchcancel": 1,
+          "window.click": 1,
+          "window.auxclick": 1,
+          "window.dblclick": 1,
+          "window.contextmenu": 1
+        },
+        "domIds": [
+          "DIV#app.",
+          "CANVAS#.",
+          "PRE#.",
+          "DIV#.hud compact tight short",
+          "DIV#.selbox",
+          "DIV#.ghostlabel"
+        ]
+      },
+      {
+        "label": "Runde 1 nach Spielende",
+        "geometries": 38,
+        "textures": 4,
+        "programs": 24,
+        "sceneObjects": 82,
+        "heapMB": 58,
+        "listeners": 17,
+        "audioCtx": "running",
+        "voicesActive": 0,
+        "domNodes": 175,
+        "lsBy": {
+          "window.resize": 1,
+          "window.pointerdown": 1,
+          "window.keydown": 0,
+          "window.touchend": 0,
+          "window.mousedown": 0,
+          "document.visibilitychange": 1,
+          "document.pointerdown": 1,
+          "document.pointerover": 1,
+          "window.blur": 1,
+          "window.wheel": 1,
+          "window.pointerup": 1,
+          "window.mousemove": 1,
+          "window.mouseup": 1,
+          "window.keyup": 0,
+          "document.mouseleave": 0,
+          "window.__playwright_global_listeners_check__": 1,
+          "window.touchstart": 1,
+          "window.touchcancel": 1,
+          "window.click": 1,
+          "window.auxclick": 1,
+          "window.dblclick": 1,
+          "window.contextmenu": 1
+        },
+        "domIds": [
+          "DIV#app.",
+          "DIV#.screen"
+        ]
+      },
+      {
+        "label": "Runde 2 im Spiel",
+        "geometries": 70,
+        "textures": 4,
+        "programs": 24,
+        "sceneObjects": 131,
+        "heapMB": 68.7,
+        "listeners": 28,
+        "audioCtx": "running",
+        "voicesActive": 0,
+        "domNodes": 1082,
+        "lsBy": {
+          "window.resize": 2,
+          "window.pointerdown": 1,
+          "window.keydown": 2,
+          "window.touchend": 0,
+          "window.mousedown": 0,
+          "document.visibilitychange": 1,
+          "document.pointerdown": 1,
+          "document.pointerover": 1,
+          "window.blur": 2,
+          "window.wheel": 1,
+          "window.pointerup": 2,
+          "window.mousemove": 3,
+          "window.mouseup": 3,
+          "window.keyup": 1,
+          "document.mouseleave": 1,
+          "window.__playwright_global_listeners_check__": 1,
+          "window.touchstart": 1,
+          "window.touchcancel": 1,
+          "window.click": 1,
+          "window.auxclick": 1,
+          "window.dblclick": 1,
+          "window.contextmenu": 1
+        },
+        "domIds": [
+          "DIV#app.",
+          "CANVAS#.",
+          "PRE#.",
+          "DIV#.hud compact tight short",
+          "DIV#.selbox",
+          "DIV#.ghostlabel"
+        ]
+      },
+      {
+        "label": "Runde 2 nach Spielende",
+        "geometries": 38,
+        "textures": 4,
+        "programs": 24,
+        "sceneObjects": 82,
+        "heapMB": 63.1,
+        "listeners": 17,
+        "audioCtx": "running",
+        "voicesActive": 0,
+        "domNodes": 175,
+        "lsBy": {
+          "window.resize": 1,
+          "window.pointerdown": 1,
+          "window.keydown": 0,
+          "window.touchend": 0,
+          "window.mousedown": 0,
+          "document.visibilitychange": 1,
+          "document.pointerdown": 1,
+          "document.pointerover": 1,
+          "window.blur": 1,
+          "window.wheel": 1,
+          "window.pointerup": 1,
+          "window.mousemove": 1,
+          "window.mouseup": 1,
+          "window.keyup": 0,
+          "document.mouseleave": 0,
+          "window.__playwright_global_listeners_check__": 1,
+          "window.touchstart": 1,
+          "window.touchcancel": 1,
+          "window.click": 1,
+          "window.auxclick": 1,
+          "window.dblclick": 1,
+          "window.contextmenu": 1
+        },
+        "domIds": [
+          "DIV#app.",
+          "DIV#.screen"
+        ]
+      },
+      {
+        "label": "Runde 3 im Spiel",
+        "geometries": 72,
+        "textures": 4,
+        "programs": 24,
+        "sceneObjects": 133,
+        "heapMB": 70.3,
+        "listeners": 28,
+        "audioCtx": "running",
+        "voicesActive": 0,
+        "domNodes": 1082,
+        "lsBy": {
+          "window.resize": 2,
+          "window.pointerdown": 1,
+          "window.keydown": 2,
+          "window.touchend": 0,
+          "window.mousedown": 0,
+          "document.visibilitychange": 1,
+          "document.pointerdown": 1,
+          "document.pointerover": 1,
+          "window.blur": 2,
+          "window.wheel": 1,
+          "window.pointerup": 2,
+          "window.mousemove": 3,
+          "window.mouseup": 3,
+          "window.keyup": 1,
+          "document.mouseleave": 1,
+          "window.__playwright_global_listeners_check__": 1,
+          "window.touchstart": 1,
+          "window.touchcancel": 1,
+          "window.click": 1,
+          "window.auxclick": 1,
+          "window.dblclick": 1,
+          "window.contextmenu": 1
+        },
+        "domIds": [
+          "DIV#app.",
+          "CANVAS#.",
+          "PRE#.",
+          "DIV#.hud compact tight short",
+          "DIV#.selbox",
+          "DIV#.ghostlabel"
+        ]
+      },
+      {
+        "label": "Runde 3 nach Spielende",
+        "geometries": 38,
+        "textures": 4,
+        "programs": 24,
+        "sceneObjects": 82,
+        "heapMB": 63.4,
+        "listeners": 17,
+        "audioCtx": "running",
+        "voicesActive": 0,
+        "domNodes": 175,
+        "lsBy": {
+          "window.resize": 1,
+          "window.pointerdown": 1,
+          "window.keydown": 0,
+          "window.touchend": 0,
+          "window.mousedown": 0,
+          "document.visibilitychange": 1,
+          "document.pointerdown": 1,
+          "document.pointerover": 1,
+          "window.blur": 1,
+          "window.wheel": 1,
+          "window.pointerup": 1,
+          "window.mousemove": 1,
+          "window.mouseup": 1,
+          "window.keyup": 0,
+          "document.mouseleave": 0,
+          "window.__playwright_global_listeners_check__": 1,
+          "window.touchstart": 1,
+          "window.touchcancel": 1,
+          "window.click": 1,
+          "window.auxclick": 1,
+          "window.dblclick": 1,
+          "window.contextmenu": 1
+        },
+        "domIds": [
+          "DIV#app.",
+          "DIV#.screen"
+        ]
+      }
+    ]
+  },
+  "passed": 10,
+  "failed": 0,
+  "consoleClean": true
+}

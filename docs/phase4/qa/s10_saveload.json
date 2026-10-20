@@ -1,0 +1,80 @@
+{
+  "name": "s10_saveload",
+  "base": "http://127.0.0.1:5505",
+  "query": "quick=1&dev=1&size=96&seed=3&motiondebug",
+  "at": "2026-10-20T18:46:00.718Z",
+  "checks": [
+    {
+      "label": "Spielstand liegt in IndexedDB",
+      "ok": true,
+      "extra": "[{\"key\":\"save-1792521987598\",\"name\":\"Spiel 6:46:27 PM\"}]"
+    },
+    {
+      "label": "Nach dem Laden wird kein vorhandenes Gebäude neu aufgebaut (nur nach dem Speichern gesetzte dürfen im Bau sein)",
+      "ok": true,
+      "extra": "[[],[],[],[],[],[],[],[],[],[],[],[]]"
+    },
+    {
+      "label": "Gleiche Gebäude des Spielers (Typ, Ort, Platzierungs-Tick) wie beim Speichern",
+      "ok": true,
+      "extra": "16 vs 16"
+    },
+    {
+      "label": "Gleiche Einheiten des Spielers (Typ, Anzahl ± 3 durch den Fortschritt seit dem Laden)",
+      "ok": true,
+      "extra": "{\"2:0\":1,\"0:0\":37,\"8:0\":10} vs {\"2:0\":1,\"0:0\":37,\"8:0\":10}"
+    },
+    {
+      "label": "Gleiches Gelände (Höhenprüfsumme)",
+      "ok": true,
+      "extra": "283501 vs 283501"
+    },
+    {
+      "label": "Spielstand setzt bei etwa demselben Tick fort (höchstens 2 s später)",
+      "ok": true,
+      "extra": "622 -> 631"
+    },
+    {
+      "label": "Berufe der Bauern werden nach dem Laden wieder erkannt (Berufsfiguren vorhanden wie vorher)",
+      "ok": true,
+      "extra": "{\"0\":65,\"1\":1,\"8\":2,\"11\":1,\"12\":1,\"13\":1,\"15\":1} vs {\"0\":66,\"1\":1,\"10\":1,\"11\":1,\"12\":1,\"13\":1,\"15\":1}"
+    },
+    {
+      "label": "Nach dem Laden läuft Musik (Spielthema) und Umgebung",
+      "ok": true,
+      "extra": "{\"ctx\":\"running\",\"theme\":null,\"mood\":\"build\",\"music\":8,\"amb\":true}"
+    },
+    {
+      "label": "Bewegung nach dem Laden ruhig: keine Sprünge, wenige Rückwärtsschritte, Stehende ruhen",
+      "ok": true,
+      "extra": "Sprung 0.00 %, rückw. 1.52 %, Drift 0.0000"
+    }
+  ],
+  "console": [],
+  "notes": {},
+  "data": {
+    "motionAfterLoad": {
+      "frames": 40,
+      "moveFrames": 330,
+      "ratioP50": 0.9571757912635803,
+      "ratioP95": 1.2263070344924927,
+      "ratioP99": 1.348697543144226,
+      "ratioMax": 1.4039723873138428,
+      "jumpPct": 0,
+      "haltPct": 0.6060606060606061,
+      "backPct": 1.5151515151515151,
+      "reversalsPerMin": 4.223418857565191,
+      "turnP95": 144.71676635742188,
+      "turnMax": 401.0704650878906,
+      "degPerTile": 26.363593271780775,
+      "idleDriftMean": 0,
+      "idleDriftP95": 0,
+      "marchInPlacePct": 0,
+      "slidePct": 0,
+      "strideCV": 0.014579013018697238
+    }
+  },
+  "passed": 9,
+  "failed": 0,
+  "consoleClean": true
+}

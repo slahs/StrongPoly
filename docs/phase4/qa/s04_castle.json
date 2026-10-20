@@ -1,0 +1,106 @@
+{
+  "name": "s04_castle",
+  "base": "http://127.0.0.1:5572",
+  "query": "quick=1&dev=1&size=128&seed=6",
+  "at": "2026-10-20T18:50:44.518Z",
+  "checks": [
+    {
+      "label": "Ebene Fläche für die Burg gefunden",
+      "ok": true,
+      "extra": "{\"sc\":52.2549980015984,\"x0\":53,\"y0\":89,\"rw\":24,\"rh\":18,\"bad\":1}"
+    },
+    {
+      "label": "Mauern entstehen als zusammenhängender Zug (≥ 20 Stücke aus vier Linien, alle fertig)",
+      "ok": true,
+      "extra": "{\"tick\":254,\"walls\":25,\"done\":25,\"part\":0}"
+    },
+    {
+      "label": "Burg steht: 4 große Türme, 3 Wachtürme, Tor, Treppen",
+      "ok": true,
+      "extra": "{\"0\":1,\"1\":1,\"2\":3,\"3\":1,\"4\":1,\"39\":25,\"41\":3,\"42\":4,\"44\":1,\"46\":2,\"53\":1}"
+    },
+    {
+      "label": "Geschütz auf Großem Turm gesetzt",
+      "ok": true,
+      "extra": "[1,0,0,0]"
+    },
+    {
+      "label": "24 Soldaten im Hof",
+      "ok": true,
+      "extra": "24"
+    },
+    {
+      "label": "Truppen passieren das Torhaus nach außen (≥ 16 von 24 binnen 70 s Realzeit bei 2-facher Geschwindigkeit)",
+      "ok": true,
+      "extra": "19/24"
+    },
+    {
+      "label": "Truppen passieren das Torhaus nach innen",
+      "ok": true,
+      "extra": "24/24"
+    },
+    {
+      "label": "Mindestens ein Teil der Truppen erreicht die Mauerkrone über die Treppe",
+      "ok": true,
+      "extra": "23/24"
+    }
+  ],
+  "console": [],
+  "notes": {},
+  "data": {
+    "wallWave": [
+      {
+        "tick": 238,
+        "walls": 0,
+        "done": 0,
+        "part": 0
+      },
+      {
+        "tick": 254,
+        "walls": 25,
+        "done": 25,
+        "part": 0
+      }
+    ],
+    "motion": {
+      "frames": 0,
+      "moveFrames": 0,
+      "ratioP50": 0,
+      "ratioP95": 0,
+      "ratioP99": 0,
+      "ratioMax": 0,
+      "jumpPct": 0,
+      "haltPct": 0,
+      "backPct": 0,
+      "reversalsPerMin": 0,
+      "turnP95": 0,
+      "turnMax": 0,
+      "degPerTile": 0,
+      "idleDriftMean": 0,
+      "idleDriftP95": 0,
+      "marchInPlacePct": 0,
+      "slidePct": 0,
+      "strideCV": 0
+    },
+    "cross": [
+      {
+        "label": "durch das Tor hinaus",
+        "hit": 19,
+        "secs": 70.5
+      },
+      {
+        "label": "durch das Tor herein",
+        "hit": 24,
+        "secs": 3.8
+      },
+      {
+        "label": "Treppe hinauf auf die Mauerkrone",
+        "hit": 23,
+        "secs": 6.9
+      }
+    ]
+  },
+  "passed": 8,
+  "failed": 0,
+  "consoleClean": true
+}
