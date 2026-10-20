@@ -41,7 +41,22 @@ if (new URLSearchParams(location.search).has('shots')) {
 
 const canvas = document.getElementById('view') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLElement;
-const gs = new GameScene(canvas);
+/** Ohne WebGL 2 (Safari/Chrome ohne Hardwarebeschleunigung, blockierte GPU) gäbe es nur eine leere Seite: verständlich erklären. */
+function createScene(): GameScene {
+  try {
+    return new GameScene(canvas);
+  } catch (e) {
+    const box = document.createElement('div');
+    box.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#1d1812;color:#f1e6cf;font:16px/1.5 system-ui,sans-serif;padding:24px;text-align:center;z-index:99';
+    box.textContent =
+      'StrongPoly braucht WebGL 2, aber der Browser stellt es nicht bereit. Bitte Hardwarebeschleunigung aktivieren bzw. einen aktuellen Browser verwenden ' +
+      '(Safari 15 oder neuer, Chrome, Edge, Firefox) und die Seite neu laden. Technische Meldung: ' +
+      (e instanceof Error ? e.message : String(e));
+    document.body.append(box);
+    throw e;
+  }
+}
+const gs = createScene();
 const settings = new Settings();
 if (new URLSearchParams(location.search).get('blood') === '0') settings.blood = false;
 const qParam = new URLSearchParams(location.search).get('quality');
@@ -121,9 +136,12 @@ const hooks = {
     });
   },
   loadGame: (key: string) => {
-    void saves.load(key).then((save) => {
-      if (save) launch(save.setup, false, undefined, undefined, save.state);
-    });
+    void saves
+      .load(key)
+      .then((save) => {
+        if (save) launch(save.setup, false, undefined, undefined, save.state);
+      })
+      .catch(() => undefined);
   },
   listSaves: () => saves.list(),
   deleteSave: (key: string) => saves.remove(key),
@@ -157,7 +175,11 @@ function launch(setup: GameSetup, online: boolean, n?: NetClient, missionId?: st
   hooks.saveGame = conn.local
     ? () => {
         void conn.save?.().then((state) => {
-          void saves.save(makeSave(setup, state, `Spiel ${new Date().toLocaleTimeString()}`)).then(() => s.hud.toast('Spiel gespeichert'));
+          // IndexedDB kann fehlen oder gesperrt sein (Safari: privates Fenster, blockierte Website-Daten): Fehler melden statt still zu scheitern
+          void saves
+            .save(makeSave(setup, state, `Spiel ${new Date().toLocaleTimeString()}`))
+            .then(() => s.hud.toast('Spiel gespeichert'))
+            .catch(() => s.hud.toast('Speichern nicht möglich (Browser blockiert den Speicher)', true));
         });
         screens.hide();
         if (s.paused) s.togglePause();

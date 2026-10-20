@@ -17,6 +17,15 @@
  *
  * Standardmäßig wird Software-GL (SwiftShader) erzwungen, damit der Lauf überall funktioniert. Mit --hw nutzt der
  * Browser die echte GPU. Software-GL-Zahlen sind nur ein pessimistischer Richtwert.
+ *
+ * Wie lese ich die Tabelle?
+ *  - „FPS/Ø ms/p95/p99“ = ganze Bildzeit (JS + Rasterisieren + Anzeige). Bei Software-GL bestimmt fast nur der Rasterizer diese Werte
+ *    (4 Kerne, ~1 FPS bei 2.000 Einheiten): sie sagen nichts über eine echte GPU.
+ *  - „JS Ø ms (ohne Raster)“ (Lauf mit nodraw=1, Draw-Calls als No-ops) ist die reine JS-Zeit je Bild (Aktualisierung + Aufbau der
+ *    Draw-Calls) und damit die Zahl, die sich zwischen Rechnern am wenigsten unterscheidet. Ziel Mittel: ≤ 8 ms, Draw-Calls < 150.
+ *  - Liegt die JS-Zeit weit unter der Bildzeit, ist die GPU/Auflösung der Engpass (Pixel-Ratio, Stufe); liegen beide dicht beieinander, die CPU.
+ *  - „60 FPS bei 2.000 Einheiten“ gilt erst als erreicht, wenn es mit --hw bzw. in Safari auf echter GPU gemessen wurde.
+ * Safari auf dem Mac: gleiche Szene von Hand, siehe README „Lokaler Test auf dem MacBook (Safari)“ (BENCH_DONE-Zeile in der Konsole).
  */
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';

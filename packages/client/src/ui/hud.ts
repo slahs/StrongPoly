@@ -185,7 +185,7 @@ export class Hud {
     this.info = h('div', { class: 'panel pp info' });
     // Während die Maustaste im Infopanel gedrückt ist (Schieberegler, Klick) wird nicht neu aufgebaut
     this.info.addEventListener('pointerdown', () => (this.infoFrozen = true));
-    window.addEventListener('pointerup', () => (this.infoFrozen = false));
+    window.addEventListener('pointerup', this.onPointerUp);
     this.context = new ContextPanel(this.sharedApi, this.info);
     this.troops = new TroopPanel(this.sharedApi, this.info);
     this.troops.formationHandler = (f) => this.formationHandler?.(f);
@@ -199,6 +199,10 @@ export class Hud {
   }
 
   private onResize = (): void => this.refreshLayout();
+  /** benannt, damit destroy() ihn entfernen kann (ein anonymer Listener hielt nach jedem Spiel das ganze Hud samt Welt im Speicher) */
+  private onPointerUp = (): void => {
+    this.infoFrozen = false;
+  };
 
   setMe(me: number): void {
     this.me = me;
@@ -540,6 +544,7 @@ export class Hud {
 
   destroy(): void {
     window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('pointerup', this.onPointerUp);
     this.minimap.destroy();
     this.root.remove();
   }

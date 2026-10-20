@@ -36,8 +36,12 @@ UNIT_TOP[U.FireBallista] = 1.0;
 export const UNIT_CORPSE: boolean[] = UNITS.map((d) => d.side !== 'siege');
 /** Reittiere und Ochsen kippen zur Seite, Fußvolk nach hinten */
 export const UNIT_SIDEWAYS: boolean[] = UNITS.map((d) => !!d.mounted || d.id === U.Ox);
-/** Schrittfrequenz (rad/s) je Einheitentyp, passend zur Geschwindigkeit */
-export const UNIT_WALK_W: number[] = UNITS.map((d) => Math.min(14, 3 + d.speed * (d.side === 'siege' ? 3.2 : 4.2)));
+/**
+ * Schrittfrequenz (rad/s) je Einheitentyp, passend zur Geschwindigkeit. Fußvolk: 4H-Messung (test/unit_gait.test.ts) – bei 4,2 je Tile/s
+ * glitt der Fuß gegenüber dem Körper um 20–40 % (Körperweg je Schritt gegen 2·Beinlänge·sin 0,66); 4,8 senkt das Gleiten auf 10–17 %
+ * (schnelle Typen bleiben durch die Obergrenze 14 rad/s ≈ 4,5 Schritte/s bei ≤ 1,4).
+ */
+export const UNIT_WALK_W: number[] = UNITS.map((d) => Math.min(14, 3 + d.speed * (d.side === 'siege' ? 3.2 : 4.8)));
 /** Angriffs-/Schusszyklus in Sekunden (Abklingzeit der Waffe) */
 export const UNIT_CYCLE: number[] = UNITS.map((d) => Math.max(0.5, d.cd));
 

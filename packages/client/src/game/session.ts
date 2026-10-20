@@ -3,6 +3,7 @@ import {
   BUILDINGS,
   BT,
   ClientWorld,
+  checkPlaceRules,
   Command,
   PlayerView,
   Snapshot,
@@ -145,6 +146,9 @@ export class Session {
       getTrace: () => this.debug.trace,
       legacy: this.legacyMotion,
     };
+    // Prüfhilfe für Browser-Skripte (scripts/qa): Platzierungsregeln der Sim für den eigenen Spieler (null = erlaubt)
+    (window as unknown as Record<string, unknown>).__place = (type: number, x: number, y: number, rot = 0): string | null =>
+      checkPlaceRules(this.world, this.me, type, x, y, rot);
     const cv = gs.canvas;
     this.onMove = (e: PointerEvent): void => {
       this.mouse.x = e.clientX;
@@ -729,6 +733,12 @@ export class Session {
     this.gs.canvas.removeEventListener('pointermove', this.onMove);
     this.gs.canvas.removeEventListener('pointerleave', this.onLeave);
     window.removeEventListener('keydown', this.onDebugKey);
+    this.debug.destroy();
+    const hook = (window as unknown as Record<string, { debug?: unknown } | undefined>).__motion;
+    if (hook && hook.debug === this.debug) {
+      delete (window as unknown as Record<string, unknown>).__motion;
+      delete (window as unknown as Record<string, unknown>).__place;
+    }
     this.gs.onGfx = null;
     this.conn.close();
     this.input.destroy();

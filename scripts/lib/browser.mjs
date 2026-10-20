@@ -68,7 +68,7 @@ export function findChromium() {
 }
 
 export function serveDist(dir, port = 0) {
-  const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json', '.wasm': 'application/wasm' };
+  const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json', '.wasm': 'application/wasm', '.mp3': 'audio/mpeg', '.png': 'image/png', '.jpg': 'image/jpeg', '.webmanifest': 'application/manifest+json' };
   return new Promise((resolve) => {
     const srv = http.createServer((req, res) => {
       let p = decodeURIComponent((req.url ?? '/').split('?')[0]);
@@ -82,6 +82,7 @@ export function serveDist(dir, port = 0) {
       res.writeHead(200, { 'content-type': types[path.extname(f)] ?? 'application/octet-stream' });
       fs.createReadStream(f).pipe(res);
     });
+    // port 0 = freier Port; Bereich `lo-hi` (z. B. 5500-5599) probiert der Reihe nach
     srv.listen(port, '127.0.0.1', () => resolve({ srv, url: `http://127.0.0.1:${srv.address().port}` }));
   });
 }

@@ -255,6 +255,14 @@ export class MotionDebug {
     this.ctx = this.cv.getContext('2d');
   }
 
+  /** Overlay aus dem Dokument nehmen (Spielende; sonst blieben je Sitzung ein Canvas und ein Textfeld im #ui-Baum) */
+  destroy(): void {
+    this.cv.remove();
+    this.box.remove();
+    this.trails.clear();
+    this.trace = [];
+  }
+
   /** Bahn dieser Slots je Frame aufzeichnen (leer = Aufzeichnung aus) */
   startTrace(slots: number[]): void {
     this.traceSlots = slots;

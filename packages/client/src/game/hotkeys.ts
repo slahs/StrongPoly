@@ -91,6 +91,13 @@ export function comboOf(e: { code: string; ctrlKey: boolean; metaKey: boolean; a
   return `${e.ctrlKey || e.metaKey ? 'Ctrl+' : ''}${e.altKey ? 'Alt+' : ''}${e.code}`;
 }
 
+/**
+ * Gehaltene Tasten (Kamera schwenken/zoomen) nur ohne Strg/Alt/Cmd merken: Alt+S (Lager anwählen) darf nicht gleichzeitig
+ * die Kamera nach unten schwenken, und unter macOS sendet der Browser bei gehaltener Cmd-Taste kein keyup für die Buchstabentaste
+ * (sonst bliebe die Kamera hängen).
+ */
+export const tracksHeldKey = (e: { ctrlKey: boolean; metaKey: boolean; altKey: boolean }): boolean => !(e.ctrlKey || e.metaKey || e.altKey);
+
 const KEY_NAMES: Record<string, string> = {
   Equal: '+', Minus: '-', Escape: 'Esc', Space: 'Leertaste', Pause: 'Pause', Delete: 'Entf', Home: 'Pos1', End: 'Ende', Enter: 'Eingabe',
   Backquote: '^', ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', PageUp: 'Bild↑', PageDown: 'Bild↓', Insert: 'Einfg',

@@ -206,6 +206,83 @@ node scripts/bench-fps.mjs --hw                  # echte GPU statt Software-GL
 
 Das Skript braucht `playwright-core` (normal installiert, per `NODE_PATH` oder `PLAYWRIGHT_CORE=<Verzeichnis>`) und ein Chromium (`CHROMIUM=<Pfad>` oder Autodetektion unter `/opt/pw-browsers`). Ohne `--hw` wird Software-GL (SwiftShader) erzwungen; deren FPS sind nur ein pessimistischer Richtwert.
 
+### Lokaler Test auf dem MacBook (Safari) – Anleitung
+
+Ziel: messen, wie flüssig das Spiel auf einem MacBook Air M3 in Safari läuft. Die Zahlen aus dieser Entwicklungsumgebung stammen von **Software-Rendering (SwiftShader) ohne GPU** und sind nur Richtwerte; „60 FPS bei 2.000 Einheiten“ gilt erst als erreicht, wenn es auf echter Hardware gemessen und zurückgemeldet wurde.
+
+**1. Einrichten (einmalig)**
+
+```bash
+# Node ≥ 20 (z. B. brew install node), dann im Repository-Ordner:
+corepack enable                          # falls pnpm fehlt; das Repository legt pnpm 10.28 fest
+corepack pnpm i
+corepack pnpm --filter @strongpoly/client dev      # Vite-Dev-Server, http://localhost:5173
+```
+
+Der Client-Dev-Server genügt für alles außer Online-Spielen (`corepack pnpm dev` startet zusätzlich den Server auf Port 3000). Für Messungen ist der gebaute Client genauer als der Dev-Server (keine Dev-Hilfen, minimierter Code): `corepack pnpm build && corepack pnpm --filter @strongpoly/client preview` (Standard `http://localhost:4173`); die URLs unten gelten dort gleich.
+
+**2. Safari vorbereiten**
+
+- Safari → Einstellungen → Erweitert → „Funktionen für Webentwickler anzeigen“; danach Entwickler → „JavaScript-Konsole einblenden“ (⌥⌘C). WebGL 2 ist in Safari ab Version 15 standardmäßig an; ob es läuft, zeigt das Spiel selbst (sonst erscheint die Meldung „StrongPoly braucht WebGL 2 …“).
+- **Energiesparmodus aus** (Systemeinstellungen → Batterie), am besten am Netzteil: im Energiesparmodus begrenzt macOS Safari auf 30 Bilder/s, das verfälscht jede FPS-Messung.
+- Fenster/Vollbild in der Größe, in der du normalerweise spielst, und nur einen Tab offen lassen (Hintergrund-Tabs werden gedrosselt). Auf dem Retina-Display rechnet das Spiel je Stufe mit höchstens Pixel-Ratio 1 (Niedrig), 1,5 (Mittel) oder 2 (Hoch) – die tatsächliche Zeichenauflösung steht im Overlay/Ergebnis (`viewport`); der Benchmark selbst startet mit Pixel-Ratio 1, `&pr=2` simuliert die volle Retina-Auflösung.
+- Ton: Safari erlaubt Audio erst nach der ersten Maus-/Tastaturbedienung; danach laufen Musik, Umgebung und Stimmen. Die Browser-Stimme (Ersatz, wenn ein Clip fehlt) nutzt die in macOS installierten deutschen Stimmen (Systemeinstellungen → Bedienungshilfen → Gesprochene Inhalte → Systemstimme verwalten).
+
+**3. Was wo ausprobiert wird** (alle Adressen mit `http://localhost:5173/`)
+
+| Adresse | Zweck |
+| --- | --- |
+| `?quick=1` | sofort ein Gefecht gegen die KI (normales Spiel, FPS unten rechts im Bild) |
+| `?quick=1&dev=1` | wie oben mit Dev-Befehlen (`session().conn.dev('spawn', {...})`, siehe „Entwicklungs-URL-Parameter“) |
+| `?bench&quality=medium&units=2000&secs=20` | **Hauptmessung:** 2.000 kämpfende Einheiten, 20 s Messfenster nach 3 s Warmlauf |
+| `?bench&quality=medium&units=2000&secs=20&nodraw=1` | dieselbe Szene ohne Zeichnen (Draw-Calls als No-ops): reine **JS-Zeit** pro Bild |
+| `?bench&quality=low` / `…=high` | die anderen Stufen; `&pr=2` Retina-Auflösung, `&dist=36` Kameraabstand wie in unseren Tabellen |
+| `?bench&showcase=units` / `showcase=buildings` / `showcase=build` | Prüfszenen: alle Figuren, alle Gebäude, Baustellen |
+| `?shots=castle&quality=medium` (auch `early`, `town`, `siege`, `figures`, `map` …) | feste Vergleichsszenen zum Ansehen |
+| `?quick=1&motiondebug` (oder **F10**) | Bewegungs-Debug: Overlay mit Puffer, Snapshot-Abstand, Kennzahlen; `&motionlegacy=1` zeigt das alte Verhalten zum Vergleich |
+
+**4. Ergebnis ablesen und zurückmelden**
+
+- Während des Laufs zeigt das Overlay oben links FPS, Bildzeit, JS-Zeit (Aktualisierung/Rendern), Draw-Calls, Dreiecke. Nach „Messung beendet“ steht das Ergebnis in der Konsole als Zeile `BENCH_DONE {…}`; mit `window.__bench.result()` (in die Konsole tippen) bekommt man dasselbe Objekt: `fps`, `avgMs`, `p95Ms`, `p99Ms`, `cpuAvgMs` (JS-Zeit), `updateMs`/`renderMs`, `calls`, `triangles`, `unitsDrawn`, `quality`, `viewport`, `gl` (Name der GPU).
+- Bitte je Stufe (Niedrig, Mittel, Hoch) einmal mit und einmal mit `&nodraw=1` laufen lassen und zurückmelden: Mac-Modell und macOS-/Safari-Version, Fenstergröße/Skalierung, Stufe, **`BENCH_DONE`-Zeile** (kopieren), eventuelle Konsolenfehler (rote/gelbe Zeilen) und den subjektiven Eindruck (ruckelt es beim Scrollen/Zoomen, beim Kampf, beim Start?).
+- **Gesamt-FPS gegen JS-Zeit:** `fps`/`avgMs` ist die ganze Bildzeit (JS + GPU + Anzeige). `cpuAvgMs` ist nur die JS-Arbeit je Bild; im `nodraw=1`-Lauf ist sie vom Rasterisieren unabhängig. Ziel Mittel: JS-Zeit ≤ 8 ms, Draw-Calls < 150. Liegt die JS-Zeit weit unter der Bildzeit (z. B. 5 ms gegen 25 ms), ist die GPU/Auflösung der Engpass (Pixel-Ratio senken oder Stufe wechseln); liegen beide dicht beieinander, ist es die CPU (Sim/Snapshots/Animation).
+- Ein normaler Spieltest (`?quick=1`, eigene Burg bauen, Truppen schicken, Schlacht mit `&dev=1` und mehreren Hundert gespawnter Einheiten) ist mindestens so wichtig wie die Zahl: Zittern von Figuren, Hänger beim ersten Auftauchen eines Gebäude-/Einheitentyps, Ton (Stimmen, Berater, Umgebung) und Schärfe der Darstellung.
+
+**5. Bekannte Safari-/macOS-Eigenheiten, die das Spiel abfängt**
+
+Rechtsklick: Zwei-Finger-Tipp oder **Strg+Klick**; Trackpad-Pinch zoomt die Kamera (nicht die Seite); `⌥`-Kombinationen (`Alt+H` Berater wiederholen, `Alt+K/G/B/M/S/W` Gebäude anwählen) schwenken die Kamera nicht mit; bei gehaltener `⌘`-Taste sendet Safari kein `keyup` – gehaltene Tasten werden beim Loslassen von `⌘` verworfen, die Kamera bleibt nicht hängen. Fehlt WebGL 2 oder ist `IndexedDB` gesperrt (privates Fenster), erscheint eine Meldung statt einer leeren Seite bzw. eines stillen Fehlers beim Speichern. Alle Shader nutzen nur WebGL-2-Kernfunktionen (keine Erweiterungen); die statische Prüfung steht in `PROGRESS-4.md` („Safari-Risiken“).
+
+### Abnahme-Skripte im echten Browser (`scripts/qa`, Meilenstein 4H)
+
+Die Skripte spielen die verbindlichen Szenarien 1–12 mit Playwright und Chromium (Software-GL) durch; sie prüfen Zustände über `window.session()`, `window.__audio`, `window.__motion` und `window.__place` (Platzierungsregeln der Sim) und legen Ergebnisse (`<szenario>.json`) und Bilder unter `docs/phase4/qa/` ab.
+
+```bash
+pnpm build                                   # die Skripte laden packages/client/dist (und für s11 packages/server/dist)
+export PLAYWRIGHT_CORE=<Ordner von playwright-core>   # oder NODE_PATH; Chromium unter /opt/pw-browsers oder CHROMIUM=<Pfad>
+node scripts/qa/run.mjs s01_start s02_economy        # Szenarien nacheinander (ohne Namen: alle s*.mjs), Protokolle in $TMP/strongpoly-qa
+node scripts/qa/s04_castle.mjs --fast [--legacy]     # einzeln; --fast = Niedrig/640x360 für aussagekräftige Bewegungskennzahlen
+```
+
+| Skript | Szenario |
+| --- | --- |
+| `s01_start.mjs` | 1 Gefecht gegen KI (Hauptmenü und `?quick=1`) |
+| `s02_economy.mjs` | 2 Wirtschaftsgebäude, Bauanimation (Zeitpunkte), Sofortbau, Einzug/Produktion |
+| `s03_motion.mjs` | 3 Bauern bei der Arbeit, `__motion`-Kennzahlen neu gegen `&motionlegacy=1` |
+| `s04_castle.mjs` | 4 Burg mit Mauerwelle, Tor, Türmen, Treppen, Geschütz; Truppen über Tor/Treppe/Mauer |
+| `s05_units.mjs` | 5 Auswahl, Rahmen, Formationen, Angriffsmarsch, Patrouille, Stopp/Haltung, Hotkey-Kollisionen |
+| `s06_voices.mjs` | 6 Stimmen: Autoplay, alle Clips dekodieren, Auswahl/Befehle, Untertitel, Regler, Aufnahme je Rolle + Rücktranskription (Whisper, Python-Umgebung aus `scripts/check_voices.py`) |
+| `s07_advisor.mjs` | 7 Ressourcenmangel → Berater (einmal, Text, Stimme, Alt+H, Sprung), Hunger |
+| `s08_popularity.mjs` | 8 Steuern/Rationen → Hover, Detailansicht, Bergfried-Panel, Berater |
+| `s09_battle.mjs` | 9 Schlacht mit mehreren Hundert Soldaten: Lesbarkeit, Pegel am Bus, Gleichzeitigkeit der Klänge, Leichen |
+| `s10_saveload.mjs` | 10 Speichern/Laden: keine Neubau-Animation, gleiche Welt, Musik/Atmosphäre, ruhige Bewegung |
+| `s11_online.mjs` | 11 Server + zwei Clients + KI, Trennen/Wiederverbinden/Offline/Neuladen |
+| `s12_quality.mjs` | 12 Grafikstufen zur Laufzeit wechseln, Nah/Fern; `--shots` ruft `scripts/shots.mjs --check` für alle Stufen auf |
+| `s13_leaks.mjs` | Spielstart/-ende dreimal: Geometrien, Texturen, Programme, Szenenobjekte, Listener, JS-Heap |
+| `s14_missions.mjs` | Tutorial-Missionen 1–5 starten, Zufallsbedienung, Konsole sauber, Berater nicht zugespammt |
+| `s15_nowebgl.mjs` | ohne WebGL 2: verständliche Meldung |
+| `perf_profile.mjs` | CPU-Profil (Spielstart bzw. `?bench&nodraw=1`) mit Hotspot-Tabelle |
+| `compare_shots.mjs` | „Nachher“-Aufnahmen mit den Kameras der Vorher-Bilder (`docs/phase4/final/`) |
+
 ## Sound, Musik, Stimmen und Umgebung (`client/src/audio`)
 
 Effekte, Musik und Umgebungsklänge entstehen zur Laufzeit per WebAudio-Synthese (keine fremden Melodien). Gesprochene Zeilen

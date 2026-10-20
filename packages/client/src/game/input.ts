@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { BUILDINGS, BT, BuildingDef, checkPlaceRules, ClientWorld, Formation, UNITS, U } from '@strongpoly/shared';
 import type { GhostPlacement } from '../render/ghost';
-import { comboOf, loadHotkeys, HotkeyAction } from './hotkeys';
+import { isMac, isSecondaryClick, wheelPixels } from './pointer';
+import { comboOf, loadHotkeys, HotkeyAction, tracksHeldKey } from './hotkeys';
 import { explainPlacementError } from '../ui/tooltip';
 import type { Session } from './session';
 import { groundYAt } from '../render/util';
@@ -49,6 +50,9 @@ export class InputController {
   private dragTile: { x: number; y: number } | null = null;
   private lastClick = { t: 0, type: -1 };
   formation: number = Formation.Free;
+  /** Mac: Strg+Klick wurde als Rechtsklick behandelt (Loslassen ignorieren) */
+  private secondaryDown = false;
+  private mac = isMac();
   private groupTap = { n: 0, t: 0 };
   private disposers: (() => void)[] = [];
   private hover: { x: number; y: number; fx: number; fy: number } | null = null;
@@ -82,8 +86,20 @@ export class InputController {
       e.preventDefault();
       // Beim Platzieren dreht das Mausrad das Gebäude (Umschalt+Rad zoomt)
       if (this.mode.k === 'place' && !e.shiftKey && BUILDINGS[this.mode.type].placement !== 'onWall') this.mode.rot ^= 1;
-      else s.gs.cam.zoom(e.deltaY);
+      else s.gs.cam.zoom(wheelPixels(e));
     }, { passive: false });
+    // Safari (macOS): Trackpad-Pinch löst Gesten-Ereignisse aus und würde sonst die ganze Seite skalieren; stattdessen die Kamera zoomen
+    let gestureScale = 1;
+    add(canvas, 'gesturestart', (e: Event) => {
+      e.preventDefault();
+      gestureScale = 1;
+    });
+    add(canvas, 'gesturechange', (e: Event) => {
+      e.preventDefault();
+      const sc = (e as unknown as { scale: number }).scale;
+      s.gs.cam.zoom(-(sc - gestureScale) * 400);
+      gestureScale = sc;
+    });
     add(window, 'keydown', (e: KeyboardEvent) => this.onKey(e, true));
     add(window, 'keyup', (e: KeyboardEvent) => this.onKey(e, false));
     add(document, 'mouseleave', () => (this.mouse.inside = false));
@@ -301,7 +317,9 @@ export class InputController {
     this.mouse.y = e.clientY;
     const s = this.s;
     const mode = this.mode;
-    if (e.button === 2) {
+    // Mac: Strg+Klick = Rechtsklick (das Loslassen wird in onUp ignoriert)
+    this.secondaryDown = e.button === 0 && isSecondaryClick(e, this.mac);
+    if (e.button === 2 || this.secondaryDown) {
       if (mode.k !== 'normal') {
         this.setMode({ k: 'normal' });
         return;
@@ -383,6 +401,10 @@ export class InputController {
 
   private onUp(e: MouseEvent): void {
     if (e.button !== 0) return;
+    if (this.secondaryDown) {
+      this.secondaryDown = false;
+      return;
+    }
     const s = this.s;
     const mode = this.mode;
     const g = this.hover;
@@ -537,13 +559,15 @@ export class InputController {
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     if (!down) {
       this.keys.delete(e.code);
+      // macOS: Zu Cmd+Taste kommt kein keyup der Taste, beim Loslassen der Cmd-Taste alles Gehaltene vergessen
+      if (e.code === 'MetaLeft' || e.code === 'MetaRight') this.keys.clear();
       return;
     }
     if (e.repeat) {
-      this.keys.add(e.code);
+      if (tracksHeldKey(e)) this.keys.add(e.code);
       return;
     }
-    this.keys.add(e.code);
+    if (tracksHeldKey(e)) this.keys.add(e.code);
     const s = this.s;
     const hk = this.hotkeys;
     const combo = comboOf(e);
