@@ -37,6 +37,10 @@ export interface RenderOpts {
   tickF?: number;
   /** Pause: Einheiten bewegen sich und animieren nicht weiter */
   paused?: boolean;
+  /** echte Frame-Zeit (s) für Bewegung und Gehphase; `update(dt, …)` bekommt die auf 0,1 s begrenzte */
+  motionDt?: number;
+  /** Vergleichsmodus mit dem alten Bewegungsverhalten (URL ?motionlegacy) */
+  legacyMotion?: boolean;
   now: number;
   camYaw: number;
   selected: Set<number>;
@@ -744,7 +748,7 @@ export class EntityRenderer {
     const w = this.world;
     for (const m of this.unitMeshes) m?.begin();
     for (const m of this.cargoMeshes.values()) m.begin();
-    this.motion.update(w, { tickF: o.tickF, alpha: o.alpha, dt, paused: !!o.paused, walkW: UNIT_WALK_W });
+    this.motion.update(w, { tickF: o.tickF, alpha: o.alpha, dt: o.motionDt ?? dt, paused: !!o.paused, walkW: UNIT_WALK_W, legacy: o.legacyMotion });
     const mo = this.motion;
     // Shader-Zeit dieses Frames (GameScene.render setzt sie danach auf now − t0)
     if (this.lastNowU === 0) this.lastNowU = o.now;
@@ -816,7 +820,7 @@ export class EntityRenderer {
       const tm = this.unitMesh(type);
       let phase = (s * 0.61803) % 1;
       // Gehphase: der Shader rechnet uTime·Frequenz + phase·2π, daher die gewünschte Phase um uTime·Frequenz verschieben
-      if (mo.walk[s] && !(af & (AF.Melee | AF.Shoot | AF.Work))) phase = (mo.gait[s] - uT * UNIT_WALK_W[type]) / PI2;
+      if (mo.gaitDriven && mo.walk[s] && !(af & (AF.Melee | AF.Shoot | AF.Work))) phase = (mo.gait[s] - uT * UNIT_WALK_W[type]) / PI2;
       tm.push(x, ny, y, face, sc, sc, owner, phase, af, UNIT_WALK_W[type], af & AF.Work ? 1.1 : UNIT_CYCLE[type]);
       if (useBlob) blob.push(x, ny + 0.025, y, Math.max(0.5, def.radius * 2.3) * sc, 0, 0, 0, SIEGE[type] ? 0.32 : 0.3);
       const sel = o.selected.has(id);

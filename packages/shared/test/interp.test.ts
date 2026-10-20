@@ -217,6 +217,30 @@ describe('RenderClock', () => {
     expect(c.render).toBeLessThanOrEqual(30 + RenderClock.MAX_EXTRAP + 1e-6);
   });
 
+  it('Tab im Hintergrund (3 s ohne Frames, danach Snapshot-Schwall): Uhr holt auf, läuft nie rückwärts, bleibt endlich', () => {
+    const c = new RenderClock();
+    c.reset(0);
+    for (let i = 0; i < 60; i++) {
+      c.advance(0.0167, 1, false);
+      if (i % 6 === 5) c.onSnapshot(i / 6 + 1, 0, 1);
+    }
+    const before = c.render;
+    // 3 s lang kein Frame; währenddessen laufen 30 Ticks auf
+    c.advance(3, 1, false);
+    for (let t = 11; t <= 40; t++) c.onSnapshot(t, (40 - t) * 100, 1);
+    expect(Number.isFinite(c.render)).toBe(true);
+    expect(c.render).toBeGreaterThan(before);
+    expect(c.render).toBeLessThanOrEqual(c.latest + RenderClock.MAX_EXTRAP + 1e-6);
+    // danach läuft es wieder ruhig weiter
+    let prev = c.render;
+    for (let i = 0; i < 120; i++) {
+      c.advance(0.0167, 1, false);
+      if (i % 6 === 0) c.onSnapshot(41 + i / 6, 0, 1);
+      expect(c.render).toBeGreaterThanOrEqual(prev - 1e-9);
+      prev = c.render;
+    }
+  });
+
   it('Voll-Snapshot (reset) setzt Uhr und Puffer neu', () => {
     const { clock } = drive(60);
     expect(clock.jitter).toBeGreaterThan(0.1);

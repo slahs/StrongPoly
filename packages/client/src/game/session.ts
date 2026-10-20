@@ -11,6 +11,9 @@ import {
   RenderClock,
 } from '@strongpoly/shared';
 import { EntityRenderer } from '../render/entities';
+import { MotionDebug } from '../render/motion_debug';
+import { MotionRunner } from './motion_runner';
+import { motionScene } from './motion_scenes';
 import { GhostRenderer } from '../render/ghost';
 import { GameScene } from '../render/scene';
 import { Hud, HudActions, ModeName } from '../ui/hud';
@@ -61,6 +64,13 @@ export class Session {
   /** gleichmäßige Darstellungsuhr in Sim-Ticks (Interpolation der Einheiten) */
   readonly clock = new RenderClock();
   private lastFrameSec = 0;
+  private realDt = 0;
+  /** Bewegungs-Debug (?motiondebug / F10) und Vergleichsmodus mit dem alten Verhalten (?motionlegacy) */
+  readonly debug: MotionDebug;
+  private legacyMotion = false;
+  private runner: MotionRunner | null = null;
+  private debugSample: number[] = [];
+  private debugSampleT = 0;
   private view: PlayerView | null = null;
   private hudTimer = 0;
   private fpsAcc = { frames: 0, t: 0, fps: 0 };
@@ -73,6 +83,7 @@ export class Session {
   private hoverTimer = 0;
   private onMove: (e: PointerEvent) => void;
   private onLeave: () => void;
+  private onDebugKey: (e: KeyboardEvent) => void;
   private alertCooldown = 0;
   private info = { tickMs: 0, tick: 0, units: 0 };
   audio: AudioEngine | null;
@@ -96,6 +107,43 @@ export class Session {
     gs.onGfx = (q, shadows) => this.entities.applyQuality(q, shadows);
     this.entities.applyQuality(gs.qcfg, gs.gfx.shadows && gs.qcfg.shadows);
     gs.root.add(this.entities.group, this.ghost.group);
+    const q = new URLSearchParams(location.search);
+    this.legacyMotion = q.has('motionlegacy');
+    this.debug = new MotionDebug({
+      parent: uiRoot,
+      canvas: gs.canvas,
+      world: this.world,
+      clock: this.clock,
+      motion: () => this.entities.motion,
+      camera: () => gs.cam.camera,
+      selected: () => (this.selection.units.length ? this.selection.units : this.sampleUnits()),
+      speed: () => this.speed,
+      paused: () => this.paused,
+      legacy: this.legacyMotion,
+    });
+    if (q.has('motiondebug') || q.has('motion')) this.debug.setEnabled(true);
+    if (q.has('motion')) this.debug.measure = true;
+    const scene = q.get('motion') ? motionScene(q.get('motion')!) : undefined;
+    if (scene) this.runner = new MotionRunner(this.world, conn, this.me, (c) => this.conn.send(c), scene);
+    this.onDebugKey = (e: KeyboardEvent): void => {
+      if (e.code === 'F10') {
+        e.preventDefault();
+        this.hud.toast(this.debug.toggle() ? 'Bewegungs-Debug an (F10)' : 'Bewegungs-Debug aus');
+      }
+    };
+    window.addEventListener('keydown', this.onDebugKey);
+    (window as unknown as Record<string, unknown>).__motion = {
+      debug: this.debug,
+      clock: this.clock,
+      report: () => this.debug.meter.report(),
+      resetMeter: () => this.debug.meter.reset(),
+      enable: (v = true) => this.debug.setEnabled(v),
+      measure: (v = true) => (this.debug.measure = v),
+      runner: () => this.runner,
+      trace: (slots: number[]) => this.debug.startTrace(slots),
+      getTrace: () => this.debug.trace,
+      legacy: this.legacyMotion,
+    };
     const cv = gs.canvas;
     this.onMove = (e: PointerEvent): void => {
       this.mouse.x = e.clientX;
@@ -386,6 +434,7 @@ export class Session {
         this.initAfterFull();
         this.gotFirst = true;
       } else this.clock.onSnapshot(s.tick, nowMs - at, this.speed, at);
+      this.debug.onSnapshot(at);
       for (const t of this.world.tileChanges) {
         if (t < 0) continue;
         this.gs.terrain?.markTile(t % this.world.map.w, (t / this.world.map.w) | 0);
@@ -441,6 +490,7 @@ export class Session {
     // echte Frame-Zeit (main.ts begrenzt dt auf 0,1 s; die Uhr braucht auch lange Frames, um Rückstand zu vermeiden)
     const real = this.lastFrameSec ? Math.max(0, Math.min(1, nowSec - this.lastFrameSec)) : dt;
     this.lastFrameSec = nowSec;
+    this.realDt = real;
     this.clock.advance(real, this.speed, this.paused);
     this.applySnapshots(nowMs);
     this.alertCooldown -= dt;
@@ -453,6 +503,11 @@ export class Session {
     if (this.opts.mission) this.hud.setMission(this.world.mission);
     // Eingabe/Kamera
     this.input.update(dt);
+    if (this.runner) {
+      const first = !this.runner.focus.x && !this.runner.focus.y;
+      this.runner.update();
+      if (first && (this.runner.focus.x || this.runner.focus.y)) this.gs.cam.lookAt(this.runner.focus.x, this.runner.focus.y + 3);
+    }
     // Fog
     if (this.fog) {
       this.fogTimer -= dt;
@@ -474,7 +529,7 @@ export class Session {
     }
     this.updateHover(dt);
     // Rendering
-    const alpha = this.clock.alpha;
+    const alpha = this.legacyMotion ? (nowMs - this.world.lastSnapMs) / (100 / this.speed) : this.clock.alpha;
     const sel = new Set(this.selection.units);
     const pc = this.world.proj.length / 8;
     this.lastProj = pc;
@@ -483,8 +538,10 @@ export class Session {
     this.entities.consumeEvents();
     this.entities.update(dt, {
       alpha,
-      tickF: this.clock.render,
+      tickF: this.legacyMotion ? undefined : this.clock.render,
+      motionDt: this.realDt,
       paused: this.paused,
+      legacyMotion: this.legacyMotion,
       now: nowSec,
       camYaw: this.gs.cam.yaw,
       selected: sel,
@@ -499,6 +556,7 @@ export class Session {
       teamOfPlayer: this.teamOf,
     });
     this.entities.clearEvents();
+    this.debug.update(this.realDt, nowSec);
     const tU1 = performance.now();
     this.gs.render(dt, nowSec);
     const tU2 = performance.now();
@@ -558,6 +616,18 @@ export class Session {
     this.hoverBuilding = id;
   }
 
+  /** für die Debug-Zeichnung ohne Auswahl: einige eigene Einheiten (nicht Lord/Ochse), einmal je Sekunde neu gewählt */
+  private sampleUnits(): number[] {
+    const now = performance.now();
+    if (now - this.debugSampleT < 1000 && this.debugSample.length) return this.debugSample;
+    this.debugSampleT = now;
+    const w = this.world;
+    const out: number[] = [];
+    for (let s = 0; s < w.top && out.length < 24; s++) if (w.ids[s] && w.owner[s] === this.me && w.type[s] !== 2 && w.type[s] !== 1) out.push(w.ids[s]);
+    this.debugSample = out;
+    return out;
+  }
+
   private soundView(): SoundView {
     const c = this.gs.cam;
     return { me: this.me, myTeam: this.myTeam, teamOf: this.teamOf, camX: c.tx, camY: c.tz, camYaw: c.yaw, camDist: c.dist };
@@ -591,6 +661,7 @@ export class Session {
   destroy(): void {
     this.gs.canvas.removeEventListener('pointermove', this.onMove);
     this.gs.canvas.removeEventListener('pointerleave', this.onLeave);
+    window.removeEventListener('keydown', this.onDebugKey);
     this.gs.onGfx = null;
     this.conn.close();
     this.input.destroy();

@@ -145,6 +145,24 @@ Alles entsteht zur Laufzeit per WebAudio-Synthese; es gibt keine Audiodateien un
 
 Lautstärkeregler (Master, Effekte, Musik, Berater), Musik-Schalter und Stumm stehen in den Optionen (`audio/ui.ts`, `Settings.vol*`), **M** schaltet den Ton stumm. Prüfung ohne Lautsprecher: `window.__audio.state()` (Kontextstatus, Stimmung, Stimmen, Zähler gespielter Effekte) und `window.__audio.renderAll()` (rendert jede Synthese offline und meldet Spitzenpegel, RMS und NaN).
 
+## Bewegung und Interpolation (`client/src/render/motion*.ts`, `shared/src/net/interp.ts`)
+
+Die Sim tickt mit 10 Hz, gezeichnet wird mit der Bildrate des Geräts. Damit Einheiten gleichmäßig laufen, entkoppelt der Client beides:
+
+- **Positionshistorie** (`ClientWorld`): je Einheit die letzten vier Stützstellen mit Sim-Tick. Einheiten ohne Delta-Eintrag stehen (sie behalten ihre letzte Stützstelle, nichts pendelt zurück); übersprungene Ticks werden über die Zwischenstelle am vorigen Snapshot sauber abgebildet; Sprünge (Teleport) werden nicht interpoliert.
+- **Darstellungsuhr** (`RenderClock`): eigene, gleichmäßige Uhr in Sim-Ticks (Frame-Zeit × Spielgeschwindigkeit, Pause friert sie ein). Snapshots korrigieren sie nur sanft (höchstens ±6 % Zeitraffer), gezeichnet wird mit mindestens einem Tick Verzögerung plus gemessenem Jitter (Puffer wächst langsam, sinkt langsam). Extrapolation höchstens 0,3 Tick; bei großem Fehler (Aussetzer, Reconnect) harte Neusynchronisation.
+- **Pose** (`UnitMotion`): Position leicht geglättet (nimmt die 1/16-Tile-Rasterung der Snapshots heraus), Blickrichtung bei Bewegung aus der tatsächlichen Bahn, sonst aus der Sim-Ausrichtung, zeitbasiert über den kürzesten Weg mit begrenzter Drehrate; die **Gehphase** wächst mit der zurückgelegten Strecke (gleiche Schrittweite bei jedem Tempo, kein Marschieren auf der Stelle, beim Anhalten Auslaufen bis zum Nulldurchgang).
+
+Prüfwerkzeuge:
+
+| Aufruf | Zweck |
+| --- | --- |
+| `?motiondebug` oder **F10** | Overlay: Darstellungszeit, Uhr, Puffer, Snapshot-Abstand, Korrekturereignisse (Resync, Teleport, Posensprung, leerer Puffer, mehrere Snapshots je Frame), Kennzahlen der gezeichneten Bewegung, Daten der gewählten Einheit; Zeichnung über dem Spiel: Sim-Position (rot), gezeichnete Position (grün), Blickrichtung (cyan), Spur |
+| `?quick=1&dev=1&motion=pawns\|gate\|formation\|haul\|stairs\|crowd` | reproduzierbare Prüfszenen (Bauern vor dem Bergfried, enges Tor, Formation, Warentransport, Treppen/Mauern, große Ansammlung); Gegner untätig, Overlay und Messung an; `window.__motion.report()` liefert die Kennzahlen |
+| `&motionlegacy=1` | altes Verhalten (Echtzeit-Alpha, Sim-Richtung, Sim-Gehflag) zum Vergleich |
+| `cd packages/client && npx tsx bench/motion.ts <scene\|all> <local60\|local60j\|local30\|net60\|all> <legacy\|new\|all> [speed]` | headless Messlabor: Sim → Host → Snapshot → ClientWorld → Pose mit simulierten Worker-Timern, Übertragungs- und Frame-Jitter; Sprünge, Rückwärtsschritte, Umkehrungen, Drehraten, Drift Stehender, Schrittsynchronität |
+| `npx tsx bench/simjitter.ts <scene>` / `bench/simjitter_game.ts [min] [seed]` | Bewegungsqualität auf Sim-Ebene (Szene bzw. echte KI-Partie) |
+
 ## Bedienung (Stronghold-Stil)
 
 Unten sitzt das Hauptpanel: links Baumenü (Reiter Burg/Industrie/Landwirtschaft/Stadt/Waffen/Nahrung, bei „Burg“ Unterkategorien Mauern/Türme/Tore/Truppen/Belagerung, Icon-Raster mit Kosten, ausgegraut wenn nicht bezahlbar, Werkzeuge Abreißen/Reparieren/Rückgängig/Abbrechen), in der Mitte das Kontextpanel (Bergfried mit Beliebtheits-Aufschlüsselung und Prognose, Kornspeicher/Lager/Waffenkammer mit Beständen und Rationen, Kaserne und Söldner mit Rekrutierung, Markt mit Preisen, Werkstätten mit Rezeptwahl und Fortschritt, Schenke/Kirche mit Abdeckung, Arbeiter an/aus, Truppenpanel mit Typ-Icons, Haltung, Formation, Patrouille, Bodenangriff, Graben, Öl), rechts die Minikarte. Platzierungs-Geist grün/rot mit Grund und Kosten am Cursor, Linien-Vorschau bei Mauern, Berater mit Meldungsliste und Kamerasprung (`Leertaste`), Endbildschirm mit Podium und Statistik. Tooltips (Hover) und Enzyklopädie (`F2`, auch im Menü) erklären alle Gebäude, Einheiten, Waren, Wirtschaftsketten und Regeln; Deutsch und Englisch (`?lang=en`).

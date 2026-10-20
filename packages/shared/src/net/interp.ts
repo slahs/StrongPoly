@@ -102,7 +102,8 @@ export class RenderClock {
     const estAtArrival = this.est - (Math.max(0, lateMs) / 1000) * rate;
     const e = tick - estAtArrival;
     this.lastError = e;
-    if (Math.abs(e) > 4) {
+    // Schwelle: 0,4 s Echtzeit (mindestens 4 Ticks), damit bei hoher Spielgeschwindigkeit kurze Hänger nicht gleich neu synchronisieren
+    if (Math.abs(e) > Math.max(4, 0.4 * rate)) {
       // Aussetzer, Wechsel der Geschwindigkeit oder alter Zustand: hart neu synchronisieren
       this.est = tick + (Math.max(0, lateMs) / 1000) * rate;
       this.adj = 0;

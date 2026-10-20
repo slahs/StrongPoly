@@ -27,7 +27,7 @@ export function stridePerTile(walkW: number, speed: number): number {
 
 /** Schwelle (Tiles/s), ab der eine Einheit als gehend gilt (mit Hysterese) */
 const WALK_ON = 0.3;
-const WALK_OFF = 0.12;
+const WALK_OFF = 0.2;
 /** Zeitkonstanten (s) der Geschwindigkeits- und Richtungsglättung */
 const TAU_SPEED = 0.09;
 /** Zeitkonstante der Positionsglättung (s): nimmt die Rasterung der Snapshot-Positionen (1/16 Tile) heraus */
@@ -35,8 +35,12 @@ const TAU_POS = 0.045;
 /** Abstand zwischen Zielpose und gezeichneter Pose, ab dem nicht geglättet, sondern gesprungen wird (Tiles) */
 const SNAP_DIST = 1.5;
 const TAU_DIR = 0.14;
+/** Höchste Drehrate (rad/s): Fußvolk, Reiter, Belagerungsgerät */
+export const TURN_FOOT = 7;
+const TURN_MOUNTED = 4.5;
+const TURN_SIEGE = 1.6;
 /** Ausgleich der Gehphase beim Anhalten: mindestens diese Phasengeschwindigkeit (rad/s) bis zum nächsten Nulldurchgang */
-const SETTLE_RATE = 8;
+const SETTLE_RATE = 14;
 
 export interface MotionOpts {
   /** Darstellungszeit in Sim-Ticks; undefined → keine Zeitinterpolation (Benchmark-Szene), dann `alpha` mit prev/cur */
@@ -46,6 +50,8 @@ export interface MotionOpts {
   paused: boolean;
   /** Schrittfrequenz der Gehanimation je Typ (rad/s, wie im Vertex-Shader) */
   walkW: ArrayLike<number>;
+  /** altes Verhalten (nur für den Vergleich, URL ?motionlegacy): Echtzeit-Alpha, Sim-Richtung, Sim-Gehflag */
+  legacy?: boolean;
 }
 
 /**
@@ -65,6 +71,8 @@ export class UnitMotion {
   gait = new Float32Array(8192);
   walk = new Uint8Array(8192);
   private seen = new Int32Array(8192);
+  /** Gehphase kommt aus der Bewegung (false im Vergleichsmodus: dann feste Phase und Frequenz wie früher) */
+  gaitDriven = true;
   /** Zähler und letzter Befund für die Debug-Anzeige */
   jumps = 0;
   lastJump = { id: 0, d: 0 };
@@ -80,7 +88,30 @@ export class UnitMotion {
     return this.seen[s] === id;
   }
 
+  /** Vergleichsmodus: Stand vor dem Umbau (Positionen per prev/cur mit Echtzeit-Alpha, Blickrichtung exponentiell zur Sim-Richtung, Gehflag aus der Sim) */
+  private updateLegacy(w: ClientWorld, o: MotionOpts): void {
+    const a = Math.min(1.15, o.alpha);
+    const fk = Math.min(1, o.dt * 12);
+    for (let s = 0; s < w.top; s++) {
+      const id = w.ids[s];
+      if (id === 0) continue;
+      this.x[s] = w.prevX[s] + (w.curX[s] - w.prevX[s]) * a;
+      this.y[s] = w.prevY[s] + (w.curY[s] - w.prevY[s]) * a;
+      if (this.seen[s] !== id) {
+        this.seen[s] = id;
+        this.face[s] = w.face[s];
+      } else this.face[s] += angleDiff(this.face[s], w.face[s]) * fk;
+      this.walk[s] = w.flags[s] & 4 ? 1 : 0;
+      this.speed[s] = 0;
+    }
+  }
+
   update(w: ClientWorld, o: MotionOpts): void {
+    this.gaitDriven = !o.legacy;
+    if (o.legacy) {
+      this.updateLegacy(w, o);
+      return;
+    }
     const dt = o.dt;
     const timeBased = o.tickF !== undefined;
     for (let s = 0; s < w.top; s++) {
@@ -171,7 +202,7 @@ export class UnitMotion {
       this.walk[s] = walking ? 1 : 0;
       // Blickrichtung
       const vlen = Math.hypot(this.vx[s], this.vy[s]);
-      const maxRate = def.side === 'siege' ? 1.6 : def.mounted ? 4.5 : 9;
+      const maxRate = def.side === 'siege' ? TURN_SIEGE : def.mounted ? TURN_MOUNTED : TURN_FOOT;
       let target = w.face[s];
       let tau = 0.12;
       if (vlen > 0.35 && sp > 0.3) {

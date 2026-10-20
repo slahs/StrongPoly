@@ -30,18 +30,23 @@ export interface MotionScene {
   step?(api: SceneApi, tick: number): void;
 }
 
-/** Sucht spiralförmig ab (nx, ny) ein ebenes, freies Rechteck w × h und liefert seine linke obere Ecke. */
+/** Sucht spiralförmig ab (nx, ny) ein ebenes (Höhenunterschied ≤ 1), freies Rechteck w × h und liefert seine linke obere Ecke. */
 export function findFree(api: SceneApi, w: number, h: number, nx: number, ny: number, maxR = 40, margin = 1): { x: number; y: number } | null {
   const m = api.map;
   const ok = (x0: number, y0: number): boolean => {
     if (x0 - margin < 1 || y0 - margin < 1 || x0 + w + margin >= m.w - 1 || y0 + h + margin >= m.h - 1) return false;
-    const h0 = m.height[m.idx(x0, y0)];
+    // eben genug: Höhenunterschied im Rechteck höchstens 1 (so groß ist der Schritt, den Einheiten noch gehen)
+    let lo = 255;
+    let hi = 0;
     for (let y = y0 - margin; y < y0 + h + margin; y++)
       for (let x = x0 - margin; x < x0 + w + margin; x++) {
         const i = m.idx(x, y);
-        if (!m.walkable(i) || api.bldAt(i) || m.height[i] !== h0) return false;
+        if (!m.walkable(i) || api.bldAt(i)) return false;
+        const hh = m.height[i];
+        if (hh < lo) lo = hh;
+        if (hh > hi) hi = hh;
       }
-    return true;
+    return hi - lo <= 1;
   };
   for (let r = 0; r < maxR; r++)
     for (let dy = -r; dy <= r; dy++)
@@ -101,16 +106,16 @@ const gate: MotionScene = {
   ticks: 1000,
   setup(api) {
     const { x, y } = api.home;
-    const W = 21;
-    const f = findFree(api, W, 18, x + 4, y + 10, 50, 0);
+    const W = 15;
+    const f = findFree(api, W, 17, x + 4, y + 10, 60, 0);
     const x0 = f ? f.x : Math.round(x) + 4;
     const y0 = f ? f.y : Math.round(y) + 10;
-    const wy = y0 + 8;
+    const wy = y0 + 7;
     const gx = x0 + (W >> 1) - 1;
     for (let k = 0; k < W; k++) if (k < gx - x0 || k > gx - x0 + 2) api.build(BT.WallHigh, x0 + k, wy);
     api.build(BT.GateWood, gx, wy);
-    api.spawn(U.Spearman, gx - 3, y0 + 1, 28, 2);
-    api.spawn(U.Peasant, gx - 2, y0 + 16, 16, 2);
+    api.spawn(U.Spearman, gx - 2, y0 + 1, 25, 2);
+    api.spawn(U.Peasant, gx - 1, y0 + 12, 12, 2);
     gateCenter = { x: gx + 1.5, y: wy + 1 };
     gateBox = { x0, y0 };
     return fp(gx + 1.5, wy + 1);
@@ -118,9 +123,9 @@ const gate: MotionScene = {
   step(api, tick) {
     const g = gateBox;
     if (!g) return;
-    const rect: [number, number, number, number] = [g.x0 - 2, g.y0 - 2, g.x0 + 24, g.y0 + 20];
+    const rect: [number, number, number, number] = [g.x0 - 2, g.y0 - 2, g.x0 + 18, g.y0 + 18];
     const north = g.y0 + 2;
-    const south = g.y0 + 15;
+    const south = g.y0 + 13;
     if (tick === 2 || tick === 340 || tick === 680) {
       const down = tick !== 340;
       api.order(rect, (ids) => ({ c: 'move', units: ids, x: gateCenter.x, y: down ? south : north }), [U.Spearman]);
@@ -138,11 +143,11 @@ const formation: MotionScene = {
   ticks: 1000,
   setup(api) {
     const { x, y } = api.home;
-    const f = findFree(api, 30, 22, x + 4, y + 14, 50, 0);
-    const bx = (f ? f.x : Math.round(x)) + 4;
-    const by = (f ? f.y : Math.round(y)) + 4;
+    const f = findFree(api, 28, 18, x + 4, y + 12, 60, 0);
+    const bx = (f ? f.x : Math.round(x)) + 3;
+    const by = (f ? f.y : Math.round(y)) + 3;
     api.spawn(U.Spearman, bx, by, 24, 0);
-    api.spawn(U.Swordsman, bx, by + 6, 24, 0);
+    api.spawn(U.Swordsman, bx, by + 5, 24, 0);
     formBase = { x: bx, y: by };
     return fp(bx + 8, by + 6);
   },
@@ -150,10 +155,10 @@ const formation: MotionScene = {
     const b = formBase;
     if (!b) return;
     const pts: [number, number, number][] = [
-      [2, b.x + 20, b.y + 2],
-      [220, b.x + 20, b.y + 14],
-      [440, b.x + 4, b.y + 12],
-      [660, b.x + 12, b.y + 2],
+      [2, b.x + 18, b.y + 1],
+      [220, b.x + 18, b.y + 11],
+      [440, b.x + 4, b.y + 10],
+      [660, b.x + 11, b.y + 1],
     ];
     const forms = [Formation.Line, Formation.Box, Formation.Wedge, Formation.Line];
     pts.forEach(([t, px, py], k) => {
@@ -170,8 +175,8 @@ const stairs: MotionScene = {
   ticks: 900,
   setup(api) {
     const { x, y } = api.home;
-    const W = 14;
-    const f = findFree(api, W + 2, 12, x + 4, y + 12, 50, 0);
+    const W = 12;
+    const f = findFree(api, W + 2, 12, x + 4, y + 12, 60, 0);
     const x0 = (f ? f.x : Math.round(x)) + 1;
     const y0 = (f ? f.y : Math.round(y)) + 5;
     for (let k = 0; k < W; k++) api.build(BT.WallHigh, x0 + k, y0);
@@ -199,23 +204,23 @@ const crowd: MotionScene = {
   ticks: 900,
   setup(api) {
     const { x, y } = api.home;
-    const f = findFree(api, 34, 20, x + 6, y + 12, 50, 0);
+    const f = findFree(api, 32, 18, x + 6, y + 12, 60, 0);
     const bx = (f ? f.x : Math.round(x)) + 2;
     const by = (f ? f.y : Math.round(y)) + 2;
     api.spawn(U.Spearman, bx, by, 80, 0);
     api.spawn(U.Swordsman, bx, by + 8, 60, 0);
-    api.spawn(U.Archer, bx + 24, by, 60, 0);
-    api.spawn(U.Pikeman, bx + 24, by + 8, 50, 0);
-    api.spawn(U.Peasant, bx + 12, by + 14, 30, 0);
+    api.spawn(U.Archer, bx + 22, by, 60, 0);
+    api.spawn(U.Pikeman, bx + 22, by + 8, 50, 0);
+    api.spawn(U.Peasant, bx + 11, by + 13, 30, 0);
     crowdBase = { x: bx, y: by };
     return fp(bx + 14, by + 8);
   },
   step(api, tick) {
     const b = crowdBase;
     if (!b) return;
-    const rect: [number, number, number, number] = [b.x - 10, b.y - 10, b.x + 50, b.y + 40];
+    const rect: [number, number, number, number] = [b.x - 10, b.y - 10, b.x + 40, b.y + 30];
     if (tick === 2) {
-      api.order(rect, (ids) => ({ c: 'move', units: ids, x: b.x + 26, y: b.y + 4 }), [U.Spearman, U.Swordsman]);
+      api.order(rect, (ids) => ({ c: 'move', units: ids, x: b.x + 24, y: b.y + 4 }), [U.Spearman, U.Swordsman]);
       api.order(rect, (ids) => ({ c: 'move', units: ids, x: b.x + 2, y: b.y + 4 }), [U.Archer, U.Pikeman]);
       api.order(rect, (ids) => ({ c: 'move', units: ids, x: b.x + 14, y: b.y + 4 }), [U.Peasant]);
     }

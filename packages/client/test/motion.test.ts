@@ -4,7 +4,7 @@ import { PROFILES, runLab } from '../bench/motion_lab';
 import { LegacyPose } from '../bench/motion_legacy';
 import { NewPose } from '../bench/motion_new';
 import { motionScene } from '../src/game/motion_scenes';
-import { angleDiff, stridePerTile, turnToward, UnitMotion } from '../src/render/motion';
+import { angleDiff, stridePerTile, TURN_FOOT, turnToward, UnitMotion } from '../src/render/motion';
 import { UNIT_WALK_W } from '../src/render/models_units';
 
 describe('Winkelglättung', () => {
@@ -142,7 +142,7 @@ describe('Blickrichtung bei Bewegung', () => {
 
   it('wechselt nie sprunghaft: Drehung pro Frame höchstens maxRate·dt', () => {
     const { log } = drive(1.7, 4);
-    for (let i = 1; i < log.length; i++) expect(Math.abs(angleDiff(log[i - 1].face, log[i].face))).toBeLessThanOrEqual((9 / 60) * 1.001);
+    for (let i = 1; i < log.length; i++) expect(Math.abs(angleDiff(log[i - 1].face, log[i].face))).toBeLessThanOrEqual((TURN_FOOT / 60) * 1.001);
   });
 });
 
