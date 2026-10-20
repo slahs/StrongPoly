@@ -16,6 +16,8 @@ export interface ClipEntry {
   t: string;
   /** Stimme (Gruppe) */
   v: string;
+  /** 1 = Zeile stammt aus fremder Datenquelle (Beraterzeilen des Ereignis-Beraters) */
+  x?: number;
 }
 
 export interface ClipManifest {
@@ -35,7 +37,7 @@ export function validateManifest(raw: unknown): ClipManifest | null {
   for (const [k, v] of Object.entries(o.clips as Record<string, unknown>)) {
     const e = v as Partial<ClipEntry> | null;
     if (!e || typeof e.f !== 'string' || typeof e.d !== 'number' || !(e.d > 0) || typeof e.t !== 'string') continue;
-    clips[k] = { f: e.f, d: e.d, t: e.t, v: typeof e.v === 'string' ? e.v : '' };
+    clips[k] = { f: e.f, d: e.d, t: e.t, v: typeof e.v === 'string' ? e.v : '', ...(e.x === 1 ? { x: 1 } : {}) };
   }
   return { lang: o.lang, format: String(o.format ?? 'mp3'), sampleRate: Number(o.sampleRate) || undefined, generator: typeof o.generator === 'string' ? o.generator : undefined, clips };
 }
@@ -134,12 +136,41 @@ export class ClipRegistry {
     return m && typeof m !== 'string' && !(m instanceof Promise) ? m : null;
   }
 
+  private altIndex = new Map<string, Map<string, string>>();
+
+  /** Index „Zeilenschlüssel + Text → Clip-Schlüssel“ für ausgeschriebene Varianten (`<zeile>@<wert>`, z. B. Beraterzeilen mit Warennamen) */
+  private alt(lang: string): Map<string, string> {
+    let m = this.altIndex.get(lang);
+    if (!m) {
+      m = new Map();
+      const man = this.manifest(lang);
+      if (man) {
+        for (const [k, e] of Object.entries(man.clips)) if (k.includes('@')) m.set(`${k.split('@')[0]}\u0000${normText(e.t)}`, k);
+        this.altIndex.set(lang, m);
+      }
+    }
+    return m;
+  }
+
+  /**
+   * Clip zu Schlüssel und Text finden. Ein Clip gilt nur, wenn sein Text zum angefragten passt; sonst wird nach einer
+   * ausgeschriebenen Variante (`<schlüssel>@<wert>`) mit genau diesem Text gesucht. Liefert den tatsächlichen Clip-Schlüssel.
+   */
+  resolve(lang: string, key: string, text?: string): { key: string; entry: ClipEntry } | null {
+    const man = this.manifest(lang);
+    if (!man) return null;
+    const e = man.clips[key];
+    if (e && (text === undefined || text === '' || normText(text) === normText(e.t))) return { key, entry: e };
+    if (text) {
+      const k2 = this.alt(lang).get(`${key}\u0000${normText(text)}`);
+      if (k2) return { key: k2, entry: man.clips[k2] };
+    }
+    return null;
+  }
+
   /** Gibt es für Schlüssel (und, falls angegeben, passenden Text) einen Clip? */
   entry(lang: string, key: string, text?: string): ClipEntry | null {
-    const e = this.manifest(lang)?.clips[key];
-    if (!e) return null;
-    if (text !== undefined && text !== '' && normText(text) !== normText(e.t)) return null;
-    return e;
+    return this.resolve(lang, key, text)?.entry ?? null;
   }
 
   private cacheKey(lang: string, key: string): string {

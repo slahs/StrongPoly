@@ -148,7 +148,8 @@ export class VoiceSystem implements VoiceApi {
     }
     this.lastDrop = null;
 
-    const entry = this.clips?.entry(lang, req.key, text) ?? null;
+    const hit = this.clips?.resolve(lang, req.key, text) ?? null;
+    const entry = hit?.entry ?? null;
     const ttsOk = this.host.settings().ttsFallback && typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined';
     const channel = gr.category === 'advisor' ? 'advisor' : 'voice';
     const quiet = volumeCurve(this.host.settings()[channel === 'advisor' ? 'advisor' : 'voice']) < 0.0005;
@@ -199,7 +200,7 @@ export class VoiceSystem implements VoiceApi {
       return true;
     }
     const t0 = now;
-    void this.clips.buffer(lang, req.key).then((buf) => {
+    void this.clips.buffer(lang, hit!.key).then((buf) => {
       if (run.cancelled) return;
       if (!buf) return speakText();
       if (performance.now() - t0 > late) return finish();

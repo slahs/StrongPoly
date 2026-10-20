@@ -327,7 +327,9 @@ describe('Sprachpaket de: Manifest und Dateien', () => {
     const keys = new Set(allVoiceLines('de').map((l) => l.key));
     let size = 0;
     for (const [k, e] of Object.entries(man.clips)) {
-      expect(keys.has(k), `toter Clip ${k}`).toBe(true);
+      // Zeilen aus fremder Datenquelle (Ereignis-Berater, advisor_lines.ts) sind mit x=1 markiert und dürfen über die eigenen hinausgehen
+      if (e.x === 1) expect(k.startsWith('advisor.'), `Zusatzclip ${k}`).toBe(true);
+      else expect(keys.has(k), `toter Clip ${k}`).toBe(true);
       size += statSync(join(PACK, e.f)).size;
     }
     expect(size).toBeLessThan(15 * 1024 * 1024);
@@ -338,6 +340,32 @@ describe('Sprachpaket de: Manifest und Dateien', () => {
       const b = readFileSync(join(PACK, e.f)).subarray(0, 3);
       expect((b[0] === 0xff && (b[1] & 0xe0) === 0xe0) || (b[0] === 0x49 && b[1] === 0x44 && b[2] === 0x33), e.f).toBe(true);
     }
+  });
+});
+
+describe('Sprachpaket en: Manifest und Dateien', () => {
+  const dir = join(__dirname, '../public/voice/en');
+  const have = existsSync(join(dir, 'manifest.json'));
+  it.skipIf(!have)('jede englische Zeile hat einen Clip mit passendem Text; keine toten Clips; Größe', () => {
+    const man = validateManifest(JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8')))!;
+    expect(man.lang).toBe('en');
+    const lines = allVoiceLines('en');
+    let size = 0;
+    for (const l of lines) {
+      const e = man.clips[l.key];
+      expect(e, `Clip fehlt: ${l.key}`).toBeDefined();
+      expect(normText(e.t), l.key).toBe(normText(l.text));
+      expect(existsSync(join(dir, e.f)), e.f).toBe(true);
+      expect(e.d, l.key).toBeGreaterThan(0.3);
+      expect(e.d, l.key).toBeLessThan(6);
+    }
+    const keys = new Set(lines.map((l) => l.key));
+    for (const [k, e] of Object.entries(man.clips)) {
+      if (e.x === 1) expect(k.startsWith('advisor.'), k).toBe(true);
+      else expect(keys.has(k), `toter Clip ${k}`).toBe(true);
+      size += statSync(join(dir, e.f)).size;
+    }
+    expect(size).toBeLessThan(15 * 1024 * 1024);
   });
 });
 
@@ -434,6 +462,24 @@ describe('Sprachsystem (Attrappen)', () => {
     expect(sources.length).toBe(0);
     expect(subs).toEqual(['advisor:Holz wird knapp, Herr!']);
     expect(vs.debug().stats.textOnly).toBe(1);
+  });
+
+  it('ausgeschriebene Varianten (<zeile>@<wert>) werden über Zeilenschlüssel + fertigen Text gefunden', async () => {
+    const man = {
+      lang: 'de',
+      format: 'mp3',
+      clips: {
+        'advisor.res.empty.1@Holz': { f: 'a.mp3', d: 1, t: 'Kein Holz mehr, Herr!', v: 'advisor', x: 1 },
+        'advisor.res.empty.1@Stein': { f: 'b.mp3', d: 1, t: 'Kein Stein mehr, Herr!', v: 'advisor', x: 1 },
+      },
+    };
+    const reg = new ClipRegistry(async () => ({}) as AudioBuffer, '/v/', (async () => ({ ok: true, json: async () => man }) as Response) as unknown as typeof fetch);
+    await reg.ensure('de');
+    expect(reg.resolve('de', 'advisor.res.empty.1', 'Kein Holz mehr, Herr!')?.key).toBe('advisor.res.empty.1@Holz');
+    expect(reg.resolve('de', 'advisor.res.empty.1', 'kein stein mehr herr')?.key).toBe('advisor.res.empty.1@Stein');
+    expect(reg.resolve('de', 'advisor.res.empty.1', 'Kein Eisen mehr, Herr!')).toBeNull();
+    expect(reg.resolve('de', 'advisor.res.empty.1')).toBeNull();
+    expect(reg.resolve('en', 'advisor.res.empty.1', 'x')).toBeNull();
   });
 
   it('Entprellung: Wiederholung wird verworfen, Rückgabe false', async () => {

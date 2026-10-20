@@ -1,0 +1,3629 @@
+{
+ "lang": "de",
+ "format": "mp3",
+ "sampleRate": 22050,
+ "generator": "scripts/gen_voices.py v5 (Piper/VITS via sherpa-onnx, ffmpeg)",
+ "clips": {
+  "advisor.army.lost": {
+   "f": "advisor/army.lost.mp3",
+   "d": 1.99,
+   "h": "1f6c7a01cb",
+   "t": "Wir haben schwere Verluste, Herr.",
+   "v": "advisor"
+  },
+  "advisor.army.ready": {
+   "f": "advisor/army.ready.mp3",
+   "d": 1.2,
+   "h": "e5b859e171",
+   "t": "Unser Heer ist bereit.",
+   "v": "advisor"
+  },
+  "advisor.better": {
+   "f": "advisor/better.mp3",
+   "d": 1.25,
+   "h": "c715286ddd",
+   "t": "Die Lage entspannt sich.",
+   "v": "advisor"
+  },
+  "advisor.chain.blocked.1@Apfelplantage": {
+   "f": "advisor/chain.blocked.1_Apfelplantage.mp3",
+   "d": 3.46,
+   "h": "7da7211284",
+   "t": "Apfelplantage wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Bogner": {
+   "f": "advisor/chain.blocked.1_Bogner.mp3",
+   "d": 2.71,
+   "h": "c6c6528277",
+   "t": "Bogner wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Brauerei": {
+   "f": "advisor/chain.blocked.1_Brauerei.mp3",
+   "d": 2.92,
+   "h": "ee3dc78293",
+   "t": "Brauerei wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Bäckerei": {
+   "f": "advisor/chain.blocked.1_Baeckerei.mp3",
+   "d": 2.96,
+   "h": "c1ff760394",
+   "t": "Bäckerei wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Drechsler": {
+   "f": "advisor/chain.blocked.1_Drechsler.mp3",
+   "d": 2.91,
+   "h": "9df2223c29",
+   "t": "Drechsler wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Eisenmine": {
+   "f": "advisor/chain.blocked.1_Eisenmine.mp3",
+   "d": 3.02,
+   "h": "010f11937a",
+   "t": "Eisenmine wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Gerber": {
+   "f": "advisor/chain.blocked.1_Gerber.mp3",
+   "d": 2.76,
+   "h": "88cdf94415",
+   "t": "Gerber wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Holzfäller": {
+   "f": "advisor/chain.blocked.1_Holzfaeller.mp3",
+   "d": 2.95,
+   "h": "f26882efb8",
+   "t": "Holzfäller wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Hopfenfarm": {
+   "f": "advisor/chain.blocked.1_Hopfenfarm.mp3",
+   "d": 3.11,
+   "h": "3e9f98f6b5",
+   "t": "Hopfenfarm wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Jägerhütte": {
+   "f": "advisor/chain.blocked.1_Jaegerhuette.mp3",
+   "d": 2.77,
+   "h": "da57ecce27",
+   "t": "Jägerhütte wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Milchhof": {
+   "f": "advisor/chain.blocked.1_Milchhof.mp3",
+   "d": 2.83,
+   "h": "05e9fc2825",
+   "t": "Milchhof wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Mühle": {
+   "f": "advisor/chain.blocked.1_Muehle.mp3",
+   "d": 2.62,
+   "h": "e1577a368c",
+   "t": "Mühle wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Pechgrube": {
+   "f": "advisor/chain.blocked.1_Pechgrube.mp3",
+   "d": 2.89,
+   "h": "597210e5bb",
+   "t": "Pechgrube wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Plattner": {
+   "f": "advisor/chain.blocked.1_Plattner.mp3",
+   "d": 2.78,
+   "h": "c1ba674a2e",
+   "t": "Plattner wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Schmied": {
+   "f": "advisor/chain.blocked.1_Schmied.mp3",
+   "d": 2.68,
+   "h": "c1e4003ccd",
+   "t": "Schmied wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Steinbruch": {
+   "f": "advisor/chain.blocked.1_Steinbruch.mp3",
+   "d": 2.88,
+   "h": "2f7edf399b",
+   "t": "Steinbruch wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.blocked.1@Weizenhof": {
+   "f": "advisor/chain.blocked.1_Weizenhof.mp3",
+   "d": 3.09,
+   "h": "4031d41eca",
+   "t": "Weizenhof wird seine Ware nicht los. Die Abholung stockt.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Apfelplantage": {
+   "f": "advisor/chain.noworkers.1_Apfelplantage.mp3",
+   "d": 2.76,
+   "h": "72b53751b1",
+   "t": "Apfelplantage steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Bogner": {
+   "f": "advisor/chain.noworkers.1_Bogner.mp3",
+   "d": 2.33,
+   "h": "6076129871",
+   "t": "Bogner steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Brauerei": {
+   "f": "advisor/chain.noworkers.1_Brauerei.mp3",
+   "d": 2.29,
+   "h": "3012c99c46",
+   "t": "Brauerei steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Bäckerei": {
+   "f": "advisor/chain.noworkers.1_Baeckerei.mp3",
+   "d": 2.36,
+   "h": "cab6812be6",
+   "t": "Bäckerei steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Drechsler": {
+   "f": "advisor/chain.noworkers.1_Drechsler.mp3",
+   "d": 2.58,
+   "h": "f637e07409",
+   "t": "Drechsler steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Eisenmine": {
+   "f": "advisor/chain.noworkers.1_Eisenmine.mp3",
+   "d": 2.5,
+   "h": "f1f8992ae4",
+   "t": "Eisenmine steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Gerber": {
+   "f": "advisor/chain.noworkers.1_Gerber.mp3",
+   "d": 2.29,
+   "h": "8f6210caef",
+   "t": "Gerber steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Holzfäller": {
+   "f": "advisor/chain.noworkers.1_Holzfaeller.mp3",
+   "d": 2.57,
+   "h": "7e4914c34d",
+   "t": "Holzfäller steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Hopfenfarm": {
+   "f": "advisor/chain.noworkers.1_Hopfenfarm.mp3",
+   "d": 2.74,
+   "h": "649a671bbf",
+   "t": "Hopfenfarm steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Jägerhütte": {
+   "f": "advisor/chain.noworkers.1_Jaegerhuette.mp3",
+   "d": 2.6,
+   "h": "d357917203",
+   "t": "Jägerhütte steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Milchhof": {
+   "f": "advisor/chain.noworkers.1_Milchhof.mp3",
+   "d": 2.55,
+   "h": "58228d7fe2",
+   "t": "Milchhof steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Mühle": {
+   "f": "advisor/chain.noworkers.1_Muehle.mp3",
+   "d": 2.4,
+   "h": "86f64bbb7a",
+   "t": "Mühle steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Pechgrube": {
+   "f": "advisor/chain.noworkers.1_Pechgrube.mp3",
+   "d": 2.43,
+   "h": "ea02366b11",
+   "t": "Pechgrube steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Plattner": {
+   "f": "advisor/chain.noworkers.1_Plattner.mp3",
+   "d": 2.5,
+   "h": "b492c52fc7",
+   "t": "Plattner steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Schmied": {
+   "f": "advisor/chain.noworkers.1_Schmied.mp3",
+   "d": 2.32,
+   "h": "8643b13976",
+   "t": "Schmied steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Steinbruch": {
+   "f": "advisor/chain.noworkers.1_Steinbruch.mp3",
+   "d": 2.55,
+   "h": "a98f821e4f",
+   "t": "Steinbruch steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.noworkers.1@Weizenhof": {
+   "f": "advisor/chain.noworkers.1_Weizenhof.mp3",
+   "d": 2.52,
+   "h": "3457d158b9",
+   "t": "Weizenhof steht still. Dort arbeitet niemand.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.chain.recovered.1": {
+   "f": "advisor/chain.recovered.1.mp3",
+   "d": 2.71,
+   "h": "187fbfe40a",
+   "t": "Die Werkstätten arbeiten wieder. Die Räder drehen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.defeat": {
+   "f": "advisor/defeat.mp3",
+   "d": 1.06,
+   "h": "d1db145e2d",
+   "t": "Die Burg ist verloren.",
+   "v": "advisor"
+  },
+  "advisor.enemy.attack": {
+   "f": "advisor/enemy.attack.mp3",
+   "d": 1.39,
+   "h": "13436f5792",
+   "t": "Wir werden angegriffen!",
+   "v": "advisor"
+  },
+  "advisor.enemy.gate": {
+   "f": "advisor/enemy.gate.mp3",
+   "d": 1.44,
+   "h": "89a6b259b1",
+   "t": "Sie stehen vor dem Tor!",
+   "v": "advisor"
+  },
+  "advisor.enemy.near": {
+   "f": "advisor/enemy.near.mp3",
+   "d": 1.12,
+   "h": "4791ed79c4",
+   "t": "Feinde nähern sich!",
+   "v": "advisor"
+  },
+  "advisor.enemy.siege": {
+   "f": "advisor/enemy.siege.mp3",
+   "d": 1.75,
+   "h": "c8174f6426",
+   "t": "Sie bringen Belagerungsgerät!",
+   "v": "advisor"
+  },
+  "advisor.fire": {
+   "f": "advisor/fire.mp3",
+   "d": 1.17,
+   "h": "bd1e2b478c",
+   "t": "Feuer in der Burg!",
+   "v": "advisor"
+  },
+  "advisor.food.empty.1": {
+   "f": "advisor/food.empty.1.mp3",
+   "d": 3.02,
+   "h": "457aa34919",
+   "t": "Hunger, Herr! Die Bauern haben nichts mehr zu essen.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.food.empty.2": {
+   "f": "advisor/food.empty.2.mp3",
+   "d": 2.68,
+   "h": "74f6db5253",
+   "t": "Der Kornspeicher ist leer! Das Volk hungert.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.food.low": {
+   "f": "advisor/food.low.mp3",
+   "d": 1.53,
+   "h": "f367e4f47e",
+   "t": "Der Kornspeicher leert sich.",
+   "v": "advisor"
+  },
+  "advisor.food.none": {
+   "f": "advisor/food.none.mp3",
+   "d": 1.39,
+   "h": "d7381e9486",
+   "t": "Das Volk hungert, Herr!",
+   "v": "advisor"
+  },
+  "advisor.food.recovered.1": {
+   "f": "advisor/food.recovered.1.mp3",
+   "d": 2.98,
+   "h": "e4bb3cbca1",
+   "t": "Die Speicher füllen sich wieder. Das Volk darf aufatmen.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.food.variety": {
+   "f": "advisor/food.variety.mp3",
+   "d": 1.94,
+   "h": "0d311ceef9",
+   "t": "Dem Volk fehlt Abwechslung beim Essen.",
+   "v": "advisor"
+  },
+  "advisor.gate.fallen.1": {
+   "f": "advisor/gate.fallen.1.mp3",
+   "d": 1.39,
+   "h": "ad7d427658",
+   "t": "Das Tor ist gefallen!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.gold.low": {
+   "f": "advisor/gold.low.mp3",
+   "d": 1.43,
+   "h": "2255fa52b2",
+   "t": "Die Schatzkammer ist fast leer.",
+   "v": "advisor"
+  },
+  "advisor.growth": {
+   "f": "advisor/growth.mp3",
+   "d": 1.32,
+   "h": "f87748b7c8",
+   "t": "Unsere Siedlung wächst.",
+   "v": "advisor"
+  },
+  "advisor.hello": {
+   "f": "advisor/hello.mp3",
+   "d": 2.97,
+   "h": "379d977f04",
+   "t": "Willkommen zurück, Herr. Die Burg erwartet Eure Befehle.",
+   "v": "advisor"
+  },
+  "advisor.housing.full": {
+   "f": "advisor/housing.full.mp3",
+   "d": 1.23,
+   "h": "32f1e0af67",
+   "t": "Es fehlt an Wohnraum.",
+   "v": "advisor"
+  },
+  "advisor.idle.build": {
+   "f": "advisor/idle.build.mp3",
+   "d": 2.72,
+   "h": "a96b298abc",
+   "t": "Eine starke Mauer kostet Stein, aber spart Blut.",
+   "v": "advisor"
+  },
+  "advisor.idle.calm": {
+   "f": "advisor/idle.calm.mp3",
+   "d": 2.26,
+   "h": "626edc394b",
+   "t": "Alles ist ruhig, Herr. Zu ruhig vielleicht.",
+   "v": "advisor"
+  },
+  "advisor.idle.market": {
+   "f": "advisor/idle.market.mp3",
+   "d": 2.53,
+   "h": "4faead830f",
+   "t": "Der Markt zahlt gut, wenn man ihn zu nutzen weiß.",
+   "v": "advisor"
+  },
+  "advisor.iron.low": {
+   "f": "advisor/iron.low.mp3",
+   "d": 1.61,
+   "h": "8d9d1fb592",
+   "t": "Das Eisen reicht bald nicht mehr.",
+   "v": "advisor"
+  },
+  "advisor.keep.danger": {
+   "f": "advisor/keep.danger.mp3",
+   "d": 1.57,
+   "h": "e30ae15009",
+   "t": "Der Bergfried ist in Gefahr!",
+   "v": "advisor"
+  },
+  "advisor.lord.danger.1": {
+   "f": "advisor/lord.danger.1.mp3",
+   "d": 1.29,
+   "h": "2287edb657",
+   "t": "Der Lord ist in Gefahr!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.lord.hurt.1": {
+   "f": "advisor/lord.hurt.1.mp3",
+   "d": 1.72,
+   "h": "d6050a014c",
+   "t": "Der Lord ist schwer verwundet!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.pop.crowded": {
+   "f": "advisor/pop.crowded.mp3",
+   "d": 1.29,
+   "h": "35bb530ac0",
+   "t": "Die Burg ist überfüllt.",
+   "v": "advisor"
+  },
+  "advisor.pop.falling": {
+   "f": "advisor/pop.falling.mp3",
+   "d": 1.52,
+   "h": "b8b360598e",
+   "t": "Die Stimmung im Volk sinkt.",
+   "v": "advisor"
+  },
+  "advisor.pop.good": {
+   "f": "advisor/pop.good.mp3",
+   "d": 1.33,
+   "h": "370c7b5946",
+   "t": "Das Volk ist zufrieden.",
+   "v": "advisor"
+  },
+  "advisor.pop.leaving": {
+   "f": "advisor/pop.leaving.mp3",
+   "d": 2.0,
+   "h": "bbcdd2a307",
+   "t": "Die ersten Bauern verlassen die Burg.",
+   "v": "advisor"
+  },
+  "advisor.pop.rations": {
+   "f": "advisor/pop.rations.mp3",
+   "d": 2.15,
+   "h": "3c80aac49f",
+   "t": "Die knappen Rationen drücken auf die Stimmung.",
+   "v": "advisor"
+  },
+  "advisor.pop.taxes": {
+   "f": "advisor/pop.taxes.mp3",
+   "d": 1.77,
+   "h": "df300866bf",
+   "t": "Eure Steuern belasten das Volk.",
+   "v": "advisor"
+  },
+  "advisor.production.stalled": {
+   "f": "advisor/production.stalled.mp3",
+   "d": 1.47,
+   "h": "3ffb4bb8c4",
+   "t": "Eine Werkstatt steht still.",
+   "v": "advisor"
+  },
+  "advisor.res.empty.1@Armbrust": {
+   "f": "advisor/res.empty.1_Armbrust.mp3",
+   "d": 3.32,
+   "h": "08aa0b9888",
+   "t": "Kein Armbrust mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Bier": {
+   "f": "advisor/res.empty.1_Bier.mp3",
+   "d": 3.15,
+   "h": "695465402c",
+   "t": "Kein Bier mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Bogen": {
+   "f": "advisor/res.empty.1_Bogen.mp3",
+   "d": 3.34,
+   "h": "7dd8f5bca6",
+   "t": "Kein Bogen mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Brot": {
+   "f": "advisor/res.empty.1_Brot.mp3",
+   "d": 3.29,
+   "h": "30aa31b13e",
+   "t": "Kein Brot mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Eisen": {
+   "f": "advisor/res.empty.1_Eisen.mp3",
+   "d": 3.26,
+   "h": "6ebbbf726c",
+   "t": "Kein Eisen mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Fleisch": {
+   "f": "advisor/res.empty.1_Fleisch.mp3",
+   "d": 3.29,
+   "h": "87307db4fa",
+   "t": "Kein Fleisch mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Holz": {
+   "f": "advisor/res.empty.1_Holz.mp3",
+   "d": 3.24,
+   "h": "a23e93dedc",
+   "t": "Kein Holz mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Hopfen": {
+   "f": "advisor/res.empty.1_Hopfen.mp3",
+   "d": 3.34,
+   "h": "c2da7a481e",
+   "t": "Kein Hopfen mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Kuh": {
+   "f": "advisor/res.empty.1_Kuh.mp3",
+   "d": 3.3,
+   "h": "2974c9de49",
+   "t": "Kein Kuh mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Käse": {
+   "f": "advisor/res.empty.1_Kaese.mp3",
+   "d": 3.24,
+   "h": "7f458ddbd0",
+   "t": "Kein Käse mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Lederrüstung": {
+   "f": "advisor/res.empty.1_Lederruestung.mp3",
+   "d": 3.42,
+   "h": "6fbab15d5c",
+   "t": "Kein Lederrüstung mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Mehl": {
+   "f": "advisor/res.empty.1_Mehl.mp3",
+   "d": 3.15,
+   "h": "68b3085f1b",
+   "t": "Kein Mehl mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Pech": {
+   "f": "advisor/res.empty.1_Pech.mp3",
+   "d": 3.26,
+   "h": "ccadcf5a0c",
+   "t": "Kein Pech mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Pike": {
+   "f": "advisor/res.empty.1_Pike.mp3",
+   "d": 3.22,
+   "h": "0c6b3f9569",
+   "t": "Kein Pike mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Plattenrüstung": {
+   "f": "advisor/res.empty.1_Plattenruestung.mp3",
+   "d": 3.7,
+   "h": "e87de36970",
+   "t": "Kein Plattenrüstung mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Schwert": {
+   "f": "advisor/res.empty.1_Schwert.mp3",
+   "d": 3.3,
+   "h": "aa2632866d",
+   "t": "Kein Schwert mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Speer": {
+   "f": "advisor/res.empty.1_Speer.mp3",
+   "d": 3.33,
+   "h": "81e4e15549",
+   "t": "Kein Speer mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Stein": {
+   "f": "advisor/res.empty.1_Stein.mp3",
+   "d": 3.11,
+   "h": "375b23f3f5",
+   "t": "Kein Stein mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Streitkolben": {
+   "f": "advisor/res.empty.1_Streitkolben.mp3",
+   "d": 3.64,
+   "h": "ee48069409",
+   "t": "Kein Streitkolben mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Weizen": {
+   "f": "advisor/res.empty.1_Weizen.mp3",
+   "d": 3.44,
+   "h": "67ecbeba81",
+   "t": "Kein Weizen mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.1@Äpfel": {
+   "f": "advisor/res.empty.1_Aepfel.mp3",
+   "d": 3.24,
+   "h": "8509dd1f3a",
+   "t": "Kein Äpfel mehr, Herr! Bau und Handwerk müssen warten.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Armbrust": {
+   "f": "advisor/res.empty.2_Armbrust.mp3",
+   "d": 4.75,
+   "h": "d30d620c66",
+   "t": "Das Lager ist leer: Armbrust ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Bier": {
+   "f": "advisor/res.empty.2_Bier.mp3",
+   "d": 4.42,
+   "h": "f68cd448f6",
+   "t": "Das Lager ist leer: Bier ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Bogen": {
+   "f": "advisor/res.empty.2_Bogen.mp3",
+   "d": 4.47,
+   "h": "0372423435",
+   "t": "Das Lager ist leer: Bogen ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Brot": {
+   "f": "advisor/res.empty.2_Brot.mp3",
+   "d": 4.45,
+   "h": "c40809830a",
+   "t": "Das Lager ist leer: Brot ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Eisen": {
+   "f": "advisor/res.empty.2_Eisen.mp3",
+   "d": 4.57,
+   "h": "328ee8582b",
+   "t": "Das Lager ist leer: Eisen ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Fleisch": {
+   "f": "advisor/res.empty.2_Fleisch.mp3",
+   "d": 4.69,
+   "h": "82c722426e",
+   "t": "Das Lager ist leer: Fleisch ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Holz": {
+   "f": "advisor/res.empty.2_Holz.mp3",
+   "d": 4.63,
+   "h": "470f419345",
+   "t": "Das Lager ist leer: Holz ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Hopfen": {
+   "f": "advisor/res.empty.2_Hopfen.mp3",
+   "d": 4.51,
+   "h": "b8c2a9f2e5",
+   "t": "Das Lager ist leer: Hopfen ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Kuh": {
+   "f": "advisor/res.empty.2_Kuh.mp3",
+   "d": 4.55,
+   "h": "18f456962c",
+   "t": "Das Lager ist leer: Kuh ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Käse": {
+   "f": "advisor/res.empty.2_Kaese.mp3",
+   "d": 4.42,
+   "h": "76e4281355",
+   "t": "Das Lager ist leer: Käse ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Lederrüstung": {
+   "f": "advisor/res.empty.2_Lederruestung.mp3",
+   "d": 4.87,
+   "h": "cd7f075c88",
+   "t": "Das Lager ist leer: Lederrüstung ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Mehl": {
+   "f": "advisor/res.empty.2_Mehl.mp3",
+   "d": 4.56,
+   "h": "0b15fd8f1c",
+   "t": "Das Lager ist leer: Mehl ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Pech": {
+   "f": "advisor/res.empty.2_Pech.mp3",
+   "d": 4.49,
+   "h": "2084b4d719",
+   "t": "Das Lager ist leer: Pech ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Pike": {
+   "f": "advisor/res.empty.2_Pike.mp3",
+   "d": 4.43,
+   "h": "56c5dffd08",
+   "t": "Das Lager ist leer: Pike ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Plattenrüstung": {
+   "f": "advisor/res.empty.2_Plattenruestung.mp3",
+   "d": 4.95,
+   "h": "c136a83daf",
+   "t": "Das Lager ist leer: Plattenrüstung ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Schwert": {
+   "f": "advisor/res.empty.2_Schwert.mp3",
+   "d": 4.52,
+   "h": "9789894c6b",
+   "t": "Das Lager ist leer: Schwert ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Speer": {
+   "f": "advisor/res.empty.2_Speer.mp3",
+   "d": 4.47,
+   "h": "d3b50f9fb8",
+   "t": "Das Lager ist leer: Speer ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Stein": {
+   "f": "advisor/res.empty.2_Stein.mp3",
+   "d": 4.44,
+   "h": "9d2266374a",
+   "t": "Das Lager ist leer: Stein ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Streitkolben": {
+   "f": "advisor/res.empty.2_Streitkolben.mp3",
+   "d": 4.96,
+   "h": "0af6049964",
+   "t": "Das Lager ist leer: Streitkolben ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Weizen": {
+   "f": "advisor/res.empty.2_Weizen.mp3",
+   "d": 4.71,
+   "h": "55c826f7f6",
+   "t": "Das Lager ist leer: Weizen ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.empty.2@Äpfel": {
+   "f": "advisor/res.empty.2_Aepfel.mp3",
+   "d": 4.65,
+   "h": "1afdf43b79",
+   "t": "Das Lager ist leer: Äpfel ist aufgebraucht. Ohne Nachschub geht hier nichts mehr.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Armbrust": {
+   "f": "advisor/res.recovered.1_Armbrust.mp3",
+   "d": 2.12,
+   "h": "6024d7332c",
+   "t": "Gut so: Armbrust ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Bier": {
+   "f": "advisor/res.recovered.1_Bier.mp3",
+   "d": 1.8,
+   "h": "573810930d",
+   "t": "Gut so: Bier ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Bogen": {
+   "f": "advisor/res.recovered.1_Bogen.mp3",
+   "d": 1.74,
+   "h": "3fa7209695",
+   "t": "Gut so: Bogen ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Brot": {
+   "f": "advisor/res.recovered.1_Brot.mp3",
+   "d": 1.82,
+   "h": "a651923de1",
+   "t": "Gut so: Brot ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Eisen": {
+   "f": "advisor/res.recovered.1_Eisen.mp3",
+   "d": 1.82,
+   "h": "3bb4ae86df",
+   "t": "Gut so: Eisen ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Fleisch": {
+   "f": "advisor/res.recovered.1_Fleisch.mp3",
+   "d": 1.93,
+   "h": "d551113327",
+   "t": "Gut so: Fleisch ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Holz": {
+   "f": "advisor/res.recovered.1_Holz.mp3",
+   "d": 1.92,
+   "h": "9fe87ffb2f",
+   "t": "Gut so: Holz ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Hopfen": {
+   "f": "advisor/res.recovered.1_Hopfen.mp3",
+   "d": 1.87,
+   "h": "d6debd8060",
+   "t": "Gut so: Hopfen ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Kuh": {
+   "f": "advisor/res.recovered.1_Kuh.mp3",
+   "d": 1.72,
+   "h": "29e0a3cc51",
+   "t": "Gut so: Kuh ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Käse": {
+   "f": "advisor/res.recovered.1_Kaese.mp3",
+   "d": 1.91,
+   "h": "6f85a7187e",
+   "t": "Gut so: Käse ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Lederrüstung": {
+   "f": "advisor/res.recovered.1_Lederruestung.mp3",
+   "d": 2.3,
+   "h": "47f47998bb",
+   "t": "Gut so: Lederrüstung ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Mehl": {
+   "f": "advisor/res.recovered.1_Mehl.mp3",
+   "d": 1.79,
+   "h": "df015d42d4",
+   "t": "Gut so: Mehl ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Pech": {
+   "f": "advisor/res.recovered.1_Pech.mp3",
+   "d": 1.88,
+   "h": "7dab6d4214",
+   "t": "Gut so: Pech ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Pike": {
+   "f": "advisor/res.recovered.1_Pike.mp3",
+   "d": 1.7,
+   "h": "b1f8a9e4fb",
+   "t": "Gut so: Pike ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Plattenrüstung": {
+   "f": "advisor/res.recovered.1_Plattenruestung.mp3",
+   "d": 2.32,
+   "h": "ff9c6958b8",
+   "t": "Gut so: Plattenrüstung ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Schwert": {
+   "f": "advisor/res.recovered.1_Schwert.mp3",
+   "d": 1.9,
+   "h": "304f8561a5",
+   "t": "Gut so: Schwert ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Speer": {
+   "f": "advisor/res.recovered.1_Speer.mp3",
+   "d": 1.75,
+   "h": "51c5a1a5af",
+   "t": "Gut so: Speer ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Stein": {
+   "f": "advisor/res.recovered.1_Stein.mp3",
+   "d": 1.78,
+   "h": "3d9a210c42",
+   "t": "Gut so: Stein ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Streitkolben": {
+   "f": "advisor/res.recovered.1_Streitkolben.mp3",
+   "d": 2.38,
+   "h": "f7a1cafda4",
+   "t": "Gut so: Streitkolben ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Weizen": {
+   "f": "advisor/res.recovered.1_Weizen.mp3",
+   "d": 1.91,
+   "h": "546b38e880",
+   "t": "Gut so: Weizen ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.1@Äpfel": {
+   "f": "advisor/res.recovered.1_Aepfel.mp3",
+   "d": 1.87,
+   "h": "7b01a2a431",
+   "t": "Gut so: Äpfel ist wieder reichlich da.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Armbrust": {
+   "f": "advisor/res.recovered.2_Armbrust.mp3",
+   "d": 3.48,
+   "h": "d61dc20a12",
+   "t": "Der Engpass bei Armbrust ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Bier": {
+   "f": "advisor/res.recovered.2_Bier.mp3",
+   "d": 3.02,
+   "h": "414bced690",
+   "t": "Der Engpass bei Bier ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Bogen": {
+   "f": "advisor/res.recovered.2_Bogen.mp3",
+   "d": 3.0,
+   "h": "fc9c87f287",
+   "t": "Der Engpass bei Bogen ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Brot": {
+   "f": "advisor/res.recovered.2_Brot.mp3",
+   "d": 2.93,
+   "h": "204df24cb0",
+   "t": "Der Engpass bei Brot ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Eisen": {
+   "f": "advisor/res.recovered.2_Eisen.mp3",
+   "d": 3.13,
+   "h": "155a2d51ee",
+   "t": "Der Engpass bei Eisen ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Fleisch": {
+   "f": "advisor/res.recovered.2_Fleisch.mp3",
+   "d": 3.13,
+   "h": "b3c975e2fb",
+   "t": "Der Engpass bei Fleisch ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Holz": {
+   "f": "advisor/res.recovered.2_Holz.mp3",
+   "d": 2.95,
+   "h": "6088f30361",
+   "t": "Der Engpass bei Holz ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Hopfen": {
+   "f": "advisor/res.recovered.2_Hopfen.mp3",
+   "d": 3.25,
+   "h": "93855a1be0",
+   "t": "Der Engpass bei Hopfen ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Kuh": {
+   "f": "advisor/res.recovered.2_Kuh.mp3",
+   "d": 2.91,
+   "h": "abd33c69bf",
+   "t": "Der Engpass bei Kuh ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Käse": {
+   "f": "advisor/res.recovered.2_Kaese.mp3",
+   "d": 3.09,
+   "h": "5110c585bb",
+   "t": "Der Engpass bei Käse ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Lederrüstung": {
+   "f": "advisor/res.recovered.2_Lederruestung.mp3",
+   "d": 3.36,
+   "h": "ac7985f296",
+   "t": "Der Engpass bei Lederrüstung ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Mehl": {
+   "f": "advisor/res.recovered.2_Mehl.mp3",
+   "d": 2.92,
+   "h": "05bff0135b",
+   "t": "Der Engpass bei Mehl ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Pech": {
+   "f": "advisor/res.recovered.2_Pech.mp3",
+   "d": 2.9,
+   "h": "a2288e8213",
+   "t": "Der Engpass bei Pech ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Pike": {
+   "f": "advisor/res.recovered.2_Pike.mp3",
+   "d": 3.02,
+   "h": "d992934e98",
+   "t": "Der Engpass bei Pike ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Plattenrüstung": {
+   "f": "advisor/res.recovered.2_Plattenruestung.mp3",
+   "d": 3.47,
+   "h": "bfe9fe38d0",
+   "t": "Der Engpass bei Plattenrüstung ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Schwert": {
+   "f": "advisor/res.recovered.2_Schwert.mp3",
+   "d": 3.2,
+   "h": "3dc23a2853",
+   "t": "Der Engpass bei Schwert ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Speer": {
+   "f": "advisor/res.recovered.2_Speer.mp3",
+   "d": 3.01,
+   "h": "2f93279c39",
+   "t": "Der Engpass bei Speer ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Stein": {
+   "f": "advisor/res.recovered.2_Stein.mp3",
+   "d": 3.07,
+   "h": "47c878e10c",
+   "t": "Der Engpass bei Stein ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Streitkolben": {
+   "f": "advisor/res.recovered.2_Streitkolben.mp3",
+   "d": 3.52,
+   "h": "39c6d72820",
+   "t": "Der Engpass bei Streitkolben ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Weizen": {
+   "f": "advisor/res.recovered.2_Weizen.mp3",
+   "d": 3.14,
+   "h": "831196a43a",
+   "t": "Der Engpass bei Weizen ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.res.recovered.2@Äpfel": {
+   "f": "advisor/res.recovered.2_Aepfel.mp3",
+   "d": 3.2,
+   "h": "805899b5dc",
+   "t": "Der Engpass bei Äpfel ist behoben. Die Lager füllen sich.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.solved": {
+   "f": "advisor/solved.mp3",
+   "d": 1.29,
+   "h": "79ef18dae9",
+   "t": "Der Engpass ist behoben.",
+   "v": "advisor"
+  },
+  "advisor.stone.low": {
+   "f": "advisor/stone.low.mp3",
+   "d": 1.27,
+   "h": "12bb6237bb",
+   "t": "Der Stein geht zur Neige.",
+   "v": "advisor"
+  },
+  "advisor.storage.full.1@Das Lager": {
+   "f": "advisor/storage.full.1_Das_Lager.mp3",
+   "d": 4.09,
+   "h": "eb26f3e9d0",
+   "t": "Das Lager ist voll. Baut ein weiteres Modul an, sonst geht Ware verloren.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.storage.full.1@Der Kornspeicher": {
+   "f": "advisor/storage.full.1_Der_Kornspeicher.mp3",
+   "d": 4.69,
+   "h": "96df439019",
+   "t": "Der Kornspeicher ist voll. Baut ein weiteres Modul an, sonst geht Ware verloren.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.storage.full.1@Die Waffenkammer": {
+   "f": "advisor/storage.full.1_Die_Waffenkammer.mp3",
+   "d": 4.3,
+   "h": "73783e1445",
+   "t": "Die Waffenkammer ist voll. Baut ein weiteres Modul an, sonst geht Ware verloren.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.storage.full.2@Das Lager": {
+   "f": "advisor/storage.full.2_Das_Lager.mp3",
+   "d": 3.93,
+   "h": "b23e7aa796",
+   "t": "Mein Lord, Das Lager platzt aus allen Nähten. Ein weiteres Modul wäre klug.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.storage.full.2@Der Kornspeicher": {
+   "f": "advisor/storage.full.2_Der_Kornspeicher.mp3",
+   "d": 4.52,
+   "h": "ba22c800e6",
+   "t": "Mein Lord, Der Kornspeicher platzt aus allen Nähten. Ein weiteres Modul wäre klug.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.storage.full.2@Die Waffenkammer": {
+   "f": "advisor/storage.full.2_Die_Waffenkammer.mp3",
+   "d": 4.39,
+   "h": "f2a851ae67",
+   "t": "Mein Lord, Die Waffenkammer platzt aus allen Nähten. Ein weiteres Modul wäre klug.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.tower.fallen": {
+   "f": "advisor/tower.fallen.mp3",
+   "d": 1.34,
+   "h": "1f3ac0dca9",
+   "t": "Ein Turm ist gefallen!",
+   "v": "advisor"
+  },
+  "advisor.tower.fallen.1@Großer Turm": {
+   "f": "advisor/tower.fallen.1_Grosser_Turm.mp3",
+   "d": 1.53,
+   "h": "4ff548c110",
+   "t": "Großer Turm ist gefallen!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.tower.fallen.1@Wachturm": {
+   "f": "advisor/tower.fallen.1_Wachturm.mp3",
+   "d": 1.3,
+   "h": "59ce93f347",
+   "t": "Wachturm ist gefallen!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.tower.fallen.1@Wehrturm": {
+   "f": "advisor/tower.fallen.1_Wehrturm.mp3",
+   "d": 1.27,
+   "h": "06b6ee1bb6",
+   "t": "Wehrturm ist gefallen!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.victory": {
+   "f": "advisor/victory.mp3",
+   "d": 1.49,
+   "h": "b9ec9d2551",
+   "t": "Der Sieg gehört uns, Herr!",
+   "v": "advisor"
+  },
+  "advisor.wall.breach": {
+   "f": "advisor/wall.breach.mp3",
+   "d": 1.34,
+   "h": "25ccdef330",
+   "t": "Die Mauer ist durchbrochen!",
+   "v": "advisor"
+  },
+  "advisor.wall.breach.1": {
+   "f": "advisor/wall.breach.1.mp3",
+   "d": 1.59,
+   "h": "623dec5c54",
+   "t": "Die Mauer wurde durchbrochen!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.wood.low": {
+   "f": "advisor/wood.low.mp3",
+   "d": 1.42,
+   "h": "17e164a085",
+   "t": "Herr, das Holz wird knapp.",
+   "v": "advisor"
+  },
+  "advisor.wood.none": {
+   "f": "advisor/wood.none.mp3",
+   "d": 1.63,
+   "h": "5fbc649f4e",
+   "t": "Wir haben kein Holz mehr!",
+   "v": "advisor"
+  },
+  "advisor.workers.few": {
+   "f": "advisor/workers.few.mp3",
+   "d": 1.62,
+   "h": "f142b03e63",
+   "t": "Uns fehlen Arbeitskräfte.",
+   "v": "advisor"
+  },
+  "archer.attack.1": {
+   "f": "archer/attack_1.mp3",
+   "d": 1.3,
+   "h": "020dabf5e1",
+   "t": "Bogen spannen, Männer!",
+   "v": "archer"
+  },
+  "archer.attack.2": {
+   "f": "archer/attack_2.mp3",
+   "d": 1.3,
+   "h": "dbc11e2824",
+   "t": "Zielt und lasst fliegen!",
+   "v": "archer"
+  },
+  "archer.attack.3": {
+   "f": "archer/attack_3.mp3",
+   "d": 1.8,
+   "h": "05d72b651b",
+   "t": "Der Himmel wird dunkel von Pfeilen!",
+   "v": "archer"
+  },
+  "archer.attack.4": {
+   "f": "archer/attack_4.mp3",
+   "d": 1.6,
+   "h": "73c7f43714",
+   "t": "Freie Schussbahn, Feuer!",
+   "v": "archer"
+  },
+  "archer.hold.1": {
+   "f": "archer/hold_1.mp3",
+   "d": 1.0,
+   "h": "209c22fa0d",
+   "t": "Wir decken die Mauer.",
+   "v": "archer"
+  },
+  "archer.hold.2": {
+   "f": "archer/hold_2.mp3",
+   "d": 1.9,
+   "h": "7a8e77edbe",
+   "t": "Von hier haben wir jeden Feind im Visier.",
+   "v": "archer"
+  },
+  "archer.hold.3": {
+   "f": "archer/hold_3.mp3",
+   "d": 1.16,
+   "h": "3fe769fcbf",
+   "t": "Wir halten die Zinnen.",
+   "v": "archer"
+  },
+  "archer.move.1": {
+   "f": "archer/move_1.mp3",
+   "d": 1.02,
+   "h": "063f9b12dc",
+   "t": "Wir beziehen Stellung.",
+   "v": "archer"
+  },
+  "archer.move.2": {
+   "f": "archer/move_2.mp3",
+   "d": 1.31,
+   "h": "3f0ea8e55e",
+   "t": "Wir gehen in Position.",
+   "v": "archer"
+  },
+  "archer.move.3": {
+   "f": "archer/move_3.mp3",
+   "d": 1.49,
+   "h": "e26ebc65ba",
+   "t": "Schnell, bevor sie uns sehen.",
+   "v": "archer"
+  },
+  "archer.move.4": {
+   "f": "archer/move_4.mp3",
+   "d": 1.67,
+   "h": "8f0d923ea4",
+   "t": "Von der Anhöhe sehen wir besser.",
+   "v": "archer"
+  },
+  "archer.select.1": {
+   "f": "archer/select_1.mp3",
+   "d": 1.36,
+   "h": "99ad145b42",
+   "t": "Unsere Bögen sind bereit.",
+   "v": "archer"
+  },
+  "archer.select.2": {
+   "f": "archer/select_2.mp3",
+   "d": 1.29,
+   "h": "2664b95647",
+   "t": "Die Pfeile sind im Köcher.",
+   "v": "archer"
+  },
+  "archer.select.3": {
+   "f": "archer/select_3.mp3",
+   "d": 1.02,
+   "h": "e8ad5def4a",
+   "t": "Wohin zielen wir?",
+   "v": "archer"
+  },
+  "archer.select.4": {
+   "f": "archer/select_4.mp3",
+   "d": 1.36,
+   "h": "f35a8abfcf",
+   "t": "Wir haben ein scharfes Auge.",
+   "v": "archer"
+  },
+  "archer.wounded.1": {
+   "f": "archer/wounded_1.mp3",
+   "d": 0.91,
+   "h": "02783d50e5",
+   "t": "Ich bin getroffen!",
+   "v": "archer"
+  },
+  "archer.wounded.2": {
+   "f": "archer/wounded_2.mp3",
+   "d": 1.41,
+   "h": "587b000f4b",
+   "t": "Mein Arm, mein Bogenarm!",
+   "v": "archer"
+  },
+  "archer.wounded.3": {
+   "f": "archer/wounded_3.mp3",
+   "d": 1.28,
+   "h": "24dfe8a58e",
+   "t": "Deckung, ich bin verwundet!",
+   "v": "archer"
+  },
+  "assassin.attack.1": {
+   "f": "assassin/attack_1.mp3",
+   "d": 1.76,
+   "h": "e297312047",
+   "t": "Der Dolch trifft zuerst.",
+   "v": "assassin"
+  },
+  "assassin.attack.2": {
+   "f": "assassin/attack_2.mp3",
+   "d": 1.71,
+   "h": "d3ac307df4",
+   "t": "Ein Stich, kein Laut.",
+   "v": "assassin"
+  },
+  "assassin.attack.3": {
+   "f": "assassin/attack_3.mp3",
+   "d": 1.69,
+   "h": "4bc61a00d6",
+   "t": "Für dich ist es zu spät.",
+   "v": "assassin"
+  },
+  "assassin.hold.1": {
+   "f": "assassin/hold_1.mp3",
+   "d": 1.07,
+   "h": "90628ce1c1",
+   "t": "Ich lauere.",
+   "v": "assassin"
+  },
+  "assassin.hold.2": {
+   "f": "assassin/hold_2.mp3",
+   "d": 1.73,
+   "h": "72cf90dfc8",
+   "t": "Ich warte im Dunkeln.",
+   "v": "assassin"
+  },
+  "assassin.hold.3": {
+   "f": "assassin/hold_3.mp3",
+   "d": 1.76,
+   "h": "cb1e596f6e",
+   "t": "Geduld ist meine Waffe.",
+   "v": "assassin"
+  },
+  "assassin.move.1": {
+   "f": "assassin/move_1.mp3",
+   "d": 1.22,
+   "h": "add0a304f6",
+   "t": "Ich schleiche.",
+   "v": "assassin"
+  },
+  "assassin.move.2": {
+   "f": "assassin/move_2.mp3",
+   "d": 1.7,
+   "h": "e2c6001727",
+   "t": "Niemand wird mich sehen.",
+   "v": "assassin"
+  },
+  "assassin.move.3": {
+   "f": "assassin/move_3.mp3",
+   "d": 1.62,
+   "h": "3209a4edd1",
+   "t": "Unbemerkt wie Rauch.",
+   "v": "assassin"
+  },
+  "assassin.select.1": {
+   "f": "assassin/select_1.mp3",
+   "d": 1.69,
+   "h": "c46b3e6937",
+   "t": "Ich bin nur ein Schatten.",
+   "v": "assassin"
+  },
+  "assassin.select.2": {
+   "f": "assassin/select_2.mp3",
+   "d": 1.95,
+   "h": "154c6581ca",
+   "t": "Sagt, wer fallen soll.",
+   "v": "assassin"
+  },
+  "assassin.select.3": {
+   "f": "assassin/select_3.mp3",
+   "d": 1.56,
+   "h": "7dce787b30",
+   "t": "Lautlos wie der Wind.",
+   "v": "assassin"
+  },
+  "assassin.wounded.1": {
+   "f": "assassin/wounded_1.mp3",
+   "d": 1.34,
+   "h": "590c49eca6",
+   "t": "Ich wurde gesehen!",
+   "v": "assassin"
+  },
+  "assassin.wounded.2": {
+   "f": "assassin/wounded_2.mp3",
+   "d": 1.1,
+   "h": "9217abc662",
+   "t": "Das tat weh.",
+   "v": "assassin"
+  },
+  "assassin.wounded.3": {
+   "f": "assassin/wounded_3.mp3",
+   "d": 2.25,
+   "h": "6baca13c69",
+   "t": "Entdeckt, zurück in den Schatten!",
+   "v": "assassin"
+  },
+  "baker.done.1": {
+   "f": "baker/done_1.mp3",
+   "d": 1.36,
+   "h": "80d82f17b9",
+   "t": "Frisch aus dem Ofen!",
+   "v": "baker"
+  },
+  "baker.done.2": {
+   "f": "baker/done_2.mp3",
+   "d": 1.45,
+   "h": "15f18243f8",
+   "t": "Das Brot ist fertig.",
+   "v": "baker"
+  },
+  "baker.done.3": {
+   "f": "baker/done_3.mp3",
+   "d": 1.49,
+   "h": "1422e2ce7f",
+   "t": "Der Duft zieht durch die Gassen.",
+   "v": "baker"
+  },
+  "baker.move.1": {
+   "f": "baker/move_1.mp3",
+   "d": 1.45,
+   "h": "f5f4efd262",
+   "t": "Ich bringe gleich Brot.",
+   "v": "baker"
+  },
+  "baker.move.2": {
+   "f": "baker/move_2.mp3",
+   "d": 1.75,
+   "h": "da5844bb7b",
+   "t": "Ich muss nur noch den Ofen schließen.",
+   "v": "baker"
+  },
+  "baker.move.3": {
+   "f": "baker/move_3.mp3",
+   "d": 1.23,
+   "h": "682b1cc82a",
+   "t": "Bin schon unterwegs.",
+   "v": "baker"
+  },
+  "baker.select.1": {
+   "f": "baker/select_1.mp3",
+   "d": 1.22,
+   "h": "1351f26dcd",
+   "t": "Der Ofen ist heiß.",
+   "v": "baker"
+  },
+  "baker.select.2": {
+   "f": "baker/select_2.mp3",
+   "d": 1.15,
+   "h": "803053f6ca",
+   "t": "Frisches Brot, Herr?",
+   "v": "baker"
+  },
+  "baker.select.3": {
+   "f": "baker/select_3.mp3",
+   "d": 1.2,
+   "h": "4a0ae0215f",
+   "t": "Was darf es sein?",
+   "v": "baker"
+  },
+  "baker.work.1": {
+   "f": "baker/work_1.mp3",
+   "d": 1.27,
+   "h": "3c23653ed0",
+   "t": "Der Teig geht auf.",
+   "v": "baker"
+  },
+  "baker.work.2": {
+   "f": "baker/work_2.mp3",
+   "d": 1.14,
+   "h": "010ccc0a83",
+   "t": "Es duftet schon.",
+   "v": "baker"
+  },
+  "baker.work.3": {
+   "f": "baker/work_3.mp3",
+   "d": 1.32,
+   "h": "88bc32e346",
+   "t": "Noch ein Laib in den Ofen.",
+   "v": "baker"
+  },
+  "baker.work.4": {
+   "f": "baker/work_4.mp3",
+   "d": 0.89,
+   "h": "30e3ba6399",
+   "t": "Brot für alle.",
+   "v": "baker"
+  },
+  "brewer.done.1": {
+   "f": "brewer/done_1.mp3",
+   "d": 1.61,
+   "h": "17691bbbb8",
+   "t": "Das Fass ist voll.",
+   "v": "brewer"
+  },
+  "brewer.done.2": {
+   "f": "brewer/done_2.mp3",
+   "d": 1.31,
+   "h": "d32aff9a51",
+   "t": "Frisch gebraut!",
+   "v": "brewer"
+  },
+  "brewer.done.3": {
+   "f": "brewer/done_3.mp3",
+   "d": 1.5,
+   "h": "51060b714e",
+   "t": "Auf Euer Wohl!",
+   "v": "brewer"
+  },
+  "brewer.move.1": {
+   "f": "brewer/move_1.mp3",
+   "d": 2.24,
+   "h": "47a104554c",
+   "t": "Ich bringe gleich ein Fass.",
+   "v": "brewer"
+  },
+  "brewer.move.2": {
+   "f": "brewer/move_2.mp3",
+   "d": 1.75,
+   "h": "2fe536029b",
+   "t": "Bin schon unterwegs.",
+   "v": "brewer"
+  },
+  "brewer.move.3": {
+   "f": "brewer/move_3.mp3",
+   "d": 2.66,
+   "h": "7680e11dcc",
+   "t": "Nur noch den Zapfhahn schließen.",
+   "v": "brewer"
+  },
+  "brewer.select.1": {
+   "f": "brewer/select_1.mp3",
+   "d": 1.24,
+   "h": "3753d81276",
+   "t": "Das Bier gärt.",
+   "v": "brewer"
+  },
+  "brewer.select.2": {
+   "f": "brewer/select_2.mp3",
+   "d": 1.92,
+   "h": "241f5cc4e2",
+   "t": "Ein Humpen gefällig?",
+   "v": "brewer"
+  },
+  "brewer.select.3": {
+   "f": "brewer/select_3.mp3",
+   "d": 2.5,
+   "h": "dccfbd6c39",
+   "t": "Was kann ich Euch einschenken?",
+   "v": "brewer"
+  },
+  "brewer.work.1": {
+   "f": "brewer/work_1.mp3",
+   "d": 1.5,
+   "h": "9f1e5a4e3a",
+   "t": "Der Hopfen duftet.",
+   "v": "brewer"
+  },
+  "brewer.work.2": {
+   "f": "brewer/work_2.mp3",
+   "d": 1.52,
+   "h": "63236a5fa3",
+   "t": "Der Sud muss ruhen.",
+   "v": "brewer"
+  },
+  "brewer.work.3": {
+   "f": "brewer/work_3.mp3",
+   "d": 2.19,
+   "h": "fb4224ca61",
+   "t": "Ein Probeschluck schadet nicht.",
+   "v": "brewer"
+  },
+  "brewer.work.4": {
+   "f": "brewer/work_4.mp3",
+   "d": 2.43,
+   "h": "6b70bcb1ce",
+   "t": "Das wird ein kräftiges Bier.",
+   "v": "brewer"
+  },
+  "crossbow.attack.1": {
+   "f": "crossbow/attack_1.mp3",
+   "d": 0.86,
+   "h": "bd961f17ce",
+   "t": "Bolzen frei!",
+   "v": "crossbow"
+  },
+  "crossbow.attack.2": {
+   "f": "crossbow/attack_2.mp3",
+   "d": 1.4,
+   "h": "a4d3a632d1",
+   "t": "Ziel erfasst, Feuer!",
+   "v": "crossbow"
+  },
+  "crossbow.attack.3": {
+   "f": "crossbow/attack_3.mp3",
+   "d": 0.99,
+   "h": "4a98542b75",
+   "t": "Durch jede Rüstung!",
+   "v": "crossbow"
+  },
+  "crossbow.hold.1": {
+   "f": "crossbow/hold_1.mp3",
+   "d": 1.2,
+   "h": "8ee84ddb69",
+   "t": "Wir halten die Linie.",
+   "v": "crossbow"
+  },
+  "crossbow.hold.2": {
+   "f": "crossbow/hold_2.mp3",
+   "d": 1.32,
+   "h": "9d558e8c31",
+   "t": "Kein Schritt weiter für sie.",
+   "v": "crossbow"
+  },
+  "crossbow.hold.3": {
+   "f": "crossbow/hold_3.mp3",
+   "d": 1.77,
+   "h": "16ffe6c290",
+   "t": "Die Sehne ist gespannt, wir warten.",
+   "v": "crossbow"
+  },
+  "crossbow.move.1": {
+   "f": "crossbow/move_1.mp3",
+   "d": 0.8,
+   "h": "813e7acc9e",
+   "t": "Wir verlegen.",
+   "v": "crossbow"
+  },
+  "crossbow.move.2": {
+   "f": "crossbow/move_2.mp3",
+   "d": 1.42,
+   "h": "d0dec018b4",
+   "t": "Spannen im Gehen, los!",
+   "v": "crossbow"
+  },
+  "crossbow.move.3": {
+   "f": "crossbow/move_3.mp3",
+   "d": 1.62,
+   "h": "8b53d803d3",
+   "t": "Neue Stellung, verstanden.",
+   "v": "crossbow"
+  },
+  "crossbow.select.1": {
+   "f": "crossbow/select_1.mp3",
+   "d": 0.99,
+   "h": "7bcacf86ac",
+   "t": "Bolzen gespannt.",
+   "v": "crossbow"
+  },
+  "crossbow.select.2": {
+   "f": "crossbow/select_2.mp3",
+   "d": 1.57,
+   "h": "3472251ef9",
+   "t": "Die Armbrust ist geladen.",
+   "v": "crossbow"
+  },
+  "crossbow.select.3": {
+   "f": "crossbow/select_3.mp3",
+   "d": 1.47,
+   "h": "9e7d81ea6c",
+   "t": "Ruhige Hand, scharfes Auge.",
+   "v": "crossbow"
+  },
+  "crossbow.select.4": {
+   "f": "crossbow/select_4.mp3",
+   "d": 0.71,
+   "h": "3ec754f1b9",
+   "t": "Wir hören.",
+   "v": "crossbow"
+  },
+  "crossbow.wounded.1": {
+   "f": "crossbow/wounded_1.mp3",
+   "d": 1.18,
+   "h": "d4f5f80f53",
+   "t": "Mich hat ein Pfeil erwischt!",
+   "v": "crossbow"
+  },
+  "crossbow.wounded.2": {
+   "f": "crossbow/wounded_2.mp3",
+   "d": 1.24,
+   "h": "7be9266536",
+   "t": "Ich kann kaum noch spannen!",
+   "v": "crossbow"
+  },
+  "crossbow.wounded.3": {
+   "f": "crossbow/wounded_3.mp3",
+   "d": 1.26,
+   "h": "172514d0b7",
+   "t": "Zurück, ich bin verletzt!",
+   "v": "crossbow"
+  },
+  "engineer.attack.1": {
+   "f": "engineer/attack_1.mp3",
+   "d": 1.43,
+   "h": "4323e00f58",
+   "t": "Das gehen wir mit Köpfchen an.",
+   "v": "engineer"
+  },
+  "engineer.attack.2": {
+   "f": "engineer/attack_2.mp3",
+   "d": 1.16,
+   "h": "35577d8cd4",
+   "t": "Leitern an die Mauer!",
+   "v": "engineer"
+  },
+  "engineer.attack.3": {
+   "f": "engineer/attack_3.mp3",
+   "d": 1.63,
+   "h": "16eeb61626",
+   "t": "Wir untergraben das Fundament.",
+   "v": "engineer"
+  },
+  "engineer.hold.1": {
+   "f": "engineer/hold_1.mp3",
+   "d": 1.21,
+   "h": "4064d31af7",
+   "t": "Ich sichere das Gerät.",
+   "v": "engineer"
+  },
+  "engineer.hold.2": {
+   "f": "engineer/hold_2.mp3",
+   "d": 1.41,
+   "h": "807144bebe",
+   "t": "Hier bleibt alles stabil.",
+   "v": "engineer"
+  },
+  "engineer.hold.3": {
+   "f": "engineer/hold_3.mp3",
+   "d": 1.32,
+   "h": "c1ef877d7f",
+   "t": "Ich bleibe bei den Maschinen.",
+   "v": "engineer"
+  },
+  "engineer.move.1": {
+   "f": "engineer/move_1.mp3",
+   "d": 0.95,
+   "h": "5e30254fb6",
+   "t": "Ich bin unterwegs.",
+   "v": "engineer"
+  },
+  "engineer.move.2": {
+   "f": "engineer/move_2.mp3",
+   "d": 1.31,
+   "h": "6411b90a7e",
+   "t": "Die Pläne unter dem Arm.",
+   "v": "engineer"
+  },
+  "engineer.move.3": {
+   "f": "engineer/move_3.mp3",
+   "d": 0.78,
+   "h": "a2b2c1ce15",
+   "t": "Bin gleich da.",
+   "v": "engineer"
+  },
+  "engineer.select.1": {
+   "f": "engineer/select_1.mp3",
+   "d": 1.04,
+   "h": "064b69bd63",
+   "t": "Zeit zum Tüfteln.",
+   "v": "engineer"
+  },
+  "engineer.select.2": {
+   "f": "engineer/select_2.mp3",
+   "d": 1.47,
+   "h": "7bb7d0678e",
+   "t": "Das Werkzeug ist bereit.",
+   "v": "engineer"
+  },
+  "engineer.select.3": {
+   "f": "engineer/select_3.mp3",
+   "d": 0.89,
+   "h": "31244aaac1",
+   "t": "Ich rechne nach.",
+   "v": "engineer"
+  },
+  "engineer.select.4": {
+   "f": "engineer/select_4.mp3",
+   "d": 1.04,
+   "h": "09b1f2f4eb",
+   "t": "Was soll ich bauen?",
+   "v": "engineer"
+  },
+  "engineer.special.1": {
+   "f": "engineer/special_1.mp3",
+   "d": 1.01,
+   "h": "4a81225856",
+   "t": "Schnell geflickt.",
+   "v": "engineer"
+  },
+  "engineer.special.2": {
+   "f": "engineer/special_2.mp3",
+   "d": 0.87,
+   "h": "4ca2e942bc",
+   "t": "Das hält wieder.",
+   "v": "engineer"
+  },
+  "engineer.special.3": {
+   "f": "engineer/special_3.mp3",
+   "d": 1.85,
+   "h": "7bc236e872",
+   "t": "Ein paar Nägel, und es läuft.",
+   "v": "engineer"
+  },
+  "engineer.wounded.1": {
+   "f": "engineer/wounded_1.mp3",
+   "d": 0.8,
+   "h": "8a35672c6f",
+   "t": "Meine Pläne!",
+   "v": "engineer"
+  },
+  "engineer.wounded.2": {
+   "f": "engineer/wounded_2.mp3",
+   "d": 1.6,
+   "h": "09c1b21358",
+   "t": "Autsch, die Hände brauche ich noch.",
+   "v": "engineer"
+  },
+  "engineer.wounded.3": {
+   "f": "engineer/wounded_3.mp3",
+   "d": 0.93,
+   "h": "0494df960f",
+   "t": "Ich bin getroffen!",
+   "v": "engineer"
+  },
+  "farmer.done.1": {
+   "f": "farmer/done_1.mp3",
+   "d": 1.1,
+   "h": "3382376759",
+   "t": "Der Karren ist voll.",
+   "v": "farmer"
+  },
+  "farmer.done.2": {
+   "f": "farmer/done_2.mp3",
+   "d": 1.71,
+   "h": "25ad9380fd",
+   "t": "Die Ernte ist eingefahren.",
+   "v": "farmer"
+  },
+  "farmer.done.3": {
+   "f": "farmer/done_3.mp3",
+   "d": 1.03,
+   "h": "5f34bc0b37",
+   "t": "Genug für heute.",
+   "v": "farmer"
+  },
+  "farmer.move.1": {
+   "f": "farmer/move_1.mp3",
+   "d": 1.3,
+   "h": "5e1181ef2b",
+   "t": "Ich schaue nach dem Feld.",
+   "v": "farmer"
+  },
+  "farmer.move.2": {
+   "f": "farmer/move_2.mp3",
+   "d": 0.83,
+   "h": "3eb7558585",
+   "t": "Ich komme schon.",
+   "v": "farmer"
+  },
+  "farmer.move.3": {
+   "f": "farmer/move_3.mp3",
+   "d": 1.63,
+   "h": "995d610785",
+   "t": "Dann eben zum anderen Acker.",
+   "v": "farmer"
+  },
+  "farmer.select.1": {
+   "f": "farmer/select_1.mp3",
+   "d": 1.15,
+   "h": "10e481eb58",
+   "t": "Das Korn steht gut.",
+   "v": "farmer"
+  },
+  "farmer.select.2": {
+   "f": "farmer/select_2.mp3",
+   "d": 1.05,
+   "h": "66a344688a",
+   "t": "Was gibt es, Herr?",
+   "v": "farmer"
+  },
+  "farmer.select.3": {
+   "f": "farmer/select_3.mp3",
+   "d": 1.25,
+   "h": "cea0e50d69",
+   "t": "Die Ernte wartet nicht.",
+   "v": "farmer"
+  },
+  "farmer.work.1": {
+   "f": "farmer/work_1.mp3",
+   "d": 1.42,
+   "h": "6cf77d534e",
+   "t": "Es wird ein gutes Jahr.",
+   "v": "farmer"
+  },
+  "farmer.work.2": {
+   "f": "farmer/work_2.mp3",
+   "d": 1.25,
+   "h": "e61a887cd6",
+   "t": "Die Ähren sind schwer.",
+   "v": "farmer"
+  },
+  "farmer.work.3": {
+   "f": "farmer/work_3.mp3",
+   "d": 1.74,
+   "h": "278c31e257",
+   "t": "Ein Schluck Wasser, dann weiter.",
+   "v": "farmer"
+  },
+  "farmer.work.4": {
+   "f": "farmer/work_4.mp3",
+   "d": 1.56,
+   "h": "7a2d59a9ec",
+   "t": "Ohne uns wird keiner satt.",
+   "v": "farmer"
+  },
+  "knight.attack.1": {
+   "f": "knight/attack_1.mp3",
+   "d": 0.74,
+   "h": "aef1db3eb1",
+   "t": "Zur Attacke!",
+   "v": "knight"
+  },
+  "knight.attack.2": {
+   "f": "knight/attack_2.mp3",
+   "d": 1.5,
+   "h": "3619c16dc0",
+   "t": "Lanzen nieder und drauf!",
+   "v": "knight"
+  },
+  "knight.attack.3": {
+   "f": "knight/attack_3.mp3",
+   "d": 1.06,
+   "h": "6c6068cd58",
+   "t": "Für Ehre und Burg!",
+   "v": "knight"
+  },
+  "knight.attack.4": {
+   "f": "knight/attack_4.mp3",
+   "d": 1.22,
+   "h": "f252f820a5",
+   "t": "Reiter, vorwärts!",
+   "v": "knight"
+  },
+  "knight.hold.1": {
+   "f": "knight/hold_1.mp3",
+   "d": 1.07,
+   "h": "a4a4b25b3c",
+   "t": "Wir halten die Flanke.",
+   "v": "knight"
+  },
+  "knight.hold.2": {
+   "f": "knight/hold_2.mp3",
+   "d": 1.6,
+   "h": "1cd0b3c2a8",
+   "t": "Das Pferd steht ruhig, ich wache.",
+   "v": "knight"
+  },
+  "knight.hold.3": {
+   "f": "knight/hold_3.mp3",
+   "d": 1.26,
+   "h": "80726aa531",
+   "t": "Hier kommt keiner vorbei.",
+   "v": "knight"
+  },
+  "knight.move.1": {
+   "f": "knight/move_1.mp3",
+   "d": 1.15,
+   "h": "8a8e973070",
+   "t": "Im Galopp voran!",
+   "v": "knight"
+  },
+  "knight.move.2": {
+   "f": "knight/move_2.mp3",
+   "d": 1.03,
+   "h": "36aaddd5bc",
+   "t": "Ich reite sofort.",
+   "v": "knight"
+  },
+  "knight.move.3": {
+   "f": "knight/move_3.mp3",
+   "d": 1.32,
+   "h": "c0fe2927a1",
+   "t": "Aus dem Weg, ich komme!",
+   "v": "knight"
+  },
+  "knight.move.4": {
+   "f": "knight/move_4.mp3",
+   "d": 1.56,
+   "h": "36be076161",
+   "t": "Die Hufe donnern, wir reiten.",
+   "v": "knight"
+  },
+  "knight.select.1": {
+   "f": "knight/select_1.mp3",
+   "d": 0.99,
+   "h": "c0ff31fcf3",
+   "t": "Ich höre, Herr.",
+   "v": "knight"
+  },
+  "knight.select.2": {
+   "f": "knight/select_2.mp3",
+   "d": 1.31,
+   "h": "2296688853",
+   "t": "Das Pferd ist gesattelt.",
+   "v": "knight"
+  },
+  "knight.select.3": {
+   "f": "knight/select_3.mp3",
+   "d": 0.92,
+   "h": "3a918e282a",
+   "t": "Bereit zum Ritt.",
+   "v": "knight"
+  },
+  "knight.select.4": {
+   "f": "knight/select_4.mp3",
+   "d": 1.14,
+   "h": "4d1d7c67db",
+   "t": "Nennt mir das Ziel.",
+   "v": "knight"
+  },
+  "knight.wounded.1": {
+   "f": "knight/wounded_1.mp3",
+   "d": 1.24,
+   "h": "9ba7c6448b",
+   "t": "Mein Pferd ist verletzt!",
+   "v": "knight"
+  },
+  "knight.wounded.2": {
+   "f": "knight/wounded_2.mp3",
+   "d": 1.12,
+   "h": "b19ff3f2ef",
+   "t": "Der Panzer hält noch.",
+   "v": "knight"
+  },
+  "knight.wounded.3": {
+   "f": "knight/wounded_3.mp3",
+   "d": 1.96,
+   "h": "fb3f180a55",
+   "t": "Ich bin angeschlagen, aber nicht besiegt.",
+   "v": "knight"
+  },
+  "lord.attack.1": {
+   "f": "lord/attack_1.mp3",
+   "d": 0.85,
+   "h": "04ae3dad56",
+   "t": "Für mein Haus!",
+   "v": "lord"
+  },
+  "lord.attack.2": {
+   "f": "lord/attack_2.mp3",
+   "d": 1.16,
+   "h": "311f5e2114",
+   "t": "Dem Feind entgegen!",
+   "v": "lord"
+  },
+  "lord.attack.3": {
+   "f": "lord/attack_3.mp3",
+   "d": 1.14,
+   "h": "7f14fd425b",
+   "t": "Folgt Eurem Herrn!",
+   "v": "lord"
+  },
+  "lord.hold.1": {
+   "f": "lord/hold_1.mp3",
+   "d": 1.16,
+   "h": "204ca38e63",
+   "t": "Hier ist mein Platz.",
+   "v": "lord"
+  },
+  "lord.hold.2": {
+   "f": "lord/hold_2.mp3",
+   "d": 1.1,
+   "h": "7309b71344",
+   "t": "Die Burg fällt nicht.",
+   "v": "lord"
+  },
+  "lord.hold.3": {
+   "f": "lord/hold_3.mp3",
+   "d": 0.91,
+   "h": "9590362663",
+   "t": "Ich weiche nicht.",
+   "v": "lord"
+  },
+  "lord.move.1": {
+   "f": "lord/move_1.mp3",
+   "d": 1.12,
+   "h": "e998e648e1",
+   "t": "Ich gehe selbst.",
+   "v": "lord"
+  },
+  "lord.move.2": {
+   "f": "lord/move_2.mp3",
+   "d": 0.76,
+   "h": "bf96f625bc",
+   "t": "Folgt mir.",
+   "v": "lord"
+  },
+  "lord.move.3": {
+   "f": "lord/move_3.mp3",
+   "d": 1.16,
+   "h": "cfd40f6148",
+   "t": "Der Weg ist frei.",
+   "v": "lord"
+  },
+  "lord.select.1": {
+   "f": "lord/select_1.mp3",
+   "d": 1.3,
+   "h": "89f4bb9502",
+   "t": "Sprecht, ich höre.",
+   "v": "lord"
+  },
+  "lord.select.2": {
+   "f": "lord/select_2.mp3",
+   "d": 0.9,
+   "h": "bcc996d5e8",
+   "t": "Ich höre Euch.",
+   "v": "lord"
+  },
+  "lord.select.3": {
+   "f": "lord/select_3.mp3",
+   "d": 0.82,
+   "h": "0fb267f0fa",
+   "t": "Was gibt es?",
+   "v": "lord"
+  },
+  "lord.select.4": {
+   "f": "lord/select_4.mp3",
+   "d": 1.26,
+   "h": "4c5ac0c7d8",
+   "t": "Redet, ich höre zu.",
+   "v": "lord"
+  },
+  "lord.special.1": {
+   "f": "lord/special_1.mp3",
+   "d": 2.16,
+   "h": "75cc8acd9b",
+   "t": "Haus und Volk sind mir anvertraut.",
+   "v": "lord"
+  },
+  "lord.special.2": {
+   "f": "lord/special_2.mp3",
+   "d": 1.4,
+   "h": "dcfd496dc8",
+   "t": "Wir haben viel aufgebaut.",
+   "v": "lord"
+  },
+  "lord.special.3": {
+   "f": "lord/special_3.mp3",
+   "d": 1.54,
+   "h": "5b2ec4f2eb",
+   "t": "Diese Mauern werden bestehen.",
+   "v": "lord"
+  },
+  "lord.wounded.1": {
+   "f": "lord/wounded_1.mp3",
+   "d": 1.59,
+   "h": "6a0301c0fc",
+   "t": "Das schmerzt, doch ich lebe.",
+   "v": "lord"
+  },
+  "lord.wounded.2": {
+   "f": "lord/wounded_2.mp3",
+   "d": 1.12,
+   "h": "96f41067f8",
+   "t": "Man hat mich getroffen!",
+   "v": "lord"
+  },
+  "lord.wounded.3": {
+   "f": "lord/wounded_3.mp3",
+   "d": 1.25,
+   "h": "c2595898bb",
+   "t": "Haltet sie von mir fern!",
+   "v": "lord"
+  },
+  "mason.done.1": {
+   "f": "mason/done_1.mp3",
+   "d": 1.31,
+   "h": "710440c500",
+   "t": "Ein sauberer Block.",
+   "v": "mason"
+  },
+  "mason.done.2": {
+   "f": "mason/done_2.mp3",
+   "d": 1.66,
+   "h": "d4a5394550",
+   "t": "Die Fuhre ist beladen.",
+   "v": "mason"
+  },
+  "mason.done.3": {
+   "f": "mason/done_3.mp3",
+   "d": 1.15,
+   "h": "843d9cfb92",
+   "t": "Fest wie der Berg.",
+   "v": "mason"
+  },
+  "mason.move.1": {
+   "f": "mason/move_1.mp3",
+   "d": 1.61,
+   "h": "57653d0ad9",
+   "t": "Ich nehme den Hammer mit.",
+   "v": "mason"
+  },
+  "mason.move.2": {
+   "f": "mason/move_2.mp3",
+   "d": 1.16,
+   "h": "f58ae610b2",
+   "t": "Zum Steinbruch.",
+   "v": "mason"
+  },
+  "mason.move.3": {
+   "f": "mason/move_3.mp3",
+   "d": 1.3,
+   "h": "c6194e0994",
+   "t": "Schon unterwegs.",
+   "v": "mason"
+  },
+  "mason.select.1": {
+   "f": "mason/select_1.mp3",
+   "d": 1.38,
+   "h": "3e498b3bca",
+   "t": "Stein um Stein.",
+   "v": "mason"
+  },
+  "mason.select.2": {
+   "f": "mason/select_2.mp3",
+   "d": 1.44,
+   "h": "d736b00154",
+   "t": "Der Meißel ruht nicht.",
+   "v": "mason"
+  },
+  "mason.select.3": {
+   "f": "mason/select_3.mp3",
+   "d": 1.15,
+   "h": "5809ae819f",
+   "t": "Ich höre, Herr.",
+   "v": "mason"
+  },
+  "mason.select.4": {
+   "f": "mason/select_4.mp3",
+   "d": 1.91,
+   "h": "b30dfc6fbb",
+   "t": "Der Fels wartet schon.",
+   "v": "mason"
+  },
+  "mason.work.1": {
+   "f": "mason/work_1.mp3",
+   "d": 2.45,
+   "h": "58a02b79ea",
+   "t": "Stein um Stein baut man eine Burg.",
+   "v": "mason"
+  },
+  "mason.work.2": {
+   "f": "mason/work_2.mp3",
+   "d": 1.61,
+   "h": "19dcd9bc25",
+   "t": "Der Fels gibt nach.",
+   "v": "mason"
+  },
+  "mason.work.3": {
+   "f": "mason/work_3.mp3",
+   "d": 2.28,
+   "h": "57521175a4",
+   "t": "Das klingt nach gutem Gestein.",
+   "v": "mason"
+  },
+  "mason.work.4": {
+   "f": "mason/work_4.mp3",
+   "d": 1.08,
+   "h": "fcca55c745",
+   "t": "Noch ein Brocken.",
+   "v": "mason"
+  },
+  "mercenary.attack.1": {
+   "f": "mercenary/attack_1.mp3",
+   "d": 0.84,
+   "h": "38738e7dc4",
+   "t": "Für den Sold!",
+   "v": "mercenary"
+  },
+  "mercenary.attack.2": {
+   "f": "mercenary/attack_2.mp3",
+   "d": 1.65,
+   "h": "07c57638d4",
+   "t": "Zeigt ihnen den Wüstenstahl!",
+   "v": "mercenary"
+  },
+  "mercenary.attack.3": {
+   "f": "mercenary/attack_3.mp3",
+   "d": 2.0,
+   "h": "b860c3656e",
+   "t": "Angriff, wie der Sturm über die Dünen!",
+   "v": "mercenary"
+  },
+  "mercenary.hold.1": {
+   "f": "mercenary/hold_1.mp3",
+   "d": 1.95,
+   "h": "2584470500",
+   "t": "Wir halten, solange der Sold reicht.",
+   "v": "mercenary"
+  },
+  "mercenary.hold.2": {
+   "f": "mercenary/hold_2.mp3",
+   "d": 1.14,
+   "h": "6fe95a7b1e",
+   "t": "Wir rühren uns nicht.",
+   "v": "mercenary"
+  },
+  "mercenary.hold.3": {
+   "f": "mercenary/hold_3.mp3",
+   "d": 1.22,
+   "h": "aecd7af452",
+   "t": "Die Dünen sind unser Schild.",
+   "v": "mercenary"
+  },
+  "mercenary.move.1": {
+   "f": "mercenary/move_1.mp3",
+   "d": 0.98,
+   "h": "c10cd7aa4f",
+   "t": "Wir ziehen los.",
+   "v": "mercenary"
+  },
+  "mercenary.move.2": {
+   "f": "mercenary/move_2.mp3",
+   "d": 1.43,
+   "h": "e3e5601c81",
+   "t": "Schnell wie der Wüstenwind.",
+   "v": "mercenary"
+  },
+  "mercenary.move.3": {
+   "f": "mercenary/move_3.mp3",
+   "d": 1.29,
+   "h": "5855a66efa",
+   "t": "Ein Befehl, ein Weg.",
+   "v": "mercenary"
+  },
+  "mercenary.move.4": {
+   "f": "mercenary/move_4.mp3",
+   "d": 1.17,
+   "h": "9a7afdd459",
+   "t": "Wir folgen dem Befehl.",
+   "v": "mercenary"
+  },
+  "mercenary.select.1": {
+   "f": "mercenary/select_1.mp3",
+   "d": 1.82,
+   "h": "33a53958ec",
+   "t": "Der Sold stimmt, was ist zu tun?",
+   "v": "mercenary"
+  },
+  "mercenary.select.2": {
+   "f": "mercenary/select_2.mp3",
+   "d": 1.03,
+   "h": "a219b96fe0",
+   "t": "Sagt, wohin.",
+   "v": "mercenary"
+  },
+  "mercenary.select.3": {
+   "f": "mercenary/select_3.mp3",
+   "d": 2.33,
+   "h": "6c83b4cb3f",
+   "t": "Wir sind Euer, solange die Münzen klingen.",
+   "v": "mercenary"
+  },
+  "mercenary.select.4": {
+   "f": "mercenary/select_4.mp3",
+   "d": 1.36,
+   "h": "5c167bbef7",
+   "t": "Bei den Dünen, ich höre.",
+   "v": "mercenary"
+  },
+  "mercenary.wounded.1": {
+   "f": "mercenary/wounded_1.mp3",
+   "d": 1.38,
+   "h": "d83bbfbeae",
+   "t": "Das kostet extra!",
+   "v": "mercenary"
+  },
+  "mercenary.wounded.2": {
+   "f": "mercenary/wounded_2.mp3",
+   "d": 0.87,
+   "h": "e889c52a20",
+   "t": "Ich blute, Herr.",
+   "v": "mercenary"
+  },
+  "mercenary.wounded.3": {
+   "f": "mercenary/wounded_3.mp3",
+   "d": 1.49,
+   "h": "fd2b24d0cd",
+   "t": "Das war ein guter Schlag.",
+   "v": "mercenary"
+  },
+  "miller.done.1": {
+   "f": "miller/done_1.mp3",
+   "d": 1.32,
+   "h": "51162aff7d",
+   "t": "Das Mehl ist gesackt.",
+   "v": "miller"
+  },
+  "miller.done.2": {
+   "f": "miller/done_2.mp3",
+   "d": 0.77,
+   "h": "7fbf08c6db",
+   "t": "Ein Sack voll.",
+   "v": "miller"
+  },
+  "miller.done.3": {
+   "f": "miller/done_3.mp3",
+   "d": 1.08,
+   "h": "b637ec49ba",
+   "t": "Fein gemahlen.",
+   "v": "miller"
+  },
+  "miller.move.1": {
+   "f": "miller/move_1.mp3",
+   "d": 1.33,
+   "h": "8d610ae65b",
+   "t": "Ich schaue nach dem Wind.",
+   "v": "miller"
+  },
+  "miller.move.2": {
+   "f": "miller/move_2.mp3",
+   "d": 1.84,
+   "h": "9c64723ed2",
+   "t": "Ich komme, sobald der Stein steht.",
+   "v": "miller"
+  },
+  "miller.move.3": {
+   "f": "miller/move_3.mp3",
+   "d": 1.1,
+   "h": "c7ef63d08c",
+   "t": "Bin schon unterwegs.",
+   "v": "miller"
+  },
+  "miller.select.1": {
+   "f": "miller/select_1.mp3",
+   "d": 1.2,
+   "h": "9a72acb2b8",
+   "t": "Die Flügel drehen sich.",
+   "v": "miller"
+  },
+  "miller.select.2": {
+   "f": "miller/select_2.mp3",
+   "d": 1.43,
+   "h": "263af1a4a8",
+   "t": "Mahlen, mahlen, mahlen.",
+   "v": "miller"
+  },
+  "miller.select.3": {
+   "f": "miller/select_3.mp3",
+   "d": 1.17,
+   "h": "bb5e7bf2a7",
+   "t": "Hier ist die Mühle.",
+   "v": "miller"
+  },
+  "miller.work.1": {
+   "f": "miller/work_1.mp3",
+   "d": 1.29,
+   "h": "f39e7a308c",
+   "t": "Der Wind steht günstig.",
+   "v": "miller"
+  },
+  "miller.work.2": {
+   "f": "miller/work_2.mp3",
+   "d": 1.34,
+   "h": "8ffebf8655",
+   "t": "Das Korn wird zu Mehl.",
+   "v": "miller"
+  },
+  "miller.work.3": {
+   "f": "miller/work_3.mp3",
+   "d": 1.14,
+   "h": "d83d6aef4d",
+   "t": "Der Stein mahlt fein.",
+   "v": "miller"
+  },
+  "miller.work.4": {
+   "f": "miller/work_4.mp3",
+   "d": 1.45,
+   "h": "452c3a456c",
+   "t": "Die Flügel drehen sich schön.",
+   "v": "miller"
+  },
+  "monk.attack.1": {
+   "f": "monk/attack_1.mp3",
+   "d": 1.65,
+   "h": "53fd83375b",
+   "t": "Gott vergebe mir.",
+   "v": "monk"
+  },
+  "monk.attack.2": {
+   "f": "monk/attack_2.mp3",
+   "d": 2.95,
+   "h": "c337a48048",
+   "t": "Auch ein Stab ist eine Waffe.",
+   "v": "monk"
+  },
+  "monk.attack.3": {
+   "f": "monk/attack_3.mp3",
+   "d": 2.44,
+   "h": "1b77511804",
+   "t": "Ich greife an, in Demut.",
+   "v": "monk"
+  },
+  "monk.hold.1": {
+   "f": "monk/hold_1.mp3",
+   "d": 2.3,
+   "h": "6ac4cc17c1",
+   "t": "Ich bete für unsere Mauern.",
+   "v": "monk"
+  },
+  "monk.hold.2": {
+   "f": "monk/hold_2.mp3",
+   "d": 1.39,
+   "h": "8e25382d5f",
+   "t": "Hier wache ich.",
+   "v": "monk"
+  },
+  "monk.hold.3": {
+   "f": "monk/hold_3.mp3",
+   "d": 2.44,
+   "h": "8a4be4f0a1",
+   "t": "Ich bleibe bei den Verwundeten.",
+   "v": "monk"
+  },
+  "monk.move.1": {
+   "f": "monk/move_1.mp3",
+   "d": 2.46,
+   "h": "1d28ef6e89",
+   "t": "Ich gehe, wohin die Not ruft.",
+   "v": "monk"
+  },
+  "monk.move.2": {
+   "f": "monk/move_2.mp3",
+   "d": 1.75,
+   "h": "45613e83e1",
+   "t": "Schnellen Schrittes, Herr.",
+   "v": "monk"
+  },
+  "monk.move.3": {
+   "f": "monk/move_3.mp3",
+   "d": 1.0,
+   "h": "e8f3d8c9ac",
+   "t": "Ich eile.",
+   "v": "monk"
+  },
+  "monk.select.1": {
+   "f": "monk/select_1.mp3",
+   "d": 1.73,
+   "h": "47198ee5bc",
+   "t": "Friede sei mit dir.",
+   "v": "monk"
+  },
+  "monk.select.2": {
+   "f": "monk/select_2.mp3",
+   "d": 1.99,
+   "h": "00b47b8385",
+   "t": "Der Himmel segne dich.",
+   "v": "monk"
+  },
+  "monk.select.3": {
+   "f": "monk/select_3.mp3",
+   "d": 1.87,
+   "h": "01d3555b75",
+   "t": "Wie kann ich helfen?",
+   "v": "monk"
+  },
+  "monk.special.1": {
+   "f": "monk/special_1.mp3",
+   "d": 1.51,
+   "h": "25b031f07c",
+   "t": "Der Segen wirkt.",
+   "v": "monk"
+  },
+  "monk.special.2": {
+   "f": "monk/special_2.mp3",
+   "d": 1.85,
+   "h": "33dd14e0e6",
+   "t": "Du bist wieder heil.",
+   "v": "monk"
+  },
+  "monk.special.3": {
+   "f": "monk/special_3.mp3",
+   "d": 2.06,
+   "h": "fbfe039904",
+   "t": "Es war nur ein Kratzer.",
+   "v": "monk"
+  },
+  "monk.wounded.1": {
+   "f": "monk/wounded_1.mp3",
+   "d": 1.71,
+   "h": "1b4201e1fd",
+   "t": "Gott steh mir bei!",
+   "v": "monk"
+  },
+  "monk.wounded.2": {
+   "f": "monk/wounded_2.mp3",
+   "d": 2.76,
+   "h": "4029177671",
+   "t": "Ich kann mich nicht selbst heilen!",
+   "v": "monk"
+  },
+  "monk.wounded.3": {
+   "f": "monk/wounded_3.mp3",
+   "d": 2.18,
+   "h": "166f181dde",
+   "t": "Autsch, die Kutte brennt!",
+   "v": "monk"
+  },
+  "peasant.attack.1": {
+   "f": "peasant/attack_1.mp3",
+   "d": 1.14,
+   "h": "174cf8a717",
+   "t": "Ich bin kein Kämpfer!",
+   "v": "peasant"
+  },
+  "peasant.attack.2": {
+   "f": "peasant/attack_2.mp3",
+   "d": 1.08,
+   "h": "b014ec7e21",
+   "t": "Mit der Heugabel?",
+   "v": "peasant"
+  },
+  "peasant.attack.3": {
+   "f": "peasant/attack_3.mp3",
+   "d": 1.18,
+   "h": "8dae81b9d2",
+   "t": "Muss das wirklich sein?",
+   "v": "peasant"
+  },
+  "peasant.done.1": {
+   "f": "peasant/done_1.mp3",
+   "d": 0.47,
+   "h": "1f9250d949",
+   "t": "Fertig!",
+   "v": "peasant"
+  },
+  "peasant.done.2": {
+   "f": "peasant/done_2.mp3",
+   "d": 1.26,
+   "h": "0662f54760",
+   "t": "So, das wäre geschafft.",
+   "v": "peasant"
+  },
+  "peasant.done.3": {
+   "f": "peasant/done_3.mp3",
+   "d": 1.94,
+   "h": "209f400efe",
+   "t": "Wieder ein Stück Arbeit weniger.",
+   "v": "peasant"
+  },
+  "peasant.hold.1": {
+   "f": "peasant/hold_1.mp3",
+   "d": 0.93,
+   "h": "bea0d0083b",
+   "t": "Ich bleibe hier.",
+   "v": "peasant"
+  },
+  "peasant.hold.2": {
+   "f": "peasant/hold_2.mp3",
+   "d": 1.15,
+   "h": "9f59a79054",
+   "t": "Dann warte ich eben.",
+   "v": "peasant"
+  },
+  "peasant.hold.3": {
+   "f": "peasant/hold_3.mp3",
+   "d": 1.65,
+   "h": "7e20c501a6",
+   "t": "Hier ist es sicher genug, oder?",
+   "v": "peasant"
+  },
+  "peasant.move.1": {
+   "f": "peasant/move_1.mp3",
+   "d": 0.98,
+   "h": "2f4df302ad",
+   "t": "Ja, ich gehe schon.",
+   "v": "peasant"
+  },
+  "peasant.move.2": {
+   "f": "peasant/move_2.mp3",
+   "d": 1.23,
+   "h": "60494a8949",
+   "t": "Bin schon unterwegs.",
+   "v": "peasant"
+  },
+  "peasant.move.3": {
+   "f": "peasant/move_3.mp3",
+   "d": 1.33,
+   "h": "1efb5c4e6c",
+   "t": "Dann eben dorthin.",
+   "v": "peasant"
+  },
+  "peasant.move.4": {
+   "f": "peasant/move_4.mp3",
+   "d": 1.04,
+   "h": "ae2bb3a13e",
+   "t": "Ich bin gleich da.",
+   "v": "peasant"
+  },
+  "peasant.select.1": {
+   "f": "peasant/select_1.mp3",
+   "d": 1.09,
+   "h": "8c63d5336b",
+   "t": "Die Felder warten.",
+   "v": "peasant"
+  },
+  "peasant.select.2": {
+   "f": "peasant/select_2.mp3",
+   "d": 1.9,
+   "h": "eb2fcb9b84",
+   "t": "Ja, Herr, was gibt es?",
+   "v": "peasant"
+  },
+  "peasant.select.3": {
+   "f": "peasant/select_3.mp3",
+   "d": 1.17,
+   "h": "f30a844096",
+   "t": "Gibt es Arbeit?",
+   "v": "peasant"
+  },
+  "peasant.select.4": {
+   "f": "peasant/select_4.mp3",
+   "d": 1.33,
+   "h": "1fc172544f",
+   "t": "Womit kann ich helfen?",
+   "v": "peasant"
+  },
+  "peasant.work.1": {
+   "f": "peasant/work_1.mp3",
+   "d": 2.07,
+   "h": "41fe7108ca",
+   "t": "Die Arbeit macht sich nicht von allein.",
+   "v": "peasant"
+  },
+  "peasant.work.2": {
+   "f": "peasant/work_2.mp3",
+   "d": 1.95,
+   "h": "4b6c04620d",
+   "t": "Immer weiter, immer weiter.",
+   "v": "peasant"
+  },
+  "peasant.work.3": {
+   "f": "peasant/work_3.mp3",
+   "d": 1.13,
+   "h": "8c82dd6ddd",
+   "t": "Noch ein Handgriff.",
+   "v": "peasant"
+  },
+  "peasant.work.4": {
+   "f": "peasant/work_4.mp3",
+   "d": 1.42,
+   "h": "50cf2f0820",
+   "t": "Die Sonne steht schon hoch.",
+   "v": "peasant"
+  },
+  "peasant.wounded.1": {
+   "f": "peasant/wounded_1.mp3",
+   "d": 1.13,
+   "h": "e3ef9cba3f",
+   "t": "Aua, das tut weh!",
+   "v": "peasant"
+  },
+  "peasant.wounded.2": {
+   "f": "peasant/wounded_2.mp3",
+   "d": 0.63,
+   "h": "131d640906",
+   "t": "Zu Hilfe!",
+   "v": "peasant"
+  },
+  "peasant.wounded.3": {
+   "f": "peasant/wounded_3.mp3",
+   "d": 0.76,
+   "h": "43fded8f5e",
+   "t": "Rettet euch!",
+   "v": "peasant"
+  },
+  "siege.attack.1": {
+   "f": "siege/attack_1.mp3",
+   "d": 1.5,
+   "h": "7c9d15bb32",
+   "t": "Ziel erfasst, Feuer!",
+   "v": "siege"
+  },
+  "siege.attack.2": {
+   "f": "siege/attack_2.mp3",
+   "d": 0.96,
+   "h": "cf96bcad94",
+   "t": "Stein ab!",
+   "v": "siege"
+  },
+  "siege.attack.3": {
+   "f": "siege/attack_3.mp3",
+   "d": 2.04,
+   "h": "b5289a3c2c",
+   "t": "Ladet nach und lasst fliegen!",
+   "v": "siege"
+  },
+  "siege.attack.4": {
+   "f": "siege/attack_4.mp3",
+   "d": 2.05,
+   "h": "d567d7be00",
+   "t": "Die Mauern wackeln, bald fallen sie!",
+   "v": "siege"
+  },
+  "siege.hold.1": {
+   "f": "siege/hold_1.mp3",
+   "d": 1.53,
+   "h": "ee342deecc",
+   "t": "Wir bleiben in Stellung.",
+   "v": "siege"
+  },
+  "siege.hold.2": {
+   "f": "siege/hold_2.mp3",
+   "d": 1.75,
+   "h": "f8a18cc62f",
+   "t": "Das Geschütz ist gesichert.",
+   "v": "siege"
+  },
+  "siege.hold.3": {
+   "f": "siege/hold_3.mp3",
+   "d": 1.9,
+   "h": "8c33e1a805",
+   "t": "Wir warten auf Euer Zeichen.",
+   "v": "siege"
+  },
+  "siege.move.1": {
+   "f": "siege/move_1.mp3",
+   "d": 1.11,
+   "h": "0d63266278",
+   "t": "Zieht! Zieht!",
+   "v": "siege"
+  },
+  "siege.move.2": {
+   "f": "siege/move_2.mp3",
+   "d": 3.03,
+   "h": "52a1806102",
+   "t": "Langsam und gleichmäßig, es ist schwer.",
+   "v": "siege"
+  },
+  "siege.move.3": {
+   "f": "siege/move_3.mp3",
+   "d": 1.75,
+   "h": "0ae1657971",
+   "t": "Alle Mann an die Seile!",
+   "v": "siege"
+  },
+  "siege.move.4": {
+   "f": "siege/move_4.mp3",
+   "d": 1.39,
+   "h": "9160263208",
+   "t": "Wir schaffen es hin.",
+   "v": "siege"
+  },
+  "siege.select.1": {
+   "f": "siege/select_1.mp3",
+   "d": 1.52,
+   "h": "a9142d1972",
+   "t": "Das Geschütz ist bereit.",
+   "v": "siege"
+  },
+  "siege.select.2": {
+   "f": "siege/select_2.mp3",
+   "d": 1.91,
+   "h": "55b1250b49",
+   "t": "Die Mannschaft ist angetreten.",
+   "v": "siege"
+  },
+  "siege.select.3": {
+   "f": "siege/select_3.mp3",
+   "d": 1.24,
+   "h": "9eec944afb",
+   "t": "Schmiert die Achsen!",
+   "v": "siege"
+  },
+  "siege.select.4": {
+   "f": "siege/select_4.mp3",
+   "d": 1.38,
+   "h": "c511db5e3a",
+   "t": "Wir schieben es, Herr.",
+   "v": "siege"
+  },
+  "siege.special.1": {
+   "f": "siege/special_1.mp3",
+   "d": 1.58,
+   "h": "a9b43a3db1",
+   "t": "Der Arm ist gespannt.",
+   "v": "siege"
+  },
+  "siege.special.2": {
+   "f": "siege/special_2.mp3",
+   "d": 2.32,
+   "h": "41c04c7477",
+   "t": "Vorsicht, es schlägt gleich ein!",
+   "v": "siege"
+  },
+  "siege.special.3": {
+   "f": "siege/special_3.mp3",
+   "d": 1.3,
+   "h": "b0d62b53ed",
+   "t": "Gerät geladen.",
+   "v": "siege"
+  },
+  "siege.wounded.1": {
+   "f": "siege/wounded_1.mp3",
+   "d": 1.82,
+   "h": "076429f00d",
+   "t": "Das Gerät ist beschädigt!",
+   "v": "siege"
+  },
+  "siege.wounded.2": {
+   "f": "siege/wounded_2.mp3",
+   "d": 1.91,
+   "h": "cde12d73c4",
+   "t": "Die Mannschaft ist dezimiert!",
+   "v": "siege"
+  },
+  "siege.wounded.3": {
+   "f": "siege/wounded_3.mp3",
+   "d": 1.99,
+   "h": "a9eb41958d",
+   "t": "Wir brauchen einen Ingenieur!",
+   "v": "siege"
+  },
+  "smith.done.1": {
+   "f": "smith/done_1.mp3",
+   "d": 1.18,
+   "h": "b120ca5976",
+   "t": "Fertig geschmiedet.",
+   "v": "smith"
+  },
+  "smith.done.2": {
+   "f": "smith/done_2.mp3",
+   "d": 1.5,
+   "h": "6aaf6a5840",
+   "t": "Das hält, versprochen.",
+   "v": "smith"
+  },
+  "smith.done.3": {
+   "f": "smith/done_3.mp3",
+   "d": 1.2,
+   "h": "17de8aceef",
+   "t": "Ein Meisterstück.",
+   "v": "smith"
+  },
+  "smith.move.1": {
+   "f": "smith/move_1.mp3",
+   "d": 1.92,
+   "h": "7a349995ed",
+   "t": "Ich lösche nur schnell das Feuer.",
+   "v": "smith"
+  },
+  "smith.move.2": {
+   "f": "smith/move_2.mp3",
+   "d": 2.36,
+   "h": "6057ce4fdb",
+   "t": "Ich komme, wenn das Eisen kalt ist.",
+   "v": "smith"
+  },
+  "smith.move.3": {
+   "f": "smith/move_3.mp3",
+   "d": 1.38,
+   "h": "43e85a30c4",
+   "t": "Bin schon unterwegs.",
+   "v": "smith"
+  },
+  "smith.select.1": {
+   "f": "smith/select_1.mp3",
+   "d": 1.61,
+   "h": "7ab7cd49ae",
+   "t": "Das Eisen ist heiß.",
+   "v": "smith"
+  },
+  "smith.select.2": {
+   "f": "smith/select_2.mp3",
+   "d": 1.46,
+   "h": "3e15fa364d",
+   "t": "Was soll ich schmieden?",
+   "v": "smith"
+  },
+  "smith.select.3": {
+   "f": "smith/select_3.mp3",
+   "d": 1.37,
+   "h": "c037edee4c",
+   "t": "Der Amboss wartet.",
+   "v": "smith"
+  },
+  "smith.work.1": {
+   "f": "smith/work_1.mp3",
+   "d": 0.99,
+   "h": "cdecfa7d3f",
+   "t": "Schlag um Schlag.",
+   "v": "smith"
+  },
+  "smith.work.2": {
+   "f": "smith/work_2.mp3",
+   "d": 2.02,
+   "h": "18bda78807",
+   "t": "Das Feuer muss noch heißer werden.",
+   "v": "smith"
+  },
+  "smith.work.3": {
+   "f": "smith/work_3.mp3",
+   "d": 1.82,
+   "h": "9a1f4315e3",
+   "t": "Das wird eine gute Klinge.",
+   "v": "smith"
+  },
+  "smith.work.4": {
+   "f": "smith/work_4.mp3",
+   "d": 1.23,
+   "h": "6e053da73c",
+   "t": "Die Funken sprühen.",
+   "v": "smith"
+  },
+  "spearman.attack.1": {
+   "f": "spearman/attack_1.mp3",
+   "d": 0.89,
+   "h": "1d557c59b0",
+   "t": "Speere vor!",
+   "v": "spearman"
+  },
+  "spearman.attack.2": {
+   "f": "spearman/attack_2.mp3",
+   "d": 1.6,
+   "h": "d1db21b68b",
+   "t": "Haltet die Linie und stoßt zu!",
+   "v": "spearman"
+  },
+  "spearman.attack.3": {
+   "f": "spearman/attack_3.mp3",
+   "d": 1.47,
+   "h": "fe595dd85d",
+   "t": "Angriff, Spitzen nach vorn!",
+   "v": "spearman"
+  },
+  "spearman.hold.1": {
+   "f": "spearman/hold_1.mp3",
+   "d": 1.45,
+   "h": "2004373aa3",
+   "t": "Spieße gesenkt, wir halten.",
+   "v": "spearman"
+  },
+  "spearman.hold.2": {
+   "f": "spearman/hold_2.mp3",
+   "d": 1.5,
+   "h": "ab1e560d39",
+   "t": "Reiter kommen hier nicht durch.",
+   "v": "spearman"
+  },
+  "spearman.hold.3": {
+   "f": "spearman/hold_3.mp3",
+   "d": 0.9,
+   "h": "b20dcb36dc",
+   "t": "Die Reihe steht.",
+   "v": "spearman"
+  },
+  "spearman.move.1": {
+   "f": "spearman/move_1.mp3",
+   "d": 0.9,
+   "h": "25aa71b70b",
+   "t": "Wir ziehen los.",
+   "v": "spearman"
+  },
+  "spearman.move.2": {
+   "f": "spearman/move_2.mp3",
+   "d": 1.19,
+   "h": "e68d1b26da",
+   "t": "In Reihe, folgt mir!",
+   "v": "spearman"
+  },
+  "spearman.move.3": {
+   "f": "spearman/move_3.mp3",
+   "d": 1.63,
+   "h": "9bf9b9effc",
+   "t": "Den Speer geschultert, Marsch!",
+   "v": "spearman"
+  },
+  "spearman.move.4": {
+   "f": "spearman/move_4.mp3",
+   "d": 1.18,
+   "h": "1ea979f226",
+   "t": "Verstanden, Herr.",
+   "v": "spearman"
+  },
+  "spearman.select.1": {
+   "f": "spearman/select_1.mp3",
+   "d": 0.85,
+   "h": "e0395737e0",
+   "t": "Speer erhoben.",
+   "v": "spearman"
+  },
+  "spearman.select.2": {
+   "f": "spearman/select_2.mp3",
+   "d": 0.93,
+   "h": "6b86f7d0f7",
+   "t": "Wir sind bereit.",
+   "v": "spearman"
+  },
+  "spearman.select.3": {
+   "f": "spearman/select_3.mp3",
+   "d": 1.16,
+   "h": "4c4b954a54",
+   "t": "Gebt uns die Richtung.",
+   "v": "spearman"
+  },
+  "spearman.select.4": {
+   "f": "spearman/select_4.mp3",
+   "d": 1.03,
+   "h": "70cabfb035",
+   "t": "Spitzen nach vorn.",
+   "v": "spearman"
+  },
+  "spearman.wounded.1": {
+   "f": "spearman/wounded_1.mp3",
+   "d": 1.0,
+   "h": "e9b5479ced",
+   "t": "Mich hat es erwischt!",
+   "v": "spearman"
+  },
+  "spearman.wounded.2": {
+   "f": "spearman/wounded_2.mp3",
+   "d": 0.9,
+   "h": "00eaea11d3",
+   "t": "Ich kann noch stehen.",
+   "v": "spearman"
+  },
+  "spearman.wounded.3": {
+   "f": "spearman/wounded_3.mp3",
+   "d": 1.18,
+   "h": "11a225cb31",
+   "t": "Zu schwer verletzt, Herr!",
+   "v": "spearman"
+  },
+  "swordsman.attack.1": {
+   "f": "swordsman/attack_1.mp3",
+   "d": 0.47,
+   "h": "ad1ff3d679",
+   "t": "Auf sie!",
+   "v": "swordsman"
+  },
+  "swordsman.attack.2": {
+   "f": "swordsman/attack_2.mp3",
+   "d": 0.78,
+   "h": "c303d75af2",
+   "t": "Für unsere Burg!",
+   "v": "swordsman"
+  },
+  "swordsman.attack.3": {
+   "f": "swordsman/attack_3.mp3",
+   "d": 1.43,
+   "h": "3195885907",
+   "t": "Schilde hoch, dann zuschlagen!",
+   "v": "swordsman"
+  },
+  "swordsman.attack.4": {
+   "f": "swordsman/attack_4.mp3",
+   "d": 0.71,
+   "h": "c1fb7c21bb",
+   "t": "Zum Angriff!",
+   "v": "swordsman"
+  },
+  "swordsman.hold.1": {
+   "f": "swordsman/hold_1.mp3",
+   "d": 1.13,
+   "h": "4b4f95a1ac",
+   "t": "Wir halten die Stellung.",
+   "v": "swordsman"
+  },
+  "swordsman.hold.2": {
+   "f": "swordsman/hold_2.mp3",
+   "d": 1.34,
+   "h": "f3be646863",
+   "t": "Hier kommt keiner durch.",
+   "v": "swordsman"
+  },
+  "swordsman.hold.3": {
+   "f": "swordsman/hold_3.mp3",
+   "d": 0.74,
+   "h": "ead59fbeab",
+   "t": "Schilde zusammen!",
+   "v": "swordsman"
+  },
+  "swordsman.hold.4": {
+   "f": "swordsman/hold_4.mp3",
+   "d": 1.21,
+   "h": "6ba857c9b7",
+   "t": "Wir stehen wie ein Fels.",
+   "v": "swordsman"
+  },
+  "swordsman.move.1": {
+   "f": "swordsman/move_1.mp3",
+   "d": 0.87,
+   "h": "9c3826b71d",
+   "t": "Wir rücken vor.",
+   "v": "swordsman"
+  },
+  "swordsman.move.2": {
+   "f": "swordsman/move_2.mp3",
+   "d": 0.69,
+   "h": "21b6b579be",
+   "t": "Marsch, Männer!",
+   "v": "swordsman"
+  },
+  "swordsman.move.3": {
+   "f": "swordsman/move_3.mp3",
+   "d": 1.55,
+   "h": "63cf40be26",
+   "t": "Verstanden, wir marschieren.",
+   "v": "swordsman"
+  },
+  "swordsman.move.4": {
+   "f": "swordsman/move_4.mp3",
+   "d": 0.57,
+   "h": "7fb1b1101b",
+   "t": "Wir gehen.",
+   "v": "swordsman"
+  },
+  "swordsman.select.1": {
+   "f": "swordsman/select_1.mp3",
+   "d": 0.78,
+   "h": "77c4e94c8b",
+   "t": "Schwert bereit.",
+   "v": "swordsman"
+  },
+  "swordsman.select.2": {
+   "f": "swordsman/select_2.mp3",
+   "d": 0.92,
+   "h": "3030bbc9ff",
+   "t": "Wir hören, Herr.",
+   "v": "swordsman"
+  },
+  "swordsman.select.3": {
+   "f": "swordsman/select_3.mp3",
+   "d": 1.02,
+   "h": "2c86fda5a8",
+   "t": "Zu Euren Diensten.",
+   "v": "swordsman"
+  },
+  "swordsman.select.4": {
+   "f": "swordsman/select_4.mp3",
+   "d": 1.32,
+   "h": "ede3da2c00",
+   "t": "Die Klingen sind geschliffen.",
+   "v": "swordsman"
+  },
+  "swordsman.wounded.1": {
+   "f": "swordsman/wounded_1.mp3",
+   "d": 1.39,
+   "h": "f607328a61",
+   "t": "Das war ein harter Treffer!",
+   "v": "swordsman"
+  },
+  "swordsman.wounded.2": {
+   "f": "swordsman/wounded_2.mp3",
+   "d": 1.81,
+   "h": "5a791a6764",
+   "t": "Ich blute, aber ich kämpfe weiter.",
+   "v": "swordsman"
+  },
+  "swordsman.wounded.3": {
+   "f": "swordsman/wounded_3.mp3",
+   "d": 1.04,
+   "h": "6b94c070e9",
+   "t": "Ich brauche Hilfe!",
+   "v": "swordsman"
+  },
+  "trader.done.1": {
+   "f": "trader/done_1.mp3",
+   "d": 0.98,
+   "h": "bd78042510",
+   "t": "Ein gutes Geschäft.",
+   "v": "trader"
+  },
+  "trader.done.2": {
+   "f": "trader/done_2.mp3",
+   "d": 1.12,
+   "h": "f7935bf533",
+   "t": "Das Gold klingt schön.",
+   "v": "trader"
+  },
+  "trader.done.3": {
+   "f": "trader/done_3.mp3",
+   "d": 0.71,
+   "h": "12b67d474f",
+   "t": "Abgemacht.",
+   "v": "trader"
+  },
+  "trader.move.1": {
+   "f": "trader/move_1.mp3",
+   "d": 1.06,
+   "h": "db12e210a6",
+   "t": "Ich packe zusammen.",
+   "v": "trader"
+  },
+  "trader.move.2": {
+   "f": "trader/move_2.mp3",
+   "d": 1.22,
+   "h": "7744be3df0",
+   "t": "Meine Ware reist mit.",
+   "v": "trader"
+  },
+  "trader.move.3": {
+   "f": "trader/move_3.mp3",
+   "d": 0.92,
+   "h": "6cd054b294",
+   "t": "Bin schon unterwegs.",
+   "v": "trader"
+  },
+  "trader.select.1": {
+   "f": "trader/select_1.mp3",
+   "d": 1.51,
+   "h": "7236c20a8e",
+   "t": "Gute Ware, faire Preise.",
+   "v": "trader"
+  },
+  "trader.select.2": {
+   "f": "trader/select_2.mp3",
+   "d": 1.06,
+   "h": "1426176c36",
+   "t": "Was darf es sein?",
+   "v": "trader"
+  },
+  "trader.select.3": {
+   "f": "trader/select_3.mp3",
+   "d": 1.18,
+   "h": "aa53a77338",
+   "t": "Gold öffnet jede Tür.",
+   "v": "trader"
+  },
+  "trader.work.1": {
+   "f": "trader/work_1.mp3",
+   "d": 1.73,
+   "h": "f2f1a5bc13",
+   "t": "Dattelwein, frisch und kühl!",
+   "v": "trader"
+  },
+  "trader.work.2": {
+   "f": "trader/work_2.mp3",
+   "d": 1.38,
+   "h": "7b86c01707",
+   "t": "Stoffe aus fernen Städten!",
+   "v": "trader"
+  },
+  "trader.work.3": {
+   "f": "trader/work_3.mp3",
+   "d": 1.96,
+   "h": "777f6f75a3",
+   "t": "Hier gibt es die besten Preise der Stadt!",
+   "v": "trader"
+  },
+  "trader.work.4": {
+   "f": "trader/work_4.mp3",
+   "d": 1.4,
+   "h": "720481d46c",
+   "t": "Wer kauft, der gewinnt!",
+   "v": "trader"
+  },
+  "woodcutter.done.1": {
+   "f": "woodcutter/done_1.mp3",
+   "d": 1.29,
+   "h": "4c99fd05fd",
+   "t": "Das Holz ist gestapelt.",
+   "v": "woodcutter"
+  },
+  "woodcutter.done.2": {
+   "f": "woodcutter/done_2.mp3",
+   "d": 1.22,
+   "h": "4100f52541",
+   "t": "Wieder eine Fuhre fertig.",
+   "v": "woodcutter"
+  },
+  "woodcutter.done.3": {
+   "f": "woodcutter/done_3.mp3",
+   "d": 1.0,
+   "h": "4e44df8caf",
+   "t": "Der Stapel wächst.",
+   "v": "woodcutter"
+  },
+  "woodcutter.move.1": {
+   "f": "woodcutter/move_1.mp3",
+   "d": 1.24,
+   "h": "45098f5d96",
+   "t": "Ich nehme die Axt mit.",
+   "v": "woodcutter"
+  },
+  "woodcutter.move.2": {
+   "f": "woodcutter/move_2.mp3",
+   "d": 1.14,
+   "h": "471aeec3bf",
+   "t": "Zum nächsten Wald.",
+   "v": "woodcutter"
+  },
+  "woodcutter.move.3": {
+   "f": "woodcutter/move_3.mp3",
+   "d": 1.14,
+   "h": "a17a1d5e4d",
+   "t": "Dann gehe ich dorthin.",
+   "v": "woodcutter"
+  },
+  "woodcutter.select.1": {
+   "f": "woodcutter/select_1.mp3",
+   "d": 1.25,
+   "h": "c13d2fe033",
+   "t": "Ich mache mich an die Arbeit.",
+   "v": "woodcutter"
+  },
+  "woodcutter.select.2": {
+   "f": "woodcutter/select_2.mp3",
+   "d": 1.18,
+   "h": "bef01b152d",
+   "t": "Die Axt ist scharf.",
+   "v": "woodcutter"
+  },
+  "woodcutter.select.3": {
+   "f": "woodcutter/select_3.mp3",
+   "d": 1.61,
+   "h": "47901c1d16",
+   "t": "Holz wächst nicht auf dem Markt.",
+   "v": "woodcutter"
+  },
+  "woodcutter.select.4": {
+   "f": "woodcutter/select_4.mp3",
+   "d": 1.06,
+   "h": "e894635e4c",
+   "t": "Was braucht Ihr?",
+   "v": "woodcutter"
+  },
+  "woodcutter.work.1": {
+   "f": "woodcutter/work_1.mp3",
+   "d": 1.34,
+   "h": "0b1e09519a",
+   "t": "Hier fällt der nächste Baum.",
+   "v": "woodcutter"
+  },
+  "woodcutter.work.2": {
+   "f": "woodcutter/work_2.mp3",
+   "d": 1.22,
+   "h": "e10f1b9281",
+   "t": "Achtung, Baum fällt!",
+   "v": "woodcutter"
+  },
+  "woodcutter.work.3": {
+   "f": "woodcutter/work_3.mp3",
+   "d": 1.4,
+   "h": "755ff2945f",
+   "t": "Es riecht nach frischem Holz.",
+   "v": "woodcutter"
+  },
+  "woodcutter.work.4": {
+   "f": "woodcutter/work_4.mp3",
+   "d": 1.54,
+   "h": "7a80782224",
+   "t": "Noch ein Schlag, dann kippt er.",
+   "v": "woodcutter"
+  }
+ }
+}

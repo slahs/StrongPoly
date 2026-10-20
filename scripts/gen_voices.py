@@ -60,6 +60,11 @@ FX = {
 }
 
 
+def slug(s):
+    t = s.translate(str.maketrans({'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'Ä': 'Ae', 'Ö': 'Oe', 'Ü': 'Ue', 'ß': 'ss', '@': '_', ' ': '_'}))
+    return ''.join(c if c.isalnum() or c in '._-' else '_' for c in t)
+
+
 def load_tts(models_dir, key, cache={}):
     if key in cache:
         return cache[key]
@@ -167,7 +172,7 @@ def main():
             relevant = {k: v for k, v in prof.items() if k != other}
             h = hashlib.sha1(json.dumps([GEN_VERSION, line['text'], relevant], sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:10]
             if line['voice'] == 'advisor':
-                rel = f"advisor/{key[len('advisor.'):]}.mp3"
+                rel = f"advisor/{slug(key[len('advisor.'):])}.mp3"
             else:
                 g, ev, n = key.split('.')
                 rel = f'{g}/{ev}_{n}.mp3'
@@ -186,6 +191,8 @@ def main():
                 os.makedirs(args.keep_wav, exist_ok=True)
                 os.replace(wav, os.path.join(args.keep_wav, key + '.wav'))
             clips[key] = {'f': rel, 'd': round(len(y) / OUT_SR, 2), 'h': h, 't': line['text'], 'v': line['voice']}
+            if line.get('src'):
+                clips[key]['x'] = 1  # Zeile aus fremder Datenquelle (advisor_lines.ts), nicht aus voices.de.ts
             print(f'[{i + 1}/{total}] {key}  {clips[key]["d"]:.2f}s  {os.path.getsize(path)} B', flush=True)
     manifest = {
         'lang': lang,
