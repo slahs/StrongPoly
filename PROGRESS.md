@@ -7,10 +7,10 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 ## 1. Bugs
 - [ ] 1.1 KI hortet Gold, rekrutiert nicht (2v3 s14, 2v7 s29, 6v7 s6)
 - [ ] 1.2 Restliche Patts (17 Timeouts), Ziel ≥ 90 % Keep-Fall
-- [ ] 1.3 Unbrauchbare Waffen (Werkstätten nur für erreichbare Einheitenkosten)
-- [ ] 1.4 Bevölkerungsschaukel prüfen
-- [ ] 1.5 Burg mauert sich nicht ein / zerstörte Tore werden neu gebaut (Test)
-- [ ] 1.6 `bench/dmg.ts` (Statistik in Sim oder Skript entfernen)
+- [x] 1.3 Unbrauchbare Waffen (Werkstätten nur für erreichbare Einheitenkosten)
+- [x] 1.4 Bevölkerungsschaukel (Steuer/Rationen-Hysterese; Rest = Raubzüge)
+- [x] 1.5 Burg mauert sich nicht ein / zerstörte Tore werden neu gebaut (Test)
+- [x] 1.6 bench/dmg.ts entfernt
 - [ ] 1.7 Geschützreichweiten nach `shared/data/`
 - [ ] 1.8 Docker-Image neu bauen und prüfen
 - [ ] 1.9 Tutorial-Missionen 1–5 per Skript bis zum Sieg + Browser ohne Konsolenfehler

@@ -37,6 +37,7 @@ export function runSmoke(seed = 1, minutes = 25, quiet = false): SmokeReport {
     if (violations.length < 40 && !violations.includes(v)) violations.push(v);
   };
   const buildTypes = Object.keys(BUILDINGS).map(Number);
+  const inside = new Map<number, number>();
   const garbage = [NaN, Infinity, -1, 1e9, 0.5, -1e9];
 
   const ownBuildings = (p: number) => [...sim.buildings.values()].filter((b) => b.owner === p);
@@ -153,7 +154,13 @@ export function runSmoke(seed = 1, minutes = 25, quiet = false): SmokeReport {
       if (u.hp[s] > u.maxHp[s] + 0.01) note(`HP > Max: ${tag}`);
       if (u.layer[s] === 0) {
         const b = sim.buildingAtTile(Math.floor(x), Math.floor(y));
-        if (b && b.def.solid && !b.def.gate && !b.def.wallTop && !b.def.stairs && u.state[s] !== 7) note(`Bodeneinheit in festem Gebäude ${b.def.key}: ${tag}`);
+        const id = u.id(s);
+        if (b && b.def.solid && !b.def.gate && !b.def.wallTop && !b.def.stairs && u.state[s] !== 7) {
+          // Gebäude dürfen über Einheiten entstehen: erst melden, wenn die Einheit nach 30 s noch festsitzt (Befreiung = rescueUnit)
+          const since = inside.get(id) ?? sim.tick;
+          inside.set(id, since);
+          if (sim.tick - since > 300) note(`Bodeneinheit seit ${sim.tick - since} Ticks in festem Gebäude ${b.def.key}: ${tag}`);
+        } else inside.delete(id);
       }
     }
     for (const b of sim.buildings.values()) {
