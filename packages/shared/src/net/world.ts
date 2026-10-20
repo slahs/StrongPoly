@@ -72,6 +72,22 @@ export class ClientWorld implements PlaceCtx {
     return n;
   }
 
+  /** wie Sim.enemyNear, auf dem Client-Spiegel (Geistermodell zeigt das Bauverbot an) */
+  enemyNear(p: number, x0: number, y0: number, x1: number, y1: number): boolean {
+    const team = this.players[p]?.team;
+    for (let s = 0; s < this.top; s++) {
+      if (!this.ids[s]) continue;
+      const t = this.type[s];
+      if (t < 2) continue; // Bauer (0) und Ochse (1) blockieren nicht, der Lord (2) schon
+      const o = this.players[this.owner[s]];
+      if (!o || o.team === team) continue;
+      const x = this.curX[s];
+      const y = this.curY[s];
+      if (x >= x0 && x <= x1 && y >= y0 && y <= y1) return true;
+    }
+    return false;
+  }
+
   has(slot: number): boolean {
     return this.ids[slot] !== 0;
   }

@@ -344,7 +344,25 @@ export class Sim {
       bld: (id) => this.buildings.get(id) ?? null,
       countOwn: (p, t) => this.countOwn(p, t),
       countStoreModules: (p, k) => this.countStoreModules(p, k),
+      enemyNear: (p, x0, y0, x1, y1) => this.enemyNear(p, x0, y0, x1, y1),
     });
+  }
+
+  /** Feindliche Soldaten (sichtbar, nicht im Tunnel) im Rechteck – Bauverbot wie im Original */
+  enemyNear(p: number, x0: number, y0: number, x1: number, y1: number): boolean {
+    const u = this.units;
+    const cx = (x0 + x1) / 2;
+    const cy = (y0 + y1) / 2;
+    const r = Math.max(x1 - x0, y1 - y0) / 2 + 1;
+    let hit = false;
+    this.spatial.query(cx, cy, r, (s) => {
+      if (hit || !u.alive[s] || !this.isEnemy(p, u.owner[s])) return;
+      const t = u.type[s];
+      if (t === U.Peasant || t === U.Ox || u.state[s] === S.Tunnel) return;
+      if (UNITS[t].invisible && u.state[s] !== S.Attack) return;
+      if (u.x[s] >= x0 && u.x[s] <= x1 && u.y[s] >= y0 && u.y[s] <= y1) hit = true;
+    });
+    return hit;
   }
 
   countOwn(p: number, type: number): number {

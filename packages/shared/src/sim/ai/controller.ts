@@ -649,7 +649,8 @@ export class AiController {
         pl.stats.built += 0;
       } else if (err === 'Platz belegt') {
         st.done = true;
-      } else if (err === 'Zu wenig Ressourcen') {
+      } else if (err === 'Zu wenig Ressourcen' || err === 'Feinde in der Nähe') {
+        // Geld fehlt oder der Feind steht vor der Burg: später weiterbauen, Plan nicht aufgeben
         break;
       } else {
         // Bäume/Gelände: später erneut versuchen

@@ -52,3 +52,6 @@ export const POT_RADIUS = 4;
 
 export const MARKET_PRICE_RECOVER = 0.002;
 export const MARKET_PRICE_STEP = 0.015;
+
+/** Kein Bauen, solange feindliche Soldaten so nah (Tiles, ab Gebäuderand) sind – wie im Original verhindert das Tor-Neubau mitten im Sturm */
+export const ENEMY_BUILD_RADIUS = 8;

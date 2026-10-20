@@ -1,6 +1,7 @@
 import { BT, BUILDINGS } from '../data/buildings';
 import { StoreKind } from '../data/resources';
 import { T } from '../data/terrain';
+import { ENEMY_BUILD_RADIUS } from '../data/balance';
 import type { GameMap } from '../map/gamemap';
 
 export interface PlaceBld {
@@ -17,6 +18,8 @@ export interface PlaceCtx {
   bld(id: number): PlaceBld | null;
   countOwn(p: number, type: number): number;
   countStoreModules(p: number, kind: StoreKind): number;
+  /** feindliche Soldaten im Rechteck [x0,x1]×[y0,y1] (Tile-Koordinaten, Rand bereits eingerechnet) */
+  enemyNear?(p: number, x0: number, y0: number, x1: number, y1: number): boolean;
 }
 
 /** Terrain-, Nachbarschafts- und Sonderregeln. Kosten werden separat geprüft. */
@@ -40,6 +43,10 @@ export function checkPlaceRules(ctx: PlaceCtx, p: number, type: number, x: numbe
   const h = rot ? def.w : def.h;
   if (x < 0 || y < 0 || x + w > m.w || y + h > m.h) return 'Außerhalb der Karte';
   if (def.unique && ctx.countOwn(p, type) > 0) return 'Nur einmal baubar';
+  if (ctx.enemyNear) {
+    const r = ENEMY_BUILD_RADIUS;
+    if (ctx.enemyNear(p, x - r, y - r, x + w + r, y + h + r)) return 'Feinde in der Nähe';
+  }
   let fertile = 0;
   let dep = 0;
   let water = 0;

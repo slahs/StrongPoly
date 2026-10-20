@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AI_PROFILES, BT, generateMap, Sim, T, TREE_WOOD } from '../src';
+import { AI_PROFILES, BT, generateMap, Sim, T, TREE_WOOD, U } from '../src';
 
 describe('Regression: Burgbau der KI', () => {
   it('Startbereiche sind baumfrei (Mauerring, Gräben und Tore passen hinein)', () => {
@@ -37,6 +37,31 @@ describe('Regression: Vorkommen', () => {
     const x = iron % map.w;
     const y = Math.floor(iron / map.w);
     expect(sim.checkPlace(0, BT.Hovel, x, y, 0, true)).toBe('Vorkommen nicht überbauen');
+  });
+});
+
+describe('Regression: Bauverbot bei Feinden', () => {
+  it('neben feindlichen Soldaten kann nicht gebaut werden (früher: Tor mitten im Sturm sofort neu gebaut)', () => {
+    const map = generateMap({ seed: 7, size: 160, players: 2 });
+    const sim = new Sim({ map, seed: 7, players: [{ name: 'A', team: 0, kind: 'human' }, { name: 'B', team: 1, kind: 'human' }], startGold: 5000, troopLimit: 1000, fog: false, extreme: false });
+    sim.players[0].stock[0] = 500;
+    const st = map.starts[0];
+    // freien Platz für eine Hütte nahe dem eigenen Keep suchen
+    let spot: { x: number; y: number } | null = null;
+    for (let r = 4; r < 14 && !spot; r++)
+      for (let dy = -r; dy <= r && !spot; dy++)
+        for (let dx = -r; dx <= r && !spot; dx++) if (sim.checkPlace(0, BT.Hovel, st.x + dx, st.y + dy, 0) === null) spot = { x: st.x + dx, y: st.y + dy };
+    expect(spot).not.toBeNull();
+    const enemy = sim.spawnUnit(U.Swordsman, 1, spot!.x + 4.5, spot!.y + 1.5);
+    const peasant = sim.spawnUnit(U.Peasant, 1, spot!.x + 1.5, spot!.y - 2.5);
+    expect(enemy).toBeGreaterThanOrEqual(0);
+    expect(peasant).toBeGreaterThanOrEqual(0);
+    sim.spatial.rebuild(sim);
+    expect(sim.checkPlace(0, BT.Hovel, spot!.x, spot!.y, 0)).toBe('Feinde in der Nähe');
+    // feindliche Bauern blockieren nicht, Soldaten außerhalb des Radius auch nicht
+    sim.units.x[enemy] = spot!.x + 30;
+    sim.spatial.rebuild(sim);
+    expect(sim.checkPlace(0, BT.Hovel, spot!.x, spot!.y, 0)).toBe(null);
   });
 });
 
