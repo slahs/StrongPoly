@@ -16,9 +16,25 @@ export class RtsCamera {
   maxDist = 90;
   bounds = { w: 200, h: 200 };
   scrollSpeed = 1.4;
+  /** feste Blickrichtung (nur Prüfszenen/Screenshot-Werkzeug); null = Spielsteuerung über yawIndex */
+  yawOverride: number | null = null;
 
   constructor(aspect: number) {
     this.camera = new THREE.PerspectiveCamera(36, aspect, 0.5, 500);
+  }
+
+  /** Feste Ansicht ohne Übergänge (Prüfszenen und Screenshot-Werkzeug); yaw im Bogenmaß, Neigung in Grad */
+  setView(x: number, y: number, dist: number, yaw: number, pitchDeg: number): void {
+    this.maxDist = Math.max(this.maxDist, dist);
+    this.minDist = Math.min(this.minDist, dist);
+    this.tx = x;
+    this.tz = y;
+    this.dist = dist;
+    this.distTarget = dist;
+    this.yawOverride = yaw;
+    this.yaw = yaw;
+    this.pitch = THREE.MathUtils.degToRad(pitchDeg);
+    this.clamp();
   }
 
   setAspect(a: number): void {
@@ -60,7 +76,7 @@ export class RtsCamera {
   }
 
   update(dt: number, map: GameMap | null): void {
-    const targetYaw = Math.PI / 4 + (this.yawIndex * Math.PI) / 2;
+    const targetYaw = this.yawOverride ?? Math.PI / 4 + (this.yawIndex * Math.PI) / 2;
     // kürzester Weg zur Zielrotation
     let d = targetYaw - this.yaw;
     while (d > Math.PI) d -= Math.PI * 2;

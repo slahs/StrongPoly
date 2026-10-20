@@ -698,7 +698,7 @@ export class Session {
     this.teamOf = w.players.map((p) => p.team);
     this.myTeam = this.teamOf[this.me] ?? 0;
     this.gs.setMap(w.map);
-    this.gs.decor?.setOccupancy(w.bldAt);
+    this.gs.decor?.setOccupancy(w.bldAt, w.buildings);
     this.gs.root.add(this.entities.group, this.ghost.group);
     this.hud.minimap.refreshTerrain();
     if (setup.fog) this.fog = new FogOfWar(w.map.w, w.map.h);

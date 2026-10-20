@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welt: Vorher / Nachher</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 16px; background: #2a2622; color: #f0e8d6; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.note { margin: 0 0 20px; color: #cbbf9f; max-width: 80ch; }
+  section { margin: 0 0 28px; }
+  h2 { font-size: 16px; margin: 0 0 6px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  figure { margin: 0; }
+  figcaption { font-size: 12px; color: #cbbf9f; padding: 2px 0; }
+  img { width: 100%; height: auto; display: block; border-radius: 4px; background: #111; }
+  @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<h1>Welt: Vorher / Nachher (Mittel, 1280x720, Software-GL)</h1>
+<p class="note">Gleiche Kameras, gleiche Karte (Seed 1), gleicher Spielzustand, erzeugt mit <code>node scripts/shots.mjs</code> (siehe README, „Vergleichsszenen“).
+Links der Stand vor dem Umbau, rechts nach dem Umbau. Gebäude- und Figurenmodelle sind in beiden Bildern noch die alten (diese Arbeit wird parallel in anderen Zweigen gemacht).</p>
+<section><h2>Früher Aufbau</h2><div class="pair"><figure><img src="before/world/early.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/early.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Dichte Siedlung</h2><div class="pair"><figure><img src="before/world/town.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/town.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Große Steinburg</h2><div class="pair"><figure><img src="before/world/castle.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/castle.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Belagerung</h2><div class="pair"><figure><img src="before/world/siege.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/siege.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Figuren im Detail</h2><div class="pair"><figure><img src="before/world/figures.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/figures.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Belagerungsgerät</h2><div class="pair"><figure><img src="before/world/engines.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/engines.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Gesamtkarte</h2><div class="pair"><figure><img src="before/world/map.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/map.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Boden, Pfade, Feld</h2><div class="pair"><figure><img src="before/world/ground.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/ground.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Wald</h2><div class="pair"><figure><img src="before/world/forest.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/forest.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Wasser und Ufer</h2><div class="pair"><figure><img src="before/world/water.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/water.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Küste und Klippen</h2><div class="pair"><figure><img src="before/world/coast.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/coast.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+<section><h2>Rohstoffvorkommen</h2><div class="pair"><figure><img src="before/world/deposits.jpg" alt="Vorher"><figcaption>vorher</figcaption></figure><figure><img src="after/world/deposits.jpg" alt="Nachher"><figcaption>nachher</figcaption></figure></div></section>
+</body>
+</html>

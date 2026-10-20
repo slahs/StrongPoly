@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import { GameMap } from '@strongpoly/shared';
 import { RtsCamera } from './camera';
 import { DecorRenderer } from './decor';
-import { GFX } from './materials';
+import { AmbientLife } from './ambient';
+import { GroundMap } from './groundmap';
+import { GFX, ensureNoiseTextures, setNoiseAnisotropy } from './materials';
 import { QualityCfg, qualityOf } from './quality';
 import { FOG_COLOR, TerrainRenderer } from './terrain';
 
@@ -15,6 +17,20 @@ export interface GfxSettings {
 /** Richtung vom Boden zur Sonne (tiefer, warmer Sonnenstand aus Südwest, sichtbare Schatten) */
 const SUN_DIR = new THREE.Vector3(-0.38, 0.8, 0.46).normalize();
 const SUN_DIST = 90;
+/**
+ * Lichtstimmung (Refined Stylized Medieval): tiefe, warme Sonne, leicht kühler Himmel. Die Schatten bekommen dadurch
+ * einen kühlen Stich und die Sonnenseiten bleiben warm: Farbkontrast statt reiner Helligkeit.
+ */
+const LOOK = {
+  sunColor: 0xffe0b0,
+  sunIntensity: 2.15,
+  skyColor: 0xdfe6ee,
+  groundColor: 0x9a8560,
+  hemiIntensity: 1.05,
+  /** Himmelsfarbe für Reflexe/Randlicht */
+  skyReflect: 0xa9c4dc,
+  exposure: 1.1,
+};
 const SHADOW_TYPES = {
   basic: THREE.BasicShadowMap,
   pcf: THREE.PCFShadowMap,
@@ -39,7 +55,11 @@ export class GameScene {
   readonly hemi: THREE.HemisphereLight;
   terrain: TerrainRenderer | null = null;
   decor: DecorRenderer | null = null;
+  /** Vögel, Schmetterlinge, treibende Blätter (ab Stufe Mittel) */
+  ambient: AmbientLife | null = null;
   map: GameMap | null = null;
+  /** Bodenkarte (Trampelpfade, Felder, Kontaktschatten) der aktuellen Karte */
+  ground: GroundMap | null = null;
   gfx: GfxSettings = { shadows: true, quality: 'medium', pixelRatio: Math.min(window.devicePixelRatio, 2) };
   /** aktuell wirksame Werte der Grafikstufe (siehe render/quality.ts) */
   qcfg: QualityCfg = qualityOf('medium');
@@ -55,14 +75,18 @@ export class GameScene {
     this.renderer.setClearColor(FOG_COLOR);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // Tonemapping (Khronos-neutral: erhält die Palette, rollt Lichter weich ab; das Grading steckt in materials.ts)
+    this.renderer.toneMapping = THREE.NeutralToneMapping;
+    this.renderer.toneMappingExposure = LOOK.exposure;
+    ensureNoiseTextures();
     this.scene.background = new THREE.Color(FOG_COLOR);
-    this.scene.fog = new THREE.Fog(FOG_COLOR, 105, 235);
+    this.scene.fog = new THREE.Fog(FOG_COLOR, 60, 200);
     this.scene.add(this.root);
 
-    // Himmel warm, Boden sandig reflektiert; Sonne tief und golden
-    this.hemi = new THREE.HemisphereLight(0xfff0d2, 0x8a7656, 1.0);
+    // Himmel leicht kühl, Boden warm zurückgeworfen; Sonne tief und golden
+    this.hemi = new THREE.HemisphereLight(LOOK.skyColor, LOOK.groundColor, LOOK.hemiIntensity);
     this.scene.add(this.hemi);
-    this.sun = new THREE.DirectionalLight(0xffe2b4, 2.05);
+    this.sun = new THREE.DirectionalLight(LOOK.sunColor, LOOK.sunIntensity);
     this.sun.position.copy(SUN_DIR).multiplyScalar(SUN_DIST).add(new THREE.Vector3(30, 0, 30));
     this.sun.castShadow = true;
     const sc = this.sun.shadow.camera;
@@ -79,10 +103,27 @@ export class GameScene {
     this.scene.add(this.sun);
     this.scene.add(this.sun.target);
 
+    this.applyLook();
     this.cam = new RtsCamera(canvas.clientWidth / Math.max(1, canvas.clientHeight));
     this.resize();
     window.addEventListener('resize', () => this.resize());
     this.applyGfx({});
+  }
+
+  /** Nebelweite zusätzlich skalieren (Prüfszenen/Übersichten); 1 = normal. Der Nebel folgt sonst dem Kameraabstand. */
+  fogScale = 1;
+  setOverview(scale: number): void {
+    this.fogScale = scale;
+  }
+
+  /** Lichtfarben und -stärken in die gemeinsamen Shader-Uniforms (Wasser, Rand-/Wolkenlicht) übernehmen */
+  private applyLook(): void {
+    const sun = new THREE.Color(LOOK.sunColor);
+    GFX.uSunDir.value.copy(SUN_DIR);
+    GFX.uSunIrr.value.copy(sun).multiplyScalar(LOOK.sunIntensity);
+    GFX.uSkyIrr.value.set(LOOK.skyColor).multiplyScalar(LOOK.hemiIntensity);
+    GFX.uGndIrr.value.set(LOOK.groundColor).multiplyScalar(LOOK.hemiIntensity);
+    GFX.uSkyCol.value.set(LOOK.skyReflect);
   }
 
   resize(): void {
@@ -118,9 +159,17 @@ export class GameScene {
       this.sun.shadow.map = null;
     }
     GFX.uAo.value = q.ao;
+    GFX.uDetail.value = q.surfaceDetail;
+    GFX.uCloud.value = q.cloudShadow;
+    GFX.uRim.value = q.rimLight;
+    GFX.uVar.value = q.instanceVariation;
+    GFX.uWaterLv.value = q.waterDetail;
+    GFX.uTreeSway.value = q.treeSway;
+    setNoiseAnisotropy(Math.max(1, Math.min(q.anisotropy, this.renderer.capabilities.getMaxAnisotropy())));
     this.terrain?.applyQuality(q);
     this.terrain?.setShadows(shadows);
     this.decor?.applyQuality(q, shadows);
+    this.ambient?.applyQuality(q);
     this.onGfx?.(q, shadows);
     this.resize();
   }
@@ -135,8 +184,20 @@ export class GameScene {
       this.root.remove(this.decor.group);
       this.decor.group.traverse((o) => (o as THREE.Mesh).geometry?.dispose?.());
     }
+    if (this.ambient) {
+      this.root.remove(this.ambient.group);
+      this.ambient.group.traverse((o) => (o as THREE.Mesh).geometry?.dispose?.());
+    }
+    this.ambient = new AmbientLife(map);
+    this.ambient.applyQuality(this.qcfg);
+    this.root.add(this.ambient.group);
+    this.ground?.dispose();
+    this.ground = new GroundMap(map.w, map.h);
+    GFX.uGround.value = this.ground.texture;
+    GFX.uMapInv.value.set(1 / map.w, 1 / map.h);
     this.terrain = new TerrainRenderer(map);
     this.decor = new DecorRenderer(map);
+    this.decor.ground = this.ground;
     this.terrain.applyQuality(this.qcfg);
     this.terrain.setShadows(this.gfx.shadows && this.qcfg.shadows);
     this.decor.applyQuality(this.qcfg, this.gfx.shadows && this.qcfg.shadows);
@@ -186,8 +247,13 @@ export class GameScene {
     GFX.uTime.value = now - this.t0;
     this.cam.update(dt, this.map);
     this.updateShadow();
+    // Dunst folgt dem Kameraabstand: nah klar, in der Ferne Tiefenstaffelung
+    const fog = this.scene.fog as THREE.Fog;
+    fog.near = this.cam.dist * 1.35 * this.fogScale;
+    fog.far = this.cam.dist * 4.4 * this.fogScale;
     this.terrain?.flush();
-    this.decor?.update(now, this.cam.tx, this.cam.tz);
+    this.decor?.update(now, this.cam.tx, this.cam.tz, this.cam.dist, this.cam.camera.position);
+    this.ambient?.update(this.cam.tx, this.cam.tz, this.cam.camera.position.y - Math.sin(this.cam.pitch) * this.cam.dist, GFX.uWindDir.value);
     this.renderer.render(this.scene, this.cam.camera);
   }
 }

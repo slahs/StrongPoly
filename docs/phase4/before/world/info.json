@@ -1,0 +1,102 @@
+{
+  "quality": "medium",
+  "viewport": "1280x720",
+  "scenes": {
+    "early": {
+      "calls": 38,
+      "triangles": 144424,
+      "geometries": 44,
+      "textures": 1,
+      "programs": 14,
+      "desc": "fr\u00fcher Wirtschaftsaufbau: Bergfried, Lager, Holzf\u00e4ller, H\u00fctten, wenige Bauern"
+    },
+    "town": {
+      "calls": 76,
+      "triangles": 199822,
+      "geometries": 82,
+      "textures": 1,
+      "programs": 14,
+      "desc": "dicht bebaute Siedlung mit M\u00e4rkten, Werkst\u00e4tten, Feldern, Kirche und vielen Bauern"
+    },
+    "castle": {
+      "calls": 64,
+      "triangles": 272131,
+      "geometries": 70,
+      "textures": 1,
+      "programs": 14,
+      "desc": "gro\u00dfe Steinburg mit Ring- und Au\u00dfenmauer, Eckt\u00fcrmen, Torhaus, Graben und Hofgeb\u00e4uden"
+    },
+    "siege": {
+      "calls": 75,
+      "triangles": 276635,
+      "geometries": 78,
+      "textures": 1,
+      "programs": 18,
+      "desc": "Belagerung: Burg mit Verteidigern, mehrere hundert Angreifer mit Rammb\u00f6cken, Belagerungst\u00fcrmen, Katapulten"
+    },
+    "figures": {
+      "calls": 47,
+      "triangles": 173563,
+      "geometries": 51,
+      "textures": 1,
+      "programs": 13,
+      "desc": "Detailansicht: Zivilisten und Soldaten in Ruhe, beim Gehen, im Kampf und bei der Arbeit"
+    },
+    "engines": {
+      "calls": 31,
+      "triangles": 179404,
+      "geometries": 37,
+      "textures": 1,
+      "programs": 13,
+      "desc": "Belagerungsger\u00e4t aus der N\u00e4he: Katapult, Trebuchet, Rammbock, Belagerungsturm, Setzschild, Feuerballista"
+    },
+    "map": {
+      "calls": 70,
+      "triangles": 313516,
+      "geometries": 76,
+      "textures": 1,
+      "programs": 14,
+      "desc": "\u00dcbersicht einer vollst\u00e4ndigen Spielkarte (160x160, 4 Spieler) mit Startsiedlungen"
+    },
+    "ground": {
+      "calls": 31,
+      "triangles": 148998,
+      "geometries": 37,
+      "textures": 1,
+      "programs": 14,
+      "desc": "Nahansicht Boden: Steppe, Oase, W\u00fcste, \u00dcberg\u00e4nge, Wege und Feld bei den ersten Geb\u00e4uden"
+    },
+    "forest": {
+      "calls": 23,
+      "triangles": 156412,
+      "geometries": 29,
+      "textures": 1,
+      "programs": 11,
+      "desc": "Nahansicht Wald: dichteste Baumgruppe der Karte"
+    },
+    "water": {
+      "calls": 25,
+      "triangles": 187978,
+      "geometries": 31,
+      "textures": 1,
+      "programs": 11,
+      "desc": "Nahansicht Wasser: Gew\u00e4sser mit Ufer und Schaum, Graben mit Pech"
+    },
+    "coast": {
+      "calls": 32,
+      "triangles": 203142,
+      "geometries": 38,
+      "textures": 1,
+      "programs": 11,
+      "desc": "K\u00fcste und Klippen aus mittlerer Entfernung"
+    },
+    "deposits": {
+      "calls": 26,
+      "triangles": 107380,
+      "geometries": 32,
+      "textures": 1,
+      "programs": 14,
+      "desc": "Rohstoffvorkommen: Steinbruch auf dem Steinvorkommen, daneben Eisen und Pech"
+    }
+  }
+}
