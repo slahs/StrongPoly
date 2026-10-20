@@ -248,7 +248,10 @@ export function explainPopularity(v: PopView): PopExplain {
   if (bad && bad.value < -FLAT) advice.push({ code: 'bad', gain: -bad.value, action: 'build', params: { gain: -bad.value } });
   const crowd = by('crowd');
   if (crowd && crowd.value < 0) advice.push({ code: 'housing', gain: -crowd.value, action: 'build', params: { gain: -crowd.value, peasants: v.peasants, housing: v.housing } });
-  advice.sort((a, b) => b.gain - a.gain);
+  // Zuerst, was die Hauptbelastung betrifft, dann nach Gewinn
+  const related: Record<string, string[]> = { tax: ['tax', 'bribe'], ration: ['ration', 'food'], crowd: ['housing'], bad: ['bad'] };
+  const mainCodes = related[mainNegative?.key ?? ''] ?? [];
+  advice.sort((a, b) => Number(mainCodes.includes(b.code)) - Number(mainCodes.includes(a.code)) || b.gain - a.gain);
 
   // ---- Hinweistext aus der Hauptursache ----
   const headline = headlineOf({ pending, perMonth, v, mainNegative, mainPositive, direction });

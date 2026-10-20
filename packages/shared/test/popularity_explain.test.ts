@@ -84,6 +84,7 @@ describe('Beliebtheits-Erklärung stimmt mit der Simulation überein', () => {
     expect(ex.headline.key).toBe('pop.head.neg.tax.high');
     expect(popText(ex.headline.key, ex.headline.params, 'de')).toBe('Eure hohen Steuern belasten die Stimmung im Volk.');
     expect(ex.advice.find((a) => a.code === 'tax')?.gain).toBe(2);
+    expect(ex.advice[0].code).toBe('tax'); // Stellschraube der Hauptbelastung zuerst
     // Prognose in einem Monat entspricht der Sim (die Faktoren bleiben in diesem Szenario gleich)
     const pop0 = sim.players[0].popularity;
     expect(ex.forecast1).toBeCloseTo(clamp(pop0 + ex.perMonth), 9);

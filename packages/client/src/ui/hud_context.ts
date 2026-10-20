@@ -19,7 +19,8 @@ import {
   STOCK_RES,
 } from '@strongpoly/shared';
 import { clear, h } from './dom';
-import { adminControls, HudShared, marketGrid, popularityBreakdown } from './hud';
+import { adminControls, HudShared, marketGrid } from './hud';
+import { renderPopularitySummary } from './popularity';
 import { buildingIcon, iconEl, popFaceIcon, resourceIcon, unitIcon } from './icons';
 
 /** Warum eine Einheit gerade nicht rekrutiert werden kann (leer = möglich) */
@@ -120,7 +121,7 @@ export class ContextPanel {
     const act = this.api.actions;
     switch (b.t) {
       case BT.Keep: {
-        el.append(h('div', { class: 'popwrap small' }, h('span', { class: 'face', html: popFaceIcon(v.popularity, 40) }), h('div', {}, h('b', { text: `Beliebtheit ${v.popularity.toFixed(0)}` }), h('div', { class: v.popDelta >= 0 ? 'pos' : 'neg', text: `${v.popDelta >= 0 ? '+' : ''}${v.popDelta.toFixed(1)} pro Monat` }))));
+        renderPopularitySummary(el, v);
         adminControls(el, v, act);
         el.append(h('div', { class: 'btns' }, h('button', { text: 'Beliebtheit im Detail', onclick: () => this.api.togglePopup('popularity') })));
         return;

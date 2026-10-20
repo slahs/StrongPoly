@@ -21,6 +21,7 @@ import {
 } from '@strongpoly/shared';
 import type { AdvisorKind, AdvisorPrio, AdvisorTopic, Lang, Params, PopExplain } from '@strongpoly/shared';
 import { AdvisorQueue, joinList, prioOf } from './advisor_queue';
+import { RES_LIMITS, foodSupply } from './hud_stats';
 import type { AdvisorCandidate, Delivery } from './advisor_queue';
 import { clear, h } from './dom';
 import { iconEl, toolIcon } from './icons';
@@ -64,13 +65,7 @@ export const QUIET_NORMAL = 1200;
 export const QUIET_IMPORTANT = 600;
 export const QUIET_IMPORTANT_MISSION = 1800;
 
-/** Bestandsgrenzen je Ware: ab `arm` gilt der Bestand als vorhanden (sonst wurde die Ware nie gebraucht), unter `low` wird gemeldet, ab `ok` ist der Engpass behoben */
-export const RES_LIMITS: Record<number, { arm: number; low: number; ok: number }> = {
-  [R.Wood]: { arm: 40, low: 20, ok: 45 },
-  [R.Stone]: { arm: 40, low: 20, ok: 45 },
-  [R.Iron]: { arm: 20, low: 8, ok: 25 },
-  [R.Pitch]: { arm: 20, low: 8, ok: 25 },
-};
+export { RES_LIMITS };
 /** Schwelle Nahrung: Monate Vorrat */
 export const FOOD_LOW_MONTHS = 1.5;
 export const FOOD_OK_MONTHS = 3;
@@ -330,9 +325,7 @@ export class AdvisorLogic {
   }
 
   private foodEvents(view: PlayerView, tick: number): void {
-    let total = 0;
-    for (const r of FOOD_RES) total += view.stock[r] ?? 0;
-    const need = view.peasants * (RATION_FOOD[view.ration] ?? 0);
+    const { total, need } = foodSupply(view);
     const granary = this.firstOf(BT.Granary);
     const loc = this.locOf(granary ?? this.keep());
     const f = this.food;
@@ -747,14 +740,30 @@ export class AdvisorPanel {
     this.render();
   }
 
+  private sig = '';
+  private timeEls: { el: HTMLElement; tick: number }[] = [];
+
+  private ageText(tick: number): string {
+    const age = Math.max(0, Math.round((this.tickNow() - tick) / 10));
+    return age < 60 ? `${age}s` : `${Math.floor(age / 60)}m`;
+  }
+
+  /** Liste neu aufbauen, wenn sich Meldungen ändern; sonst nur die Altersangaben auffrischen (kein Neuaufbau unter dem Mauszeiger) */
   render(): void {
-    clear(this.listEl);
-    const now = this.tickNow();
     const shown = this.logic.list.slice(-8).reverse();
+    const sig = shown.map((m) => `${m.id}${m.read ? 'r' : ''}`).join(',');
+    if (sig === this.sig && this.timeEls.length === shown.length) {
+      for (const t of this.timeEls) t.el.textContent = this.ageText(t.tick);
+      return;
+    }
+    this.sig = sig;
+    this.timeEls = [];
+    clear(this.listEl);
     if (!shown.length) this.listEl.append(h('div', { class: 'crumb', text: 'Keine Meldungen. Leertaste springt zur letzten Meldung.' }));
     for (const m of shown) {
-      const age = Math.max(0, Math.round((now - m.tick) / 10));
       const go = m.x !== undefined && m.y !== undefined;
+      const time = h('span', { class: 'adv-time', text: this.ageText(m.tick) });
+      this.timeEls.push({ el: time, tick: m.tick });
       const el = h(
         'div',
         {
@@ -766,7 +775,7 @@ export class AdvisorPanel {
             this.render();
           },
         },
-        h('span', { class: 'adv-time', text: age < 60 ? `${age}s` : `${Math.floor(age / 60)}m` }),
+        time,
         h('span', { class: 'adv-text', text: m.text }),
       );
       this.listEl.append(el);

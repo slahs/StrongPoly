@@ -204,7 +204,9 @@ export class Session {
 
   /** Sprachausgabe des Sprachsystems (null, solange es fehlt: der Berater zeigt dann nur Text) */
   private voice(): VoiceApi | null {
-    return (this.audio as unknown as { voice?: VoiceApi } | null)?.voice ?? null;
+    const v = (this.audio as unknown as { voice?: Partial<VoiceApi> } | null)?.voice;
+    // Das Sprachsystem hängt `voice` als Objekt an die Engine; solange es fehlt (oder etwas anderes heißt), gibt es keine Sprache
+    return v && typeof v === 'object' && typeof v.say === 'function' && typeof v.replayLast === 'function' ? (v as VoiceApi) : null;
   }
 
   /** Neue Beratermeldung: Ton, Sprachausgabe (falls vorhanden und eingeschaltet), Panel */
@@ -378,6 +380,7 @@ export class Session {
     this.entities.setShadows(st.shadows);
     this.gs.cam.scrollSpeed = 1.4 * st.scrollSpeed;
     this.uiRoot.style.setProperty('--ui-scale', String(st.uiScale));
+    this.hud.refreshLayout();
     this.entities.setBlood(st.blood);
     this.audio?.configure(st.audio());
   }

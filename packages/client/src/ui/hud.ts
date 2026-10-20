@@ -22,6 +22,13 @@ import { clear, h, MONTHS } from './dom';
 import { buildingIcon, iconEl, popFaceIcon, popFactorIcon, resourceIcon, toolIcon, abilityIcon } from './icons';
 import { Minimap } from './minimap';
 import { abilityTooltip, attachTooltip, buildingTooltip, resourceTooltip, unitTooltip } from './tooltip';
+import { renderDoc } from './doc/render';
+import type { Doc } from './doc/blocks';
+import { explainPopularity } from '@strongpoly/shared';
+import { foodLevel, foodSupply, foodWarnText, fearTipDoc, goldLevel, goldTipDoc, peasantLevel, peasantsTipDoc, popularityLevel, resLevel, resWarnText, RES_LIMITS, troopLevel, troopsTipDoc } from './hud_stats';
+import type { Level } from './hud_stats';
+import { popularityTooltip, renderPopularityDetail, renderPopularitySummary } from './popularity';
+import { deltaText } from './popularity_model';
 import { BuildMenu } from './hud_build';
 import { ContextPanel } from './hud_context';
 import { TroopPanel } from './hud_troops';
@@ -81,6 +88,13 @@ export class Hud {
   private topDate!: HTMLElement;
   private topTroops!: HTMLElement;
   private topFear!: HTMLElement;
+  private statGold!: HTMLElement;
+  private statPeasants!: HTMLElement;
+  private statPop!: HTMLElement;
+  private statTroops!: HTMLElement;
+  private statFear!: HTMLElement;
+  private foodSum!: HTMLElement;
+  private armed = new Set<number>();
   private powerWrap!: HTMLElement;
   private powerFill!: HTMLElement;
   private powerText!: HTMLElement;
@@ -119,7 +133,16 @@ export class Hud {
         attachTooltip(el, () => unitTooltip(id, col), { placement: 'element' });
         break;
       case 'resource':
-        attachTooltip(el, () => resourceTooltip(id, { stock: v()?.stock[id], priceMul: v()?.priceMul[id] }), { placement: 'element' });
+        attachTooltip(
+          el,
+          () => {
+            const tip = resourceTooltip(id, { stock: v()?.stock[id], priceMul: v()?.priceMul[id] });
+            const warn = this.resWarning(id);
+            if (warn) tip.append(h('div', { class: 'doc-rule tone-warn', text: warn }));
+            return tip;
+          },
+          { placement: 'element' },
+        );
         break;
       case 'ability':
         attachTooltip(el, () => abilityTooltip(id), { placement: 'element' });
@@ -171,7 +194,11 @@ export class Hud {
     bottom.append(this.build.root, this.info, mm);
     this.root.append(bottom);
     this.showIdleInfo();
+    this.refreshLayout();
+    window.addEventListener('resize', this.onResize);
   }
+
+  private onResize = (): void => this.refreshLayout();
 
   setMe(me: number): void {
     this.me = me;
@@ -189,24 +216,31 @@ export class Hud {
     this.topTroops = h('span', { text: '0' });
     this.topFear = h('span', { text: '0' });
     this.speedLabel = h('span', { text: '1×' });
-    const stat = (ic: string | null, title: string, ...kids: (Node | string)[]) => h('div', { class: 'stat', title }, ic ? iconEl(ic) : null, ...kids);
-    const pop = h('div', { class: 'stat click pop', title: 'Beliebtheit – Klick: Aufschlüsselung und Monatsprognose', onclick: () => this.togglePopup('popularity') }, this.topFace, this.topPopularity, this.topDelta);
-    bar.append(
-      stat(coinIcon(), 'Gold', this.topGold),
-      h('div', { class: 'stat click', title: 'Bauern / Wohnraum – Klick: Verwaltung (Steuern, Rationen)', onclick: () => this.togglePopup('admin') }, iconEl(popFactorIcon('crowd', 24)), this.topPop),
-      pop,
-      stat(toolIcon('troops', 24), 'Truppen / Limit', this.topTroops),
-      stat(popFactorIcon('fear', 24), 'Angstfaktor: Produktivität +, Kampfmoral −', this.topFear),
-    );
+    const warn = (): HTMLElement => h('span', { class: 'wmark', html: WARN_SVG });
+    const view = (): PlayerView | null => this.lastView;
+    const tip = (el: HTMLElement, doc: (v: PlayerView) => Doc): void => {
+      attachTooltip(el, () => (view() ? renderDoc(doc(view() as PlayerView), { compact: true }) : null), { placement: 'element' });
+    };
+    this.statGold = h('div', { class: 'stat click gold', onclick: () => this.togglePopup('admin') }, iconEl(coinIcon()), this.topGold, warn());
+    this.statPeasants = h('div', { class: 'stat click peasants', onclick: () => this.togglePopup('admin') }, iconEl(popFactorIcon('crowd', 24)), this.topPop, warn());
+    this.statPop = h('div', { class: 'stat click pop', onclick: () => this.togglePopup('popularity') }, this.topFace, this.topPopularity, this.topDelta, warn());
+    this.statTroops = h('div', { class: 'stat troops' }, iconEl(toolIcon('troops', 24)), this.topTroops, warn());
+    this.statFear = h('div', { class: 'stat fear' }, iconEl(popFactorIcon('fear', 24)), this.topFear);
+    tip(this.statGold, goldTipDoc);
+    tip(this.statPeasants, peasantsTipDoc);
+    attachTooltip(this.statPop, popularityTooltip(view), { placement: 'element' });
+    tip(this.statTroops, troopsTipDoc);
+    tip(this.statFear, fearTipDoc);
+    bar.append(h('div', { class: 'grp' }, this.statGold, this.statPeasants, this.statPop), h('div', { class: 'grp' }, this.statTroops, this.statFear));
     this.powerFill = h('div', { style: 'width:0%' });
     this.powerText = h('span', { text: '' });
     this.powerWrap = h('div', { class: 'power', title: 'Machtleiste (Extreme)', style: this.extremeMode ? '' : 'display:none' }, this.powerFill, this.powerText);
     this.abilityBar = h('div', { class: 'abilities' });
     bar.append(this.powerWrap, this.abilityBar, h('div', { class: 'spacer' }));
-    bar.append(h('div', { class: 'stat', title: 'Spielzeit' }, iconEl(toolIcon('time', 22)), this.topDate));
+    bar.append(h('div', { class: 'stat date', title: 'Spielzeit' }, iconEl(toolIcon('time', 22)), this.topDate));
     if (this.actions.isLocal) {
       this.pauseBtn = this.iconBtn('pause', 'Pause (Pause-Taste)', () => this.actions.togglePause());
-      bar.append(this.iconBtn('zoom', 'Langsamer', () => this.actions.setSpeed(-1), '−'), h('div', { class: 'stat' }, this.speedLabel), this.iconBtn('speed', 'Schneller', () => this.actions.setSpeed(1), '+'), this.pauseBtn);
+      bar.append(h('div', { class: 'grp speedgrp' }, this.iconBtn('zoom', 'Langsamer', () => this.actions.setSpeed(-1), '−'), h('div', { class: 'stat speed' }, this.speedLabel), this.iconBtn('speed', 'Schneller', () => this.actions.setSpeed(1), '+')), this.pauseBtn);
     }
     bar.append(
       this.iconBtn('help', 'Hotkey-Übersicht (F1)', () => this.actions.openHelp()),
@@ -262,11 +296,18 @@ export class Hud {
     for (const [g, list] of groups) {
       for (const r of list) {
         const val = h('b', { text: '0' });
-        const row = h('div', { class: 'row', onclick: () => this.togglePopup(g === 'food' ? 'granary' : 'stock') }, iconEl(resourceIcon(r, 20)), h('span', { class: 'nm', text: RES_INFO[r].name }), val);
+        const row = h('div', { class: 'row', onclick: () => this.togglePopup(g === 'food' ? 'granary' : 'stock') }, iconEl(resourceIcon(r, 20)), h('span', { class: 'nm', text: RES_INFO[r].name }), h('span', { class: 'wmark', html: WARN_SVG }), val);
         this.sharedApi.tip(row, 'resource', r, `${RES_INFO[r].name} – Klick: ${g === 'food' ? 'Kornspeicher' : 'Lager'}`);
         row.dataset.res = String(r);
         this.resRows[r] = row;
         this.resBar.append(row);
+      }
+      if (g === 'food') {
+        // Vorrat in Monaten: reicht die Nahrung?
+        this.foodSum = h('b', { text: '–' });
+        const sum = h('div', { class: 'row foodsum', onclick: () => this.togglePopup('granary') }, iconEl(popFactorIcon('food', 20)), h('span', { class: 'nm', text: 'Vorrat' }), h('span', { class: 'wmark', html: WARN_SVG }), this.foodSum);
+        attachTooltip(sum, () => (this.lastView ? foodWarnText(this.lastView) : null), { placement: 'element' });
+        this.resBar.append(sum);
       }
       this.resBar.append(h('div', { class: 'sep' }));
     }
@@ -274,6 +315,29 @@ export class Hud {
     this.resBar.append(h('div', { class: 'row', title: 'Waffenkammer', onclick: () => this.togglePopup('armory') }, iconEl(resourceIcon(R.Sword, 20)), h('span', { class: 'nm', text: 'Waffen' }), arm));
     this.resRows[999] = arm.parentElement as HTMLElement;
     this.root.append(this.resBar);
+  }
+
+  /** Warnhinweis zu einer Ware für den Tooltip (leer, wenn alles in Ordnung ist) */
+  private resWarning(res: number): string {
+    const v = this.lastView;
+    if (!v) return '';
+    if (FOOD_RES.includes(res)) return foodLevel(v) === 'ok' ? '' : foodWarnText(v);
+    const lv = resLevel(res, v.stock[res] ?? 0, this.armed.has(res));
+    return resWarnText(res, v.stock[res] ?? 0, lv);
+  }
+
+  private setLevel(el: HTMLElement, lv: Level): void {
+    el.classList.toggle('warn', lv === 'warn');
+    el.classList.toggle('crit', lv === 'crit');
+  }
+
+  /** Anordnung je nach wirksamer Breite (Fensterbreite / UI-Skalierung): kompakt und eng */
+  refreshLayout(): void {
+    const scale = parseFloat(getComputedStyle(this.root).getPropertyValue('--ui-scale')) || 1;
+    const w = window.innerWidth / scale;
+    this.root.classList.toggle('compact', w < 1180);
+    this.root.classList.toggle('tight', w < 940);
+    this.root.classList.toggle('short', window.innerHeight / scale < 640);
   }
 
   openCategory(i: number): void {
@@ -299,6 +363,7 @@ export class Hud {
   update(view: PlayerView | null, sel: SelectionState): void {
     if (view) {
       this.lastView = view;
+      const ex = explainPopularity(view);
       this.topGold.textContent = String(view.gold);
       this.topPop.textContent = `${view.peasants}/${view.housing}`;
       this.topPopularity.textContent = String(Math.round(view.popularity));
@@ -307,16 +372,30 @@ export class Hud {
         this.lastFace = face;
         this.topFace.innerHTML = popFaceIcon(view.popularity, 28);
       }
-      this.topDelta.textContent = view.popDelta > 0.05 ? `▲${view.popDelta.toFixed(1)}` : view.popDelta < -0.05 ? `▼${(-view.popDelta).toFixed(1)}` : '';
-      this.topDelta.className = 'delta ' + (view.popDelta > 0.05 ? 'pos' : view.popDelta < -0.05 ? 'neg' : '');
+      this.topDelta.textContent = deltaText(ex);
+      this.topDelta.className = 'delta ' + (ex.pending ? '' : ex.direction === 'up' ? 'pos' : ex.direction === 'down' ? 'neg' : '');
       this.topTroops.textContent = `${view.troops}/${view.troopLimit}`;
       this.topFear.textContent = (view.fear > 0 ? '+' : '') + view.fear;
+      this.setLevel(this.statGold, goldLevel(view));
+      this.setLevel(this.statPeasants, peasantLevel(view));
+      this.setLevel(this.statPop, popularityLevel(view));
+      this.setLevel(this.statTroops, troopLevel(view));
       const month = this.world.month;
       this.topDate.textContent = `${MONTHS[month % 12]} ${Math.floor(month / 12) + 1}`;
       for (const r of [...STOCK_RES, ...FOOD_RES]) {
         const row = this.resRows[r];
-        if (row) (row.lastElementChild as HTMLElement).textContent = String(view.stock[r]);
+        if (!row) continue;
+        const v = view.stock[r];
+        (row.lastElementChild as HTMLElement).textContent = String(v);
+        const lim = RES_LIMITS[r];
+        if (lim && v >= lim.arm) this.armed.add(r);
+        const lv: Level = FOOD_RES.includes(r) ? (foodLevel(view) === 'crit' && v <= 0 ? 'crit' : 'ok') : resLevel(r, v, this.armed.has(r));
+        this.setLevel(row, lv);
       }
+      const fs = foodSupply(view);
+      const fl = foodLevel(view);
+      this.foodSum.textContent = view.foodShort ? 'Hunger' : Number.isFinite(fs.months) ? `${fs.months >= 10 ? '10+' : fs.months.toFixed(1).replace('.', ',')} Mon.` : '–';
+      this.setLevel(this.foodSum.parentElement as HTMLElement, fl);
       let arm = 0;
       for (const r of ARMORY_RES) arm += view.stock[r];
       if (this.resRows[999]) (this.resRows[999].lastElementChild as HTMLElement).textContent = String(arm);
@@ -392,7 +471,7 @@ export class Hud {
     if (this.popupEl && this.popupKind === kind) return this.closePopup();
     this.closePopup();
     this.popupKind = kind;
-    this.popupEl = h('div', { class: 'panel pp popup' });
+    this.popupEl = h('div', { class: `panel pp popup ${kind}` });
     this.root.append(this.popupEl);
     this.popupEl.style.pointerEvents = 'auto';
     this.refreshPopup(true);
@@ -412,7 +491,7 @@ export class Hud {
   private refreshPopup(force = false): void {
     const v = this.lastView;
     if (!this.popupEl || !v) return;
-    const sig = this.popupKind === 'market' ? `${this.popupKind}|${v.gold}|${v.stock.join(',')}|${v.priceMul.join(',')}` : `${this.popupKind}|${v.gold}|${v.stock.join(',')}|${v.tax}|${v.ration}|${v.popularity | 0}|${v.factors.map((f) => f.value.toFixed(1)).join(',')}`;
+    const sig = this.popupKind === 'market' ? `${this.popupKind}|${v.gold}|${v.stock.join(',')}|${v.priceMul.join(',')}` : `${this.popupKind}|${v.gold}|${v.stock.join(',')}|${v.tax}|${v.ration}|${(v.popularity * 10) | 0}|${v.peasants}|${v.housing}|${v.foodShort}|${v.foodTypes}|${v.aleCover.toFixed(2)}|${v.relCover.toFixed(2)}|${v.factors.map((f) => f.value.toFixed(1)).join(',')}`;
     if (!force && sig === this.popupSig) return;
     this.popupSig = sig;
     const el = this.popupEl;
@@ -445,7 +524,7 @@ export class Hud {
   }
 
   private popupPopularity(el: HTMLElement, v: PlayerView): void {
-    popularityBreakdown(el, v);
+    popularityBreakdown(el, v, { openAdmin: () => this.togglePopup('admin'), close: () => this.closePopup() });
   }
 
   private popupAdmin(el: HTMLElement, v: PlayerView): void {
@@ -460,6 +539,7 @@ export class Hud {
   }
 
   destroy(): void {
+    window.removeEventListener('resize', this.onResize);
     this.minimap.destroy();
     this.root.remove();
   }
@@ -491,30 +571,9 @@ export function marketGrid(api: HudShared, v: PlayerView): HTMLElement {
   return g;
 }
 
-/** Beliebtheit: Zahl, Gesicht, alle Faktoren mit Vorzeichen, Monatsprognose */
-export function popularityBreakdown(el: HTMLElement, v: PlayerView): void {
-  const next = Math.max(0, Math.min(100, v.popularity + v.popDelta));
-  el.append(
-    h('div', { class: 'popwrap' },
-      h('span', { class: 'face', html: popFaceIcon(v.popularity, 56) }),
-      h('div', {},
-        h('div', { class: 'popnum', html: `<b>${v.popularity.toFixed(1)}</b> / 100` }),
-        h('div', { class: v.popDelta >= 0 ? 'pos' : 'neg', text: `${v.popDelta >= 0 ? '+' : ''}${v.popDelta.toFixed(1)} pro Monat` }),
-        h('div', { class: 'crumb', text: `Prognose: in einem Monat ≈ ${next.toFixed(0)}` }),
-      ),
-    ),
-  );
-  el.append(h('div', { class: 'crumb', text: 'Unter 50 verlassen Bauern die Burg, ab 50 kommen neue.' }));
-  const g = h('div', { class: 'grid2', style: 'margin-top:8px' });
-  let sum = 0;
-  for (const f of v.factors) {
-    sum += f.value;
-    const key = f.key;
-    g.append(iconEl(popFactorIcon(key, 22)), h('span', { text: f.label }), h('b', { class: f.value > 0.05 ? 'pos' : f.value < -0.05 ? 'neg' : '', text: (f.value > 0 ? '+' : '') + f.value.toFixed(1) }));
-  }
-  g.append(h('span'), h('b', { text: 'Summe' }), h('b', { class: sum >= 0 ? 'pos' : 'neg', text: (sum > 0 ? '+' : '') + sum.toFixed(1) }));
-  el.append(g);
-  el.append(h('div', { class: 'crumb', style: 'margin-top:8px', text: `Nahrungssorten: ${v.foodTypes}${v.foodShort ? ' · NAHRUNGSMANGEL' : ''} · Angstfaktor: ${v.fear} · Bierabdeckung ${(v.aleCover * 100).toFixed(0)} % · Glaubensabdeckung ${(v.relCover * 100).toFixed(0)} %` }));
+/** Beliebtheit: Detailansicht (Zahl, Entwicklung, Faktoren, Warnungen, Hinweise) – dieselbe Funktion für Taste L, Klick und Bergfried */
+export function popularityBreakdown(el: HTMLElement, v: PlayerView, hooks: { openAdmin?: () => void; close?: () => void } = {}): void {
+  renderPopularityDetail(el, v, hooks);
 }
 
 /** Steuern und Rationen (Bergfried / Verwaltung) */
@@ -549,3 +608,8 @@ export function adminControls(el: HTMLElement, v: PlayerView, actions: HudAction
 
 void BT;
 void buildingIcon;
+void renderPopularitySummary;
+void TAX_POP;
+
+/** Kleines Warndreieck (eigenes Symbol) für Mangelanzeigen */
+const WARN_SVG = `<svg viewBox="0 0 20 20" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="10,2 19,18 1,18" fill="#f0b030" stroke="#3a2512" stroke-width="1.6" stroke-linejoin="round"/><rect x="9" y="7.5" width="2" height="5.5" fill="#3a2512"/><rect x="9" y="14" width="2" height="2" fill="#3a2512"/></svg>`;
