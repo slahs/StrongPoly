@@ -3,7 +3,8 @@
  * Aufruf (aus dem Repo-Wurzelordner): pnpm --filter @strongpoly/shared exec tsx ../../scripts/export-voice-lines.ts <lang> <ausgabe.json>
  *
  * Zusätzlich werden, falls vorhanden, die Beraterzeilen des Ereignis-Beraters (`shared/src/data/advisor_lines.ts`, Schlüssel
- * `advisor.<ereignis>.<nr>`) mitvertont – aber nur Zeilen OHNE Platzhalter `{…}`: Texte mit zur Laufzeit eingesetzten Zahlen oder
+ * `advisor.<ereignis>.<nr>`) mitvertont: Zeilen ohne Platzhalter `{…}` direkt, Zeilen mit genau einem endlichen Namensplatzhalter
+ * (Ware, Lager, Gebäude) je Wert ausgeschrieben (Schlüssel `<zeile>@<wert>`). Texte mit zur Laufzeit eingesetzten Zahlen oder freien
  * Namen kann ein vorab erzeugter Clip nicht enthalten, dafür greift der Ersatz (Browser-Sprachausgabe mit dem fertigen Text).
  * Dringende Ereignisse (Priorität 2 / Art „alert“) bekommen das Profil `advisor.alarm`.
  */
