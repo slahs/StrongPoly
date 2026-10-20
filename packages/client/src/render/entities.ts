@@ -152,7 +152,7 @@ export class EntityRenderer {
   private frustum = new THREE.Frustum();
   private projScreen = new THREE.Matrix4();
   /** Statistik der letzten Aktualisierung (für Messungen) */
-  stats = { units: 0, buildings: 0, projectiles: 0, corpses: 0 };
+  stats = { units: 0, buildings: 0, projectiles: 0, corpses: 0, ms: { buildings: 0, units: 0, corpses: 0, proj: 0, emit: 0, fx: 0 } };
 
   constructor(world: ClientWorld) {
     this.world = world;
@@ -377,13 +377,31 @@ export class EntityRenderer {
       this.projScreen.multiplyMatrices((o.camera as THREE.PerspectiveCamera).projectionMatrix, o.camera.matrixWorldInverse);
       this.frustum.setFromProjectionMatrix(this.projScreen);
     }
+    const ms = this.stats.ms;
+    let t = performance.now();
     this.updateBuildings(dt, o);
+    let t2 = performance.now();
+    ms.buildings = t2 - t;
+    t = t2;
     this.updateUnits(dt, o);
+    t2 = performance.now();
+    ms.units = t2 - t;
+    t = t2;
     this.updateCorpses(o);
+    t2 = performance.now();
+    ms.corpses = t2 - t;
+    t = t2;
     this.updateProjectiles(o);
     this.updateBanners(o);
+    t2 = performance.now();
+    ms.proj = t2 - t;
+    t = t2;
     this.updateEmitters(dt, o);
+    t2 = performance.now();
+    ms.emit = t2 - t;
+    t = t2;
     this.fx.update(dt);
+    ms.fx = performance.now() - t;
   }
 
   private inView(x: number, y: number, z: number, r: number): boolean {
@@ -563,13 +581,13 @@ export class EntityRenderer {
 
       if (rebuildLists) {
         if (b.f & BF.Burning) {
-          burn.push({ x: b.x, z: b.y, y, w: b.w, h: b.h, top: def.height });
+          burn.push({ x: b.x, z: b.y, y, w: b.w, h: b.h, top: Math.max(0.5, def.height) });
           const n = Math.max(1, Math.min(6, Math.round((b.w * b.h) / 3)));
           for (let k = 0; k < n; k++) {
             fire.push({
               x: b.x + 0.5 + (((k * 7919) % 97) / 97) * Math.max(0, b.w - 1),
               z: b.y + 0.5 + (((k * 104729) % 89) / 89) * Math.max(0, b.h - 1),
-              y: y + def.height * 0.6,
+              y: y + Math.max(0.3, def.height * 0.6),
               s: 1 + def.height * 0.25,
             });
           }

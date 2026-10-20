@@ -13,7 +13,7 @@ export interface GfxSettings {
 }
 
 /** Richtung vom Boden zur Sonne (tiefer, warmer Sonnenstand aus Südwest, sichtbare Schatten) */
-const SUN_DIR = new THREE.Vector3(-0.42, 0.74, 0.52).normalize();
+const SUN_DIR = new THREE.Vector3(-0.38, 0.8, 0.46).normalize();
 const SUN_DIST = 90;
 const SHADOW_TYPES = {
   basic: THREE.BasicShadowMap,
@@ -65,6 +65,7 @@ export class GameScene {
     sc.far = 300;
     this.sun.shadow.mapSize.set(2048, 2048);
     this.sun.shadow.bias = -0.0004;
+    this.sun.shadow.intensity = 0.8;
     this.sun.shadow.normalBias = 0.05;
     this.scene.add(this.sun);
     this.scene.add(this.sun.target);

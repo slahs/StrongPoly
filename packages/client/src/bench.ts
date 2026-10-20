@@ -34,6 +34,8 @@ export interface BenchResult {
   /** davon: Entity-Aktualisierung und renderer.render */
   updateMs: number;
   renderMs: number;
+  /** Aufschlüsselung der Entity-Aktualisierung (Mittel in ms) */
+  parts: Record<string, number>;
   calls: number;
   triangles: number;
   units: number;
@@ -50,11 +52,22 @@ export interface BenchResult {
 
 declare global {
   interface Window {
-    __bench?: { ready: boolean; done: boolean; result: () => BenchResult; scene: GameScene; entities: EntityRenderer; world: ClientWorld; setCamera: (x: number, y: number, dist?: number) => void };
+    __bench?: {
+      ready: boolean;
+      done: boolean;
+      result: () => BenchResult;
+      scene: GameScene;
+      entities: EntityRenderer;
+      world: ClientWorld;
+      setCamera: (x: number, y: number, dist?: number) => void;
+      /** Gebäude zerstören (Einsturz, Staub, Trümmer) – Prüfhilfe */
+      destroy: (id: number) => void;
+      /** Auswahl/Hover für Prüfaufnahmen */
+      selected: Set<number>;
+      ui: { selectedBuilding: number; hoverBuilding: number };
+    };
   }
 }
-
-const q = new URLSearchParams(location.search);
 
 function pct(sorted: number[], p: number): number {
   if (!sorted.length) return 0;
@@ -109,7 +122,7 @@ const ARMY_B: [number, number][] = [
   [U.Mantlet, 0.02],
 ];
 
-class BenchWorld {
+export class BenchWorld {
   readonly w = new ClientWorld();
   private hpf = new Float32Array(8192);
   private cd = new Float32Array(8192);
@@ -129,6 +142,7 @@ class BenchWorld {
   constructor(
     private total: number,
     seed: number,
+    private plain = false,
   ) {
     let s = seed * 2654435761 + 1;
     this.rnd = () => {
@@ -158,8 +172,10 @@ class BenchWorld {
       { id: 1, name: 'Blau', team: 1, color: 1, kind: 'ai', alive: true, keepX: this.cx + 50, keepY: this.cy },
     ];
     w.players = players;
-    this.placeBuildings();
-    this.populate();
+    if (!plain) {
+      this.placeBuildings();
+      this.populate();
+    }
   }
 
   private addBuilding(t: number, x: number, y: number, o: number, rot = 0, f = 0, staffed = 0): ClientBuilding {
@@ -452,6 +468,66 @@ class BenchWorld {
     });
   }
 
+  /** Prüfszene: alle Einheitentypen in vier Zeilen (Stehen, Gehen, Angriff, Arbeit) */
+  showcaseUnits(): void {
+    const { cx, cy } = this;
+    const w = this.w;
+    for (let t = 0; t < UNITS.length; t++) {
+      for (let row = 0; row < 4; row++) {
+        const s = this.spawn(t, row % 2 === 0 ? 0 : 1, cx - 28 + t * 2.2, cy - 5 + row * 2.6);
+        if (s < 0) continue;
+        w.face[s] = Math.PI;
+        w.prevX[s] = w.curX[s];
+        if (row === 1) w.flags[s] |= 4;
+        if (row === 2) w.aux[s] |= 1;
+        if (row === 3) {
+          w.aux[s] |= 2;
+          w.carry[s] = 1 + (t % 12);
+        }
+        w.hp[s] = row === 2 ? 140 : 255;
+      }
+    }
+    this.commitTick(0);
+  }
+
+  /** Prüfszene: alle Gebäudetypen im Raster, dazu Mauerformen */
+  showcaseBuildings(): void {
+    const { cx, cy } = this;
+    let x = cx - 42;
+    let y = cy - 24;
+    let rowH = 0;
+    for (let t = 0; t < BUILDINGS.length; t++) {
+      const def = BUILDINGS[t];
+      if (def.hp <= 0 || t === BT.WallWood || t === BT.WallLow || t === BT.WallHigh || t === BT.Stairs) continue;
+      if (x + def.w > cx + 44) {
+        x = cx - 42;
+        y += rowH + 2;
+        rowH = 0;
+      }
+      this.addBuilding(t, Math.round(x), Math.round(y), t % 2, 0, t === BT.Fletcher ? 1 : 0, 1);
+      x += def.w + 1.5;
+      rowH = Math.max(rowH, def.h);
+    }
+    // Mauerformen: gerade, Ecke, T, Kreuz, Treppe, Tor
+    const wy = cy + 14;
+    const wx = cx - 40;
+    const plan = [
+      '#########  ####  #####  ###  #  ',
+      '#       #  #  #  #       # #  #  ',
+      '#   #####  #  #  #####   ###  #S#',
+      '#   #      ####      #        #  ',
+      '#####                #####       ',
+    ];
+    plan.forEach((row, j) => {
+      for (let i = 0; i < row.length; i++) {
+        const ch = row[i];
+        if (ch === '#') this.addBuilding([BT.WallHigh, BT.WallLow, BT.WallWood][Math.floor(i / 12) % 3], wx + i, wy + j * 1, 0);
+      }
+    });
+    this.addBuilding(BT.Stairs, wx + 35, wy + 1, 0);
+    this.addBuilding(BT.TowerLookout, wx + 36, wy + 6, 0);
+  }
+
   /** schreibt den Projektilpuffer im Snapshot-Format */
   private commitTick(_dt: number): void {
     const w = this.w;
@@ -482,6 +558,7 @@ class BenchWorld {
 
 /** Einstieg: ersetzt das normale Spiel durch die Benchmark-Szene */
 export function startBench(): void {
+  const q = new URLSearchParams(location.search);
   const total = Math.max(2, Number(q.get('units') ?? 2000));
   const secs = Number(q.get('secs') ?? 20);
   const warm = Number(q.get('warm') ?? 3);
@@ -494,7 +571,10 @@ export function startBench(): void {
   const canvas = document.getElementById('view') as HTMLCanvasElement;
   const gs = new GameScene(canvas);
   gs.gfx.pixelRatio = Number(q.get('pr') ?? 1);
-  const bw = new BenchWorld(total, seed);
+  const showcase = q.get('showcase');
+  const bw = new BenchWorld(showcase ? 0 : total, seed, !!showcase);
+  if (showcase === 'units') bw.showcaseUnits();
+  else if (showcase === 'buildings') bw.showcaseBuildings();
   const world = bw.w;
   const entities = new EntityRenderer(world);
   gs.root.add(entities.group);
@@ -532,6 +612,7 @@ export function startBench(): void {
   const cpuMs: number[] = [];
   const updMs: number[] = [];
   const renMs: number[] = [];
+  const partMs: Record<string, number[]> = { buildings: [], units: [], corpses: [], proj: [], emit: [], fx: [] };
   let startT = 0;
   let last = performance.now();
   let tickAcc = 0;
@@ -556,6 +637,7 @@ export function startBench(): void {
       cpuP95Ms: pct(c, 0.95),
       updateMs: mean(updMs),
       renderMs: mean(renMs),
+      parts: Object.fromEntries(Object.entries(partMs).map(([k, v]) => [k, mean(v)])),
       calls: lastCalls,
       triangles: lastTris,
       units: bw.count,
@@ -570,7 +652,19 @@ export function startBench(): void {
       done,
     };
   };
-  window.__bench = { ready: true, done: false, result, scene: gs, entities, world, setCamera };
+  const ctl = { selectedBuilding: 0, hoverBuilding: 0 };
+  const selected = new Set<number>();
+  const destroy = (id: number): void => {
+    const b = world.buildings.get(id);
+    if (!b) return;
+    const def = BUILDINGS[b.t];
+    world.clearBuilding(b);
+    world.removedBuildings.push(b);
+    world.buildings.delete(id);
+    world.buildingsDirty = true;
+    world.events.push({ e: 'fx', k: def.wood ? 'collapseWood' : 'collapse', x: b.x + b.w / 2, y: b.y + b.h / 2, z: def.height });
+  };
+  window.__bench = { ready: true, done: false, result, scene: gs, entities, world, setCamera, destroy, selected, ui: ctl };
 
   const loop = (nowMs: number): void => {
     const dtReal = (nowMs - last) / 1000;
@@ -587,9 +681,10 @@ export function startBench(): void {
     let ticks = 0;
     while (tickAcc >= 0.1 && ticks < 12) {
       tickAcc -= 0.1;
-      bw.tick();
+      if (!showcase) bw.tick();
       ticks++;
     }
+    if (showcase) world.lastSnapMs = performance.now();
     if (tickAcc > 1.2) tickAcc = 0;
     const nowS = nowMs / 1000;
     // Kamera: leichter Schwenk, damit Schatten- und Dekor-Updates mitlaufen
@@ -602,8 +697,9 @@ export function startBench(): void {
       alpha,
       now: nowS,
       camYaw: gs.cam.yaw,
-      selected: new Set(),
-      selectedBuilding: 0,
+      selected,
+      selectedBuilding: ctl.selectedBuilding,
+      hoverBuilding: ctl.hoverBuilding,
       hoverTile: null,
       camera: gs.cam.camera,
       visible: null,
@@ -626,6 +722,7 @@ export function startBench(): void {
       cpuMs.push(cpu);
       updMs.push(tU1 - tU0);
       renMs.push(tU2 - tU1);
+      for (const k of Object.keys(partMs)) partMs[k].push((entities.stats.ms as Record<string, number>)[k]);
       if (elapsed >= warm + secs) {
         done = true;
         if (window.__bench) window.__bench.done = true;

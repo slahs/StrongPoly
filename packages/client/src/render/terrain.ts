@@ -38,12 +38,12 @@ const TC: Record<number, TerrainColors> = {
   [T.Moat]: { a: col(PAL.sandDark), b: col(PAL.waterDeep), pat: 0 },
 };
 const WET = mix(col(PAL.sandDark), col(PAL.waterDeep), 0.22);
-const BED = mix(col(PAL.sandDark), col(PAL.waterDeep), 0.55);
+const BED = mix(col(PAL.waterDeep), col(PAL.sandDark), 0.3);
 const CLIFF = col(PAL.rockDark);
 const CLIFF_LIGHT = mix(col(PAL.rock), col(PAL.sandDark), 0.2);
 const FOGC = col(FOG_COLOR);
 const WHITE: RGB = [1, 1, 1];
-const WATER_SHALLOW = mix(col(PAL.water), col(PAL.white), 0.3);
+const WATER_SHALLOW = mix(col(PAL.water), col(PAL.white), 0.12);
 const WATER_DEEP = col(PAL.waterDeep);
 const MOAT_SHALLOW = mix(col(PAL.water), col(PAL.swamp), 0.25);
 const MOAT_DEEP = mix(col(PAL.waterDeep), col(PAL.pitch), 0.25);
@@ -523,13 +523,14 @@ export class TerrainRenderer {
     const corners: [number, number][] = [[x, y], [x, y + 1], [x + 1, y + 1], [x + 1, y]];
     const foams = corners.map(([px, py]) => cornerFoam(px, py));
     const fcenter = (foams[0] + foams[1] + foams[2] + foams[3]) / 4;
-    const cols = corners.map(([px, py], k) => fogC(mix(cc, WHITE, foams[k] * 0.28), px, py));
-    const cmid = fogC(mix(cc, WHITE, fcenter * 0.2), x + 0.5, y + 0.5);
+    const cols = corners.map(([px, py], k) => fogC(mix(cc, WHITE, foams[k] * 0.12), px, py));
+    const cmid = fogC(mix(cc, WHITE, fcenter * 0.08), x + 0.5, y + 0.5);
     const mid = [x + 0.5, yw, y + 0.5];
     for (let k = 0; k < 4; k++) {
       const a = corners[k];
       const b = corners[(k + 1) % 4];
-      acc.tri([a[0], yw, a[1]], mid, [b[0], yw, b[1]], cols[k], cmid, cols[(k + 1) % 4], foams[k], fcenter, foams[(k + 1) % 4]);
+      // Windung so, dass die Fläche nach oben zeigt
+      acc.tri([b[0], yw, b[1]], mid, [a[0], yw, a[1]], cols[(k + 1) % 4], cmid, cols[k], foams[(k + 1) % 4], fcenter, foams[k]);
     }
   }
 

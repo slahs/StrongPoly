@@ -307,9 +307,9 @@ export function buildBuildingModel(def: BuildingDef): ModelGeos {
       b.box(0.14, 0.14, 0.34, 0, 1.43, 0.9, PAL.woodDark);
       // Flügel: Kreuz aus zwei Balken mit Stoffbahnen, dreht sich um die Welle (z)
       b.part(PART.Sail, 0, 1.5, 1.08);
-      b.box(0.1, 1.8, 0.05, 0, 0.6, 1.08, PAL.wood);
-      b.box(1.8, 0.1, 0.05, 0, 1.45, 1.08, PAL.wood);
-      for (const [x, y, w, h] of [[0.0, 1.95, 0.36, 0.34], [0.0, 1.05, 0.36, 0.34], [0.55, 1.5, 0.34, 0.3], [-0.55, 1.5, 0.34, 0.3]] as [number, number, number, number][])
+      b.box(0.1, 2.3, 0.05, 0, 0.35, 1.08, PAL.wood);
+      b.box(2.3, 0.1, 0.05, 0, 1.45, 1.08, PAL.wood);
+      for (const [x, y, w, h] of [[0.0, 2.45, 0.5, 0.6], [0.0, 0.55, 0.5, 0.6], [0.7, 1.5, 0.6, 0.5], [-0.7, 1.5, 0.6, 0.5]] as [number, number, number, number][])
         b.box(w, h, 0.03, x, y - h / 2, 1.1, PAL.white);
       b.box(0.2, 0.2, 0.08, 0, 1.4, 1.1, PAL.woodDark);
       b.part(0);

@@ -262,7 +262,7 @@ export function waterMaterial(animated: boolean): THREE.MeshLambertMaterial {
     vertexColors: true,
     flatShading: true,
     transparent: true,
-    opacity: animated ? 0.8 : 1,
+    opacity: animated ? 0.9 : 1,
     depthWrite: !animated,
   });
   if (animated) {
