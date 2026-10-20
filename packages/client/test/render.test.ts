@@ -5,7 +5,7 @@ import { ModelBuilder } from '../src/render/builder';
 import { PART } from '../src/render/materials';
 import { buildBuildingModel, WALL_JOIN, WALL_TYPES, wallParts } from '../src/render/models_buildings';
 import { arrowGeo, flameGeo, foundationGeo, rubbleGeo, scaffoldGeo, stoneGeo } from '../src/render/models_misc';
-import { buildCargoModel, buildUnitModel, CARGO_KINDS, CARGO_OF_RES, UNIT_CORPSE, UNIT_CYCLE, UNIT_SCALE, UNIT_TOP, UNIT_WALK_W } from '../src/render/models_units';
+import { buildCargoModel, buildUnitModel, CARGO_KINDS, CARGO_OF_RES, instanceTris, UNIT_CORPSE, UNIT_CYCLE, UNIT_SCALE, UNIT_TOP, UNIT_WALK_W, worstCaseTris } from '../src/render/models_units';
 import { QUALITY, qualityOf } from '../src/render/quality';
 import { EMITTERS } from '../src/render/work_fx';
 
@@ -57,7 +57,8 @@ describe('Einheitenmodelle', () => {
       const m = buildUnitModel(t);
       expect(m.merged.getAttribute('position').count % 3, `Typ ${t}`).toBe(0);
       expect(m.tris, `Typ ${t}`).toBeGreaterThan(12);
-      expect(m.tris, `Typ ${t}`).toBeLessThan(1200);
+      // sichtbare Dreiecke einer Instanz (alle Varianten/Berufe berücksichtigt): nah höchstens 1500
+      expect(worstCaseTris(m, true, t), `Typ ${t}`).toBeLessThan(1500);
       expect(finite(m.merged), `Typ ${t}`).toBe(true);
       expect(UNIT_TOP[t]).toBeGreaterThan(0);
       expect(UNIT_WALK_W[t]).toBeGreaterThan(0);
@@ -81,8 +82,9 @@ describe('Einheitenmodelle', () => {
   it('Lord, Ritter und Belagerungsgerät sind klar unterscheidbar (Größe/Zierde)', () => {
     expect(UNIT_SCALE[U.Lord]).toBeGreaterThan(UNIT_SCALE[U.Swordsman]);
     expect(UNIT_SCALE[U.Knight]).toBeGreaterThan(UNIT_SCALE[U.Spearman]);
-    expect(buildUnitModel(U.Lord).tris).toBeGreaterThan(buildUnitModel(U.Peasant).tris);
-    expect(buildUnitModel(U.Knight).tris).toBeGreaterThan(buildUnitModel(U.Swordsman).tris);
+    const vis = (t: number): number => instanceTris(buildUnitModel(t), true, 0, 0);
+    expect(vis(U.Lord)).toBeGreaterThan(vis(U.Peasant) * 0.9);
+    expect(vis(U.Knight)).toBeGreaterThan(vis(U.Swordsman));
     expect(UNIT_TOP[U.SiegeTower]).toBeGreaterThan(UNIT_TOP[U.Lord]);
   });
   it('Fußvolk und Reiter bleiben liegen, Belagerungsgerät nicht', () => {

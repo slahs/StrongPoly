@@ -11,7 +11,9 @@ import {
   generateMap,
   PublicPlayer,
 } from '@strongpoly/shared';
+import * as THREE from 'three';
 import { EntityRenderer } from './render/entities';
+import { JOB_NAMES } from './render/unit_jobs';
 import { GameScene } from './render/scene';
 
 /**
@@ -64,6 +66,10 @@ declare global {
       setCamera: (x: number, y: number, dist?: number) => void;
       /** Gebäude zerstören (Einsturz, Staub, Trümmer) – Prüfhilfe */
       destroy: (id: number) => void;
+      /** feste Zeit (s) für Bildserien der Animation; null = Echtzeit */
+      setTime: (t: number | null) => void;
+      /** Zähler gezeichneter Bilder (zum Warten auf ein neues Bild) */
+      frameNo: () => number;
       /** Auswahl/Hover für Prüfaufnahmen */
       selected: Set<number>;
       ui: { selectedBuilding: number; hoverBuilding: number };
@@ -124,6 +130,18 @@ const ARMY_B: [number, number][] = [
   [U.Mantlet, 0.02],
 ];
 
+/** Eintrag der Einheiten-Prüfszene */
+export interface ShowcaseEntry {
+  type: number;
+  label: string;
+  /** getragene Ware (Ressourcen-ID + 1) – bestimmt bei Bauern u. a. den Beruf */
+  carry?: number;
+  /** Arbeits-Teilzustand (Sim `P.*`) */
+  sub?: number;
+  /** Beruf erzwingen (Prüfhilfe: `EntityRenderer.debugJobs`) */
+  job?: number;
+}
+
 export class BenchWorld {
   readonly w = new ClientWorld();
   private hpf = new Float32Array(8192);
@@ -140,6 +158,13 @@ export class BenchWorld {
   private armyA: number[] = [];
   private armyB: number[] = [];
   private nextB = 100;
+  /** Beschriftungen für Prüfszenen (Weltkoordinaten) */
+  readonly labels: { x: number; y: number; text: string }[] = [];
+  showcaseGrid = { cols: 1, spacing: 2.3, rowSpacing: 2.7 };
+  /** Blickrichtung der Prüfszene (Bruchteile von π; 0,4 = Dreiviertelansicht, 0,75 = Seitenansicht nach rechts) */
+  showFace = 0.4;
+  /** erzwungene Berufe der Prüfszene (Einheiten-ID → Beruf) */
+  readonly showJobs = new Map<number, number>();
 
   constructor(
     private total: number,
@@ -470,26 +495,62 @@ export class BenchWorld {
     });
   }
 
-  /** Prüfszene: alle Einheitentypen in vier Zeilen (Stehen, Gehen, Angriff, Arbeit) */
-  showcaseUnits(): void {
+  /**
+   * Prüfszene: alle Einheitentypen in vier Zeilen (Stehen, Gehen, Angriff, Arbeit), bildschirmparallel zur Standardkamera
+   * (Spalten laufen nach rechts, Zeilen zur Kamera hin). `extra` hängt zusätzliche Spalten an (z. B. Berufe der Bauern).
+   */
+  showcaseUnits(extra: ShowcaseEntry[] = []): void {
     const { cx, cy } = this;
     const w = this.w;
-    for (let t = 0; t < UNITS.length; t++) {
+    const list: ShowcaseEntry[] = UNITS.map((d) => ({ type: d.id, label: d.name }));
+    list.push(...extra);
+    this.showcaseGrid = { cols: list.length, spacing: list.length > 30 ? 1.7 : 2.3, rowSpacing: 2.7 };
+    list.forEach((e, col) => {
       for (let row = 0; row < 4; row++) {
-        const s = this.spawn(t, row % 2 === 0 ? 0 : 1, cx - 28 + t * 2.2, cy - 5 + row * 2.6);
+        const p = this.gridPos(col, row);
+        const s = this.spawn(e.type, row % 2 === 0 ? 0 : 1, p.x, p.y);
         if (s < 0) continue;
-        w.face[s] = Math.PI;
-        w.prevX[s] = w.curX[s];
+        w.face[s] = Math.PI * this.showFace;
         if (row === 1) w.flags[s] |= 4;
         if (row === 2) w.aux[s] |= 1;
         if (row === 3) {
           w.aux[s] |= 2;
-          w.carry[s] = 1 + (t % 12);
-        }
+          w.carry[s] = e.carry ?? 1 + (e.type % 12);
+        } else if (e.carry && e.type === U.Peasant) w.carry[s] = e.carry;
+        if (e.sub !== undefined) w.aux[s] = (w.aux[s] & 15) | (e.sub << 4);
+        if (e.job !== undefined) this.showJobs.set(w.ids[s], e.job);
         w.hp[s] = row === 2 ? 140 : 255;
       }
-    }
+      const p = this.gridPos(col, 3.6);
+      this.labels.push({ x: p.x, y: p.y, text: e.label });
+    });
+    void cx;
+    void cy;
     this.commitTick(0);
+  }
+
+  /** Prüfszene mit einer einzigen Einheit in der Kartenmitte (Bildserien der Animation): state = stand|walk|attack|work */
+  showcaseSingle(type: number, state: string, job: number, side: number, carry = 0): void {
+    const w = this.w;
+    const s = this.spawn(type, side, this.cx, this.cy);
+    if (s < 0) return;
+    w.face[s] = Math.PI * this.showFace;
+    if (state === 'walk') w.flags[s] |= 4;
+    if (state === 'attack') w.aux[s] |= 1;
+    if (state === 'work') w.aux[s] |= 2;
+    if (carry) w.carry[s] = carry;
+    if (job > 0) this.showJobs.set(w.ids[s], job);
+    if (state === 'dead') w.ids[s] = 0; // nur die Leiche (per Sterbe-Ereignis aus dem Skript) bleibt
+    this.commitTick(0);
+  }
+
+  /** Weltposition einer Rasterzelle der Prüfszene (Spalte nach Bildschirm-rechts, Zeile zur Kamera) */
+  gridPos(col: number, row: number): { x: number; y: number } {
+    const g = this.showcaseGrid;
+    const u = (col - (g.cols - 1) / 2) * g.spacing;
+    const v = (row - 1.5) * g.rowSpacing;
+    const k = Math.SQRT1_2;
+    return { x: this.cx + (u + v) * k, y: this.cy + (v - u) * k };
   }
 
   /** Prüfszene: alle Gebäudetypen im Raster, dazu Mauerformen */
@@ -558,6 +619,11 @@ export class BenchWorld {
   }
 }
 
+/** Zusätzliche Prüfspalten: Bauern in den verschiedenen Berufen (Beruf folgt aus Ware/Teilzustand) */
+function professionEntries(): ShowcaseEntry[] {
+  return JOB_NAMES.map((label, job) => ({ type: U.Peasant, label, job }));
+}
+
 /** Einstieg: ersetzt das normale Spiel durch die Benchmark-Szene */
 export function startBench(): void {
   const q = new URLSearchParams(location.search);
@@ -582,14 +648,17 @@ export function startBench(): void {
   }
   const showcase = q.get('showcase');
   const bw = new BenchWorld(showcase ? 0 : total, seed, !!showcase);
-  if (showcase === 'units') bw.showcaseUnits();
+  if (q.get('face')) bw.showFace = Number(q.get('face'));
+  if (showcase === 'units') bw.showcaseUnits(q.get('prof') === '1' ? professionEntries() : []);
   else if (showcase === 'buildings') bw.showcaseBuildings();
+  else if (showcase === 'single') bw.showcaseSingle(Number(q.get('type') ?? 8), q.get('state') ?? 'stand', Number(q.get('job') ?? 0), Number(q.get('team') ?? 0), Number(q.get('carry') ?? 0));
   const world = bw.w;
   const entities = new EntityRenderer(world);
   gs.root.add(entities.group);
   gs.setMap(world.map);
   gs.decor?.setOccupancy(world.bldAt, world.buildings);
   entities.onBuildingsChanged = () => gs.decor?.markDirty();
+  for (const [id, j] of bw.showJobs) entities.debugJobs.set(id, j);
   gs.onGfx = (qc, sh) => entities.applyQuality(qc, sh);
   gs.applyGfx({ quality, shadows: q.get('shadows') !== '0' });
   entities.applyQuality(gs.qcfg, gs.gfx.shadows && gs.qcfg.shadows);
@@ -613,6 +682,19 @@ export function startBench(): void {
   };
   setCamera(camX, camY, camDist);
 
+  // &labels=1: Beschriftung der Prüfszene (Einheitennamen über der ersten Reihe)
+  const labelEls: HTMLDivElement[] = [];
+  if (q.get('labels') === '1') {
+    for (const l of bw.labels) {
+      const el = document.createElement('div');
+      el.textContent = l.text;
+      el.style.cssText = 'position:fixed;transform:translate(-50%,-100%);padding:1px 4px;background:rgba(20,16,12,0.7);color:#f3e8c8;font:10px/1.3 sans-serif;border-radius:3px;pointer-events:none;z-index:19;white-space:nowrap';
+      app.appendChild(el);
+      labelEls.push(el);
+    }
+  }
+  const still = q.get('still') === '1';
+  const projV = new THREE.Vector3();
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;left:8px;top:8px;padding:6px 10px;background:rgba(20,16,12,0.78);color:#f3e8c8;font:12px/1.5 monospace;border-radius:6px;pointer-events:none;z-index:20;white-space:pre';
   app.appendChild(overlay);
@@ -674,7 +756,9 @@ export function startBench(): void {
     world.buildingsDirty = true;
     world.events.push({ e: 'fx', k: def.wood ? 'collapseWood' : 'collapse', x: b.x + b.w / 2, y: b.y + b.h / 2, z: def.height });
   };
-  window.__bench = { ready: true, done: false, result, scene: gs, entities, world, setCamera, destroy, selected, ui: ctl };
+  let fixedT: number | null = null;
+  let frameCount = 0;
+  window.__bench = { ready: true, done: false, result, scene: gs, entities, world, setCamera, destroy, selected, ui: ctl, setTime: (t) => (fixedT = t), frameNo: () => frameCount };
 
   const loop = (nowMs: number): void => {
     const dtReal = (nowMs - last) / 1000;
@@ -696,10 +780,23 @@ export function startBench(): void {
     }
     if (showcase) world.lastSnapMs = performance.now();
     if (tickAcc > 1.2) tickAcc = 0;
-    const nowS = nowMs / 1000;
+    const nowS = fixedT ?? nowMs / 1000;
+    frameCount++;
     // Kamera: leichter Schwenk, damit Schatten- und Dekor-Updates mitlaufen
     const t = (nowMs - begin) / 1000;
-    gs.cam.lookAt(camX + Math.sin(t * 0.35) * 5, camY + Math.cos(t * 0.27) * 2);
+    if (still) gs.cam.lookAt(camX, camY);
+    else gs.cam.lookAt(camX + Math.sin(t * 0.35) * 5, camY + Math.cos(t * 0.27) * 2);
+    if (labelEls.length) {
+      gs.cam.camera.updateMatrixWorld();
+      bw.labels.forEach((l, i) => {
+        projV.set(l.x, 0.0, l.y).project(gs.cam.camera);
+        const el = labelEls[i];
+        const vis = projV.z < 1 && Math.abs(projV.x) < 1.05 && Math.abs(projV.y) < 1.05;
+        el.style.display = vis ? '' : 'none';
+        el.style.left = `${((projV.x + 1) / 2) * innerWidth}px`;
+        el.style.top = `${((1 - projV.y) / 2) * innerHeight}px`;
+      });
+    }
     const alpha = (performance.now() - world.lastSnapMs) / 100;
     const tU0 = performance.now();
     entities.consumeEvents();

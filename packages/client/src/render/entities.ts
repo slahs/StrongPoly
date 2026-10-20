@@ -1,13 +1,14 @@
 import * as THREE from 'three';
 import { BUILDINGS, BT, BuildingDef, ClientWorld, PAL, PLAYER_COLORS, PROJ, U, UNITS, UNIT_TYPES, BUILDING_TYPES, BF, SLOT_MASK } from '@strongpoly/shared';
 import type { ClientBuilding } from '@strongpoly/shared';
+import { WorkerPhase } from '@strongpoly/shared';
 import { FxSystem, BillboardLayer } from './fx';
 import { TypeMesh, teamTable } from './instanced';
 import { AF, GFX } from './materials';
 import { buildBuildingModel, wallParts, WALL_JOIN, WALL_TYPES } from './models_buildings';
 import { arrowGeo, flameGeo, foundationGeo, rubbleGeo, scaffoldGeo, stoneGeo } from './models_misc';
 import {
-  buildCargoModel,
+  buildCargoAll,
   buildUnitModel,
   CargoKind,
   CARGO_KINDS,
@@ -20,8 +21,11 @@ import {
   UNIT_WALK_W,
 } from './models_units';
 import { ModelBuilder } from './builder';
-import { QualityCfg, qualityOf } from './quality';
+import { QualityCfg, qualityOf, QUALITY } from './quality';
 import { UnitMotion } from './motion';
+import { unitDepthMaterial, unitMaterial } from './unit_shader';
+import { JOB, JOB_OF_BUILDING, resolveJob } from './unit_jobs';
+import { LOD_HYST, LOD_NEAR_DIST, UnitDetail, unitVariant, UnitVariant, VIS } from './units_style';
 import { groundYAt, RES_COLORS, tileY } from './util';
 import { EMITTERS } from './work_fx';
 
@@ -60,6 +64,8 @@ export interface RenderOpts {
 }
 
 interface Corpse {
+  id: number;
+  job: number;
   type: number;
   x: number;
   y: number;
@@ -121,7 +127,8 @@ export class EntityRenderer {
   private unitMeshes: (TypeMesh | null)[] = new Array(UNIT_TYPES).fill(null);
   private bldMeshes: (TypeMesh | null)[] = new Array(BUILDING_TYPES).fill(null);
   private wallMeshes = new Map<string, TypeMesh>();
-  private cargoMeshes = new Map<CargoKind, TypeMesh>();
+  /** alle getragenen Waren in EINEM Mesh (Form je Instanz über Sichtbarkeits-Bits) */
+  private cargo: TypeMesh;
   private foundation: TypeMesh;
   private scaffold: TypeMesh;
   private rubbleStone: TypeMesh;
@@ -148,6 +155,16 @@ export class EntityRenderer {
   readonly motion = new UnitMotion();
   private lastNowU = 0;
   private seenId: Int32Array = new Int32Array(8192);
+  /** Figuren: Detailstufe (aus der Grafikstufe), Nah/Fern-Auswahl, Beruf-Merker und Variation je Slot */
+  private detail: UnitDetail = 1;
+  /** Prüfhilfe: erzwungene Berufe (Einheiten-ID → Beruf), z. B. in der Prüfszene `?bench&showcase=units&prof=1` */
+  readonly debugJobs = new Map<number, number>();
+  private lodS: Uint8Array = new Uint8Array(8192);
+  private jobS: Uint8Array = new Uint8Array(8192);
+  private jobId: Int32Array = new Int32Array(8192);
+  private varId: Int32Array = new Int32Array(8192);
+  private varJob: Uint8Array = new Uint8Array(8192);
+  private vars: (UnitVariant | null)[] = new Array(8192).fill(null);
   private shadows = true;
   private q: QualityCfg = qualityOf('medium');
   private unitShadows = true;
@@ -205,7 +222,7 @@ export class EntityRenderer {
     }
     this.hpFg.renderOrder = 11;
 
-    for (const k of CARGO_KINDS) this.cargoMeshes.set(k, new TypeMesh(buildCargoModel(k).merged, this.group, { anim: true, shadow: false, cap: 64 }, TEAM));
+    this.cargo = new TypeMesh(buildCargoAll().merged, this.group, { anim: true, shadow: false, cap: 128, vari: true, material: unitMaterial(), depthMaterial: unitDepthMaterial() }, TEAM);
 
     this.arrows = new TypeMesh(arrowGeo('arrow'), this.group, { anim: false, shadow: false, cap: 512 }, TEAM);
     this.bolts = new TypeMesh(arrowGeo('bolt'), this.group, { anim: false, shadow: false, cap: 128 }, TEAM);
@@ -272,11 +289,20 @@ export class EntityRenderer {
   /** Grafikstufe anwenden (Schatten, Partikelobergrenzen, Blob-Schatten) */
   applyQuality(q: QualityCfg, shadows = this.shadows): void {
     const reFx = this.q !== q;
+    const det: UnitDetail = q === QUALITY.low ? 0 : q === QUALITY.high ? 2 : 1;
+    if (det !== this.detail) {
+      // Figurenmodelle in anderer Detailstufe neu bauen (lazy in unitMesh)
+      this.detail = det;
+      for (let i = 0; i < this.unitMeshes.length; i++) {
+        this.unitMeshes[i]?.dispose();
+        this.unitMeshes[i] = null;
+      }
+    }
     this.q = q;
     this.shadows = shadows;
     this.unitShadows = shadows && q.shadowUnits;
     for (const m of this.unitMeshes) m?.setShadows(this.unitShadows);
-    for (const m of this.cargoMeshes.values()) m.setShadows(false);
+    this.cargo.setShadows(false);
     for (const m of this.bldMeshes) m?.setShadows(shadows);
     for (const m of this.wallMeshes.values()) m.setShadows(shadows);
     this.scaffold.setShadows(shadows);
@@ -309,7 +335,7 @@ export class EntityRenderer {
   private unitMesh(t: number): TypeMesh {
     let m = this.unitMeshes[t];
     if (!m) {
-      m = new TypeMesh(buildUnitModel(t).merged, this.group, { anim: true, shadow: this.unitShadows, cap: t === U.Peasant ? 512 : 128 }, TEAM);
+      m = new TypeMesh(buildUnitModel(t, this.detail).merged, this.group, { anim: true, shadow: this.unitShadows, cap: t === U.Peasant ? 512 : 128, vari: true, material: unitMaterial(), depthMaterial: unitDepthMaterial() }, TEAM);
       this.unitMeshes[t] = m;
     }
     return m;
@@ -336,8 +362,93 @@ export class EntityRenderer {
     return m;
   }
 
-  private cargoMesh(k: CargoKind): TypeMesh {
-    return this.cargoMeshes.get(k)!;
+  // ------------------------------------------------------------------ Figuren: Beruf, Variation, Nah/Fern
+  private jobOfId(id: number): number {
+    const s = id & SLOT_MASK;
+    return this.jobId[s] === id ? this.jobS[s] : 0;
+  }
+
+  /** Beruf eines Bauern aus Arbeitsplatz, Teilzustand und getragener Ware (nur Darstellung; wird je Einheit gemerkt) */
+  private jobFor(s: number, id: number, x: number, y: number, owner: number, sub: number, carry: number, w: ClientWorld): number {
+    if (this.jobId[s] !== id) {
+      this.jobId[s] = id;
+      this.jobS[s] = JOB.None;
+    }
+    if (this.debugJobs.size) {
+      const dj = this.debugJobs.get(id);
+      if (dj !== undefined) return dj;
+    }
+    const prev = this.jobS[s];
+    let near = -1;
+    let roam = -1;
+    const working = sub === WorkerPhase.Working || sub === WorkerPhase.WaitWork;
+    if (working) near = this.workplaceNear(w, x, y, owner);
+    else if (prev === JOB.None && (sub === WorkerPhase.Search || sub === WorkerPhase.ToRes || sub === WorkerPhase.Gather)) roam = this.roamPostNear(w, x, y, owner);
+    const r = resolveJob({ prev, sub, carry, nearBuilding: near, roamBuilding: roam });
+    this.jobS[s] = r.keep;
+    return r.show;
+  }
+
+  /** Typ des Arbeitsplatz-Gebäudes direkt neben (x,y), -1 wenn keines */
+  private workplaceNear(w: ClientWorld, x: number, y: number, owner: number): number {
+    const tx = Math.floor(x);
+    const ty = Math.floor(y);
+    const m = w.map;
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++) {
+        const px = tx + dx;
+        const py = ty + dy;
+        if (px < 0 || py < 0 || px >= m.w || py >= m.h) continue;
+        const bi = w.bldAt[m.idx(px, py)];
+        if (!bi) continue;
+        const b = w.buildings.get(bi);
+        if (b && b.o === owner && JOB_OF_BUILDING[b.t] >= 0) return b.t;
+      }
+    return -1;
+  }
+
+  /** nächster Holzfäller-/Jägerposten des Besitzers im Umkreis (für Sammler im Freien) */
+  private roamPostNear(w: ClientWorld, x: number, y: number, owner: number): number {
+    let best = -1;
+    let bd = 20 * 20;
+    for (const b of w.buildings.values()) {
+      if (b.o !== owner || (b.t !== BT.Woodcutter && b.t !== BT.HunterPost)) continue;
+      const d = (b.x + b.w / 2 - x) ** 2 + (b.y + b.h / 2 - y) ** 2;
+      if (d < bd) {
+        bd = d;
+        best = b.t;
+      }
+    }
+    return best;
+  }
+
+  /** Variation der Einheit im Slot (zwischengespeichert, solange ID und Beruf gleich bleiben) */
+  private variantFor(s: number, id: number, type: number, job: number): UnitVariant {
+    let v = this.vars[s];
+    if (!v || this.varId[s] !== id || this.varJob[s] !== job) {
+      v = unitVariant(type, id, job);
+      this.vars[s] = v;
+      this.varId[s] = id;
+      this.varJob[s] = job;
+    }
+    return v;
+  }
+
+  /** Sichtbarkeits-Bits für Nah-/Fern-Modell (mit Hysterese an der Grenze) */
+  private visMask(s: number, x: number, y: number, z: number, cam: THREE.Vector3 | null): number {
+    if (this.detail === 0) return VIS.Far;
+    const T = LOD_NEAR_DIST[this.detail];
+    let near = this.lodS[s] === 1;
+    if (cam) {
+      const dx = x - cam.x;
+      const dy = y - cam.y;
+      const dz = z - cam.z;
+      const d2 = dx * dx + dy * dy + dz * dz;
+      if (near) near = d2 < (T + LOD_HYST) * (T + LOD_HYST);
+      else near = d2 < (T - LOD_HYST) * (T - LOD_HYST);
+    } else near = true;
+    this.lodS[s] = near ? 1 : 0;
+    return near ? VIS.Near | (this.detail === 2 ? VIS.Detail : 0) : VIS.Far;
   }
 
   private visibleAt(x: number, y: number): boolean {
@@ -367,12 +478,12 @@ export class EntityRenderer {
       const gy = tileY(w, Math.floor(d.x), Math.floor(d.y));
       if (UNIT_CORPSE[d.type] && d.type !== U.Ox) {
         if (this.corpses.length >= this.q.corpses) this.corpses.shift();
-        this.corpses.push({ type: d.type, x: d.x, y: d.y, face: d.face, owner: d.owner, t0: now, phase: Math.random() });
+        this.corpses.push({ id: d.id, job: this.jobOfId(d.id), type: d.type, x: d.x, y: d.y, face: d.face, owner: d.owner, t0: now, phase: Math.random() });
         if (d.type !== U.Peasant) this.fx.bloodAt(d.x, gy, d.y);
         this.fx.effect('dust', d.x, d.y, gy + 0.1);
       } else if (d.type === U.Ox) {
         if (this.corpses.length >= this.q.corpses) this.corpses.shift();
-        this.corpses.push({ type: d.type, x: d.x, y: d.y, face: d.face, owner: d.owner, t0: now, phase: Math.random() });
+        this.corpses.push({ id: d.id, job: this.jobOfId(d.id), type: d.type, x: d.x, y: d.y, face: d.face, owner: d.owner, t0: now, phase: Math.random() });
       } else {
         // Belagerungsgerät zerfällt in Splitter
         this.fx.effect('collapseWood', d.x, d.y, gy + 0.4);
@@ -747,7 +858,7 @@ export class EntityRenderer {
   private updateUnits(dt: number, o: RenderOpts): void {
     const w = this.world;
     for (const m of this.unitMeshes) m?.begin();
-    for (const m of this.cargoMeshes.values()) m.begin();
+    this.cargo.begin();
     this.motion.update(w, { tickF: o.tickF, alpha: o.alpha, dt: o.motionDt ?? dt, paused: !!o.paused, walkW: UNIT_WALK_W, legacy: o.legacyMotion });
     const mo = this.motion;
     // Shader-Zeit dieses Frames (GameScene.render setzt sie danach auf now − t0)
@@ -778,6 +889,7 @@ export class EntityRenderer {
     const yS = this.yS;
     const seen = this.seenId;
     const yk = Math.min(1, dt * 14);
+    const camP = o.camera ? o.camera.position : null;
     let drawn = 0;
     for (let s = 0; s < w.top; s++) {
       const id = ids[s];
@@ -823,6 +935,10 @@ export class EntityRenderer {
       if (mo.gaitDriven && mo.walk[s] && !(af & (AF.Melee | AF.Shoot | AF.Work))) phase = (mo.gait[s] - uT * UNIT_WALK_W[type]) / PI2;
       tm.push(x, ny, y, face, sc, sc, owner, phase, af, UNIT_WALK_W[type], af & AF.Work ? 1.1 : UNIT_CYCLE[type]);
       if (useBlob) blob.push(x, ny + 0.025, y, Math.max(0.5, def.radius * 2.3) * sc, 0, 0, 0, SIEGE[type] ? 0.32 : 0.3);
+      // Figur: Beruf (Bauern), Nah/Fern-Modell, Variation (Haut, Haar, Stoffe, Größe) – ein Mesh je Typ, keine Extra-Draw-Calls
+      const job = type === U.Peasant ? this.jobFor(s, id, x, y, owner, ax >> 4, carryA[s], w) : 0;
+      const vr = this.variantFor(s, id, type, job);
+      tm.styleLast(vr.pack, vr.jitter, this.visMask(s, x, ny, y, camP) | vr.bits, vr.jobBit, vr.kx, vr.ky);
       const sel = o.selected.has(id);
       if (sel && rings < 2048) {
         const r = Math.max(1, def.radius * 2.3) * (1 + 0.035 * Math.sin(ptr * 5 + s));
@@ -863,8 +979,9 @@ export class EntityRenderer {
       if (carry > 0) {
         const kind = CARGO_OF_RES[carry - 1];
         if (kind) {
-          const cm = this.cargoMesh(kind);
+          const cm = this.cargo;
           cm.push(x, ny, y, face, sc, sc, 0, phase, af, UNIT_WALK_W[type], 1.1);
+          cm.styleLast(0, 1, 0, 1 << CARGO_KINDS.indexOf(kind), vr.kx, vr.ky);
           const c = RES_COLORS[carry - 1] ?? 0xffffff;
           cm.tintLast(srgb(((c >> 16) & 255) / 255), srgb(((c >> 8) & 255) / 255), srgb((c & 255) / 255));
         }
@@ -909,7 +1026,7 @@ export class EntityRenderer {
     }
 
     for (const m of this.unitMeshes) m?.end();
-    for (const m of this.cargoMeshes.values()) m.end();
+    this.cargo.end();
     this.ringMesh.count = rings;
     this.ringMesh.instanceMatrix.needsUpdate = true;
     (this.ringMesh.instanceColor as THREE.InstancedBufferAttribute).needsUpdate = true;
@@ -973,7 +1090,10 @@ export class EntityRenderer {
       }
       const gy = tileY(w, Math.floor(c.x), Math.floor(c.y));
       const sc = UNIT_SCALE[c.type];
-      this.unitMesh(c.type).push(c.x, gy, c.y, c.face, sc, sc, c.owner, c.phase, AF.Dead, UNIT_SIDEWAYS[c.type] ? 1 : 0, age);
+      const cm = this.unitMesh(c.type);
+      cm.push(c.x, gy, c.y, c.face, sc, sc, c.owner, c.phase, AF.Dead, UNIT_SIDEWAYS[c.type] ? 1 : 0, age);
+      const vr = unitVariant(c.type, c.id, c.type === U.Peasant ? c.job : 0);
+      cm.styleLast(vr.pack, vr.jitter, (this.detail > 0 ? VIS.Near | (this.detail === 2 ? VIS.Detail : 0) : VIS.Far) | vr.bits, vr.jobBit, vr.kx, vr.ky);
       n++;
     }
     this.stats.corpses = n;

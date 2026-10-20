@@ -20,6 +20,11 @@ export interface TypeMeshOpts {
   shadow: boolean;
   /** Anfangskapazität */
   cap: number;
+  /** zusätzliches Instanzattribut iVar (vec4: Palette, Helligkeit, Sichtbarkeits-Bits, Auswahl) – für Figuren */
+  vari?: boolean;
+  /** eigenes Material/Schattenmaterial statt der gemeinsamen Animationsmaterialien (Figuren) */
+  material?: THREE.Material;
+  depthMaterial?: THREE.Material;
 }
 
 /**
@@ -36,6 +41,8 @@ export class TypeMesh {
   private mat: Float32Array;
   private col: Float32Array;
   private ani: Float32Array | null = null;
+  private vr: THREE.InstancedBufferAttribute | null = null;
+  private vari: Float32Array | null = null;
 
   constructor(
     private geo: THREE.BufferGeometry,
@@ -49,10 +56,11 @@ export class TypeMesh {
     this.mat = this.mesh.instanceMatrix.array as Float32Array;
     this.col = (this.mesh.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
     this.ani = this.an ? (this.an.array as Float32Array) : null;
+    this.vari = this.vr ? (this.vr.array as Float32Array) : null;
   }
 
   private make(): THREE.InstancedMesh {
-    const m = new THREE.InstancedMesh(this.geo, this.opts.anim ? animMaterial() : staticMaterial(), this.cap);
+    const m = new THREE.InstancedMesh(this.geo, this.opts.material ?? (this.opts.anim ? animMaterial() : staticMaterial()), this.cap);
     m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     m.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(this.cap * 3), 3);
     m.instanceColor.setUsage(THREE.DynamicDrawUsage);
@@ -60,7 +68,12 @@ export class TypeMesh {
       this.an = new THREE.InstancedBufferAttribute(new Float32Array(this.cap * 4), 4);
       this.an.setUsage(THREE.DynamicDrawUsage);
       this.geo.setAttribute('iAnim', this.an);
-      m.customDepthMaterial = animDepthMaterial();
+      m.customDepthMaterial = (this.opts.depthMaterial as THREE.MeshDepthMaterial | undefined) ?? animDepthMaterial();
+    }
+    if (this.opts.vari) {
+      this.vr = new THREE.InstancedBufferAttribute(new Float32Array(this.cap * 4), 4);
+      this.vr.setUsage(THREE.DynamicDrawUsage);
+      this.geo.setAttribute('iVar', this.vr);
     }
     m.frustumCulled = false;
     m.castShadow = this.shadow;
@@ -82,6 +95,7 @@ export class TypeMesh {
     this.mat = this.mesh.instanceMatrix.array as Float32Array;
     this.col = (this.mesh.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
     this.ani = this.an ? (this.an.array as Float32Array) : null;
+    this.vari = this.vr ? (this.vr.array as Float32Array) : null;
   }
 
   setShadows(on: boolean): void {
@@ -104,11 +118,13 @@ export class TypeMesh {
       const oldMat = this.mat.slice(0, this.count * 16);
       const oldCol = this.col.slice(0, this.count * 3);
       const oldAni = this.ani ? this.ani.slice(0, this.count * 4) : null;
+      const oldVar = this.vari ? this.vari.slice(0, this.count * 4) : null;
       const n = this.count;
       this.ensure(this.cap * 2);
       this.mat.set(oldMat);
       this.col.set(oldCol);
       if (oldAni && this.ani) this.ani.set(oldAni);
+      if (oldVar && this.vari) this.vari.set(oldVar);
       this.count = n;
     }
     const c = Math.cos(rot) * sx;
@@ -132,6 +148,35 @@ export class TypeMesh {
       this.ani[q + 3] = a3;
     }
     this.count++;
+  }
+
+  /**
+   * Figuren: Variation der zuletzt geschriebenen Instanz. v0 = gepackte Palette, v1 = Helligkeit, v2 = Sichtbarkeits-Bits,
+   * v3 = Auswahl-ID; kx/ky skalieren die Instanz (Breite/Höhe) zusätzlich.
+   */
+  styleLast(v0: number, v1: number, v2: number, v3: number, kx = 1, ky = 1): void {
+    const i = this.count - 1;
+    if (i < 0) return;
+    if (this.vari) {
+      const q = i * 4;
+      this.vari[q] = v0;
+      this.vari[q + 1] = v1;
+      this.vari[q + 2] = v2;
+      this.vari[q + 3] = v3;
+    }
+    if (kx !== 1 || ky !== 1) {
+      const a = this.mat;
+      const o = i * 16;
+      a[o] *= kx; a[o + 2] *= kx; a[o + 8] *= kx; a[o + 10] *= kx;
+      a[o + 5] *= ky;
+    }
+  }
+
+  /** Gibt das Mesh frei (Qualitätswechsel) */
+  dispose(): void {
+    this.parent.remove(this.mesh);
+    this.mesh.dispose();
+    this.geo.dispose();
   }
 
   /** Eigene Farbe statt Teamfarbe (Waren, Trümmer) */
@@ -158,6 +203,11 @@ export class TypeMesh {
       this.an.clearUpdateRanges();
       this.an.addUpdateRange(0, n * 4);
       this.an.needsUpdate = true;
+    }
+    if (this.vr) {
+      this.vr.clearUpdateRanges();
+      this.vr.addUpdateRange(0, n * 4);
+      this.vr.needsUpdate = true;
     }
   }
 }
