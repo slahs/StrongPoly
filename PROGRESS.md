@@ -5,8 +5,8 @@ Gate nach jedem Meilenstein: `pnpm test`, `pnpm -r typecheck`, `pnpm build`.
 Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 
 ## 1. Bugs
-- [ ] 1.1 KI hortet Gold, rekrutiert nicht (2v3 s14, 2v7 s29, 6v7 s6)
-- [ ] 1.2 Restliche Patts (17 Timeouts), Ziel ≥ 90 % Keep-Fall
+- [x] 1.1 KI hortet Gold, rekrutiert nicht: 2v3 s14 (Sieg nach 7,9 Min) und 2v7 s29 (Sieg nach 70 Min) enden, 6v7 s6 bleibt Patt (Ursache: Holzfäller 45 Felder vom Lager entfernt + Bogner verbrauchen das Holz, Mathilde hat weder Eisen noch Markt – siehe „Gefundene Bugs“)
+- [x] 1.2 Restliche Patts: Endlauf auf Stand `feccce3` (= HEAD-KI): **98/108 = 90,7 % Keep-Fall**, Median 43,8 min, längste Partie 83,6 min; je Profil mindestens 20/24 (83 %)
 - [x] 1.3 Unbrauchbare Waffen (Werkstätten nur für erreichbare Einheitenkosten)
 - [x] 1.4 Bevölkerungsschaukel (Steuer/Rationen-Hysterese; Rest = Raubzüge)
 - [x] 1.5 Burg mauert sich nicht ein / zerstörte Tore werden neu gebaut (Test)
@@ -15,7 +15,7 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 - [x] 1.8 Docker-Image neu gebaut (Stand b76a3f0-Vorgänger; Build nur mit temporärem Dockerfile + Proxy-CA, Repo-Dockerfile unverändert), Container gestartet: `/healthz` ok, Client wird ausgeliefert, Missionen 1–5 im Browser gegen den Container gestartet ohne Konsolenfehler
 - [x] 1.9 Tutorial-Missionen 1–5 per Skript bis zum Sieg (fertig: test/missions_play.test.ts; Mission 5: Tutorial-KI nutzt keine Angriffsfähigkeiten); Browser: Missionen 1–5 starten und laufen ohne Konsolenfehler (walk.mjs gegen Docker-Container)
 - [x] 1.10 Smoke 3 Seeds (Seed 2 meldete nur kurzzeitig überbaute Einheit, jetzt 30-s-Schwelle) + test/determinism.test.ts
-- [ ] 1.11 Laufend: Bugs aus B–F (siehe unten „Gefundene Bugs“)
+- [x] 1.11 Laufend: Bugs aus B–F (siehe unten „Gefundene Bugs“)
 
 ## 2. Meilenstein B – Menüs und Bedienung
 - [x] Unteres Hauptpanel (Reiter, Unterkategorien, Kontextfeld, Minikarte)
@@ -88,12 +88,15 @@ Entscheidungen und offene Punkte (D):
 - Angebunden (B): Tooltips an Bau-/Truppenleiste/Kontextpanels über `Hud.tipHook`, Platzierungsfehler über `explainPlacementError`
 
 ## Abschluss
-- [ ] Turnier-Endlauf (≥ 90 %, Median)
-- [ ] FPS-Messung dokumentiert
-- [ ] README aktualisiert
-- [ ] Abschlussbericht
+- [x] Turnier-Endlauf: 9 Profile paarweise × 3 Seeds × 90 min = 108 Partien, 98 mit Keep-Fall (90,7 %), Median 43,8 min (Datei `OUT=/home/user/tour/t5.json`, Commit feccce3). Frühere Läufe: Milestone A 72–79 %; nach den Wirtschaftsfixes 91 % (3d5ed3c). Zwei spätere KI-Experimente (Markt bei Goldhortung zuerst; Welle erst bei Überlegenheit) brachten 86 % bzw. 84 % und wurden zurückgenommen (Reverts im Verlauf)
+- [x] FPS-Messung dokumentiert (Abschnitt 4: SwiftShader-Software-GL, 60 FPS auf echter GPU NICHT verifiziert; Draw-Calls 70, JS 3,2 ms)
+- [x] README aktualisiert
+- [x] Abschlussbericht (im Chat)
 
 ## Gefundene Bugs / Erkenntnisse
 (laufend ergänzen)
+- **Patt 6v7 Seed 6 (offen):** Kaiserin Mathilde hortet 1.300 Gold bei Holz ≈ 0: ihre Holzfäller stehen 42–49 Felder vom Lager entfernt (Umgebung baumfrei), die Bogner verbrauchen jedes Stück Holz, Eisen gibt es nicht und der Markt (20 Holz) wird nie bezahlbar. Ein Fix (Markt zuerst, Holzwerkstätten pausieren) löste diesen Fall, senkte das Turnier aber auf 86 % und wurde zurückgenommen.
+- **Restliche 10 Timeouts des Endlaufs:** ebenbürtige Heere, beide Seiten bei ~0 Gold; Angriffe auf intakte Verteidiger verlieren etwa 3:1 (Verteidiger auf Mauern/Türmen), die Wellen lösen sich nacheinander auf. Der Versuch, erst bei Überlegenheit anzugreifen, half nicht (84 %).
+- Browser-Tests (uitest.mjs) hatten bei hoher Rechnerlast Zeitüberschreitungen (500 ms Wartezeit) – Wartezeit auf 1,5 s erhöht.
 - **E (Sound):** `ClientWorld.apply` bekam `proj` (Float32Array) und `tiles` (Int32Array) nach dem msgpack-Weg als `Uint8Array` (Rohbytes) – Geschosse und Tile-Änderungen im Client-Spiegel waren Datenmüll. Fix in `shared/src/net/world.ts` (`asFloat32`/`asInt32`), Regressionstest in `shared/test/snapshot.test.ts`.
 - **E (Sound):** Hotkey `M` war mit Extreme-Fähigkeit 4 belegt; Fähigkeit 4 liegt jetzt standardmäßig auf `J`, `M` = Ton stumm (`toggleMute`).
