@@ -24,6 +24,7 @@ export interface TypeMeshOpts {
   vari?: boolean;
   /** eigenes Material/Schattenmaterial statt der gemeinsamen Animationsmaterialien (Figuren) */
   material?: THREE.Material;
+  /** eigenes Schattenmaterial (nur mit `anim`); sonst die gemeinsame Animationstiefe */
   depthMaterial?: THREE.Material;
 }
 
@@ -98,6 +99,13 @@ export class TypeMesh {
     this.vari = this.vr ? (this.vr.array as Float32Array) : null;
   }
 
+  /** Mesh entfernen und GPU-Puffer samt Geometrie freigeben */
+  dispose(): void {
+    this.parent.remove(this.mesh);
+    this.mesh.dispose();
+    this.geo.dispose();
+  }
+
   setShadows(on: boolean): void {
     this.shadow = on;
     this.mesh.castShadow = on;
@@ -170,13 +178,6 @@ export class TypeMesh {
       a[o] *= kx; a[o + 2] *= kx; a[o + 8] *= kx; a[o + 10] *= kx;
       a[o + 5] *= ky;
     }
-  }
-
-  /** Gibt das Mesh frei (Qualitätswechsel) */
-  dispose(): void {
-    this.parent.remove(this.mesh);
-    this.mesh.dispose();
-    this.geo.dispose();
   }
 
   /** Eigene Farbe statt Teamfarbe (Waren, Trümmer) */

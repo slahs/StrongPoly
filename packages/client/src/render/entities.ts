@@ -5,8 +5,11 @@ import { WorkerPhase } from '@strongpoly/shared';
 import { FxSystem, BillboardLayer } from './fx';
 import { TypeMesh, teamTable } from './instanced';
 import { AF, GFX } from './materials';
-import { buildBuildingModel, wallParts, WALL_JOIN, WALL_TYPES } from './models_buildings';
-import { arrowGeo, flameGeo, foundationGeo, rubbleGeo, scaffoldGeo, stoneGeo } from './models_misc';
+import { buildBuildingModel, buildTurretModel, buildWallModel, ModelDetail, TURRET_BASE_Y, WALL_JOIN, WALL_TYPES } from './models_buildings';
+import { BGFX, buildingLevelOf, buildingMaterial } from './building_materials';
+import { arrowGeo, flameGeo, rubbleGeo, stoneGeo } from './models_misc';
+import { BuildSites } from './build_sites';
+import { buildTicksOf } from './build_config';
 import {
   buildCargoAll,
   buildUnitModel,
@@ -110,10 +113,9 @@ interface EmitSite {
   acc: number;
 }
 
-/** Dauer der Baustufen-Darstellung in Sim-Ticks (10 je Sekunde, rein visuell); 0 = keine (Mauern, Fallen, Lagerfeuer) */
+/** Dauer der Baustufen-Darstellung in Sim-Ticks (10 je Sekunde, rein visuell, aus der zentralen Konfiguration build_config.ts); 0 = keine */
 export function buildTicks(def: BuildingDef): number {
-  if (def.line || def.height < 0.7 || def.id === BT.Campfire) return 0;
-  return Math.round(Math.min(6, 1.2 + Math.sqrt(def.hp) * 0.075) * 10);
+  return buildTicksOf(def);
 }
 
 const ease = (t: number): number => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
@@ -129,8 +131,9 @@ export class EntityRenderer {
   private wallMeshes = new Map<string, TypeMesh>();
   /** alle getragenen Waren in EINEM Mesh (Form je Instanz über Sichtbarkeits-Bits) */
   private cargo: TypeMesh;
-  private foundation: TypeMesh;
-  private scaffold: TypeMesh;
+  /** Baustellen (Fundament, Gerüst, Baumaterial, wachsende Gebäude und Mauern, Abschlusseffekt) – siehe build_sites.ts */
+  private sites: BuildSites;
+  private turretMeshes: (TypeMesh | null)[] = [null, null, null];
   private rubbleStone: TypeMesh;
   private rubbleWood: TypeMesh;
   private ringMesh: THREE.InstancedMesh;
@@ -167,6 +170,8 @@ export class EntityRenderer {
   private vars: (UnitVariant | null)[] = new Array(8192).fill(null);
   private shadows = true;
   private q: QualityCfg = qualityOf('medium');
+  /** Detailstufe der Gebäudemodelle (aus der Grafikstufe, siehe building_materials.ts) */
+  private bDetail: ModelDetail = 2;
   private unitShadows = true;
   private flameT = 0;
   private world: ClientWorld;
@@ -193,8 +198,7 @@ export class EntityRenderer {
     this.group.name = 'entities';
     this.group.add(this.fx.group);
 
-    this.foundation = new TypeMesh(foundationGeo(), this.group, { anim: false, shadow: false, cap: 64 }, TEAM);
-    this.scaffold = new TypeMesh(scaffoldGeo(), this.group, { anim: false, shadow: true, cap: 256 }, TEAM);
+    this.sites = new BuildSites(this.group, this.fx, TEAM);
     this.rubbleStone = new TypeMesh(rubbleGeo(false), this.group, { anim: false, shadow: true, cap: 128 }, TEAM);
     this.rubbleWood = new TypeMesh(rubbleGeo(true), this.group, { anim: false, shadow: true, cap: 128 }, TEAM);
 
@@ -298,6 +302,18 @@ export class EntityRenderer {
         this.unitMeshes[i] = null;
       }
     }
+    const lvl = buildingLevelOf(q);
+    BGFX.uDetail.value = lvl.patterns ? 1 : 0;
+    if (lvl.detail !== this.bDetail) {
+      // andere Modellstufe: Gebäudemeshes verwerfen, sie werden beim nächsten Zeichnen neu aufgebaut
+      this.bDetail = lvl.detail;
+      for (const m of this.bldMeshes) m?.dispose();
+      for (const m of this.wallMeshes.values()) m.dispose();
+      this.bldMeshes.fill(null);
+      this.wallMeshes.clear();
+      for (const m of this.turretMeshes) m?.dispose();
+      this.turretMeshes.fill(null);
+    }
     this.q = q;
     this.shadows = shadows;
     this.unitShadows = shadows && q.shadowUnits;
@@ -305,7 +321,8 @@ export class EntityRenderer {
     this.cargo.setShadows(false);
     for (const m of this.bldMeshes) m?.setShadows(shadows);
     for (const m of this.wallMeshes.values()) m.setShadows(shadows);
-    this.scaffold.setShadows(shadows);
+    this.sites.setQuality(shadows, q.particleScale, lvl.detail);
+    for (const m of this.turretMeshes) m?.setShadows(shadows);
     this.rubbleStone.setShadows(shadows);
     this.rubbleWood.setShadows(shadows);
     this.stones.setShadows(shadows);
@@ -323,6 +340,7 @@ export class EntityRenderer {
       if (m.geometry) m.geometry.dispose();
       if ((o as THREE.InstancedMesh).isInstancedMesh) (o as THREE.InstancedMesh).dispose();
     });
+    this.sites.dispose();
     for (const g of this.edgeCache.values()) g.dispose();
     this.edgeCache.clear();
   }
@@ -344,7 +362,7 @@ export class EntityRenderer {
   private bldMesh(t: number): TypeMesh {
     let m = this.bldMeshes[t];
     if (!m) {
-      m = new TypeMesh(buildBuildingModel(BUILDINGS[t]).merged, this.group, { anim: true, shadow: this.shadows, cap: 64 }, TEAM);
+      m = new TypeMesh(buildBuildingModel(BUILDINGS[t], this.bDetail, true).merged, this.group, { anim: true, shadow: this.shadows, cap: 64, material: buildingMaterial() }, TEAM);
       this.bldMeshes[t] = m;
     }
     return m;
@@ -354,9 +372,7 @@ export class EntityRenderer {
     const key = `${t}:${kind}`;
     let m = this.wallMeshes.get(key);
     if (!m) {
-      const b = new ModelBuilder({ ao: 0.34, aoH: 0.8 });
-      wallParts(b, t, BUILDINGS[t].height, kind, 1);
-      m = new TypeMesh(b.build().merged, this.group, { anim: true, shadow: this.shadows, cap: 256 }, TEAM);
+      m = new TypeMesh(buildWallModel(t, BUILDINGS[t].height, kind, this.bDetail, true).merged, this.group, { anim: true, shadow: this.shadows, cap: 256, material: buildingMaterial() }, TEAM);
       this.wallMeshes.set(key, m);
     }
     return m;
@@ -500,7 +516,10 @@ export class EntityRenderer {
           break;
         }
       }
-      this.building.delete(b.i);
+      const wasBuilding = this.building.delete(b.i);
+      this.sites.forget(b.i);
+      // Abbruch/Rückgängig während der Bauphase: Baustelle verschwindet mit einer Staubwolke
+      if (wasBuilding && !destroyed && this.visibleAt(b.x + b.w / 2, b.y + b.h / 2)) this.sites.abort(b, tileY(w, b.x, b.y));
       if (!destroyed) continue;
       this.collapsing.push({ type: b.t, cx: b.x + b.w / 2, cz: b.y + b.h / 2, y: def.placement === 'water' ? -0.1 : tileY(w, b.x, b.y), rot: b.r ? Math.PI / 2 : 0, t0: now, owner: b.o });
       const life = this.q.particleScale < 0.5 ? 8 : 22;
@@ -566,6 +585,7 @@ export class EntityRenderer {
       // neue Karte/Vollzustand: alles als fertig behandeln
       this.mapRef = w.map;
       this.building.clear();
+      this.sites.reset();
       this.rubble.length = 0;
       this.collapsing.length = 0;
       this.corpses.length = 0;
@@ -603,13 +623,12 @@ export class EntityRenderer {
   private lastSelB = -1;
 
   private rewriteBuildings(dt: number, o: RenderOpts, rebuildLists: boolean): void {
-    void dt;
     const w = this.world;
     const now = o.now;
     for (const m of this.bldMeshes) m?.begin();
     for (const m of this.wallMeshes.values()) m.begin();
-    this.foundation.begin();
-    this.scaffold.begin();
+    this.sites.begin();
+    for (const m of this.turretMeshes) m?.begin();
     this.aoLayer.n = 0;
     const burn: BurnSite[] = [];
     const emits: EmitSite[] = [];
@@ -629,15 +648,15 @@ export class EntityRenderer {
       const cz = b.y + b.h / 2;
       // Bauphase aus dem Platzierungs-Tick (Fundament → Gerüst → fertig); Pause und Spielgeschwindigkeit wirken mit
       let prog = 1;
-      const dur = buildTicks(def);
-      if (b.n > 0 && dur > 0) {
-        const age = w.tick - b.n + Math.min(1, o.alpha);
-        if (age < dur) {
-          prog = Math.max(0, age / dur);
-          this.building.add(b.i);
-        }
+      if (b.n > 0) {
+        prog = this.sites.progress(w, b, o.alpha);
+        if (prog < 1) this.building.add(b.i);
       }
-      if (prog >= 1 && this.building.delete(b.i) && this.visibleAt(cx, cz)) this.fx.effect('built', cx, cz, tileY(w, b.x, b.y) + 0.2);
+      if (prog >= 1 && this.building.delete(b.i)) {
+        // fertig: Abschlusseffekt; Schornsteine, Rauch und Brandstellen werden erst jetzt eingetragen
+        this.bldDirty = true;
+        if (this.visibleAt(cx, cz)) this.sites.finish(b, def, tileY(w, b.x, b.y));
+      }
       if (o.explored && !mine && !o.explored(cx, cz)) continue;
       count++;
       const y = def.placement === 'water' ? -0.1 : tileY(w, b.x, b.y);
@@ -645,28 +664,14 @@ export class EntityRenderer {
       const staffed = b.s > 0;
 
       // Bodenverdunklung unter größeren Gebäuden (weicher Kontaktschatten)
-      if (def.height >= 0.7 && !def.line && b.w + b.h >= 4 && this.aoLayer.n < 1000) {
+      if (prog >= 0.2 && def.height >= 0.7 && !def.line && b.w + b.h >= 4 && this.aoLayer.n < 1000) {
         this.aoLayer.push(cx, y + 0.025, cz, Math.max(b.w, b.h) + 0.9, 0.05, 0.04, 0.03, 0.38);
       }
 
-      // Bauphase: Fundament, Gerüst, wachsendes Gebäude
-      if (prog < 1) {
-        // Fundament: eine Platte je Tile
-        for (let yy = 0; yy < b.h; yy++) for (let xx = 0; xx < b.w; xx++) this.foundation.push(b.x + xx + 0.5, y + 0.01, b.y + yy + 0.5, 0, 1, 1, b.o);
-        const g = prog < 0.22 ? 0 : ease((prog - 0.22) / 0.78);
-        if (g > 0.02) {
-          const sy = 0.08 + 0.92 * g;
-          const h = def.height * sy;
-          this.pushScaffold(b, y, h);
-          const m = this.bldMesh(b.t);
-          m.push(cx, y, cz, b.r ? Math.PI / 2 : 0, 1, sy, b.o, phase, AF.Static, 0, 1);
-        } else if (def.height >= 1.2) this.pushScaffold(b, y, 0.45);
-        continue;
-      }
-
-      // Mauern: Pfosten + Arme zu den vier Nachbarn (nahtlos, Ecken und T-Stücke ergeben sich von selbst)
-      if (WALL_TYPES.includes(b.t)) {
-        let mask = 0;
+      // Bauphase: Fundament, Baumaterial, Gerüst, von unten wachsende Teile (build_sites.ts)
+      const isWall = WALL_TYPES.includes(b.t);
+      let wallMask = 0;
+      if (isWall) {
         for (let k = 0; k < 4; k++) {
           const nx = b.x + dir4[k][0];
           const ny = b.y + dir4[k][1];
@@ -674,31 +679,31 @@ export class EntityRenderer {
           const nid = bld[ny * mw + nx];
           if (!nid) continue;
           const nb = w.buildings.get(nid);
-          if (nb && WALL_JOIN.has(nb.t)) mask |= 1 << k;
+          if (nb && WALL_JOIN.has(nb.t)) wallMask |= 1 << k;
         }
+      }
+      if (prog < 1) {
+        const vis = !o.camera || this.inView(cx, y + 1, cz, 4 + Math.max(b.w, b.h));
+        if (isWall) this.sites.drawWall(b, def, y, wallMask, prog, phase, dt, vis);
+        else {
+          const so = this.stairOrient(b, dir4, bld, mw, mh);
+          this.sites.draw(b, def, y, so.rot, so.sy, prog, phase, dt, vis);
+        }
+        continue;
+      }
+
+      // Mauern: Pfosten + Arme zu den vier Nachbarn (nahtlos, Ecken und T-Stücke ergeben sich von selbst)
+      if (isWall) {
+        const mask = wallMask;
         const post = this.wallMesh(b.t, mask === 0 ? 'stub' : 'post');
         post.push(cx, y, cz, 0, 1, 1, b.o, phase, AF.Static, 0, 1);
         for (let k = 0; k < 4; k++) if (mask & (1 << k)) this.wallMesh(b.t, 'arm').push(cx, y, cz, armRot[k], 1, 1, b.o, phase, AF.Static, 0, 1);
         continue;
       }
 
-      let rot = b.r ? Math.PI / 2 : 0;
-      let sy = 1;
-      if (b.t === BT.Stairs) {
-        // Treppe schaut zur angrenzenden Mauer und steigt bis zur Mauerkrone
-        for (const [dx, dz] of dir4) {
-          const nx = b.x + dx;
-          const ny = b.y + dz;
-          if (nx < 0 || ny < 0 || nx >= mw || ny >= mh) continue;
-          const nid = bld[ny * mw + nx];
-          const nb = nid ? w.buildings.get(nid) : null;
-          if (nb && nb.t !== BT.Stairs && BUILDINGS[nb.t].wallTop) {
-            rot = Math.atan2(dx, dz);
-            sy = BUILDINGS[nb.t].height;
-            break;
-          }
-        }
-      }
+      const so = this.stairOrient(b, dir4, bld, mw, mh);
+      const rot = so.rot;
+      const sy = so.sy;
       let flags = AF.Static;
       const a2 = 0;
       let a3 = 1.2;
@@ -712,6 +717,7 @@ export class EntityRenderer {
         a3 = p;
       }
       this.bldMesh(b.t).push(cx, y, cz, rot, 1, sy, b.o, phase, flags, a2, a3);
+      if (b.u > 0 && b.t === BT.TowerRound) this.pushTurret(b, y, cx, cz, o, phase);
 
       if (rebuildLists) {
         if (b.f & BF.Burning) {
@@ -751,8 +757,8 @@ export class EntityRenderer {
     }
     for (const m of this.bldMeshes) m?.end();
     for (const m of this.wallMeshes.values()) m.end();
-    this.foundation.end();
-    this.scaffold.end();
+    this.sites.end();
+    for (const m of this.turretMeshes) m?.end();
     this.aoLayer.commit();
     this.stats.buildings = count;
     if (rebuildLists) {
@@ -762,15 +768,49 @@ export class EntityRenderer {
     }
   }
 
-  /** Gerüst: Pfosten + Querlatten rund um die Grundfläche, Höhe h */
-  private pushScaffold(b: ClientBuilding, y: number, h: number): void {
-    const x0 = b.x;
-    const z0 = b.y;
-    const sc = this.scaffold;
-    for (let i = 0; i < b.w; i++) sc.push(x0 + i, y, z0, 0, 1, h, 0);
-    for (let j = 0; j < b.h; j++) sc.push(x0 + b.w, y, z0 + j, -Math.PI / 2, 1, h, 0);
-    for (let i = 0; i < b.w; i++) sc.push(x0 + b.w - i, y, z0 + b.h, Math.PI, 1, h, 0);
-    for (let j = 0; j < b.h; j++) sc.push(x0, y, z0 + b.h - j, Math.PI / 2, 1, h, 0);
+  /** Drehung und Höhenmaß: Treppen schauen zur angrenzenden Mauer und steigen bis zur Mauerkrone */
+  private stairOrient(b: ClientBuilding, dir4: [number, number][], bld: Int32Array, mw: number, mh: number): { rot: number; sy: number } {
+    let rot = b.r ? Math.PI / 2 : 0;
+    let sy = 1;
+    if (b.t === BT.Stairs) {
+      for (const [dx, dz] of dir4) {
+        const nx = b.x + dx;
+        const ny = b.y + dz;
+        if (nx < 0 || ny < 0 || nx >= mw || ny >= mh) continue;
+        const nid = bld[ny * mw + nx];
+        const nb = nid ? this.world.buildings.get(nid) : null;
+        if (nb && nb.t !== BT.Stairs && BUILDINGS[nb.t].wallTop) {
+          rot = Math.atan2(dx, dz);
+          sy = BUILDINGS[nb.t].height;
+          break;
+        }
+      }
+    }
+    return { rot, sy };
+  }
+
+  /** Geschütz auf einem Großen Turm: zielt auf den nächsten gegnerischen Bergfried und schwenkt leicht */
+  private pushTurret(b: ClientBuilding, y: number, cx: number, cz: number, o: RenderOpts, phase: number): void {
+    const kind = b.u === 2 ? 2 : 1;
+    let m = this.turretMeshes[kind];
+    if (!m) {
+      m = new TypeMesh(buildTurretModel(kind === 1 ? 'ballista' : 'mangonel', this.bDetail, true).merged, this.group, { anim: true, shadow: this.shadows, cap: 16, material: buildingMaterial() }, TEAM);
+      this.turretMeshes[kind] = m;
+      m.begin();
+    }
+    let best = 1e9;
+    let ang = 0;
+    for (const p of this.world.players) {
+      if (!p.alive || p.id === b.o || o.teamOfPlayer[p.id] === o.teamOfPlayer[b.o]) continue;
+      const dx = p.keepX - cx;
+      const dz = p.keepY - cz;
+      const d = dx * dx + dz * dz;
+      if (d < best) {
+        best = d;
+        ang = Math.atan2(dx, dz);
+      }
+    }
+    m.push(cx, y + TURRET_BASE_Y, cz, ang + Math.sin(o.now * 0.35 + b.i) * 0.3, 1, 1, b.o, phase, AF.Static, 0, 1);
   }
 
   private updateRubble(o: RenderOpts): void {
@@ -835,10 +875,11 @@ export class EntityRenderer {
     this.frames.instanceMatrix.needsUpdate = true;
     (this.frames.instanceColor as THREE.InstancedBufferAttribute).needsUpdate = true;
     // Kantenlinien des überfahrenen Gebäudes
-    if (hov && !WALL_TYPES.includes(hov.t) && BUILDINGS[hov.t].height >= 0.7) {
+    // (während der Bauphase keine Kontur des fertigen Gebäudes anzeigen)
+    if (hov && !WALL_TYPES.includes(hov.t) && BUILDINGS[hov.t].height >= 0.7 && !this.building.has(hov.i)) {
       let eg = this.edgeCache.get(hov.t);
       if (!eg) {
-        eg = new THREE.EdgesGeometry(buildBuildingModel(BUILDINGS[hov.t]).merged, 28);
+        eg = new THREE.EdgesGeometry(buildBuildingModel(BUILDINGS[hov.t], 0, true).merged, 28);
         this.edgeCache.set(hov.t, eg);
       }
       if (this.hoverLines.geometry !== eg) this.hoverLines.geometry = eg;
@@ -1234,6 +1275,19 @@ export class EntityRenderer {
             break;
           case 'sparks':
             fx.ember(e.x, e.y - 0.8, e.z);
+            break;
+          case 'anvil':
+            fx.ember(e.x, e.y, e.z);
+            if (Math.random() < 0.5) fx.ember(e.x + (Math.random() - 0.5) * 0.1, e.y, e.z);
+            break;
+          case 'dust':
+            fx.puff(e.x + (Math.random() - 0.5) * 0.3, e.y, e.z + (Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3, 0.2 + Math.random() * 0.2, (Math.random() - 0.5) * 0.3, 1.0 + Math.random() * 0.6, 0.12, 0.5, [0.78, 0.7, 0.55], 0.32, -0.05, 0.9);
+            break;
+          case 'flour':
+            fx.puff(e.x + (Math.random() - 0.5) * 0.3, e.y, e.z + (Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.2, 0.15 + Math.random() * 0.15, 0.1 + Math.random() * 0.2, 1.2, 0.1, 0.4, [0.94, 0.92, 0.86], 0.4, -0.04, 0.9);
+            break;
+          case 'chips':
+            fx.chunk(e.x, e.y, e.z, (Math.random() - 0.5) * 1.1, 1 + Math.random() * 0.9, 0.2 + Math.random() * 0.8, 0.5, 0.04, [0.74, 0.56, 0.32], 9);
             break;
         }
       }

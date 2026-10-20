@@ -80,6 +80,11 @@ function devOp(sim: Sim, op: string, a: Record<string, number>): void {
   } else if (op === 'gold') sim.players[a.owner ?? 0].gold += a.n ?? 1000;
   else if (op === 'res') sim.addStock(a.owner ?? 0, a.res, a.n ?? 100);
   else if (op === 'build') sim.addBuilding(a.owner ?? 0, a.type, a.x, a.y, a.rot ?? 0);
+  else if (op === 'turret') {
+    // Prüfhilfe: Geschütz (1 Ballista, 2 Mangonel) auf das Gebäude an (x, y) setzen
+    const b = sim.buildingAtTile(a.x, a.y);
+    if (b) b.turret = a.kind === 2 ? 2 : 1;
+  }
 }
 
 ctx.onmessage = (ev) => {
