@@ -49,6 +49,7 @@ export class AiController {
   difficulty: number;
   private castleDone = false;
   private retryAt = 0;
+  private woodCheckAt = 0;
 
   constructor(
     sim: Sim,
@@ -202,8 +203,10 @@ export class AiController {
     pl.ration = pl.foodShort ? 1 : pl.popularity < 50 ? 3 : 2;
 
     const peas = pl.peasants;
-    // Die Bevölkerung wächst mit der Spieldauer (mehr Steuern und Arbeiter, sonst erstarrt die Partie)
-    const housingWant = Math.ceil((pr.econ.peasants - 8) / 8) + Math.min(6, Math.floor(sim.tick / 9000));
+    // Die Bevölkerung wächst mit der Spieldauer (mehr Steuern und Arbeiter, sonst erstarrt die Partie),
+    // aber nur, solange die Nahrung mithält (sonst Hunger -> Beliebtheit < 50 -> Abwanderungs-Schaukel)
+    const foodOk = !pl.foodShort && this.foodCapacity() >= peas * RATION_FOOD[2] * 1.7 * pr.econ.food + 8;
+    const housingWant = Math.ceil((pr.econ.peasants - 8) / 8) + (foodOk ? Math.min(6, Math.floor(sim.tick / 9000)) : 0);
     const sequence: [number, number, boolean?][] = [];
     const add = (type: number, target: number, cond = true) => sequence.push([type, target, cond]);
 
@@ -254,7 +257,8 @@ export class AiController {
     if (pr.econ.pitch) add(BT.PitchRig, pr.econ.pitch, t > 3000);
     else if (pr.castle.cauldrons || pr.castle.killingPits) add(BT.PitchRig, 1, t > 4000);
     // Komfort
-    if (pr.econ.market) add(BT.Market, 1, t > 3000);
+    // Profile ohne Markt bauen ihn trotzdem, wenn das Gold ausgeht (Überschuss verkaufen statt Stillstand)
+    if (pr.econ.market || (t > 12000 && pl.gold < 120)) add(BT.Market, 1, t > 3000);
     if (pr.econ.ale) {
       add(BT.HopFarm, 1, peas > 20);
       add(BT.Brewery, 1, c(BT.HopFarm) > 0);
@@ -296,6 +300,11 @@ export class AiController {
         anchor = a;
       } else if (def.placement === 'fertile') {
         anchor = this.depositAnchor(sim, T.Oasis) ?? undefined;
+      } else if (type === BT.Woodcutter) {
+        // dorthin, wo noch Wald steht (der Burgbereich ist baumfrei)
+        const a = this.treeAnchor(sim);
+        if (!a) continue;
+        anchor = a;
       } else if (type === BT.OxTether) {
         const q = this.anyBuilding(sim, BT.Quarry);
         if (q) anchor = { x: q.cx, y: q.cy };
@@ -307,6 +316,73 @@ export class AiController {
     }
     // Waffenproduktion lenken
     this.steerRecipes(sim);
+  }
+
+  private treeCache = { tick: -1e9, at: null as { x: number; y: number } | null };
+
+  /** Bäume im Arbeitsradius eines Holzfällers (wie findTree: Quadrat um die Mitte) */
+  private treesAround(sim: Sim, cx: number, cy: number, r = 14): number {
+    const m = sim.map;
+    let n = 0;
+    for (let y = Math.max(0, cy - r); y <= Math.min(m.h - 1, cy + r); y++)
+      for (let x = Math.max(0, cx - r); x <= Math.min(m.w - 1, cx + r); x++) if (m.trees[y * m.w + x]) n++;
+    return n;
+  }
+
+  /** Mittelpunkt des dichtesten erreichbaren Waldstücks nahe der Burg (grobes 4er-Raster, 5 s gecacht) */
+  private treeAnchor(sim: Sim): { x: number; y: number } | null {
+    if (sim.tick - this.treeCache.tick < 50) return this.treeCache.at;
+    const m = sim.map;
+    const C = 4;
+    const R = 48;
+    const x0 = Math.max(0, this.kx - R);
+    const y0 = Math.max(0, this.ky - R);
+    const cw = Math.ceil((Math.min(m.w, this.kx + R) - x0) / C);
+    const ch = Math.ceil((Math.min(m.h, this.ky + R) - y0) / C);
+    const cells = new Int32Array(cw * ch);
+    for (let y = y0; y < Math.min(m.h, y0 + ch * C); y++)
+      for (let x = x0; x < Math.min(m.w, x0 + cw * C); x++) if (m.trees[y * m.w + x]) cells[((y - y0) / C | 0) * cw + ((x - x0) / C | 0)]++;
+    const wcs: Building[] = [];
+    for (const b of sim.buildings.values()) if (b.owner === this.p && b.type === BT.Woodcutter) wcs.push(b);
+    let best: { x: number; y: number } | null = null;
+    let bs = 0;
+    for (let cy = 0; cy < ch; cy++)
+      for (let cx = 0; cx < cw; cx++) {
+        let sum = 0;
+        for (let dy = -3; dy <= 3; dy++)
+          for (let dx = -3; dx <= 3; dx++) {
+            const xx = cx + dx;
+            const yy = cy + dy;
+            if (xx >= 0 && yy >= 0 && xx < cw && yy < ch) sum += cells[yy * cw + xx];
+          }
+        if (sum < 8) continue;
+        const px = x0 + cx * C + C / 2;
+        const py = y0 + cy * C + C / 2;
+        // nah an der Burg bevorzugen, schon bewirtschaftete Stellen meiden
+        let score = sum - Math.hypot(px - this.kx, py - this.ky) * 0.6;
+        for (const w of wcs) if (Math.hypot(w.cx - px, w.cy - py) < 8) score *= 0.6;
+        if (score > bs) {
+          bs = score;
+          best = { x: px, y: py };
+        }
+      }
+    this.treeCache = { tick: sim.tick, at: best };
+    return best;
+  }
+
+  /** Abgeholzte Holzfäller abreißen, damit sie neu am Wald entstehen (Arbeiter + halbes Holz zurück) */
+  private relocateWoodcutters(sim: Sim): void {
+    const dead: number[] = [];
+    let alive = 0;
+    for (const b of sim.buildings.values()) {
+      if (b.owner !== this.p || b.type !== BT.Woodcutter) continue;
+      if (this.treesAround(sim, Math.floor(b.cx), Math.floor(b.cy)) < 3) dead.push(b.id);
+      else alive++;
+    }
+    if (!dead.length || !this.treeAnchor(sim)) return;
+    applyCommand(sim, this.p, { c: 'demolish', ids: dead });
+    this.counts[BT.Woodcutter] = alive;
+    this.buildFail.delete(BT.Woodcutter);
   }
 
   /** Anteil des Burgplans, der noch aussteht (0 = fertig) */
@@ -1043,10 +1119,16 @@ export class AiController {
   // ---------------- Haushalt ----------------
   private upkeepStep(sim: Sim): void {
     const pl = sim.players[this.p];
+    if (sim.tick - this.woodCheckAt >= 600) {
+      this.woodCheckAt = sim.tick;
+      this.relocateWoodcutters(sim);
+    }
     // Überschuss verkaufen, wenn Gold knapp ist
     if (this.cnt(BT.Market) > 0 && pl.gold < 150) {
-      for (const [res, keep] of [[R.Wood, 150], [R.Stone, 120], [R.Iron, 80], [R.Cheese, 60], [R.Meat, 60]] as [number, number][]) {
-        if (pl.stock[res] > keep + 40) {
+      // [Ware, Behalten, Verkaufsschwelle]: Waffen ab 25 Stück (liegen sonst ungenutzt in der Waffenkammer)
+      const weapons: [number, number, number][] = [R.Bow, R.Crossbow, R.Spear, R.Pike, R.Mace, R.Sword, R.Leather, R.Armor].map((r) => [r, 15, 25]);
+      for (const [res, keep, over] of [[R.Wood, 150, 190], [R.Stone, 120, 160], [R.Iron, 80, 120], [R.Cheese, 60, 100], [R.Meat, 60, 100], ...weapons] as [number, number, number][]) {
+        if (pl.stock[res] > over) {
           applyCommand(sim, this.p, { c: 'trade', res, amount: pl.stock[res] - keep, buy: false });
           break;
         }

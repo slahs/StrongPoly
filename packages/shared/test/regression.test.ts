@@ -40,6 +40,31 @@ describe('Regression: Vorkommen', () => {
   });
 });
 
+describe('Regression: Holzversorgung der KI', () => {
+  it('Gräfin (seed 15) bleibt mit Holz versorgt (früher: Holzfäller im baumfreien Burgbereich, ab Minute 9 kein Holz mehr)', () => {
+    const map = generateMap({ seed: 15, size: 160, players: 2 });
+    const sim = new Sim({ map, seed: 15, players: [{ name: 'A', team: 0, kind: 'ai', ai: 0 }, { name: 'B', team: 1, kind: 'ai', ai: 1 }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
+    let minWoodAfter15 = Infinity;
+    while (sim.tick < 30 * 600 && !sim.gameOver) {
+      sim.step();
+      if (sim.tick > 15 * 600 && sim.tick % 600 === 0) minWoodAfter15 = Math.min(minWoodAfter15, sim.players[1].stock[0]);
+    }
+    // früher: alle 5 Holzfäller im baumfreien Burgbereich, ab Minute 9 dauerhaft 0 Holz
+    let supplied = 0;
+    const m = sim.map;
+    for (const b of sim.buildings.values()) {
+      if (b.owner !== 1 || b.type !== BT.Woodcutter) continue;
+      let n = 0;
+      for (let y = Math.floor(b.cy) - 14; y <= Math.floor(b.cy) + 14; y++)
+        for (let x = Math.floor(b.cx) - 14; x <= Math.floor(b.cx) + 14; x++) if (m.inBounds(x, y) && m.trees[m.idx(x, y)]) n++;
+      if (n >= 3) supplied++;
+    }
+    expect(supplied).toBeGreaterThanOrEqual(1);
+    expect(minWoodAfter15).toBeGreaterThan(0);
+    expect([...sim.buildings.values()].some((b) => b.owner === 1 && b.type === BT.Market)).toBe(true);
+  }, 120000);
+});
+
 describe('Regression: KI-Duelle enden', () => {
   it('Baron vs Wolf (früher Patt bei ~25 Gold): ein Bergfried fällt innerhalb von 90 Minuten', () => {
     const map = generateMap({ seed: 7, size: 160, players: 2 });
