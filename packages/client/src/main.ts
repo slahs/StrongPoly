@@ -212,7 +212,8 @@ if (params.get('quick') === '1') {
       map: { gen: { seed: Number(params.get('seed') ?? 1), size, players: 2 } },
       players: [
         { name: 'Du', team: 0, kind: 'human' },
-        { name: 'Gegner', team: 1, kind: 'ai', ai: Number(params.get('ai') ?? 0), difficulty: 1 },
+        // Bewegungs-Prüfszenen (?motion=…): der Gegner bleibt untätig
+        { name: 'Gegner', team: 1, kind: params.has('motion') ? 'human' : 'ai', ai: Number(params.get('ai') ?? 0), difficulty: 1 },
       ],
       seed: 1,
       startGold: 1500,

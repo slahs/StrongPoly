@@ -1,0 +1,44 @@
+{
+ "report": {
+  "frames": 18,
+  "moveFrames": 18,
+  "ratioP50": 0.9803921580314636,
+  "ratioP95": 1.2475860118865967,
+  "ratioP99": 1.2475860118865967,
+  "ratioMax": 1.2475860118865967,
+  "jumpPct": 0,
+  "haltPct": 0,
+  "backPct": 0,
+  "reversalsPerMin": 0,
+  "turnP95": 88.57604217529297,
+  "turnMax": 88.57604217529297,
+  "degPerTile": 3.405715590059517,
+  "idleDriftMean": 0,
+  "idleDriftP95": 0,
+  "marchInPlacePct": 0,
+  "slidePct": 5.555555555555555,
+  "strideCV": 0
+ },
+ "fps": 2.9178621796428716,
+ "frameMs": {
+  "p50": 366.60000000000036,
+  "p95": 450,
+  "max": 450
+ },
+ "tick": 111,
+ "units": 62,
+ "speed": 1,
+ "clock": {
+  "delay": 2.9605879999999996,
+  "jitter": 1.84548938885584,
+  "resyncs": 5
+ },
+ "cuts": 0,
+ "runnerDone": false,
+ "outliers": [],
+ "scene": "pawns",
+ "mode": "legacy",
+ "viewport": "640x360",
+ "noDraw": false,
+ "errors": []
+}

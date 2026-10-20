@@ -2,6 +2,7 @@ import { UNIT_CAP, SLOT_MASK } from '../data/balance';
 import { GameMap } from '../map/gamemap';
 import type { SimEvent } from '../sim/types';
 import { BuildingRec, PlayerView, PublicPlayer, Snapshot, UREC } from './snapshot';
+import { HIST, teleportLimit } from './interp';
 import type { PlaceBld, PlaceCtx } from '../sim/placement';
 import type { StoreKind } from '../data/resources';
 
@@ -36,6 +37,21 @@ export class ClientWorld implements PlaceCtx {
   prevY = new Float32Array(UNIT_CAP);
   curX = new Float32Array(UNIT_CAP);
   curY = new Float32Array(UNIT_CAP);
+  /**
+   * Positionshistorie je Einheit (Ring der letzten HIST Stützstellen mit Sim-Tick): Grundlage der
+   * zeitbasierten Interpolation. Einheiten ohne Delta-Eintrag behalten ihre letzte Stützstelle – sie stehen.
+   */
+  hx = new Float32Array(UNIT_CAP * HIST);
+  hy = new Float32Array(UNIT_CAP * HIST);
+  ht = new Int32Array(UNIT_CAP * HIST);
+  hn = new Uint8Array(UNIT_CAP);
+  hh = new Uint8Array(UNIT_CAP);
+  /** Ergebnis von sampleInto */
+  sx = 0;
+  sy = 0;
+  /** Sprünge (Teleport, Spawn-Versetzung), die nicht interpoliert wurden: Zähler und letzter Fall (Diagnose) */
+  cuts = 0;
+  lastCut = { id: 0, x0: 0, y0: 0, x1: 0, y1: 0, tick: 0 };
   /** Zeitpunkt der letzten Aktualisierung (ms, performance.now) */
   top = 0;
 
@@ -119,12 +135,14 @@ export class ClientWorld implements PlaceCtx {
       this.digMask = new Uint8Array(m.n);
       this.buildings.clear();
       this.ids.fill(0);
+      this.hn.fill(0);
       this.top = 0;
       this.tileChanges = [];
       this.buildingsDirty = true;
       this.tileChanges.push(-1); // Signal: komplette Karte neu
     }
     if (snap.players) this.players = snap.players;
+    const prevTick = snap.full ? snap.tick : this.tick;
     this.tick = snap.tick;
     this.month = snap.month;
     this.winner = snap.winner;
@@ -158,6 +176,7 @@ export class ClientWorld implements PlaceCtx {
         this.prevX[s] = this.curX[s];
         this.prevY[s] = this.curY[s];
       }
+      this.pushHistory(s, fresh, prevTick, snap.tick, x, y);
       this.curX[s] = x;
       this.curY[s] = y;
       if (s >= this.top) this.top = s + 1;
@@ -208,6 +227,97 @@ export class ClientWorld implements PlaceCtx {
     this.banners = snap.banners ?? [];
     if (snap.mission) this.mission = snap.mission;
     for (const e of snap.events) this.events.push(e);
+  }
+
+  /**
+   * Neue Stützstelle (tick, x, y). War die Einheit seit der letzten Stützstelle unverändert (kein Delta-Eintrag),
+   * steht sie bis zum vorigen Snapshot (`prevTick`) an der alten Stelle: dort wird eine Zwischenstelle ergänzt,
+   * damit nur über den letzten Tick interpoliert wird. Große Sprünge werden nicht interpoliert.
+   */
+  private pushHistory(s: number, fresh: boolean, prevTick: number, tick: number, x: number, y: number): void {
+    const base = s * HIST;
+    let n = fresh ? 0 : this.hn[s];
+    let head = this.hh[s];
+    if (n > 0) {
+      const i = base + head;
+      const lt = this.ht[i];
+      if (lt >= tick) {
+        // gleicher Tick noch einmal (doppelter Eintrag): überschreiben
+        this.hx[i] = x;
+        this.hy[i] = y;
+        return;
+      }
+      const lx = this.hx[i];
+      const ly = this.hy[i];
+      const d = Math.hypot(x - lx, y - ly);
+      if (d > teleportLimit(tick - prevTick)) {
+        this.cuts++;
+        this.lastCut = { id: this.ids[s], x0: lx, y0: ly, x1: x, y1: y, tick };
+        n = 0;
+      } else if (lt < prevTick) {
+        head = (head + 1) % HIST;
+        const j = base + head;
+        this.hx[j] = lx;
+        this.hy[j] = ly;
+        this.ht[j] = prevTick;
+        n = Math.min(HIST, n + 1);
+      }
+    }
+    head = n === 0 ? 0 : (head + 1) % HIST;
+    const k = base + head;
+    this.hx[k] = x;
+    this.hy[k] = y;
+    this.ht[k] = tick;
+    this.hn[s] = Math.min(HIST, n + 1);
+    this.hh[s] = head;
+  }
+
+  /**
+   * Position der Einheit zur Darstellungszeit `t` (Sim-Ticks, gebrochen) nach `sx`/`sy`: linear zwischen den
+   * Stützstellen; vor der ältesten bzw. nach der neuesten wird gehalten, nach der neuesten höchstens `maxExtra`
+   * Ticks mit der Geschwindigkeit des letzten Abschnitts fortgeschrieben.
+   */
+  sampleInto(s: number, t: number, maxExtra = 0): void {
+    const n = this.hn[s];
+    const base = s * HIST;
+    const head = this.hh[s];
+    if (n === 0) {
+      this.sx = this.curX[s];
+      this.sy = this.curY[s];
+      return;
+    }
+    let ib = base + head;
+    if (t >= this.ht[ib]) {
+      // jenseits der neuesten Stützstelle
+      let x = this.hx[ib];
+      let y = this.hy[ib];
+      if (maxExtra > 0 && n > 1) {
+        const ia = base + ((head + HIST - 1) % HIST);
+        const dt = this.ht[ib] - this.ht[ia];
+        const ex = Math.min(maxExtra, t - this.ht[ib]);
+        if (dt > 0 && dt <= 2) {
+          x += ((x - this.hx[ia]) / dt) * ex;
+          y += ((y - this.hy[ia]) / dt) * ex;
+        }
+      }
+      this.sx = x;
+      this.sy = y;
+      return;
+    }
+    // von der neuesten rückwärts: erste Stützstelle mit Tick <= t
+    for (let k = 1; k < n; k++) {
+      const ia = base + ((head + HIST - k) % HIST);
+      if (this.ht[ia] <= t) {
+        const f = (t - this.ht[ia]) / (this.ht[ib] - this.ht[ia]);
+        this.sx = this.hx[ia] + (this.hx[ib] - this.hx[ia]) * f;
+        this.sy = this.hy[ia] + (this.hy[ib] - this.hy[ia]) * f;
+        return;
+      }
+      ib = ia;
+    }
+    // vor der ältesten Stützstelle
+    this.sx = this.hx[ib];
+    this.sy = this.hy[ib];
   }
 
   placeBuilding(b: ClientBuilding): void {
