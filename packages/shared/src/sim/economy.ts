@@ -1,5 +1,5 @@
 import { DT, FEAR_PROD_STEP } from '../data/balance';
-import { BT, HORSES_PER_STABLE } from '../data/buildings';
+import { BT, HORSES_PER_STABLE, HORSE_BREED_SECONDS, OXEN_PER_TETHER, OX_RESPAWN_SECONDS } from '../data/buildings';
 import { RES_INFO } from '../data/resources';
 import { T } from '../data/terrain';
 import { U } from '../data/units';
@@ -71,16 +71,16 @@ function updateBuildings(sim: Sim): void {
     if (b.type === BT.Stable) {
       if (b.horses < HORSES_PER_STABLE) {
         b.spawnTimer += DT;
-        if (b.spawnTimer >= 40) {
+        if (b.spawnTimer >= HORSE_BREED_SECONDS) {
           b.spawnTimer = 0;
           b.horses++;
         }
       }
     } else if (b.type === BT.OxTether) {
       b.workers = b.workers.filter((id) => sim.units.valid(id));
-      if (b.workers.length < 2) {
+      if (b.workers.length < OXEN_PER_TETHER) {
         b.spawnTimer += DT;
-        if (b.spawnTimer >= (b.workers.length ? 40 : 5) && sim.players[b.owner].alive) {
+        if (b.spawnTimer >= (b.workers.length ? OX_RESPAWN_SECONDS : 5) && sim.players[b.owner].alive) {
           b.spawnTimer = 0;
           const e = sim.entryOf(b);
           const w = sim.map.w;

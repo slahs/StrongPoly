@@ -233,3 +233,8 @@ export const CASTLE_SUBCATS: { id: string; name: string; types: number[] }[] = [
   { id: 'troops', name: 'Truppen', types: [BT.Barracks, BT.MercPost, BT.Stable] },
   { id: 'siege', name: 'Belagerungsbau', types: [BT.EngineerGuild, BT.Pit, BT.KillingPit, BT.PitchDitch, BT.Cauldron] },
 ];
+/** Sekunden, bis ein Stall ein weiteres Pferd züchtet (bis HORSES_PER_STABLE) */
+export const HORSE_BREED_SECONDS = 40;
+/** Ochsen pro Ochsengespann und Sekunden bis zum Nachrücken eines zweiten Ochsen */
+export const OXEN_PER_TETHER = 2;
+export const OX_RESPAWN_SECONDS = 40;

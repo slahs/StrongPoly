@@ -15,6 +15,7 @@ import { GameScene } from '../render/scene';
 import { Hud, HudActions, ModeName } from '../ui/hud';
 import { AdvisorLogic, AdvisorPanel } from '../ui/advisor';
 import { showEndScreen } from '../ui/endscreen';
+import { closeEncyclopedia, isEncyclopediaOpen, openEncyclopedia } from '../ui/encyclopedia';
 import type { GameConnection } from './connection';
 import { FogOfWar } from './fog';
 import { InputController } from './input';
@@ -334,8 +335,18 @@ export class Session {
   openHelp(): void {
     this.opts.onHelp?.();
   }
+  /** F2 / Knopf: Enzyklopädie; im Einzelspieler pausiert die Partie, solange sie offen ist */
+  toggleEncyclopedia(): void {
+    if (isEncyclopediaOpen()) {
+      closeEncyclopedia();
+      return;
+    }
+    const pausedByUs = this.conn.local && !this.paused;
+    if (pausedByUs) this.togglePause();
+    openEncyclopedia(undefined, { onClose: () => { if (pausedByUs && this.paused) this.togglePause(); } });
+  }
   openEncyclopedia(): void {
-    this.opts.onEncyclopedia?.();
+    this.toggleEncyclopedia();
   }
 
   // ----- Frame -----

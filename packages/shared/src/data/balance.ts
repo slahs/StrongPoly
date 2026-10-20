@@ -44,6 +44,14 @@ export const RELIGION_COVER = { chapel: 25, church: 50, cathedral: 100 };
 export const GOOD_POP = 0.7;
 export const BAD_POP = -0.5;
 export const CROWD_POP = -4;
+/** Obergrenzen der Beliebtheits-Summanden (Gute Dinge, Schlechte Dinge, Religion) */
+export const POP_GOOD_CAP = 8;
+export const POP_BAD_CAP = 8;
+export const RELIGION_POP_CAP = 12;
+/** Ab dieser Beliebtheit kommen Bauern, darunter wandern sie ab */
+export const POP_THRESHOLD = 50;
+/** Ticks zwischen zwei Abwanderungen bei Beliebtheit unter POP_THRESHOLD */
+export const LEAVE_INTERVAL_TICKS = 40;
 /** Angstfaktor: pro Stufe Produktivität/Moral +- */
 export const FEAR_PROD_STEP = 0.05;
 export const FEAR_DMG_STEP = 0.04;
@@ -60,3 +68,16 @@ export const MARKET_PRICE_STEP = 0.015;
 
 /** Kein Bauen, solange feindliche Soldaten so nah (Tiles, ab Gebäuderand) sind – wie im Original verhindert das Tor-Neubau mitten im Sturm */
 export const ENEMY_BUILD_RADIUS = 8;
+
+/**
+ * Mauergeschütze auf Großen Türmen (Ballista = turret 1, Mangonel = turret 2).
+ * range/minRange in Tiles, cooldown in Ticks, dmg = Grundschaden (vor Angstfaktor), splash = Flächenradius in Tiles.
+ * Die Reichweiten sind bewusst kürzer als bei Belagerungsgerät (Katapult/Trebuchet).
+ */
+export const TURRETS = {
+  ballista: { range: 18, minRange: 2, dmg: 60, cooldown: 30, splash: 0 },
+  mangonel: { range: 16, minRange: 5, dmg: 55, cooldown: 60, splash: 1.5 },
+} as const;
+
+/** Ölkessel: Reichweite und Wirkradius in Tiles, Schaden (Feuer), Abklingzeit in Ticks; verbraucht 1 Pech pro Guss. */
+export const CAULDRON = { range: 6.5, queryRadius: 2.4, radius: 2, dmg: 85, cooldown: 90, pitchPerUse: 1 } as const;

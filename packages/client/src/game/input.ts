@@ -563,7 +563,7 @@ export class InputController {
     else if (is('jumpAlert')) s.jumpToAlert();
     else if (is('centerSelection')) s.centerOnSelection();
     else if (is('help')) s.openHelp();
-    else if (is('encyclopedia')) s.openEncyclopedia();
+    else if (is('encyclopedia')) s.toggleEncyclopedia();
     else if (is('tunnel') && s.selection.units.length) this.setMode({ k: 'tunnel' });
     else if (is('selectKeep')) s.selectBuildingType(BT.Keep);
     else if (is('selectGranary')) s.selectBuildingType(BT.Granary);

@@ -5,6 +5,11 @@ import {
   CROWD_POP,
   FEAR_MAX,
   GOOD_POP,
+  POP_BAD_CAP,
+  POP_GOOD_CAP,
+  POP_THRESHOLD,
+  LEAVE_INTERVAL_TICKS,
+  RELIGION_POP_CAP,
   INN_SERVES,
   MARKET_PRICE_RECOVER,
   POP_INTERVAL,
@@ -148,11 +153,11 @@ function applyInterval(sim: Sim, pid: number): void {
   // Religion
   const relCov = n > 0 ? Math.min(1, cover.n / n) : 0;
   pl.relCover = relCov;
-  factors.push({ key: 'religion', label: 'Religion', value: Math.min(12, cover.pts) * relCov });
+  factors.push({ key: 'religion', label: 'Religion', value: Math.min(RELIGION_POP_CAP, cover.pts) * relCov });
 
   // Gute/schlechte Dinge (direkter Beliebtheitseffekt)
-  factors.push({ key: 'good', label: 'Gute Dinge', value: Math.min(8, good * GOOD_POP) });
-  factors.push({ key: 'bad', label: 'Schlechte Dinge', value: Math.max(-8, bad * BAD_POP) });
+  factors.push({ key: 'good', label: 'Gute Dinge', value: Math.min(POP_GOOD_CAP, good * GOOD_POP) });
+  factors.push({ key: 'bad', label: 'Schlechte Dinge', value: Math.max(-POP_BAD_CAP, bad * BAD_POP) });
 
   // Überfüllung
   factors.push({ key: 'crowd', label: 'Überfüllung', value: n > pl.housing ? CROWD_POP : 0 });
@@ -173,16 +178,16 @@ function applyInterval(sim: Sim, pid: number): void {
 function spawnAndLeave(sim: Sim, pid: number): void {
   const pl = sim.players[pid];
   const u = sim.units;
-  if (pl.popularity >= 50 && pl.peasants < pl.housing) {
+  if (pl.popularity >= POP_THRESHOLD && pl.peasants < pl.housing) {
     pl.spawnTimer++;
-    const interval = Math.max(6, SPAWN_INTERVAL_TICKS * (1 - Math.min(0.6, (pl.popularity - 50) / 100)));
+    const interval = Math.max(6, SPAWN_INTERVAL_TICKS * (1 - Math.min(0.6, (pl.popularity - POP_THRESHOLD) / 100)));
     if (pl.spawnTimer >= interval) {
       pl.spawnTimer = 0;
       if (sim.spawnPeasant(pid) >= 0) pl.peasants++;
     }
-  } else if (pl.popularity < 50 && pl.peasants > 0) {
+  } else if (pl.popularity < POP_THRESHOLD && pl.peasants > 0) {
     pl.leaveTimer++;
-    if (pl.leaveTimer >= 40) {
+    if (pl.leaveTimer >= LEAVE_INTERVAL_TICKS) {
       pl.leaveTimer = 0;
       // unbeschäftigte zuerst
       let victim = -1;
