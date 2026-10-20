@@ -35,6 +35,8 @@ export class Settings {
   uiScale = 1;
   /** Kamera-Scrollgeschwindigkeit (Faktor) */
   scrollSpeed = 1;
+  /** Blut bei Gefallenen darstellen (abschaltbar) */
+  blood = true;
 
   constructor() {
     try {
@@ -69,6 +71,7 @@ export class Settings {
           aa: this.aa,
           uiScale: this.uiScale,
           scrollSpeed: this.scrollSpeed,
+          blood: this.blood,
         }),
       );
     } catch {

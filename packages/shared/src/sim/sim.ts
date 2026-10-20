@@ -422,6 +422,7 @@ export class Sim {
   /** Legt ein Gebäude ohne Prüfung an. */
   addBuilding(owner: number, type: number, x: number, y: number, rot: number): Building {
     const b = new Building(this.nextBid++, type, owner, x, y, rot);
+    b.born = this.tick;
     this.registerBuilding(b);
     if (b.def.solid) this.ejectUnits(b);
     if (b.def.store || b.def.housing) this.recountStores(owner);

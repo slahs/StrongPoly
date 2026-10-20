@@ -63,6 +63,11 @@ export class Session {
   private ended = false;
   private themed = false;
   private moveFlash: { x: number; y: number; t: number }[] = [];
+  private mouse = { x: 0, y: 0, inside: false };
+  private hoverBuilding = 0;
+  private hoverTimer = 0;
+  private onMove: (e: PointerEvent) => void;
+  private onLeave: () => void;
   private alertCooldown = 0;
   private info = { tickMs: 0, tick: 0, units: 0 };
   audio: AudioEngine | null;
@@ -82,7 +87,21 @@ export class Session {
     this.audio?.playTheme(null);
     this.audio?.setMood('build');
     this.entities = new EntityRenderer(this.world);
+    this.entities.onBuildingsChanged = () => gs.decor?.markDirty();
+    gs.onGfx = (q, shadows) => this.entities.applyQuality(q, shadows);
+    this.entities.applyQuality(gs.qcfg, gs.gfx.shadows && gs.qcfg.shadows);
     gs.root.add(this.entities.group, this.ghost.group);
+    const cv = gs.canvas;
+    this.onMove = (e: PointerEvent): void => {
+      this.mouse.x = e.clientX;
+      this.mouse.y = e.clientY;
+      this.mouse.inside = true;
+    };
+    this.onLeave = (): void => {
+      this.mouse.inside = false;
+    };
+    cv.addEventListener('pointermove', this.onMove);
+    cv.addEventListener('pointerleave', this.onLeave);
     const actions: HudActions = {
       send: (c) => this.send(c),
       startPlacement: (t) => this.startPlacement(t),
@@ -309,6 +328,7 @@ export class Session {
     this.entities.setShadows(st.shadows);
     this.gs.cam.scrollSpeed = 1.4 * st.scrollSpeed;
     this.uiRoot.style.setProperty('--ui-scale', String(st.uiScale));
+    this.entities.setBlood(st.blood);
     this.audio?.configure(st.audio());
   }
 
@@ -441,6 +461,7 @@ export class Session {
         }
       }
     }
+    this.updateHover(dt);
     // Rendering
     const alpha = (nowMs - this.world.lastSnapMs) / (100 / this.speed);
     const sel = new Set(this.selection.units);
@@ -456,6 +477,8 @@ export class Session {
       selected: sel,
       selectedBuilding: this.selection.building,
       hoverTile: null,
+      hoverBuilding: this.hoverBuilding,
+      camera: this.gs.cam.camera,
       visible: this.fog ? (x, y) => this.fog!.visible(x, y) : null,
       explored: this.fog ? (x, y) => this.fog!.explored(Math.floor(x), Math.floor(y)) : null,
       me: this.me,
@@ -499,6 +522,29 @@ export class Session {
       pf.entities = pf.render = pf.n = 0;
     }
   }
+  /** Gebäude unter dem Mauszeiger (für die Umriss-Hervorhebung), höchstens 15 Mal pro Sekunde geprüft */
+  private updateHover(dt: number): void {
+    this.hoverTimer -= dt;
+    if (this.hoverTimer > 0) return;
+    this.hoverTimer = 0.066;
+    if (!this.mouse.inside || !this.world.map.n) {
+      this.hoverBuilding = 0;
+      return;
+    }
+    const r = this.gs.canvas.getBoundingClientRect();
+    const nx = ((this.mouse.x - r.left) / r.width) * 2 - 1;
+    const ny = -(((this.mouse.y - r.top) / r.height) * 2 - 1);
+    const p = this.gs.cam.pick(nx, ny, this.world.map);
+    let id = 0;
+    if (p) {
+      const tx = Math.floor(p.x);
+      const ty = Math.floor(p.y);
+      if (this.world.map.inBounds(tx, ty)) id = this.world.bldAt[this.world.map.idx(tx, ty)];
+      if (id && this.fog && !this.fog.explored(tx, ty)) id = 0;
+    }
+    this.hoverBuilding = id;
+  }
+
   private soundView(): SoundView {
     const c = this.gs.cam;
     return { me: this.me, myTeam: this.myTeam, teamOf: this.teamOf, camX: c.tx, camY: c.tz, camYaw: c.yaw, camDist: c.dist };
@@ -516,6 +562,7 @@ export class Session {
     this.teamOf = w.players.map((p) => p.team);
     this.myTeam = this.teamOf[this.me] ?? 0;
     this.gs.setMap(w.map);
+    this.gs.decor?.setOccupancy(w.bldAt);
     this.gs.root.add(this.entities.group, this.ghost.group);
     this.hud.minimap.refreshTerrain();
     if (setup.fog) this.fog = new FogOfWar(w.map.w, w.map.h);
@@ -529,10 +576,14 @@ export class Session {
   }
 
   destroy(): void {
+    this.gs.canvas.removeEventListener('pointermove', this.onMove);
+    this.gs.canvas.removeEventListener('pointerleave', this.onLeave);
+    this.gs.onGfx = null;
     this.conn.close();
     this.input.destroy();
     this.advisorPanel?.destroy();
     this.hud.destroy();
     this.gs.root.remove(this.entities.group, this.ghost.group);
+    this.entities.dispose();
   }
 }

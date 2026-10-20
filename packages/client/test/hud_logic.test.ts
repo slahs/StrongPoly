@@ -76,7 +76,7 @@ describe('Berater', () => {
     const a = new AdvisorLogic(w, () => 0, () => [0, 1]);
     const got: string[] = [];
     a.onMessage = (m) => got.push(m.text);
-    const rec = { i: 7, t: BT.WallLow, o: 0, x: 60, y: 60, r: 0, hp: 0, f: 0, u: 0, q: 0, s: 0, c: 0, b: 0, p: 0, w: 1, h: 1 };
+    const rec = { i: 7, t: BT.WallLow, o: 0, x: 60, y: 60, r: 0, hp: 0, f: 0, u: 0, q: 0, s: 0, c: 0, b: 0, p: 0, n: 0, w: 1, h: 1 };
     w.removedBuildings.push(rec);
     a.checkRemoved(100);
     expect(got.length).toBe(0);

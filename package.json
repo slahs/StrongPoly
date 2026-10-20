@@ -11,7 +11,8 @@
     "start": "node packages/server/dist/server.mjs",
     "test": "pnpm -r --workspace-concurrency=1 test",
     "typecheck": "pnpm -r typecheck",
-    "bench": "pnpm --filter @strongpoly/shared bench"
+    "bench": "pnpm --filter @strongpoly/shared bench",
+    "bench:fps": "node scripts/bench-fps.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",

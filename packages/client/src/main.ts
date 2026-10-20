@@ -27,10 +27,19 @@ if (new URLSearchParams(location.search).has('tooltips')) {
   await new Promise<never>(() => {});
 }
 
+// Benchmark-Szene (?bench): eigener Einstieg ohne Netz und Sim-Worker
+if (new URLSearchParams(location.search).has('bench')) {
+  (await import('./bench')).startBench();
+  await new Promise<never>(() => {});
+}
+
 const canvas = document.getElementById('view') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLElement;
 const gs = new GameScene(canvas);
 const settings = new Settings();
+if (new URLSearchParams(location.search).get('blood') === '0') settings.blood = false;
+const qParam = new URLSearchParams(location.search).get('quality');
+if (qParam === 'low' || qParam === 'medium' || qParam === 'high') settings.quality = qParam;
 const audio = new AudioEngine();
 audio.configure(settings.audio());
 exposeAudioDebug(audio);

@@ -574,6 +574,7 @@ export class Screens {
         h('span', { text: 'Grafikstufe' }), quality,
         h('span', { text: 'Schatten' }), h('input', { type: 'checkbox', checked: st.shadows, onchange: (e) => { st.shadows = (e.target as HTMLInputElement).checked; apply(); } }),
         h('span', { text: 'Kantenglättung' }), h('div', { class: 'row' }, aaBox, h('span', { class: 'crumb', text: 'wirkt beim nächsten Start' })),
+        h('span', { text: 'Blut bei Gefallenen' }), h('input', { type: 'checkbox', checked: st.blood, onchange: (e) => { st.blood = (e.target as HTMLInputElement).checked; apply(); } }),
         ...num('UI-Skalierung', st.uiScale, 0.8, 1.5, 0.05, (v) => (st.uiScale = v), (v) => `${Math.round(v * 100)} %`),
       ),
       h('h3', { text: 'Steuerung' }),

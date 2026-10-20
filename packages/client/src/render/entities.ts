@@ -1,92 +1,34 @@
 import * as THREE from 'three';
-import { BUILDINGS, BT, ClientWorld, HEIGHT_STEP, PAL, PLAYER_COLORS, PROJ, S, U, UNITS, UNIT_TYPES, BUILDING_TYPES, BF } from '@strongpoly/shared';
-import { ModelBuilder, ModelGeos } from './builder';
-import { FxSystem } from './fx';
-import { buildBuildingModel } from './models_buildings';
-import { buildUnitModel } from './models_units';
+import { BUILDINGS, BT, BuildingDef, ClientWorld, PAL, PLAYER_COLORS, PROJ, U, UNITS, UNIT_TYPES, BUILDING_TYPES, BF, SLOT_MASK } from '@strongpoly/shared';
+import type { ClientBuilding } from '@strongpoly/shared';
+import { FxSystem, BillboardLayer } from './fx';
+import { TypeMesh, teamTable } from './instanced';
+import { AF } from './materials';
+import { buildBuildingModel, wallParts, WALL_JOIN, WALL_TYPES } from './models_buildings';
+import { arrowGeo, flameGeo, foundationGeo, rubbleGeo, scaffoldGeo, stoneGeo } from './models_misc';
+import {
+  buildCargoModel,
+  buildUnitModel,
+  CargoKind,
+  CARGO_KINDS,
+  CARGO_OF_RES,
+  UNIT_CORPSE,
+  UNIT_CYCLE,
+  UNIT_SCALE,
+  UNIT_SIDEWAYS,
+  UNIT_TOP,
+  UNIT_WALK_W,
+} from './models_units';
+import { ModelBuilder } from './builder';
+import { QualityCfg, qualityOf } from './quality';
 import { groundYAt, RES_COLORS, tileY } from './util';
+import { EMITTERS } from './work_fx';
 
-const matBody = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
-const matAccent = new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true });
-const teamColors = PLAYER_COLORS.map((c) => new THREE.Color(c));
-
-class TypeMesh {
-  body: THREE.InstancedMesh;
-  accent: THREE.InstancedMesh | null = null;
-  cap: number;
-  count = 0;
-  constructor(
-    private geos: ModelGeos,
-    private parent: THREE.Group,
-    cap: number,
-    private shadows: boolean,
-  ) {
-    this.cap = cap;
-    this.body = this.make(geos.body, matBody, false);
-    if (geos.accent) this.accent = this.make(geos.accent, matAccent, true);
-  }
-  private make(geo: THREE.BufferGeometry, mat: THREE.Material, color: boolean): THREE.InstancedMesh {
-    const m = new THREE.InstancedMesh(geo, mat, this.cap);
-    if (color) m.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(this.cap * 3), 3);
-    m.frustumCulled = false;
-    m.castShadow = this.shadows;
-    m.receiveShadow = false;
-    m.count = 0;
-    this.parent.add(m);
-    return m;
-  }
-  ensure(n: number): void {
-    if (n <= this.cap) return;
-    let cap = this.cap;
-    while (cap < n) cap *= 2;
-    this.parent.remove(this.body);
-    this.body.dispose();
-    this.cap = cap;
-    this.body = this.make(this.geos.body, matBody, false);
-    if (this.accent) {
-      this.parent.remove(this.accent);
-      this.accent.dispose();
-      this.accent = this.make(this.geos.accent!, matAccent, true);
-    }
-  }
-  setShadows(on: boolean): void {
-    this.shadows = on;
-    this.body.castShadow = on;
-    if (this.accent) this.accent.castShadow = on;
-  }
-  begin(): void {
-    this.count = 0;
-  }
-  /** Schreibt Matrix (Position, Y-Rotation, Skalierung) und Teamfarbe */
-  push(x: number, y: number, z: number, rot: number, scale: number, team: THREE.Color): void {
-    if (this.count >= this.cap) this.ensure(this.cap * 2);
-    const c = Math.cos(rot) * scale;
-    const s = Math.sin(rot) * scale;
-    const o = this.count * 16;
-    const a = this.body.instanceMatrix.array as Float32Array;
-    a[o] = c; a[o + 1] = 0; a[o + 2] = -s; a[o + 3] = 0;
-    a[o + 4] = 0; a[o + 5] = scale; a[o + 6] = 0; a[o + 7] = 0;
-    a[o + 8] = s; a[o + 9] = 0; a[o + 10] = c; a[o + 11] = 0;
-    a[o + 12] = x; a[o + 13] = y; a[o + 14] = z; a[o + 15] = 1;
-    if (this.accent) {
-      (this.accent.instanceMatrix.array as Float32Array).set(a.subarray(o, o + 16), o);
-      const ca = (this.accent.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
-      ca[this.count * 3] = team.r;
-      ca[this.count * 3 + 1] = team.g;
-      ca[this.count * 3 + 2] = team.b;
-    }
-    this.count++;
-  }
-  end(): void {
-    this.body.count = this.count;
-    this.body.instanceMatrix.needsUpdate = true;
-    if (this.accent) {
-      this.accent.count = this.count;
-      this.accent.instanceMatrix.needsUpdate = true;
-      (this.accent.instanceColor as THREE.InstancedBufferAttribute).needsUpdate = true;
-    }
-  }
-}
+const TEAM = teamTable(PLAYER_COLORS);
+const NEUTRAL = new THREE.Color(0xf2ede0);
+const RANGED: boolean[] = UNITS.map((d) => d.proj !== PROJ.None && d.range > 2);
+const SIEGE: boolean[] = UNITS.map((d) => d.side === 'siege');
+const PI2 = Math.PI * 2;
 
 export interface RenderOpts {
   alpha: number;
@@ -95,6 +37,10 @@ export interface RenderOpts {
   selected: Set<number>;
   selectedBuilding: number;
   hoverTile: { x: number; y: number } | null;
+  /** Gebäude unter dem Mauszeiger (id oder 0) */
+  hoverBuilding?: number;
+  /** Kamera für die Sichtbarkeitsprüfung (nur Sichtbares wird geschrieben) */
+  camera?: THREE.Camera;
   /** Sichtbarkeitsprüfung (Fog of War) */
   visible: ((x: number, y: number) => boolean) | null;
   /** Erkundet (Gebäude bleiben sichtbar, wenn einmal gesehen) */
@@ -104,113 +50,255 @@ export interface RenderOpts {
   teamOfPlayer: number[];
 }
 
+interface Corpse {
+  type: number;
+  x: number;
+  y: number;
+  face: number;
+  owner: number;
+  t0: number;
+  phase: number;
+}
+interface RubbleCell {
+  x: number;
+  y: number;
+  z: number;
+  rot: number;
+  s: number;
+  t0: number;
+  wood: boolean;
+  life: number;
+}
+interface Collapse {
+  type: number;
+  cx: number;
+  cz: number;
+  y: number;
+  rot: number;
+  t0: number;
+  owner: number;
+}
+interface BurnSite {
+  x: number;
+  z: number;
+  y: number;
+  w: number;
+  h: number;
+  top: number;
+}
+interface EmitSite {
+  x: number;
+  y: number;
+  z: number;
+  kind: string;
+  rate: number;
+  acc: number;
+}
+
+/** Dauer der Baustufen-Darstellung in Sim-Ticks (10 je Sekunde, rein visuell); 0 = keine (Mauern, Fallen, Lagerfeuer) */
+export function buildTicks(def: BuildingDef): number {
+  if (def.line || def.height < 0.7 || def.id === BT.Campfire) return 0;
+  return Math.round(Math.min(6, 1.2 + Math.sqrt(def.hp) * 0.075) * 10);
+}
+
+const ease = (t: number): number => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
+
 /** Zeichnet Einheiten, Gebäude, Projektile und Effekte aus dem ClientWorld-Zustand (nur lesend). */
 export class EntityRenderer {
   readonly group = new THREE.Group();
   readonly fx = new FxSystem();
+  /** wird aufgerufen, wenn sich Gebäude geändert haben (z. B. Dekor neu berechnen) */
+  onBuildingsChanged: (() => void) | null = null;
   private unitMeshes: (TypeMesh | null)[] = new Array(UNIT_TYPES).fill(null);
   private bldMeshes: (TypeMesh | null)[] = new Array(BUILDING_TYPES).fill(null);
+  private wallMeshes = new Map<string, TypeMesh>();
+  private cargoMeshes = new Map<CargoKind, TypeMesh>();
+  private foundation: TypeMesh;
+  private scaffold: TypeMesh;
+  private rubbleStone: TypeMesh;
+  private rubbleWood: TypeMesh;
   private ringMesh: THREE.InstancedMesh;
   private hpBg: THREE.InstancedMesh;
   private hpFg: THREE.InstancedMesh;
-  private cargo: THREE.InstancedMesh;
-  private arrows: THREE.InstancedMesh;
-  private stones: THREE.InstancedMesh;
+  private arrows: TypeMesh;
+  private bolts: TypeMesh;
+  private fireArrows: TypeMesh;
+  private stones: TypeMesh;
+  private boulders: TypeMesh;
   private fires: THREE.InstancedMesh;
   private ladderMesh: THREE.InstancedMesh;
-  private selBox: THREE.Mesh;
-  private bannerMesh: TypeMesh | null = null;
+  private frames: THREE.InstancedMesh;
+  private blob: BillboardLayer;
+  private aoLayer: BillboardLayer;
+  private bannerMesh: TypeMesh;
+  private hoverLines: THREE.LineSegments;
+  private edgeCache = new Map<number, THREE.BufferGeometry>();
+  private hoverId = -1;
   private yS: Float32Array = new Float32Array(8192);
+  private faceS: Float32Array = new Float32Array(8192);
+  private seenId: Int32Array = new Int32Array(8192);
   private shadows = true;
+  private q: QualityCfg = qualityOf('medium');
+  private unitShadows = true;
   private flameT = 0;
   private world: ClientWorld;
-  private fxClock = 0;
+  private lastOpts: RenderOpts | null = null;
+  private corpses: Corpse[] = [];
+  private rubble: RubbleCell[] = [];
+  private collapsing: Collapse[] = [];
+  /** Gebäude, die gerade gebaut werden (Baustufe aus world.tick − Platzierungs-Tick `n` im Snapshot) */
+  private building = new Set<number>();
+  private gateP = new Map<number, number>();
+  private mapRef: unknown = null;
+  private burnSites: BurnSite[] = [];
+  private emitSites: EmitSite[] = [];
+  private fireList: { x: number; y: number; z: number; s: number }[] = [];
+  private bldDirty = true;
+  private gateAnim = false;
+  private frustum = new THREE.Frustum();
+  private projScreen = new THREE.Matrix4();
+  /** Statistik der letzten Aktualisierung (für Messungen) */
+  stats = { units: 0, buildings: 0, projectiles: 0, corpses: 0, ms: { buildings: 0, units: 0, corpses: 0, proj: 0, emit: 0, fx: 0 } };
 
   constructor(world: ClientWorld) {
     this.world = world;
     this.group.name = 'entities';
-    this.group.add(this.fx.mesh);
-    const ringGeo = new THREE.RingGeometry(0.34, 0.46, 10);
+    this.group.add(this.fx.group);
+
+    this.foundation = new TypeMesh(foundationGeo(), this.group, { anim: false, shadow: false, cap: 64 }, TEAM);
+    this.scaffold = new TypeMesh(scaffoldGeo(), this.group, { anim: false, shadow: true, cap: 256 }, TEAM);
+    this.rubbleStone = new TypeMesh(rubbleGeo(false), this.group, { anim: false, shadow: true, cap: 128 }, TEAM);
+    this.rubbleWood = new TypeMesh(rubbleGeo(true), this.group, { anim: false, shadow: true, cap: 128 }, TEAM);
+
+    const ringGeo = new THREE.RingGeometry(0.36, 0.47, 14);
     ringGeo.rotateX(-Math.PI / 2);
-    this.ringMesh = new THREE.InstancedMesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, depthWrite: false }), 2048);
+    const ringInner = new THREE.RingGeometry(0.31, 0.34, 14);
+    ringInner.rotateX(-Math.PI / 2);
+    const rg = mergeGeos(ringGeo, ringInner);
+    this.ringMesh = new THREE.InstancedMesh(rg, new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, depthWrite: false, transparent: true, opacity: 0.95 }), 2048);
     this.ringMesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(2048 * 3), 3);
     this.ringMesh.count = 0;
     this.ringMesh.frustumCulled = false;
+    this.ringMesh.renderOrder = 2;
     this.group.add(this.ringMesh);
 
     const barGeo = new THREE.PlaneGeometry(1, 1);
-    this.hpBg = new THREE.InstancedMesh(barGeo, new THREE.MeshBasicMaterial({ color: 0x24211e, depthTest: false, transparent: true }), 1536);
-    this.hpFg = new THREE.InstancedMesh(barGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, transparent: true }), 1536);
-    this.hpFg.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(1536 * 3), 3);
+    this.hpBg = new THREE.InstancedMesh(barGeo, new THREE.MeshBasicMaterial({ color: 0x24211e, depthTest: false, transparent: true, opacity: 0.85 }), 2048);
+    this.hpFg = new THREE.InstancedMesh(barGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, transparent: true }), 2048);
+    this.hpFg.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(2048 * 3), 3);
     for (const m of [this.hpBg, this.hpFg]) {
       m.count = 0;
       m.frustumCulled = false;
       m.renderOrder = 10;
       this.group.add(m);
     }
+    this.hpFg.renderOrder = 11;
 
-    const cargoGeo = new ModelBuilder().box(0.16, 0.16, 0.16, 0, 0, 0, 0xffffff).build().body;
-    this.cargo = new THREE.InstancedMesh(cargoGeo, new THREE.MeshLambertMaterial({ flatShading: true }), 4096);
-    this.cargo.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(4096 * 3), 3);
-    this.cargo.count = 0;
-    this.cargo.frustumCulled = false;
-    this.group.add(this.cargo);
+    for (const k of CARGO_KINDS) this.cargoMeshes.set(k, new TypeMesh(buildCargoModel(k).merged, this.group, { anim: true, shadow: false, cap: 64 }, TEAM));
 
-    const arrowGeo = new ModelBuilder().box(0.04, 0.04, 0.55, 0, 0, 0, PAL.woodDark).box(0.05, 0.05, 0.12, 0, 0, 0.3, PAL.stone).build().body;
-    this.arrows = new THREE.InstancedMesh(arrowGeo, matBody, 2048);
-    this.arrows.count = 0;
-    this.arrows.frustumCulled = false;
-    this.group.add(this.arrows);
-    const stoneGeo = new ModelBuilder().box(0.4, 0.4, 0.4, 0, -0.2, 0, PAL.stoneDark).build().body;
-    this.stones = new THREE.InstancedMesh(stoneGeo, matBody, 512);
-    this.stones.count = 0;
-    this.stones.frustumCulled = false;
-    this.stones.castShadow = true;
-    this.group.add(this.stones);
+    this.arrows = new TypeMesh(arrowGeo('arrow'), this.group, { anim: false, shadow: false, cap: 512 }, TEAM);
+    this.bolts = new TypeMesh(arrowGeo('bolt'), this.group, { anim: false, shadow: false, cap: 128 }, TEAM);
+    this.fireArrows = new TypeMesh(arrowGeo('fire'), this.group, { anim: false, shadow: false, cap: 128 }, TEAM);
+    this.stones = new TypeMesh(stoneGeo(false), this.group, { anim: false, shadow: true, cap: 128 }, TEAM);
+    this.boulders = new TypeMesh(stoneGeo(true), this.group, { anim: false, shadow: true, cap: 64 }, TEAM);
 
-    const fireGeo = new ModelBuilder().cone(0.22, 0.6, 4, 0, 0, 0, PAL.gold).cone(0.14, 0.45, 4, 0, 0, 0, PAL.roof).build().body;
-    this.fires = new THREE.InstancedMesh(fireGeo, matBody, 1024);
+    const fireGeo = flameGeo();
+    this.fires = new THREE.InstancedMesh(fireGeo, new THREE.MeshBasicMaterial({ vertexColors: true }), 1024);
     this.fires.count = 0;
     this.fires.frustumCulled = false;
     this.group.add(this.fires);
 
-    const ladGeo = new ModelBuilder()
+    const ladGeo = new ModelBuilder({ ao: 0.1 })
       .box(0.06, 1.8, 0.06, -0.2, 0, 0, PAL.wood)
       .box(0.06, 1.8, 0.06, 0.2, 0, 0, PAL.wood)
       .box(0.4, 0.05, 0.05, 0, 0.4, 0, PAL.woodDark)
       .box(0.4, 0.05, 0.05, 0, 0.9, 0, PAL.woodDark)
       .box(0.4, 0.05, 0.05, 0, 1.4, 0, PAL.woodDark)
       .build().body;
-    this.ladderMesh = new THREE.InstancedMesh(ladGeo, matBody, 256);
+    this.ladderMesh = new THREE.InstancedMesh(ladGeo, new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true }), 256);
     this.ladderMesh.count = 0;
     this.ladderMesh.frustumCulled = false;
+    this.ladderMesh.castShadow = true;
     this.group.add(this.ladderMesh);
 
-    const poleModel = new ModelBuilder()
+    const pole = new ModelBuilder({ ao: 0.2 })
       .cyl(0.05, 0.07, 2.6, 5, 0, 0, 0, PAL.woodDark)
-      .box(0.7, 0.45, 0.04, 0.38, 2.05, 0, PAL.white, true)
+      .part(11, 0, 2.45, 0)
+      .box(0.04, 0.45, 0.7, 0, 2.05, 0.38, PAL.white, true)
+      .part(0)
       .pyramid(0.08, 0.2, 0, 2.6, 0, PAL.gold)
       .cyl(0.35, 0.4, 0.15, 6, 0, 0, 0, PAL.stoneDark)
       .build();
-    this.bannerMesh = new TypeMesh(poleModel, this.group, 8, true);
-    this.selBox = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 0.06, 1),
-      new THREE.MeshBasicMaterial({ color: 0xffe070, transparent: true, opacity: 0.4, depthWrite: false }),
+    this.bannerMesh = new TypeMesh(pole.merged, this.group, { anim: true, shadow: true, cap: 8 }, TEAM);
+
+    // Rahmen für Hover (0..3) und Auswahl (4..7) von Gebäuden
+    this.frames = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.92, depthWrite: false }),
+      8,
     );
-    this.selBox.visible = false;
-    this.group.add(this.selBox);
+    this.frames.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(8 * 3), 3);
+    this.frames.count = 0;
+    this.frames.frustumCulled = false;
+    this.frames.renderOrder = 6;
+    this.group.add(this.frames);
+
+    this.hoverLines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xfff0b0, transparent: true, opacity: 0.85 }));
+    this.hoverLines.visible = false;
+    this.hoverLines.frustumCulled = false;
+    this.hoverLines.renderOrder = 7;
+    this.group.add(this.hoverLines);
+
+    this.blob = new BillboardLayer(4096, { flat: true, order: 1, shape: 0 });
+    this.aoLayer = new BillboardLayer(1024, { flat: true, order: 0, shape: 2 });
+    this.group.add(this.blob.mesh, this.aoLayer.mesh);
   }
 
   setShadows(on: boolean): void {
-    this.shadows = on;
-    for (const m of this.unitMeshes) m?.setShadows(on);
-    for (const m of this.bldMeshes) m?.setShadows(on);
+    this.applyQuality(this.q, on);
+  }
+
+  /** Grafikstufe anwenden (Schatten, Partikelobergrenzen, Blob-Schatten) */
+  applyQuality(q: QualityCfg, shadows = this.shadows): void {
+    const reFx = this.q !== q;
+    this.q = q;
+    this.shadows = shadows;
+    this.unitShadows = shadows && q.shadowUnits;
+    for (const m of this.unitMeshes) m?.setShadows(this.unitShadows);
+    for (const m of this.cargoMeshes.values()) m.setShadows(false);
+    for (const m of this.bldMeshes) m?.setShadows(shadows);
+    for (const m of this.wallMeshes.values()) m.setShadows(shadows);
+    this.scaffold.setShadows(shadows);
+    this.rubbleStone.setShadows(shadows);
+    this.rubbleWood.setShadows(shadows);
+    this.stones.setShadows(shadows);
+    this.boulders.setShadows(shadows);
+    this.bannerMesh.setShadows(shadows);
+    this.ladderMesh.castShadow = shadows;
+    if (reFx) this.fx.applyQuality(q);
+    this.bldDirty = true;
+  }
+
+  /** Gibt GPU-Puffer und Geometrien frei (beim Beenden der Partie) */
+  dispose(): void {
+    this.group.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (m.geometry) m.geometry.dispose();
+      if ((o as THREE.InstancedMesh).isInstancedMesh) (o as THREE.InstancedMesh).dispose();
+    });
+    for (const g of this.edgeCache.values()) g.dispose();
+    this.edgeCache.clear();
+  }
+
+  /** Blut abschaltbar (Einstellung) */
+  setBlood(on: boolean): void {
+    this.fx.blood = on;
   }
 
   private unitMesh(t: number): TypeMesh {
     let m = this.unitMeshes[t];
     if (!m) {
-      m = new TypeMesh(buildUnitModel(t), this.group, t === U.Peasant ? 512 : 128, this.shadows);
+      m = new TypeMesh(buildUnitModel(t).merged, this.group, { anim: true, shadow: this.unitShadows, cap: t === U.Peasant ? 512 : 128 }, TEAM);
       this.unitMeshes[t] = m;
     }
     return m;
@@ -219,92 +307,429 @@ export class EntityRenderer {
   private bldMesh(t: number): TypeMesh {
     let m = this.bldMeshes[t];
     if (!m) {
-      m = new TypeMesh(buildBuildingModel(BUILDINGS[t]), this.group, 64, this.shadows);
+      m = new TypeMesh(buildBuildingModel(BUILDINGS[t]).merged, this.group, { anim: true, shadow: this.shadows, cap: 64 }, TEAM);
       this.bldMeshes[t] = m;
     }
     return m;
   }
 
+  private wallMesh(t: number, kind: 'arm' | 'post' | 'stub'): TypeMesh {
+    const key = `${t}:${kind}`;
+    let m = this.wallMeshes.get(key);
+    if (!m) {
+      const b = new ModelBuilder({ ao: 0.34, aoH: 0.8 });
+      wallParts(b, t, BUILDINGS[t].height, kind, 1);
+      m = new TypeMesh(b.build().merged, this.group, { anim: true, shadow: this.shadows, cap: 256 }, TEAM);
+      this.wallMeshes.set(key, m);
+    }
+    return m;
+  }
+
+  private cargoMesh(k: CargoKind): TypeMesh {
+    return this.cargoMeshes.get(k)!;
+  }
+
+  private visibleAt(x: number, y: number): boolean {
+    const o = this.lastOpts;
+    return !o || !o.visible || o.visible(x, y);
+  }
+
   /** Ruft gesammelte Sim-Events ab und erzeugt Effekte */
   consumeEvents(): void {
     const w = this.world;
+    const now = this.lastOpts?.now ?? 0;
     for (const e of w.events) {
-      if (e.e === 'fx') this.fx.effect(e.k, e.x, e.y, (e.z ?? 0.5) + tileY(w, Math.floor(e.x), Math.floor(e.y)));
+      if (e.e === 'fx') {
+        if (!this.visibleAt(e.x, e.y)) continue;
+        this.fx.effect(e.k, e.x, e.y, (e.z ?? 0.5) + tileY(w, Math.floor(e.x), Math.floor(e.y)));
+      }
     }
     for (const d of w.deaths) {
-      const col = d.type === U.Peasant ? PAL.thatch : PAL.roof;
-      this.fx.spawn(d.x, tileY(w, Math.floor(d.x), Math.floor(d.y)) + 0.4, d.y, 6, col, 1.2, 2.2, 0.1, 0.7);
+      if (!this.visibleAt(d.x, d.y)) continue;
+      const gy = tileY(w, Math.floor(d.x), Math.floor(d.y));
+      if (UNIT_CORPSE[d.type] && d.type !== U.Ox) {
+        if (this.corpses.length >= this.q.corpses) this.corpses.shift();
+        this.corpses.push({ type: d.type, x: d.x, y: d.y, face: d.face, owner: d.owner, t0: now, phase: Math.random() });
+        if (d.type !== U.Peasant) this.fx.bloodAt(d.x, gy, d.y);
+        this.fx.effect('dust', d.x, d.y, gy + 0.1);
+      } else if (d.type === U.Ox) {
+        if (this.corpses.length >= this.q.corpses) this.corpses.shift();
+        this.corpses.push({ type: d.type, x: d.x, y: d.y, face: d.face, owner: d.owner, t0: now, phase: Math.random() });
+      } else {
+        // Belagerungsgerät zerfällt in Splitter
+        this.fx.effect('collapseWood', d.x, d.y, gy + 0.4);
+      }
+    }
+    // Zerstörte Gebäude: Einsturz + Trümmerhaufen (Abriss ohne Trümmer erkennt man am fehlenden Einsturz-Ereignis)
+    for (const b of w.removedBuildings) {
+      const def = BUILDINGS[b.t];
+      if (def.hp <= 0) continue;
+      let destroyed = false;
+      for (const e of w.events) {
+        if (e.e === 'fx' && (e.k === 'collapse' || e.k === 'collapseWood') && Math.abs(e.x - (b.x + b.w / 2)) <= b.w / 2 + 1.5 && Math.abs(e.y - (b.y + b.h / 2)) <= b.h / 2 + 1.5) {
+          destroyed = true;
+          break;
+        }
+      }
+      this.building.delete(b.i);
+      if (!destroyed) continue;
+      this.collapsing.push({ type: b.t, cx: b.x + b.w / 2, cz: b.y + b.h / 2, y: def.placement === 'water' ? -0.1 : tileY(w, b.x, b.y), rot: b.r ? Math.PI / 2 : 0, t0: now, owner: b.o });
+      const life = this.q.particleScale < 0.5 ? 8 : 22;
+      const y0 = tileY(w, b.x, b.y);
+      for (let yy = 0; yy < b.h; yy++)
+        for (let xx = 0; xx < b.w; xx++) {
+          if (this.rubble.length > 480) this.rubble.shift();
+          const h1 = ((b.x + xx) * 73856093) ^ ((b.y + yy) * 19349663) ^ (b.i * 83492791);
+          this.rubble.push({ x: b.x + xx + 0.5, y: y0, z: b.y + yy + 0.5, rot: ((h1 >>> 3) % 628) / 100, s: 0.85 + ((h1 >>> 9) % 40) / 100, t0: now + 0.25, wood: def.wood, life });
+        }
     }
   }
 
   update(dt: number, o: RenderOpts): void {
-    const w = this.world;
+    this.lastOpts = o;
     this.flameT += dt;
-    this.fxClock += dt;
-    this.updateBuildings(o);
+    if (o.camera) {
+      o.camera.updateMatrixWorld();
+      this.projScreen.multiplyMatrices((o.camera as THREE.PerspectiveCamera).projectionMatrix, o.camera.matrixWorldInverse);
+      this.frustum.setFromProjectionMatrix(this.projScreen);
+    }
+    const ms = this.stats.ms;
+    let t = performance.now();
+    this.updateBuildings(dt, o);
+    let t2 = performance.now();
+    ms.buildings = t2 - t;
+    t = t2;
     this.updateUnits(dt, o);
+    t2 = performance.now();
+    ms.units = t2 - t;
+    t = t2;
+    this.updateCorpses(o);
+    t2 = performance.now();
+    ms.corpses = t2 - t;
+    t = t2;
     this.updateProjectiles(o);
     this.updateBanners(o);
+    t2 = performance.now();
+    ms.proj = t2 - t;
+    t = t2;
+    this.updateEmitters(dt, o);
+    t2 = performance.now();
+    ms.emit = t2 - t;
+    t = t2;
     this.fx.update(dt);
+    ms.fx = performance.now() - t;
   }
 
-  private bldMatrixBuilt = false;
-  private lastBldRev = -1;
-  private bldRev = 0;
-
-  private updateBuildings(o: RenderOpts): void {
-    const w = this.world;
-    // Gebäude jeden Frame neu schreiben, wenn sich etwas geändert hat; sonst nur Zähler lassen
-    if (w.buildingsDirty || !this.bldMatrixBuilt) {
-      this.bldMatrixBuilt = true;
-      w.buildingsDirty = false;
-      for (const m of this.bldMeshes) m?.begin();
-      for (const b of w.buildings.values()) {
-        const def = BUILDINGS[b.t];
-        // Fallen sind für Gegner unsichtbar
-        if ((b.t === BT.Pit || b.t === BT.KillingPit) && o.teamOfPlayer[b.o] !== o.myTeam) continue;
-        if (o.explored && o.teamOfPlayer[b.o] !== o.myTeam && !o.explored(b.x + b.w / 2, b.y + b.h / 2)) continue;
-        const m = this.bldMesh(b.t);
-        const cx = b.x + b.w / 2;
-        const cz = b.y + b.h / 2;
-        let y = tileY(w, b.x, b.y);
-        if (def.placement === 'water') y = -0.1;
-        m.push(cx, y, cz, b.r ? Math.PI / 2 : 0, 1, teamColors[b.o % 8]);
-      }
-      for (const m of this.bldMeshes) m?.end();
-      this.rebuildFires();
+  private inView(x: number, y: number, z: number, r: number): boolean {
+    const p = this.frustum.planes;
+    for (let i = 0; i < 6; i++) {
+      const pl = p[i];
+      if (pl.normal.x * x + pl.normal.y * y + pl.normal.z * z + pl.constant < -r) return false;
     }
-    // Auswahlkasten
+    return true;
+  }
+
+  // ------------------------------------------------------------------ Gebäude
+  private updateBuildings(dt: number, o: RenderOpts): void {
+    const w = this.world;
+    const now = o.now;
+    if (this.mapRef !== w.map) {
+      // neue Karte/Vollzustand: alles als fertig behandeln
+      this.mapRef = w.map;
+      this.building.clear();
+      this.rubble.length = 0;
+      this.collapsing.length = 0;
+      this.corpses.length = 0;
+      this.gateP.clear();
+      this.bldDirty = true;
+    }
+    // Torflügel gleiten
+    this.gateAnim = false;
+    for (const [id, p] of this.gateP) {
+      const b = w.buildings.get(id);
+      if (!b) {
+        this.gateP.delete(id);
+        continue;
+      }
+      const target = b.f & BF.GateOpen ? 1 : 0;
+      if (Math.abs(p - target) > 0.01) {
+        this.gateP.set(id, p + (target - p) * Math.min(1, dt * 3.5));
+        this.gateAnim = true;
+      } else if (p !== target) this.gateP.set(id, target);
+    }
+    const redraw = w.buildingsDirty || this.bldDirty || this.building.size > 0 || this.gateAnim || this.collapsing.length > 0 || o.selectedBuilding !== this.lastSelB;
+    this.lastSelB = o.selectedBuilding;
+    const sizeBefore = w.buildings.size;
+    void sizeBefore;
+    if (redraw) {
+      const changed = w.buildingsDirty || this.bldDirty;
+      w.buildingsDirty = false;
+      this.bldDirty = false;
+      this.rewriteBuildings(dt, o, changed);
+      if (changed) this.onBuildingsChanged?.();
+    }
+    this.updateRubble(o);
+    this.updateFrames(o);
+  }
+  private lastSelB = -1;
+
+  private rewriteBuildings(dt: number, o: RenderOpts, rebuildLists: boolean): void {
+    void dt;
+    const w = this.world;
+    const now = o.now;
+    for (const m of this.bldMeshes) m?.begin();
+    for (const m of this.wallMeshes.values()) m.begin();
+    this.foundation.begin();
+    this.scaffold.begin();
+    this.aoLayer.n = 0;
+    const burn: BurnSite[] = [];
+    const emits: EmitSite[] = [];
+    const fire: { x: number; y: number; z: number; s: number }[] = [];
+    const bld = w.bldAt;
+    const mw = w.map.w;
+    const mh = w.map.h;
+    const dir4: [number, number][] = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+    const armRot = [0, -Math.PI / 2, Math.PI, Math.PI / 2];
+    let count = 0;
+    for (const b of w.buildings.values()) {
+      const def = BUILDINGS[b.t];
+      const mine = o.teamOfPlayer[b.o] === o.myTeam;
+      // Fallen sind für Gegner unsichtbar
+      if ((b.t === BT.Pit || b.t === BT.KillingPit) && !mine) continue;
+      const cx = b.x + b.w / 2;
+      const cz = b.y + b.h / 2;
+      // Bauphase aus dem Platzierungs-Tick (Fundament → Gerüst → fertig); Pause und Spielgeschwindigkeit wirken mit
+      let prog = 1;
+      const dur = buildTicks(def);
+      if (b.n > 0 && dur > 0) {
+        const age = w.tick - b.n + Math.min(1, o.alpha);
+        if (age < dur) {
+          prog = Math.max(0, age / dur);
+          this.building.add(b.i);
+        }
+      }
+      if (prog >= 1 && this.building.delete(b.i) && this.visibleAt(cx, cz)) this.fx.effect('built', cx, cz, tileY(w, b.x, b.y) + 0.2);
+      if (o.explored && !mine && !o.explored(cx, cz)) continue;
+      count++;
+      const y = def.placement === 'water' ? -0.1 : tileY(w, b.x, b.y);
+      const phase = (((b.i * 2654435761) >>> 8) % 1000) / 1000;
+      const staffed = b.s > 0;
+
+      // Bodenverdunklung unter größeren Gebäuden (weicher Kontaktschatten)
+      if (def.height >= 0.7 && !def.line && b.w + b.h >= 4 && this.aoLayer.n < 1000) {
+        this.aoLayer.push(cx, y + 0.025, cz, Math.max(b.w, b.h) + 0.9, 0.05, 0.04, 0.03, 0.38);
+      }
+
+      // Bauphase: Fundament, Gerüst, wachsendes Gebäude
+      if (prog < 1) {
+        // Fundament: eine Platte je Tile
+        for (let yy = 0; yy < b.h; yy++) for (let xx = 0; xx < b.w; xx++) this.foundation.push(b.x + xx + 0.5, y + 0.01, b.y + yy + 0.5, 0, 1, 1, b.o);
+        const g = prog < 0.22 ? 0 : ease((prog - 0.22) / 0.78);
+        if (g > 0.02) {
+          const sy = 0.08 + 0.92 * g;
+          const h = def.height * sy;
+          this.pushScaffold(b, y, h);
+          const m = this.bldMesh(b.t);
+          m.push(cx, y, cz, b.r ? Math.PI / 2 : 0, 1, sy, b.o, phase, AF.Static, 0, 1);
+        } else if (def.height >= 1.2) this.pushScaffold(b, y, 0.45);
+        continue;
+      }
+
+      // Mauern: Pfosten + Arme zu den vier Nachbarn (nahtlos, Ecken und T-Stücke ergeben sich von selbst)
+      if (WALL_TYPES.includes(b.t)) {
+        let mask = 0;
+        for (let k = 0; k < 4; k++) {
+          const nx = b.x + dir4[k][0];
+          const ny = b.y + dir4[k][1];
+          if (nx < 0 || ny < 0 || nx >= mw || ny >= mh) continue;
+          const nid = bld[ny * mw + nx];
+          if (!nid) continue;
+          const nb = w.buildings.get(nid);
+          if (nb && WALL_JOIN.has(nb.t)) mask |= 1 << k;
+        }
+        const post = this.wallMesh(b.t, mask === 0 ? 'stub' : 'post');
+        post.push(cx, y, cz, 0, 1, 1, b.o, phase, AF.Static, 0, 1);
+        for (let k = 0; k < 4; k++) if (mask & (1 << k)) this.wallMesh(b.t, 'arm').push(cx, y, cz, armRot[k], 1, 1, b.o, phase, AF.Static, 0, 1);
+        continue;
+      }
+
+      let rot = b.r ? Math.PI / 2 : 0;
+      let sy = 1;
+      if (b.t === BT.Stairs) {
+        // Treppe schaut zur angrenzenden Mauer und steigt bis zur Mauerkrone
+        for (const [dx, dz] of dir4) {
+          const nx = b.x + dx;
+          const ny = b.y + dz;
+          if (nx < 0 || ny < 0 || nx >= mw || ny >= mh) continue;
+          const nid = bld[ny * mw + nx];
+          const nb = nid ? w.buildings.get(nid) : null;
+          if (nb && nb.t !== BT.Stairs && BUILDINGS[nb.t].wallTop) {
+            rot = Math.atan2(dx, dz);
+            sy = BUILDINGS[nb.t].height;
+            break;
+          }
+        }
+      }
+      let flags = AF.Static;
+      const a2 = 0;
+      let a3 = 1.2;
+      if (staffed) flags |= AF.Work;
+      if (def.gate) {
+        let p = this.gateP.get(b.i);
+        if (p === undefined) {
+          p = b.f & BF.GateOpen ? 1 : 0;
+          this.gateP.set(b.i, p);
+        }
+        a3 = p;
+      }
+      this.bldMesh(b.t).push(cx, y, cz, rot, 1, sy, b.o, phase, flags, a2, a3);
+
+      if (rebuildLists) {
+        if (b.f & BF.Burning) {
+          burn.push({ x: b.x, z: b.y, y, w: b.w, h: b.h, top: Math.max(0.5, def.height) });
+          const n = Math.max(1, Math.min(6, Math.round((b.w * b.h) / 3)));
+          for (let k = 0; k < n; k++) {
+            fire.push({
+              x: b.x + 0.5 + (((k * 7919) % 97) / 97) * Math.max(0, b.w - 1),
+              z: b.y + 0.5 + (((k * 104729) % 89) / 89) * Math.max(0, b.h - 1),
+              y: y + Math.max(0.3, def.height * 0.6),
+              s: 1 + def.height * 0.25,
+            });
+          }
+        }
+        const em = EMITTERS[b.t];
+        if (em && this.q.workSmoke) {
+          const c = Math.cos(rot);
+          const s = Math.sin(rot);
+          for (const e of em) {
+            if (e.staffed && !staffed) continue;
+            emits.push({ x: cx + e.x * c + e.z * s, y: y + e.y, z: cz - e.x * s + e.z * c, kind: e.kind, rate: e.rate, acc: Math.random() });
+          }
+        }
+      }
+    }
+    // Zusammenbrechende Gebäude: Modell sackt ab, während der Trümmerhaufen wächst
+    for (let i = this.collapsing.length - 1; i >= 0; i--) {
+      const c = this.collapsing[i];
+      const age = now - c.t0;
+      if (age > 0.8) {
+        this.collapsing.splice(i, 1);
+        continue;
+      }
+      const k = ease(age / 0.8);
+      const shake = Math.sin(age * 60) * 0.03 * (1 - k);
+      this.bldMesh(c.type).push(c.cx + shake, c.y - 0.2 * k, c.cz, c.rot, 1, Math.max(0.05, 1 - 0.95 * k), c.owner, 0, AF.Static, 0, 1);
+    }
+    for (const m of this.bldMeshes) m?.end();
+    for (const m of this.wallMeshes.values()) m.end();
+    this.foundation.end();
+    this.scaffold.end();
+    this.aoLayer.commit();
+    this.stats.buildings = count;
+    if (rebuildLists) {
+      this.burnSites = burn;
+      this.emitSites = emits;
+      this.fireList = fire;
+    }
+  }
+
+  /** Gerüst: Pfosten + Querlatten rund um die Grundfläche, Höhe h */
+  private pushScaffold(b: ClientBuilding, y: number, h: number): void {
+    const x0 = b.x;
+    const z0 = b.y;
+    const sc = this.scaffold;
+    for (let i = 0; i < b.w; i++) sc.push(x0 + i, y, z0, 0, 1, h, 0);
+    for (let j = 0; j < b.h; j++) sc.push(x0 + b.w, y, z0 + j, -Math.PI / 2, 1, h, 0);
+    for (let i = 0; i < b.w; i++) sc.push(x0 + b.w - i, y, z0 + b.h, Math.PI, 1, h, 0);
+    for (let j = 0; j < b.h; j++) sc.push(x0, y, z0 + b.h - j, Math.PI / 2, 1, h, 0);
+  }
+
+  private updateRubble(o: RenderOpts): void {
+    const now = o.now;
+    this.rubbleStone.begin();
+    this.rubbleWood.begin();
+    for (let i = this.rubble.length - 1; i >= 0; i--) {
+      const r = this.rubble[i];
+      const age = now - r.t0;
+      if (age > r.life) {
+        this.rubble.splice(i, 1);
+        continue;
+      }
+      if (age < 0) continue;
+      const rise = ease(age / 0.6);
+      const sink = r.life - age < 3 ? ease((r.life - age) / 3) : 1;
+      const s = r.s * (0.2 + 0.8 * rise) * sink;
+      (r.wood ? this.rubbleWood : this.rubbleStone).push(r.x, r.y - (1 - sink) * 0.2, r.z, r.rot, s, s * (0.5 + 0.5 * rise), 0);
+    }
+    this.rubbleStone.end();
+    this.rubbleWood.end();
+  }
+
+  /** Rahmen um das ausgewählte und das überfahrene Gebäude, Kantenlinien beim Überfahren */
+  private updateFrames(o: RenderOpts): void {
+    const w = this.world;
+    const arr = this.frames.instanceMatrix.array as Float32Array;
+    const col = (this.frames.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
+    let n = 0;
+    const put = (b: ClientBuilding, r: number, g: number, bl: number, thick: number, lift: number): void => {
+      const y = tileY(w, b.x, b.y) + lift;
+      const x0 = b.x - 0.08;
+      const z0 = b.y - 0.08;
+      const ww = b.w + 0.16;
+      const hh = b.h + 0.16;
+      const bars: [number, number, number, number][] = [
+        [x0 + ww / 2, z0, ww, thick],
+        [x0 + ww / 2, z0 + hh, ww, thick],
+        [x0, z0 + hh / 2, thick, hh],
+        [x0 + ww, z0 + hh / 2, thick, hh],
+      ];
+      for (const [bx, bz, sx, sz] of bars) {
+        const m = n * 16;
+        arr[m] = sx; arr[m + 1] = 0; arr[m + 2] = 0; arr[m + 3] = 0;
+        arr[m + 4] = 0; arr[m + 5] = 0.05; arr[m + 6] = 0; arr[m + 7] = 0;
+        arr[m + 8] = 0; arr[m + 9] = 0; arr[m + 10] = sz; arr[m + 11] = 0;
+        arr[m + 12] = bx; arr[m + 13] = y; arr[m + 14] = bz; arr[m + 15] = 1;
+        col[n * 3] = r;
+        col[n * 3 + 1] = g;
+        col[n * 3 + 2] = bl;
+        n++;
+      }
+    };
+    const hov = o.hoverBuilding ? w.buildings.get(o.hoverBuilding) : null;
+    if (hov && hov.i !== o.selectedBuilding) put(hov, 1, 0.95, 0.7, 0.07, 0.06);
     const sb = o.selectedBuilding ? w.buildings.get(o.selectedBuilding) : null;
     if (sb) {
-      this.selBox.visible = true;
-      this.selBox.position.set(sb.x + sb.w / 2, tileY(w, sb.x, sb.y) + 0.06, sb.y + sb.h / 2);
-      this.selBox.scale.set(sb.w + 0.2, 1, sb.h + 0.2);
-    } else this.selBox.visible = false;
-  }
-
-  private fireList: { x: number; y: number; z: number; s: number }[] = [];
-  private rebuildFires(): void {
-    const w = this.world;
-    this.fireList = [];
-    for (const b of w.buildings.values()) {
-      if (!(b.f & BF.Burning)) continue;
-      const def = BUILDINGS[b.t];
-      const n = Math.max(1, Math.min(6, Math.round((b.w * b.h) / 3)));
-      for (let k = 0; k < n; k++) {
-        this.fireList.push({
-          x: b.x + 0.5 + ((k * 7919) % 97) / 97 * (b.w - 1),
-          z: b.y + 0.5 + ((k * 104729) % 89) / 89 * (b.h - 1),
-          y: tileY(w, b.x, b.y) + def.height * 0.6,
-          s: 1 + def.height * 0.25,
-        });
+      const pulse = 0.8 + 0.2 * Math.sin(o.now * 4);
+      put(sb, 1 * pulse, 0.85 * pulse, 0.25, 0.1, 0.07);
+    }
+    this.frames.count = n;
+    this.frames.instanceMatrix.needsUpdate = true;
+    (this.frames.instanceColor as THREE.InstancedBufferAttribute).needsUpdate = true;
+    // Kantenlinien des überfahrenen Gebäudes
+    if (hov && !WALL_TYPES.includes(hov.t) && BUILDINGS[hov.t].height >= 0.7) {
+      let eg = this.edgeCache.get(hov.t);
+      if (!eg) {
+        eg = new THREE.EdgesGeometry(buildBuildingModel(BUILDINGS[hov.t]).merged, 28);
+        this.edgeCache.set(hov.t, eg);
       }
+      if (this.hoverLines.geometry !== eg) this.hoverLines.geometry = eg;
+      this.hoverLines.visible = true;
+      const def = BUILDINGS[hov.t];
+      this.hoverLines.position.set(hov.x + hov.w / 2, (def.placement === 'water' ? -0.1 : tileY(w, hov.x, hov.y)) + 0.005, hov.y + hov.h / 2);
+      this.hoverLines.rotation.set(0, hov.r ? Math.PI / 2 : 0, 0);
+      this.hoverLines.scale.setScalar(1.006);
+      this.hoverId = hov.i;
+    } else {
+      this.hoverLines.visible = false;
+      this.hoverId = -1;
     }
   }
 
+  // ------------------------------------------------------------------ Einheiten
   private updateUnits(dt: number, o: RenderOpts): void {
     const w = this.world;
     for (const m of this.unitMeshes) m?.begin();
+    for (const m of this.cargoMeshes.values()) m.begin();
     const a = Math.min(1.15, o.alpha);
     const ringArr = this.ringMesh.instanceMatrix.array as Float32Array;
     const ringCol = (this.ringMesh.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
@@ -313,68 +738,98 @@ export class EntityRenderer {
     const fgArr = this.hpFg.instanceMatrix.array as Float32Array;
     const fgCol = (this.hpFg.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
     let bars = 0;
-    const cargoArr = this.cargo.instanceMatrix.array as Float32Array;
-    const cargoCol = (this.cargo.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
-    let cargo = 0;
-    const cy = Math.cos(-o.camYaw);
-    const sy = Math.sin(-o.camYaw);
-    const t = o.now;
+    const rc = Math.cos(o.camYaw);
+    const rs = Math.sin(o.camYaw);
+    const blob = this.blob;
+    blob.n = 0;
+    const useBlob = !this.unitShadows;
+    const ptr = o.now;
+    const hasCam = !!o.camera;
+    const ids = w.ids;
+    const types = w.type;
+    const owners = w.owner;
+    const flagsA = w.flags;
+    const auxA = w.aux;
+    const hpA = w.hp;
+    const faceA = w.face;
+    const carryA = w.carry;
+    const yS = this.yS;
+    const faceS = this.faceS;
+    const seen = this.seenId;
+    const fk = Math.min(1, dt * 12);
+    const yk = Math.min(1, dt * 14);
+    let drawn = 0;
     for (let s = 0; s < w.top; s++) {
-      const id = w.ids[s];
+      const id = ids[s];
       if (id === 0) continue;
-      const type = w.type[s];
-      const owner = w.owner[s];
+      const type = types[s];
+      const owner = owners[s];
       const mine = o.teamOfPlayer[owner] === o.myTeam;
-      let x = w.prevX[s] + (w.curX[s] - w.prevX[s]) * a;
-      let y = w.prevY[s] + (w.curY[s] - w.prevY[s]) * a;
+      const x = w.prevX[s] + (w.curX[s] - w.prevX[s]) * a;
+      const y = w.prevY[s] + (w.curY[s] - w.prevY[s]) * a;
+      const fl = flagsA[s];
       if (!mine) {
-        if (w.flags[s] & 8 && w.flags[s] & 4) { /* unsichtbar (Assassine) */ }
         if (o.visible && !o.visible(x, y)) continue;
-        if (w.flags[s] & 8) continue; // unsichtbar
+        if (fl & 8) continue; // unsichtbar (Assassine)
       }
-      const layer = w.flags[s] & 1;
+      const layer = fl & 1;
       let gy = groundYAt(w, x, y);
       if (layer) {
-        const b = w.buildings.get(w.bldAt[w.map.idx(Math.min(w.map.w - 1, Math.max(0, Math.floor(x))), Math.min(w.map.h - 1, Math.max(0, Math.floor(y))))]);
+        const bi = w.bldAt[w.map.idx(Math.min(w.map.w - 1, Math.max(0, Math.floor(x))), Math.min(w.map.h - 1, Math.max(0, Math.floor(y))))];
+        const b = bi ? w.buildings.get(bi) : undefined;
         if (b) gy += BUILDINGS[b.t].height;
       }
-      // sanftes Höhen-Smoothing
-      const prevY = this.yS[s] || gy;
-      const ny = prevY + (gy - prevY) * Math.min(1, dt * 14);
-      this.yS[s] = ny;
-      const moving = (w.flags[s] & 4) !== 0;
-      const working = (w.aux[s] & 2) !== 0;
-      const attacking = (w.aux[s] & 1) !== 0;
-      let bob = 0;
-      if (moving) bob = Math.abs(Math.sin(t * 11 + s)) * 0.06;
-      else if (working) bob = Math.abs(Math.sin(t * 6 + s)) * 0.05;
-      else if (attacking) bob = Math.abs(Math.sin(t * 9 + s)) * 0.07;
+      // Höhe und Blickrichtung weich nachführen (neue Einheit: sofort setzen)
+      let ny: number;
+      let face: number;
+      if (seen[s] !== id) {
+        seen[s] = id;
+        ny = gy;
+        face = faceA[s];
+      } else {
+        ny = yS[s] + (gy - yS[s]) * yk;
+        face = faceS[s];
+        let d = faceA[s] - face;
+        if (d > Math.PI) d -= PI2;
+        else if (d < -Math.PI) d += PI2;
+        face += d * fk;
+      }
+      yS[s] = ny;
+      faceS[s] = face;
       const def = UNITS[type];
+      const sc = UNIT_SCALE[type];
+      if (hasCam && !this.inView(x, ny + 0.5, y, 1.6 + sc)) continue;
+      drawn++;
+      let af = 0;
+      const ax = auxA[s];
+      if (fl & 4) af |= AF.Move;
+      if (ax & 1) af |= RANGED[type] ? AF.Shoot : AF.Melee;
+      if (ax & 2) af |= AF.Work;
       const tm = this.unitMesh(type);
-      const big = def.radius > 0.5;
-      const lunge = attacking ? Math.sin(t * 9 + s) * 0.08 : 0;
-      const face = w.face[s];
-      tm.push(x + Math.sin(face) * lunge, ny + (big ? 0 : bob), y + Math.cos(face) * lunge, face, 1, teamColors[owner % 8]);
+      const phase = (s * 0.61803) % 1;
+      tm.push(x, ny, y, face, sc, sc, owner, phase, af, UNIT_WALK_W[type], af & AF.Work ? 1.1 : UNIT_CYCLE[type]);
+      if (useBlob) blob.push(x, ny + 0.025, y, Math.max(0.5, def.radius * 2.3) * sc, 0, 0, 0, SIEGE[type] ? 0.32 : 0.3);
       const sel = o.selected.has(id);
       if (sel && rings < 2048) {
-        const r = Math.max(1, def.radius * 2.4);
+        const r = Math.max(1, def.radius * 2.3) * (1 + 0.035 * Math.sin(ptr * 5 + s));
         const m = rings * 16;
         ringArr[m] = r; ringArr[m + 1] = 0; ringArr[m + 2] = 0; ringArr[m + 3] = 0;
         ringArr[m + 4] = 0; ringArr[m + 5] = 1; ringArr[m + 6] = 0; ringArr[m + 7] = 0;
         ringArr[m + 8] = 0; ringArr[m + 9] = 0; ringArr[m + 10] = r; ringArr[m + 11] = 0;
-        ringArr[m + 12] = x; ringArr[m + 13] = ny + 0.03; ringArr[m + 14] = y; ringArr[m + 15] = 1;
-        ringCol[rings * 3] = 0.4; ringCol[rings * 3 + 1] = 1; ringCol[rings * 3 + 2] = 0.4;
+        ringArr[m + 12] = x; ringArr[m + 13] = ny + 0.035; ringArr[m + 14] = y; ringArr[m + 15] = 1;
+        // Spielerfarbe, aufgehellt (weißer Kern bleibt lesbar)
+        const t3 = (owner % 8) * 3;
+        ringCol[rings * 3] = Math.min(1, TEAM[t3] * 0.6 + 0.4);
+        ringCol[rings * 3 + 1] = Math.min(1, TEAM[t3 + 1] * 0.6 + 0.4);
+        ringCol[rings * 3 + 2] = Math.min(1, TEAM[t3 + 2] * 0.6 + 0.4);
         rings++;
       }
-      const hp = w.hp[s];
-      if ((sel || hp < 250) && bars < 1536 && type !== U.Peasant && type !== U.Ox || (sel && bars < 1536)) {
-        const wd = 0.7;
-        const h = 0.09;
-        const by = ny + (big ? 1.2 : 1.0) + (type === U.SiegeTower ? 1.8 : 0);
+      const hp = hpA[s];
+      if (((hp < 250 && type !== U.Peasant && type !== U.Ox) || sel) && bars < 2048) {
+        const wd = 0.55 + def.radius * 0.5;
+        const h = 0.085;
+        const by = ny + UNIT_TOP[type] * sc + 0.18;
         const m = bars * 16;
-        // Billboard um Y: Rotation um camYaw
-        const rc = Math.cos(o.camYaw);
-        const rs = Math.sin(o.camYaw);
         bgArr[m] = rc * (wd + 0.04); bgArr[m + 1] = 0; bgArr[m + 2] = -rs * (wd + 0.04); bgArr[m + 3] = 0;
         bgArr[m + 4] = 0; bgArr[m + 5] = h + 0.04; bgArr[m + 6] = 0; bgArr[m + 7] = 0;
         bgArr[m + 8] = rs; bgArr[m + 9] = 0; bgArr[m + 10] = rc; bgArr[m + 11] = 0;
@@ -383,7 +838,6 @@ export class EntityRenderer {
         fgArr[m] = rc * wd * f; fgArr[m + 1] = 0; fgArr[m + 2] = -rs * wd * f; fgArr[m + 3] = 0;
         fgArr[m + 4] = 0; fgArr[m + 5] = h; fgArr[m + 6] = 0; fgArr[m + 7] = 0;
         fgArr[m + 8] = rs; fgArr[m + 9] = 0; fgArr[m + 10] = rc; fgArr[m + 11] = 0;
-        // links ausrichten
         const off = -wd * (1 - f) * 0.5;
         fgArr[m + 12] = x + rc * off; fgArr[m + 13] = by + 0.001; fgArr[m + 14] = y - rs * off; fgArr[m + 15] = 1;
         fgCol[bars * 3] = f < 0.5 ? 1 : 2 - f * 2;
@@ -391,23 +845,57 @@ export class EntityRenderer {
         fgCol[bars * 3 + 2] = 0.15;
         bars++;
       }
-      const carry = w.carry[s];
-      if (carry > 0 && cargo < 4096) {
-        const m = cargo * 16;
-        cargoArr[m] = 1; cargoArr[m + 1] = 0; cargoArr[m + 2] = 0; cargoArr[m + 3] = 0;
-        cargoArr[m + 4] = 0; cargoArr[m + 5] = 1; cargoArr[m + 6] = 0; cargoArr[m + 7] = 0;
-        cargoArr[m + 8] = 0; cargoArr[m + 9] = 0; cargoArr[m + 10] = 1; cargoArr[m + 11] = 0;
-        cargoArr[m + 12] = x - Math.sin(face) * 0.14; cargoArr[m + 13] = ny + 0.78 + bob; cargoArr[m + 14] = y - Math.cos(face) * 0.14; cargoArr[m + 15] = 1;
-        const c = RES_COLORS[carry - 1] ?? 0xffffff;
-        cargoCol[cargo * 3] = ((c >> 16) & 255) / 255;
-        cargoCol[cargo * 3 + 1] = ((c >> 8) & 255) / 255;
-        cargoCol[cargo * 3 + 2] = (c & 255) / 255;
-        cargo++;
+      const carry = carryA[s];
+      if (carry > 0) {
+        const kind = CARGO_OF_RES[carry - 1];
+        if (kind) {
+          const cm = this.cargoMesh(kind);
+          cm.push(x, ny, y, face, sc, sc, 0, phase, af, UNIT_WALK_W[type], 1.1);
+          const c = RES_COLORS[carry - 1] ?? 0xffffff;
+          cm.tintLast(srgb(((c >> 16) & 255) / 255), srgb(((c >> 8) & 255) / 255), srgb((c & 255) / 255));
+        }
       }
-      // brennende Einheit: Flammenpartikel
-      if (w.flags[s] & 2 && Math.random() < 0.3) this.fx.effect('fire', x, y, ny + 0.5);
+      // brennende Einheit: Flammen
+      if (fl & 2 && Math.random() < 0.35) this.fx.effect('fire', x, y, ny + 0.5);
     }
+    this.stats.units = drawn;
+
+    // Gebäudebalken: beschädigte (< 100 %) bei Hover/Auswahl, kritische und brennende immer
+    for (const b of w.buildings.values()) {
+      if (bars >= 2040) break;
+      const def = BUILDINGS[b.t];
+      if (def.hp <= 0) continue;
+      const frac = b.hp / def.hp;
+      const selected = b.i === o.selectedBuilding;
+      const focus = selected || b.i === o.hoverBuilding;
+      if (!(selected || (frac < 0.985 && (focus || frac < 0.65 || (b.f & BF.Burning) !== 0)))) continue;
+      const cx = b.x + b.w / 2;
+      const cz = b.y + b.h / 2;
+      const mine = o.teamOfPlayer[b.o] === o.myTeam;
+      if (!mine && o.explored && !o.explored(cx, cz)) continue;
+      if (hasCam && !this.inView(cx, tileY(w, b.x, b.y) + def.height, cz, 3)) continue;
+      const wd = Math.min(2.4, 0.9 + Math.max(b.w, b.h) * 0.3);
+      const h = 0.11;
+      const by = tileY(w, b.x, b.y) + def.height + 0.55;
+      const m = bars * 16;
+      bgArr[m] = rc * (wd + 0.05); bgArr[m + 1] = 0; bgArr[m + 2] = -rs * (wd + 0.05); bgArr[m + 3] = 0;
+      bgArr[m + 4] = 0; bgArr[m + 5] = h + 0.05; bgArr[m + 6] = 0; bgArr[m + 7] = 0;
+      bgArr[m + 8] = rs; bgArr[m + 9] = 0; bgArr[m + 10] = rc; bgArr[m + 11] = 0;
+      bgArr[m + 12] = cx; bgArr[m + 13] = by; bgArr[m + 14] = cz; bgArr[m + 15] = 1;
+      const f = Math.max(0.02, Math.min(1, frac));
+      fgArr[m] = rc * wd * f; fgArr[m + 1] = 0; fgArr[m + 2] = -rs * wd * f; fgArr[m + 3] = 0;
+      fgArr[m + 4] = 0; fgArr[m + 5] = h; fgArr[m + 6] = 0; fgArr[m + 7] = 0;
+      fgArr[m + 8] = rs; fgArr[m + 9] = 0; fgArr[m + 10] = rc; fgArr[m + 11] = 0;
+      const off = -wd * (1 - f) * 0.5;
+      fgArr[m + 12] = cx + rc * off; fgArr[m + 13] = by + 0.001; fgArr[m + 14] = cz - rs * off; fgArr[m + 15] = 1;
+      fgCol[bars * 3] = f < 0.5 ? 1 : 2 - f * 2;
+      fgCol[bars * 3 + 1] = f > 0.5 ? 0.85 : f * 1.7;
+      fgCol[bars * 3 + 2] = 0.15;
+      bars++;
+    }
+
     for (const m of this.unitMeshes) m?.end();
+    for (const m of this.cargoMeshes.values()) m.end();
     this.ringMesh.count = rings;
     this.ringMesh.instanceMatrix.needsUpdate = true;
     (this.ringMesh.instanceColor as THREE.InstancedBufferAttribute).needsUpdate = true;
@@ -416,12 +904,12 @@ export class EntityRenderer {
     this.hpBg.instanceMatrix.needsUpdate = true;
     this.hpFg.instanceMatrix.needsUpdate = true;
     (this.hpFg.instanceColor as THREE.InstancedBufferAttribute).needsUpdate = true;
-    this.cargo.count = cargo;
-    this.cargo.instanceMatrix.needsUpdate = true;
-    (this.cargo.instanceColor as THREE.InstancedBufferAttribute).needsUpdate = true;
+    blob.commit();
 
-    // Flammen
+    // Flammen (Kegel) auf brennenden Gebäuden
     const farr = this.fires.instanceMatrix.array as Float32Array;
+    const fcol = this.fires.instanceColor;
+    void fcol;
     let nf = 0;
     for (const f of this.fireList) {
       if (nf >= 1024) break;
@@ -432,7 +920,6 @@ export class EntityRenderer {
       farr[m + 8] = 0; farr[m + 9] = 0; farr[m + 10] = f.s * pulse; farr[m + 11] = 0;
       farr[m + 12] = f.x; farr[m + 13] = f.y; farr[m + 14] = f.z; farr[m + 15] = 1;
       nf++;
-      if (Math.random() < 0.05) this.fx.effect('fire', f.x, f.z, f.y);
     }
     this.fires.count = nf;
     this.fires.instanceMatrix.needsUpdate = true;
@@ -455,68 +942,168 @@ export class EntityRenderer {
     }
     this.ladderMesh.count = nl;
     this.ladderMesh.instanceMatrix.needsUpdate = true;
-    void cy;
-    void sy;
   }
 
-  private neutral = new THREE.Color(0xf2ede0);
+  /** Gefallene Einheiten bleiben kurz liegen (Umkippen im Vertex-Shader), dann verschwinden sie */
+  private updateCorpses(o: RenderOpts): void {
+    const w = this.world;
+    const now = o.now;
+    const live = 4.0;
+    let n = 0;
+    for (let i = this.corpses.length - 1; i >= 0; i--) {
+      const c = this.corpses[i];
+      const age = now - c.t0;
+      if (age > live) {
+        this.corpses.splice(i, 1);
+        continue;
+      }
+      const gy = tileY(w, Math.floor(c.x), Math.floor(c.y));
+      const sc = UNIT_SCALE[c.type];
+      this.unitMesh(c.type).push(c.x, gy, c.y, c.face, sc, sc, c.owner, c.phase, AF.Dead, UNIT_SIDEWAYS[c.type] ? 1 : 0, age);
+      n++;
+    }
+    this.stats.corpses = n;
+    // `end()` der Einheitenmeshes wurde schon in updateUnits aufgerufen: Zähler nachziehen
+    for (const m of this.unitMeshes) m?.end();
+  }
+
+  private neutral = NEUTRAL;
   private updateBanners(o: RenderOpts): void {
     const m = this.bannerMesh;
-    if (!m) return;
     const b = this.world.banners;
     m.begin();
     for (let i = 0; i + 3 < b.length; i += 4) {
       const owner = b[i + 2];
-      m.push(b[i], tileY(this.world, Math.floor(b[i]), Math.floor(b[i + 1])), b[i + 1], Math.sin(o.now * 1.5 + i) * 0.4, 1, owner >= 0 ? teamColors[owner % 8] : this.neutral);
+      if (owner >= 0) m.push(b[i], tileY(this.world, Math.floor(b[i]), Math.floor(b[i + 1])), b[i + 1], Math.sin(o.now * 1.5 + i) * 0.4, 1, 1, owner, 0.3, AF.Static, 0, 1);
+      else {
+        m.push(b[i], tileY(this.world, Math.floor(b[i]), Math.floor(b[i + 1])), b[i + 1], Math.sin(o.now * 1.5 + i) * 0.4, 1, 1, 0, 0.3, AF.Static, 0, 1);
+        const k = (m.count - 1) * 3;
+        const ic = m.mesh.instanceColor as THREE.InstancedBufferAttribute;
+        (ic.array as Float32Array)[k] = this.neutral.r;
+        (ic.array as Float32Array)[k + 1] = this.neutral.g;
+        (ic.array as Float32Array)[k + 2] = this.neutral.b;
+      }
       if (b[i + 3] > 0 && Math.random() < 0.05) this.fx.effect('banner', b[i], b[i + 1], 0.5);
     }
     m.end();
   }
 
+  // ------------------------------------------------------------------ Projektile
   private updateProjectiles(o: RenderOpts): void {
     const p = this.world.proj;
-    const aarr = this.arrows.instanceMatrix.array as Float32Array;
-    const sarr = this.stones.instanceMatrix.array as Float32Array;
-    let na = 0;
-    let ns = 0;
+    this.arrows.begin();
+    this.bolts.begin();
+    this.fireArrows.begin();
+    this.stones.begin();
+    this.boulders.begin();
     const a = Math.min(1, o.alpha);
-    const v = new THREE.Vector3();
+    const t = o.now;
+    let n = 0;
+    const cap = this.q.particleScale < 0.5 ? 0.15 : 0.5;
     for (let i = 0; i + 7 < p.length; i += 8) {
       const kind = p[i];
       const x = p[i + 2] + p[i + 5] * a;
       const y = p[i + 3] + p[i + 6] * a;
       const z = p[i + 4] + p[i + 7] * a;
+      n++;
       if (kind === PROJ.Stone || kind === PROJ.Boulder) {
-        if (ns >= 512) continue;
-        const m = ns * 16;
-        const sc = kind === PROJ.Boulder ? 1.6 : 0.5;
-        sarr[m] = sc; sarr[m + 1] = 0; sarr[m + 2] = 0; sarr[m + 3] = 0;
-        sarr[m + 4] = 0; sarr[m + 5] = sc; sarr[m + 6] = 0; sarr[m + 7] = 0;
-        sarr[m + 8] = 0; sarr[m + 9] = 0; sarr[m + 10] = sc; sarr[m + 11] = 0;
-        sarr[m + 12] = x; sarr[m + 13] = z; sarr[m + 14] = y; sarr[m + 15] = 1;
-        ns++;
+        const big = kind === PROJ.Boulder;
+        const sc = big ? 1.5 : 0.7;
+        const ang = t * (big ? 3 : 7) + i * 0.37;
+        const bt = ang * 0.7;
+        const ca = Math.cos(ang), sa = Math.sin(ang), cb = Math.cos(bt), sb = Math.sin(bt);
+        const m = big ? this.boulders : this.stones;
+        pushRot(m, x, z, y, ca * sc, 0, -sa * sc, sa * sb * sc, cb * sc, ca * sb * sc, sa * cb * sc, -sb * sc, ca * cb * sc);
+        if (big && Math.random() < cap) this.fx.puff(x, z, y, 0, 0.1, 0, 0.8, 0.25, 0.7, [0.3, 0.28, 0.26], 0.45, 0, 1);
       } else {
-        if (na >= 2048) continue;
-        // Ausrichtung entlang der Geschwindigkeit (x, z=y-tile, y=höhe)
-        v.set(p[i + 5], p[i + 7], p[i + 6]);
-        if (v.lengthSq() < 1e-8) v.set(0, 0, 1);
-        v.normalize();
-        const up = Math.abs(v.y) > 0.95 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
-        const rgt = new THREE.Vector3().crossVectors(up, v).normalize();
-        const u2 = new THREE.Vector3().crossVectors(v, rgt);
-        const m = na * 16;
-        aarr[m] = rgt.x; aarr[m + 1] = rgt.y; aarr[m + 2] = rgt.z; aarr[m + 3] = 0;
-        aarr[m + 4] = u2.x; aarr[m + 5] = u2.y; aarr[m + 6] = u2.z; aarr[m + 7] = 0;
-        aarr[m + 8] = v.x; aarr[m + 9] = v.y; aarr[m + 10] = v.z; aarr[m + 11] = 0;
-        aarr[m + 12] = x; aarr[m + 13] = z; aarr[m + 14] = y; aarr[m + 15] = 1;
-        na++;
-        if (kind === PROJ.FireArrow && Math.random() < 0.5) this.fx.effect('fire', x, y, z);
+        let vx = p[i + 5];
+        let vy = p[i + 7];
+        let vz = p[i + 6];
+        const l = Math.hypot(vx, vy, vz);
+        if (l < 1e-5) {
+          vx = 0;
+          vy = 0;
+          vz = 1;
+        } else {
+          vx /= l;
+          vy /= l;
+          vz /= l;
+        }
+        // Basis: z-Achse = Flugrichtung
+        let rx = vz;
+        let ry = 0;
+        let rz = -vx;
+        let rl = Math.hypot(rx, rz);
+        if (rl < 1e-4) {
+          rx = 1;
+          rz = 0;
+          rl = 1;
+        }
+        rx /= rl;
+        rz /= rl;
+        const ux = vy * rz - vz * ry;
+        const uy = vz * rx - vx * rz;
+        const uz = vx * ry - vy * rx;
+        const m = kind === PROJ.Bolt ? this.bolts : kind === PROJ.FireArrow ? this.fireArrows : this.arrows;
+        pushRot(m, x, z, y, rx, ry, rz, ux, uy, uz, vx, vy, vz);
+        if (kind === PROJ.FireArrow && Math.random() < cap) this.fx.effect('fire', x, y, z);
       }
     }
-    this.arrows.count = na;
-    this.arrows.instanceMatrix.needsUpdate = true;
-    this.stones.count = ns;
-    this.stones.instanceMatrix.needsUpdate = true;
+    this.stats.projectiles = n;
+    this.arrows.end();
+    this.bolts.end();
+    this.fireArrows.end();
+    this.stones.end();
+    this.boulders.end();
+  }
+
+  // ------------------------------------------------------------------ Dauereffekte
+  private updateEmitters(dt: number, o: RenderOpts): void {
+    const fx = this.fx;
+    const hasCam = !!o.camera;
+    for (const b of this.burnSites) {
+      const cx = b.x + b.w / 2;
+      const cz = b.z + b.h / 2;
+      if (hasCam && !this.inView(cx, b.y + b.top, cz, 4)) continue;
+      const area = b.w * b.h;
+      let nFlames = dt * (6 + area * 1.6);
+      while (nFlames > 0) {
+        if (nFlames >= 1 || Math.random() < nFlames) fx.flame(b.x + 0.3 + Math.random() * (b.w - 0.6), b.y + b.top * (0.35 + Math.random() * 0.6), b.z + 0.3 + Math.random() * (b.h - 0.6), 0.4 + b.top * 0.12);
+        nFlames -= 1;
+      }
+      if (this.q.workSmoke) {
+        let nSmoke = dt * (2.2 + area * 0.45);
+        while (nSmoke > 0) {
+          if (nSmoke >= 1 || Math.random() < nSmoke) fx.smokeUp(cx + (Math.random() - 0.5) * b.w * 0.6, b.y + b.top + 0.3, cz + (Math.random() - 0.5) * b.h * 0.6, true, 0.45 + b.top * 0.1, 3.8);
+          nSmoke -= 1;
+        }
+        if (Math.random() < dt * 4) fx.ember(cx + (Math.random() - 0.5) * b.w, b.y + b.top, cz + (Math.random() - 0.5) * b.h);
+      }
+    }
+    for (const e of this.emitSites) {
+      if (hasCam && !this.inView(e.x, e.y, e.z, 3)) continue;
+      e.acc += dt * e.rate;
+      while (e.acc >= 1) {
+        e.acc -= 1;
+        switch (e.kind) {
+          case 'smoke':
+            fx.smokeUp(e.x, e.y, e.z, false, 0.26, 2.8);
+            break;
+          case 'smokeDark':
+            fx.smokeUp(e.x, e.y, e.z, true, 0.3, 2.8);
+            break;
+          case 'steam':
+            fx.puff(e.x + (Math.random() - 0.5) * 0.1, e.y, e.z + (Math.random() - 0.5) * 0.1, 0, 0.6 + Math.random() * 0.4, 0, 1.6, 0.15, 0.55, [0.95, 0.95, 0.92], 0.45, -0.05, 0.3);
+            break;
+          case 'flame':
+            fx.flame(e.x, e.y, e.z, 0.26);
+            break;
+          case 'sparks':
+            fx.ember(e.x, e.y - 0.8, e.z);
+            break;
+        }
+      }
+    }
   }
 
   /** Meldet das Ende der Frame-Verarbeitung von Welt-Ereignissen */
@@ -527,4 +1114,37 @@ export class EntityRenderer {
   }
 }
 
-export { HEIGHT_STEP, BT, S };
+/** sRGB-Wert (0..1) in linear umrechnen, passend zu THREE.Color-Handhabung der Instanzfarben */
+function srgb(c: number): number {
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function pushRot(m: TypeMesh, x: number, y: number, z: number, rx: number, ry: number, rz: number, ux: number, uy: number, uz: number, fx: number, fy: number, fz: number): void {
+  // schreibt eine Instanz mit beliebiger Basis (rechts, oben, vorwärts)
+  m.push(x, y, z, 0, 1, 1, 0);
+  const arr = m.mesh.instanceMatrix.array as Float32Array;
+  const o = (m.count - 1) * 16;
+  arr[o] = rx; arr[o + 1] = ry; arr[o + 2] = rz;
+  arr[o + 4] = ux; arr[o + 5] = uy; arr[o + 6] = uz;
+  arr[o + 8] = fx; arr[o + 9] = fy; arr[o + 10] = fz;
+}
+
+function mergeGeos(a: THREE.BufferGeometry, b: THREE.BufferGeometry): THREE.BufferGeometry {
+  const pa = a.getAttribute('position');
+  const pb = b.getAttribute('position');
+  const pos = new Float32Array((pa.count + pb.count) * 3);
+  pos.set(pa.array as Float32Array, 0);
+  pos.set(pb.array as Float32Array, pa.count * 3);
+  const ia = a.getIndex()!;
+  const ib = b.getIndex()!;
+  const idx: number[] = [];
+  for (let i = 0; i < ia.count; i++) idx.push(ia.getX(i));
+  for (let i = 0; i < ib.count; i++) idx.push(ib.getX(i) + pa.count);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setIndex(idx);
+  return g;
+}
+
+void SLOT_MASK;
+void flameGeo;

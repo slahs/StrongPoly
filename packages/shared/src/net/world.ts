@@ -53,7 +53,7 @@ export class ClientWorld implements PlaceCtx {
   /** Ereignisse seit dem letzten Abholen */
   events: SimEvent[] = [];
   /** neu gestorbene Einheiten (id, x, y, type, owner) für Effekte */
-  deaths: { id: number; x: number; y: number; type: number; owner: number }[] = [];
+  deaths: { id: number; x: number; y: number; type: number; owner: number; face: number }[] = [];
   removedBuildings: ClientBuilding[] = [];
   gameTimeMs = 0;
   lastSnapMs = 0;
@@ -165,7 +165,7 @@ export class ClientWorld implements PlaceCtx {
     for (const id of snap.deadUnits) {
       const s = id & SLOT_MASK;
       if (this.ids[s] === id) {
-        this.deaths.push({ id, x: this.curX[s], y: this.curY[s], type: this.type[s], owner: this.owner[s] });
+        this.deaths.push({ id, x: this.curX[s], y: this.curY[s], type: this.type[s], owner: this.owner[s], face: this.face[s] });
         this.ids[s] = 0;
       }
     }

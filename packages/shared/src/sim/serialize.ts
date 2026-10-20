@@ -27,7 +27,7 @@ export interface SimSave {
 
 const UNIT_FIELDS = ['alive', 'gen', 'type', 'owner', 'state', 'sub', 'stance', 'layer', 'flags', 'x', 'y', 'hp', 'maxHp', 'face', 'tx', 'ty', 'goal', 'march', 'target', 'targetKind', 'cd', 'timer', 'carryRes', 'carryAmt', 'home', 'ax', 'ay', 'stuck', 'burn'] as const;
 const PROJ_FIELDS = ['alive', 'kind', 'owner', 'sx', 'sy', 'sz', 'ex', 'ey', 'ez', 'arc', 't', 'T', 'dmg', 'dtype', 'splash', 'target', 'fire', 'bTarget'] as const;
-const BLD_FIELDS = ['hp', 'maxHp', 'burn', 'workers', 'out', 'inBuf', 'recipe', 'timer', 'cycles', 'turret', 'turretCd', 'queue', 'claim', 'horses', 'activeUntil', 'staffed', 'cd', 'charges', 'repair', 'repairer', 'spawnTimer', 'off', 'prog'] as const;
+const BLD_FIELDS = ['hp', 'maxHp', 'burn', 'workers', 'out', 'inBuf', 'recipe', 'timer', 'cycles', 'turret', 'turretCd', 'queue', 'claim', 'horses', 'activeUntil', 'staffed', 'cd', 'charges', 'repair', 'repairer', 'spawnTimer', 'off', 'prog', 'born'] as const;
 const PLAYER_FIELDS = ['alive', 'gold', 'tax', 'ration', 'popularity', 'popTarget', 'factors', 'keepId', 'campfireId', 'lordId', 'horses', 'fear', 'foodTypes', 'foodShort', 'spawnTimer', 'leaveTimer', 'foodAcc', 'aleAcc', 'power', 'powerMax', 'abilityCd', 'banners', 'events', 'abilitiesUsed', 'defeatedTick', 'aidRequests', 'aleCover', 'relCover', 'placed', 'peasants', 'troops', 'team', 'name'] as const;
 
 export function saveSim(sim: Sim): SimSave {

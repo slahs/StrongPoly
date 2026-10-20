@@ -38,6 +38,29 @@ describe('Snapshots', () => {
     expect(w.bldAt[w.map.idx(placed!.x, placed!.y)]).toBe(placed!.id);
   });
 
+  it('Baustufe: der Platzierungs-Tick kommt im Snapshot an (0 = von Anfang an da), die Sim bleibt unberührt', () => {
+    const host = new GameHost(mk());
+    const sim = host.sim;
+    const w = new ClientWorld();
+    const wire = (s: Snapshot): Snapshot => decode(encode(s)) as Snapshot;
+    w.apply(wire(host.fullSnapshot()), 0);
+    for (const b of w.buildings.values()) expect(b.n, `Startgebäude ${b.t}`).toBe(0);
+    for (let i = 0; i < 25; i++) w.apply(wire(host.stepOnce()), i * 100);
+    const st = sim.map.starts[0];
+    let placed = null;
+    for (let dx = 8; dx < 20 && !placed; dx++) placed = sim.place(0, BT.Well, st.x + dx, st.y - 8, 0);
+    expect(placed).not.toBeNull();
+    const tickAtPlace = sim.tick;
+    expect(placed!.born).toBe(tickAtPlace);
+    expect(tickAtPlace).toBeGreaterThan(0);
+    for (let i = 0; i < 3; i++) w.apply(wire(host.stepOnce()), 3000 + i * 100);
+    expect(w.buildings.get(placed!.id)!.n).toBe(tickAtPlace);
+    // ein Voll-Snapshot (Reconnect) liefert denselben Wert
+    const w2 = new ClientWorld();
+    w2.apply(wire(host.fullSnapshot()), 0);
+    expect(w2.buildings.get(placed!.id)!.n).toBe(tickAtPlace);
+  });
+
   it('Regression: Geschosse und Tile-Änderungen überstehen den MessagePack-Weg als richtige Typen', () => {
     const host = new GameHost(mk());
     const sim = host.sim;

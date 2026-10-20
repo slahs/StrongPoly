@@ -88,6 +88,8 @@ export interface BuildingRec {
   b: number;
   /** Produktionsfortschritt 0..100 */
   p: number;
+  /** Tick der Platzierung (0 = von Beginn an); die Darstellung leitet daraus die Baustufe ab */
+  n: number;
 }
 
 export interface Snapshot {
@@ -222,6 +224,7 @@ function bRec(b: NonNullable<ReturnType<Sim['buildings']['get']>>, sim: Sim): Bu
     c: b.recipe,
     b: b.out,
     p: Math.round(b.prog * 100),
+    n: b.born || 0,
   };
 }
 
