@@ -19,6 +19,7 @@ import { InputController } from './input';
 import type { GameSetup } from './protocol';
 import { Settings } from './settings';
 import type { AudioEngine } from '../audio/audio';
+import { Soundscape, SoundView } from './soundscape';
 
 export interface SessionOptions {
   setup: GameSetup;
@@ -51,10 +52,13 @@ export class Session {
   private fpsAcc = { frames: 0, t: 0, fps: 0 };
   private gotFirst = false;
   private ended = false;
+  private themed = false;
   private moveFlash: { x: number; y: number; t: number }[] = [];
   private alertCooldown = 0;
   private info = { tickMs: 0, tick: 0, units: 0 };
   audio: AudioEngine | null;
+  /** leitet Weltgeräusche und die Musikstimmung aus dem Spielzustand ab */
+  readonly sound: Soundscape | null;
 
   constructor(
     readonly gs: GameScene,
@@ -64,6 +68,10 @@ export class Session {
   ) {
     this.me = conn.playerId;
     this.audio = opts.audio;
+    this.sound = opts.audio ? new Soundscape(this.world, opts.audio) : null;
+    // neue Partie: Spielmusik statt Menüthema
+    this.audio?.playTheme(null);
+    this.audio?.setMood('build');
     this.entities = new EntityRenderer(this.world);
     gs.root.add(this.entities.group, this.ghost.group);
     const actions: HudActions = {
@@ -105,6 +113,50 @@ export class Session {
   // ----- Befehle & Auswahl -----
   send(cmd: Command): void {
     this.conn.send(cmd);
+    this.commandVoice(cmd);
+  }
+
+  /** Kurzer Ton je Einheitenklasse bei Befehlen an Einheiten. */
+  private commandVoice(cmd: Command): void {
+    if (!this.audio) return;
+    let kind: 'move' | 'attack' | 'attackMove' | 'stop' | null = null;
+    switch (cmd.c) {
+      case 'move':
+        kind = cmd.attack ? 'attackMove' : 'move';
+        break;
+      case 'attack':
+      case 'attackGround':
+        kind = 'attack';
+        break;
+      case 'patrol':
+        kind = 'attackMove';
+        break;
+      case 'tunnel':
+        kind = 'move';
+        break;
+      case 'stop':
+        kind = 'stop';
+        break;
+      default:
+        return;
+    }
+    const w = this.world;
+    const types: number[] = [];
+    for (const id of cmd.units) {
+      const s = w.slotOf(id);
+      if (s >= 0) types.push(w.type[s]);
+    }
+    if (types.length) this.audio.selectionCommand(types, kind);
+  }
+
+  /** Taste M: Ton stumm/an, mit sichtbarer Meldung. */
+  toggleMute(): void {
+    if (!this.audio) return;
+    const muted = this.audio.toggleMute();
+    this.opts.settings.muted = muted;
+    this.opts.settings.save();
+    this.hud.toast(muted ? 'Ton aus (M zum Einschalten)' : 'Ton an');
+    if (!muted) this.audio.ui('confirm');
   }
 
   startPlacement(type: number): void {
@@ -114,7 +166,15 @@ export class Session {
 
   setSelection(units: number[], building: number): void {
     this.selection = { units, building };
-    if (units.length) this.audio?.click();
+    if (units.length) {
+      const w = this.world;
+      const types: number[] = [];
+      for (const id of units) {
+        const s = w.slotOf(id);
+        if (s >= 0) types.push(w.type[s]);
+      }
+      this.audio?.selectionSelect(types);
+    } else if (building) this.audio?.ui('click');
   }
 
   selectAllArmy(): void {
@@ -178,8 +238,7 @@ export class Session {
     const st = this.opts.settings;
     this.gs.applyGfx({ shadows: st.shadows, quality: st.quality });
     this.entities.setShadows(st.shadows);
-    this.audio?.setVolume(st.volume);
-    this.audio?.setMusic(st.music);
+    this.audio?.configure(st.audio());
   }
 
   changeSpeed(dir: number): void {
@@ -220,22 +279,26 @@ export class Session {
       }
       this.world.tileChanges.length = 0;
       this.handleEvents(s.events);
+      this.sound?.onSnapshot(this.soundView());
       if (s.winner !== undefined && !this.ended) this.onEnd(s.winner);
     }
   }
 
   private handleEvents(events: Snapshot['events']): void {
     for (const e of events) {
-      if (e.e === 'msg' && e.p === this.me) this.hud.toast(e.text);
-      else if (e.e === 'alert' && e.p === this.me && this.alertCooldown <= 0) {
+      if (e.e === 'msg' && e.p === this.me) {
+        this.hud.toast(e.text);
+        this.audio?.advisor('info');
+      } else if (e.e === 'alert' && e.p === this.me && this.alertCooldown <= 0) {
         this.alertCooldown = 6;
         this.hud.toast(e.k === 'attack' ? 'Wir werden angegriffen!' : 'Achtung!', true);
-        this.audio?.alert();
+        this.audio?.advisor('alert');
       } else if (e.e === 'lose' && e.p === this.me) {
         this.hud.banner('Niederlage', '#d8362f');
         this.audio?.defeat();
-      }
-      else if (e.e === 'fx') this.audio?.fx(e.k, e.x, e.y, this.gs.cam.tx, this.gs.cam.tz);
+        this.audio?.playTheme('defeat');
+        this.themed = true;
+      } else if (e.e === 'fx') this.sound?.onEvent(e, this.soundView());
     }
   }
 
@@ -243,7 +306,14 @@ export class Session {
     this.ended = true;
     const won = winner === this.myTeam;
     this.hud.banner(won ? 'Sieg!' : winner < 0 ? 'Unentschieden' : 'Niederlage', won ? '#f0c040' : '#d8362f');
-    if (won) this.audio?.victory();
+    if (won) {
+      this.audio?.victory();
+      this.audio?.playTheme('victory');
+    } else if (!this.themed) {
+      this.audio?.defeat();
+      this.audio?.playTheme('defeat');
+    }
+    this.themed = true;
     setTimeout(() => this.opts.onExit(), 4500);
   }
 
@@ -278,8 +348,8 @@ export class Session {
     const alpha = (nowMs - this.world.lastSnapMs) / (100 / this.speed);
     const sel = new Set(this.selection.units);
     const pc = this.world.proj.length / 8;
-    if (pc > this.lastProj + 1) this.audio?.shoot();
     this.lastProj = pc;
+    this.sound?.update(dt, this.soundView());
     const tU0 = performance.now();
     this.entities.consumeEvents();
     this.entities.update(dt, {
@@ -331,6 +401,10 @@ export class Session {
       this.hud.fpsEl.textContent = `${this.fpsAcc.fps} FPS · Entities ${(pf.entities / Math.max(1, pf.n)).toFixed(1)} ms · Render ${(pf.render / Math.max(1, pf.n)).toFixed(1)} ms · Sim ${this.info.tickMs.toFixed(1)} ms · ${this.info.units} Einh.`;
       pf.entities = pf.render = pf.n = 0;
     }
+  }
+  private soundView(): SoundView {
+    const c = this.gs.cam;
+    return { me: this.me, myTeam: this.myTeam, teamOf: this.teamOf, camX: c.tx, camY: c.tz, camYaw: c.yaw, camDist: c.dist };
   }
   private fogTimer = 0;
   private camInit = false;

@@ -418,7 +418,6 @@ export class InputController {
     const enemy = this.unitAt(e.clientX, e.clientY, this.visibleEnemy);
     if (enemy >= 0) {
       s.send({ c: 'attack', units, kind: 'unit', target: w.ids[enemy] });
-      s.audio?.click();
       return;
     }
     const g = this.groundAt(e.clientX, e.clientY);
@@ -483,6 +482,7 @@ export class InputController {
     else if (is('togglePopularity')) s.hud.togglePopup('popularity');
     else if (is('toggleAdmin')) s.hud.togglePopup('admin');
     else if (is('toggleShadows')) s.toggleShadows();
+    else if (is('toggleMute')) s.toggleMute();
     else if (is('centerKeep')) s.centerOnKeep();
     else if (is('selectAllArmy')) s.selectAllArmy();
     else {

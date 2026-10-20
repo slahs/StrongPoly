@@ -15,6 +15,7 @@ import {
   mapFromJson,
 } from '@strongpoly/shared';
 import type { AudioEngine } from '../audio/audio';
+import { audioOptionRows } from '../audio/ui';
 import { NetClient } from '../game/netconn';
 import { HOTKEY_LABELS, DEFAULT_HOTKEYS, HotkeyAction, keyLabel, loadHotkeys, saveHotkeys } from '../game/hotkeys';
 import type { Settings } from '../game/settings';
@@ -525,8 +526,7 @@ export class Screens {
       h('div', { class: 'form' },
         h('span', { text: 'Grafikqualität' }), quality,
         h('span', { text: 'Schatten' }), h('input', { type: 'checkbox', checked: st.shadows, onchange: (e) => { st.shadows = (e.target as HTMLInputElement).checked; apply(); } }),
-        h('span', { text: 'Lautstärke' }), h('input', { type: 'range', min: '0', max: '1', step: '0.05', value: String(st.volume), oninput: (e) => { st.volume = Number((e.target as HTMLInputElement).value); apply(); this.hooks.audio.click(); } }),
-        h('span', { text: 'Musik' }), h('input', { type: 'checkbox', checked: st.music, onchange: (e) => { st.music = (e.target as HTMLInputElement).checked; apply(); } }),
+        ...audioOptionRows(this.hooks.audio, st, apply),
       ),
       h('h3', { text: 'Tastenbelegung' }),
       table,

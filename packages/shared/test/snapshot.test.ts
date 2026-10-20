@@ -37,4 +37,42 @@ describe('Snapshots', () => {
     expect(w.buildings.has(placed!.id)).toBe(true);
     expect(w.bldAt[w.map.idx(placed!.x, placed!.y)]).toBe(placed!.id);
   });
+
+  it('Regression: Geschosse und Tile-Änderungen überstehen den MessagePack-Weg als richtige Typen', () => {
+    const host = new GameHost(mk());
+    const sim = host.sim;
+    const w = new ClientWorld();
+    const wire = (s: Snapshot): Snapshot => decode(encode(s)) as Snapshot;
+    w.apply(wire(host.fullSnapshot()), 0);
+    // Tile-Änderung: Baum an einer Stelle entfernen
+    const st = sim.map.starts[0];
+    const idx = sim.map.idx(st.x + 3, st.y + 3);
+    sim.map.trees[idx] = 0;
+    sim.map.terrain[idx] = 2;
+    sim.dirtyTiles.add(idx);
+    // ein Pfeil in der Luft
+    const a = sim.spawnUnit(3, 0, st.x + 5, st.y + 9);
+    const b = sim.spawnUnit(8, 1, st.x + 5, st.y + 18);
+    expect(a).toBeGreaterThanOrEqual(0);
+    expect(b).toBeGreaterThanOrEqual(0);
+    sim.units.stance[a] = 2;
+    sim.units.stance[b] = 0;
+    let seenProj = false;
+    for (let i = 0; i < 200 && !seenProj; i++) {
+      const snap = host.stepOnce();
+      const direct = snap.proj;
+      w.apply(wire(snap), i * 100);
+      expect(w.proj).toBeInstanceOf(Float32Array);
+      expect(w.proj.length).toBe(direct.length);
+      if (direct.length) {
+        seenProj = true;
+        expect(Array.from(w.proj)).toEqual(Array.from(direct));
+        expect([1, 2, 3, 4, 5]).toContain(w.proj[0]);
+      }
+    }
+    expect(seenProj).toBe(true);
+    expect(w.map.trees[idx]).toBe(0);
+    expect(w.map.terrain[idx]).toBe(2);
+    expect(w.tileChanges).toContain(idx);
+  });
 });
