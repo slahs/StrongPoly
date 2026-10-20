@@ -70,7 +70,7 @@ export function applyLevels(bus: Bus, s: AudioSettings, ctx: BaseAudioContext, i
     if (instant) p.setValueAtTime(v, t);
     else p.setTargetAtTime(v, t, 0.04);
   };
-  set(bus.master.gain, s.muted ? 0 : volumeCurve(s.master) * 1.2);
+  set(bus.master.gain, s.muted ? 0 : volumeCurve(s.master) * 1.5);
   set(bus.level.effects.gain, volumeCurve(s.sfx));
   set(bus.level.ui.gain, volumeCurve(s.sfx));
   set(bus.level.advisor.gain, volumeCurve(s.advisor));

@@ -279,6 +279,7 @@ export class Session {
       }
       this.world.tileChanges.length = 0;
       this.handleEvents(s.events);
+      this.sound?.onSnapshot(this.soundView());
       if (s.winner !== undefined && !this.ended) this.onEnd(s.winner);
     }
   }

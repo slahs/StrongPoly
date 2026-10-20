@@ -47,7 +47,6 @@ export class Soundscape {
   private collapses: { x: number; y: number; at: number }[] = [];
   private hitEvents: { x: number; y: number }[] = [];
   private prevProj: Float32Array = new Float32Array(0);
-  private lastSnap = -1;
   private zone = new Uint8Array(1);
   private zw = 1;
   private clock = 0;
@@ -133,12 +132,6 @@ export class Soundscape {
     this.clock += dt;
     this.acc += dt;
     this.audio.setListener(v.camX, v.camY, v.camYaw, v.camDist);
-    const w = this.world;
-    if (w.lastSnapMs !== this.lastSnap) {
-      this.lastSnap = w.lastSnapMs;
-      this.diffProjectiles(v);
-      this.hitEvents.length = 0;
-    }
     if (this.acc < SCAN) return;
     const sdt = this.acc;
     this.acc = 0;
@@ -357,8 +350,14 @@ export class Soundscape {
     else a.play('harvest', x, y, { vol: 0.8 });
   }
 
-  /** Neue Geschosse → Schuss-/Abschussgeräusch; verschwundene Pfeile → Einschlag. */
-  private diffProjectiles(v: SoundView): void {
+  /** Nach jedem angewendeten Snapshot aufrufen: neue Geschosse → Schuss-/Abschussgeräusch, verschwundene Pfeile → Einschlag. */
+  onSnapshot(v: SoundView): void {
+    this.view = v;
+    this.diffProjectiles();
+    this.hitEvents.length = 0;
+  }
+
+  private diffProjectiles(): void {
     const cur = this.world.proj;
     const prev = this.prevProj;
     const a = this.audio;
@@ -368,13 +367,18 @@ export class Soundscape {
     }
     const nPrev = prev.length / 8;
     const nCur = cur.length / 8;
-    const pred = new Map<number, number[]>();
-    const key = (k: number, x: number, y: number): number => (k * 4096 + Math.round(x * 8)) * 8192 + Math.round(y * 8);
+    // Erwartete Position jedes vorherigen Geschosses (aktuelle Position + Schritt) in einem 0,5-Tile-Raster
+    const cellOf = (k: number, x: number, y: number): number => (k * 1024 + Math.max(0, Math.min(1023, Math.floor(x * 2)))) * 1024 + Math.max(0, Math.min(1023, Math.floor(y * 2)));
+    const px = new Float32Array(nPrev);
+    const py = new Float32Array(nPrev);
+    const grid = new Map<number, number[]>();
     for (let j = 0; j < nPrev; j++) {
-      const kk = key(prev[j * 8], prev[j * 8 + 2] + prev[j * 8 + 5], prev[j * 8 + 3] + prev[j * 8 + 6]);
-      const l = pred.get(kk);
+      px[j] = prev[j * 8 + 2] + prev[j * 8 + 5];
+      py[j] = prev[j * 8 + 3] + prev[j * 8 + 6];
+      const c = cellOf(prev[j * 8], px[j], py[j]);
+      const l = grid.get(c);
       if (l) l.push(j);
-      else pred.set(kk, [j]);
+      else grid.set(c, [j]);
     }
     const matched = new Uint8Array(nPrev);
     let tries = 0;
@@ -382,11 +386,22 @@ export class Soundscape {
       const k = cur[i * 8];
       const x = cur[i * 8 + 2];
       const y = cur[i * 8 + 3];
-      const l = pred.get(key(k, x, y));
-      if (l && l.length) {
-        matched[l.pop()!] = 1;
-        continue;
-      }
+      // gleiche Flugbahn fortgesetzt?
+      let found = false;
+      for (let dx = -1; dx <= 1 && !found; dx++)
+        for (let dy = -1; dy <= 1 && !found; dy++) {
+          const l = grid.get(cellOf(k, x + dx * 0.5, y + dy * 0.5));
+          if (!l) continue;
+          for (const j of l) {
+            if (matched[j]) continue;
+            if ((px[j] - x) * (px[j] - x) + (py[j] - y) * (py[j] - y) < 0.09) {
+              matched[j] = 1;
+              found = true;
+              break;
+            }
+          }
+        }
+      if (found) continue;
       if (tries >= 10) continue;
       let ok = false;
       if (k === PROJ.Arrow || k === PROJ.FireArrow) ok = a.play('arrowShot', x, y);
@@ -400,12 +415,11 @@ export class Soundscape {
       if (matched[j]) continue;
       const k = prev[j * 8];
       if (k !== PROJ.Arrow && k !== PROJ.Bolt && k !== PROJ.FireArrow) continue;
-      const px = prev[j * 8 + 2] + prev[j * 8 + 5];
-      const py = prev[j * 8 + 3] + prev[j * 8 + 6];
-      if (this.hitEvents.some((h) => (h.x - px) * (h.x - px) + (h.y - py) * (h.y - py) < 4)) continue;
-      if (a.play('arrowHit', px, py, { vol: 0.7 })) ends++;
+      const ex = px[j];
+      const ey = py[j];
+      if (this.hitEvents.some((h) => (h.x - ex) * (h.x - ex) + (h.y - ey) * (h.y - ey) < 4)) continue;
+      if (a.play('arrowHit', ex, ey, { vol: 0.7 })) ends++;
     }
-    void v;
     this.prevProj = cur;
   }
 }

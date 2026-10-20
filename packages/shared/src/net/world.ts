@@ -190,16 +190,17 @@ export class ClientWorld implements PlaceCtx {
     }
 
     // Tiles
-    for (let k = 0; k < snap.tiles.length; k += 2) {
-      const i = snap.tiles[k];
-      const v = snap.tiles[k + 1];
+    const tiles = asInt32(snap.tiles);
+    for (let k = 0; k < tiles.length; k += 2) {
+      const i = tiles[k];
+      const v = tiles[k + 1];
       this.map.terrain[i] = v & 255;
       this.map.trees[i] = (v >> 8) & 255;
       this.map.trap[i] = (v >> 16) & 255;
       this.digMask[i] = (v >> 24) & 255;
       this.tileChanges.push(i);
     }
-    this.proj = snap.proj;
+    this.proj = asFloat32(snap.proj);
     this.ladders = snap.ladders;
     this.banners = snap.banners ?? [];
     if (snap.mission) this.mission = snap.mission;
@@ -225,6 +226,25 @@ export class ClientWorld implements PlaceCtx {
 }
 
 import { BUILDINGS } from '../data/buildings';
+
+/**
+ * MessagePack liefert Float32Array/Int32Array auf der Gegenseite als rohe Bytes (Uint8Array).
+ * Hier wieder in den richtigen Typ umwandeln (Kopie, damit die Ausrichtung stimmt).
+ */
+function reinterpret<T extends Float32Array | Int32Array>(a: ArrayLike<number>, ctor: { new (b: ArrayBuffer): T }, size: number): T {
+  const u = a as unknown as ArrayBufferView;
+  const bytes = new Uint8Array(u.buffer, u.byteOffset, u.byteLength);
+  const copy = new Uint8Array(Math.floor(bytes.length / size) * size);
+  copy.set(bytes.subarray(0, copy.length));
+  return new ctor(copy.buffer);
+}
+export function asFloat32(a: ArrayLike<number>): Float32Array {
+  return a instanceof Float32Array ? a : reinterpret(a, Float32Array, 4);
+}
+export function asInt32(a: ArrayLike<number>): Int32Array {
+  return a instanceof Int32Array ? a : reinterpret(a, Int32Array, 4);
+}
+
 function defOf(t: number): [number, number] {
   const d = BUILDINGS[t];
   return [d.w, d.h];
