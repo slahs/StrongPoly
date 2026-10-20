@@ -20,6 +20,11 @@ export const HOVEL_HOUSING = 8;
 export const SPAWN_INTERVAL_TICKS = 25;
 
 /** Steuerstufen -3..+5: Gold pro Bauer & Monat, Beliebtheit pro Monat */
+/** Rückgängig (Strg+Z): ein frisch platziertes Gebäude wird innerhalb dieses Fensters voll erstattet (10 s) */
+export const UNDO_WINDOW_TICKS = 100;
+/** Wie viele Platzierungen sich rückgängig machen lassen */
+export const UNDO_HISTORY = 12;
+
 export const TAX_LEVELS = [-3, -2, -1, 0, 1, 2, 3, 4, 5] as const;
 export const TAX_GOLD: Record<number, number> = { [-3]: -1.6, [-2]: -1.2, [-1]: -0.8, 0: 0, 1: 0.6, 2: 1.0, 3: 1.4, 4: 1.8, 5: 2.4 };
 export const TAX_POP: Record<number, number> = { [-3]: 7, [-2]: 5, [-1]: 3, 0: 0, 1: -2, 2: -4, 3: -6, 4: -8, 5: -11 };

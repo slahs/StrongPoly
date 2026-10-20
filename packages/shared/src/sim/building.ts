@@ -45,6 +45,10 @@ export class Building {
   /** Reparatur angefordert / Reparateur */
   repair = false;
   repairer = 0;
+  /** Produktion vom Spieler abgeschaltet (Arbeiter werden freigegeben) */
+  off = false;
+  /** Fortschritt des laufenden Produktionszyklus 0..1 (nur Anzeige) */
+  prog = 0;
   /** Fortschritt eines Spezialtimers (Stall-Pferde, Campfire-Spawn) */
   spawnTimer = 0;
 

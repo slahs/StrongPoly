@@ -20,6 +20,8 @@ export type Command =
   | { c: 'setRecipe'; building: number; recipe: number }
   | { c: 'dig'; x1: number; y1: number; x2: number; y2: number; fill: boolean }
   | { c: 'repair'; building: number }
+  | { c: 'undo' }
+  | { c: 'setWork'; building: number; on: boolean }
   | { c: 'ability'; id: number; x: number; y: number }
   | { c: 'tunnel'; units: number[]; x: number; y: number }
   | { c: 'igniteDitch'; x: number; y: number }

@@ -7,6 +7,7 @@ import {
   PEASANT_BASE_LIMIT,
   SLOT_MASK,
   TICKS_PER_MONTH,
+  UNDO_HISTORY,
 } from '../data/balance';
 import { BT, BUILDINGS, BuildingDef, Cost, STORE_CAP_PER_MODULE } from '../data/buildings';
 import { R, RES_COUNT, RES_INFO, StoreKind } from '../data/resources';
@@ -167,6 +168,22 @@ export class Sim {
       }
     }
     return this.spawnUnit(U.Peasant, p, cx, cy);
+  }
+
+  /** Entlässt die Arbeiter eines Gebäudes (Produktion abgeschaltet): sie werden wieder freie Bauern */
+  releaseWorkers(b: Building): void {
+    const u = this.units;
+    for (const id of b.workers) {
+      const s = u.slot(id);
+      if (s < 0 || u.home[s] !== b.id) continue;
+      u.home[s] = 0;
+      u.sub[s] = 0;
+      u.state[s] = S.Idle;
+      u.goal[s] = -1;
+    }
+    b.workers = [];
+    b.staffed = 0;
+    b.out = 0;
   }
 
   /** Rezept eines Gebäudes setzen (KI-Hilfe, entspricht dem Befehl setRecipe) */
@@ -395,7 +412,10 @@ export class Sim {
     }
     this.pay(p, def.cost);
     const b = this.addBuilding(p, type, x, y, rot);
-    this.players[p].stats.built++;
+    const pl = this.players[p];
+    pl.stats.built++;
+    pl.placed.push({ id: b.id, tick: this.tick });
+    if (pl.placed.length > UNDO_HISTORY) pl.placed.shift();
     return b;
   }
 

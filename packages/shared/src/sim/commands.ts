@@ -1,6 +1,6 @@
-import { MARKET_PRICE_STEP, RATION_FOOD, TAX_LEVELS } from '../data/balance';
+import { MARKET_PRICE_STEP, RATION_FOOD, TAX_LEVELS, UNDO_WINDOW_TICKS } from '../data/balance';
 import { BT, BUILDINGS } from '../data/buildings';
-import { RES_COUNT, RES_INFO, SELL_RATIO } from '../data/resources';
+import { R, RES_COUNT, RES_INFO, SELL_RATIO } from '../data/resources';
 import { T } from '../data/terrain';
 import { U, UNITS } from '../data/units';
 import { orderAttack, orderAttackGround, orderPatrol, orderTunnel } from './combat';
@@ -37,6 +37,32 @@ export function linePoints(x1: number, y1: number, x2: number, y2: number, max =
     }
   }
   return pts;
+}
+
+/** Rückgängig: nimmt die zuletzt platzierte Baute zurück (voll erstattet), solange sie frisch und unbeschädigt ist */
+function undoPlacement(sim: Sim, p: number): void {
+  const pl = sim.players[p];
+  while (pl.placed.length) {
+    const rec = pl.placed[pl.placed.length - 1];
+    const b = sim.buildings.get(rec.id);
+    if (!b || b.owner !== p) {
+      pl.placed.pop();
+      continue;
+    }
+    if (sim.tick - rec.tick > UNDO_WINDOW_TICKS || b.hp < b.maxHp || b.burn > 0) {
+      sim.emit({ e: 'msg', p, text: 'Rückgängig nicht mehr möglich (zu spät oder beschädigt).' });
+      return;
+    }
+    pl.placed.pop();
+    const c = b.def.cost;
+    pl.gold += c.gold ?? 0;
+    if (c.wood) sim.addStock(p, R.Wood, c.wood);
+    if (c.stone) sim.addStock(p, R.Stone, c.stone);
+    if (c.iron) sim.addStock(p, R.Iron, c.iron);
+    if (c.pitch) sim.addStock(p, R.Pitch, c.pitch);
+    sim.removeBuilding(b, false);
+    return;
+  }
 }
 
 export function applyCommand(sim: Sim, p: number, cmd: Command): void {
@@ -102,6 +128,17 @@ export function applyCommand(sim: Sim, p: number, cmd: Command): void {
     case 'trade':
       trade(sim, p, cmd.res | 0, Math.min(500, Math.max(1, cmd.amount | 0)), !!cmd.buy);
       break;
+    case 'undo':
+      undoPlacement(sim, p);
+      break;
+    case 'setWork': {
+      const b = sim.buildings.get(cmd.building | 0);
+      if (b && b.owner === p && b.def.workers > 0) {
+        b.off = !cmd.on;
+        if (b.off) sim.releaseWorkers(b);
+      }
+      break;
+    }
     case 'setRecipe': {
       const b = sim.buildings.get(cmd.building | 0);
       if (b && b.owner === p && b.def.prod && cmd.recipe >= 0 && cmd.recipe < b.def.prod.recipes.length) {

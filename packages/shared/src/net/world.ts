@@ -19,6 +19,8 @@ export class ClientWorld implements PlaceCtx {
   tick = 0;
   month = 0;
   winner: number | undefined;
+  /** Statistik aller Spieler (nur nach Spielende) */
+  endStats: import('./snapshot').PlayerStats[] | null = null;
 
   // Einheiten (nach Slot)
   ids = new Int32Array(UNIT_CAP);
@@ -126,6 +128,7 @@ export class ClientWorld implements PlaceCtx {
     this.tick = snap.tick;
     this.month = snap.month;
     this.winner = snap.winner;
+    if (snap.stats) this.endStats = snap.stats;
     this.lastSnapMs = nowMs;
 
     // Einheiten

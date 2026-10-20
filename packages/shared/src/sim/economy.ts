@@ -144,6 +144,7 @@ function assignWorkers(sim: Sim): void {
   };
   for (const b of sim.buildings.values()) {
     const d = b.def;
+    if (b.off) continue;
     if (d.workers > 0) {
       b.workers = b.workers.filter((id) => {
         const s = u.slot(id);
@@ -295,6 +296,10 @@ export function workerTick(sim: Sim, s: number): void {
       b.staffed++;
       if (!prod) break; // Wirtshaus, Kirche, Markt: Anwesenheit genügt
       u.timer[s] -= DT * mul;
+      {
+        const r0 = prod.recipes[Math.min(b.recipe, prod.recipes.length - 1)];
+        b.prog = Math.max(0, Math.min(1, 1 - u.timer[s] / r0.time));
+      }
       if (u.timer[s] > 0) break;
       const rec = prod.recipes[Math.min(b.recipe, prod.recipes.length - 1)];
       if (prod.mode === 'local' && prod.haul === 'ox' && b.out >= prod.batch * 2) {

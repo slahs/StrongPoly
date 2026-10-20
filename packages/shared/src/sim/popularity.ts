@@ -126,6 +126,7 @@ function applyInterval(sim: Sim, pid: number): void {
 
   // Bier
   let aleF = 0;
+  pl.aleCover = 0;
   if (inns > 0 && n > 0) {
     const served = Math.min(n, inns * INN_SERVES);
     const need = (served * ALE_PER_PEASANT_MONTH) / POP_STEPS_PER_MONTH;
@@ -133,6 +134,7 @@ function applyInterval(sim: Sim, pid: number): void {
     const cov = served / n;
     if (have >= Math.max(1, Math.floor(need))) {
       aleF = ALE_POP_MAX * cov;
+      pl.aleCover = cov;
       pl.aleAcc += need;
       const whole = Math.floor(pl.aleAcc);
       if (whole > 0) {
@@ -145,6 +147,7 @@ function applyInterval(sim: Sim, pid: number): void {
 
   // Religion
   const relCov = n > 0 ? Math.min(1, cover.n / n) : 0;
+  pl.relCover = relCov;
   factors.push({ key: 'religion', label: 'Religion', value: Math.min(12, cover.pts) * relCov });
 
   // Gute/schlechte Dinge (direkter Beliebtheitseffekt)

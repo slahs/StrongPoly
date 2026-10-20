@@ -1,6 +1,6 @@
-import { UNIT_CAP, TICKS_PER_MONTH } from '../data/balance';
+import { UNIT_CAP, TICKS_PER_MONTH, UNDO_WINDOW_TICKS } from '../data/balance';
 import { BUILDINGS } from '../data/buildings';
-import { UNITS } from '../data/units';
+import { U, UNITS } from '../data/units';
 import type { Sim } from '../sim/sim';
 import { S } from '../sim/unitstore';
 import type { SimEvent } from '../sim/types';
@@ -45,6 +45,25 @@ export interface PlayerView {
   priceMul: number[];
   alive: boolean;
   aid: { from: number; tick: number }[];
+  /** Anteil der Bauern mit Bier / Religion (0..1) */
+  aleCover: number;
+  relCover: number;
+  /** Kann ein Rückgängig noch etwas bewirken (frische Platzierung vorhanden)? Restfenster in Sekunden, 0 = nein */
+  undoLeft: number;
+}
+
+/** Statistik je Spieler für den Endbildschirm */
+export interface PlayerStats {
+  id: number;
+  kills: number;
+  losses: number;
+  built: number;
+  goldEarned: number;
+  recruited: number;
+  buildings: number;
+  peasants: number;
+  alive: boolean;
+  defeatedTick: number;
 }
 
 export interface BuildingRec {
@@ -55,7 +74,7 @@ export interface BuildingRec {
   y: number;
   r: number;
   hp: number;
-  /** Flags: 1 brennt, 2 Reparatur, 4 Tor offen */
+  /** Flags: 1 brennt, 2 Reparatur, 4 Tor offen, 8 Produktion aus */
   f: number;
   /** Turm-Geschütz */
   u: number;
@@ -67,6 +86,8 @@ export interface BuildingRec {
   c: number;
   /** Ausgabepuffer */
   b: number;
+  /** Produktionsfortschritt 0..100 */
+  p: number;
 }
 
 export interface Snapshot {
@@ -100,6 +121,8 @@ export interface Snapshot {
   };
   players?: PublicPlayer[];
   winner?: number;
+  /** Bei Spielende: Statistik aller Spieler */
+  stats?: PlayerStats[];
 }
 
 export function packTile(sim: Sim, i: number): number {
@@ -134,7 +157,27 @@ export function playerView(sim: Sim, p: number): PlayerView {
     priceMul: Array.from(pl.priceMul, (v) => Math.round(v * 100) / 100),
     alive: pl.alive,
     aid: pl.aidRequests,
+    aleCover: pl.aleCover,
+    relCover: pl.relCover,
+    undoLeft: undoLeft(sim, p),
   };
+}
+
+function undoLeft(sim: Sim, p: number): number {
+  const placed = sim.players[p].placed;
+  const rec = placed[placed.length - 1];
+  if (!rec || !sim.buildings.has(rec.id)) return 0;
+  return Math.max(0, Math.ceil((UNDO_WINDOW_TICKS - (sim.tick - rec.tick)) / 10));
+}
+
+export function playerStats(sim: Sim): PlayerStats[] {
+  return sim.players.map((p) => {
+    let buildings = 0;
+    for (const b of sim.buildings.values()) if (b.owner === p.id) buildings++;
+    let recruited = 0;
+    for (let t = U.Archer; t < p.stats.ever.length; t++) recruited += p.stats.ever[t];
+    return { id: p.id, kills: p.stats.kills, losses: p.stats.losses, built: p.stats.built, goldEarned: Math.round(p.stats.goldEarned), recruited, buildings, peasants: p.peasants, alive: p.alive, defeatedTick: p.defeatedTick };
+  });
 }
 
 export function publicPlayers(sim: Sim): PublicPlayer[] {
@@ -159,6 +202,7 @@ function bFlags(b: ReturnType<Sim['buildings']['get']> & object, sim: Sim): numb
   if (b.burn > 0) f |= 1;
   if (b.repair) f |= 2;
   if (b.def.gate && b.activeUntil > sim.tick) f |= 4;
+  if (b.off) f |= 8;
   return f;
 }
 
@@ -177,6 +221,7 @@ function bRec(b: NonNullable<ReturnType<Sim['buildings']['get']>>, sim: Sim): Bu
     s: b.staffed,
     c: b.recipe,
     b: b.out,
+    p: Math.round(b.prog * 100),
   };
 }
 
@@ -188,6 +233,7 @@ function bSig(r: BuildingRec): number {
   h = (h * 31 + r.s) | 0;
   h = (h * 31 + r.c) | 0;
   h = (h * 31 + r.b) | 0;
+  h = (h * 31 + (r.p >> 3)) | 0;
   return h;
 }
 
@@ -331,7 +377,10 @@ export class SnapshotEncoder {
       snap.tiles = Int32Array.from(dm);
     }
     if (sim.mission && (full || sim.tick % 10 === 0)) snap.mission = sim.mission.view;
-    if (sim.gameOver) snap.winner = sim.winnerTeam;
+    if (sim.gameOver) {
+      snap.winner = sim.winnerTeam;
+      snap.stats = playerStats(sim);
+    }
     return snap;
   }
 
