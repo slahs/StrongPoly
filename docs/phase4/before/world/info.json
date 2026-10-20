@@ -8,7 +8,7 @@
       "geometries": 44,
       "textures": 1,
       "programs": 14,
-      "desc": "früher Wirtschaftsaufbau: Bergfried, Lager, Holzfäller, Hütten, wenige Bauern"
+      "desc": "fr\u00fcher Wirtschaftsaufbau: Bergfried, Lager, Holzf\u00e4ller, H\u00fctten, wenige Bauern"
     },
     "town": {
       "calls": 76,
@@ -16,7 +16,7 @@
       "geometries": 82,
       "textures": 1,
       "programs": 14,
-      "desc": "dicht bebaute Siedlung mit Märkten, Werkstätten, Feldern, Kirche und vielen Bauern"
+      "desc": "dicht bebaute Siedlung mit M\u00e4rkten, Werkst\u00e4tten, Feldern, Kirche und vielen Bauern"
     },
     "castle": {
       "calls": 64,
@@ -24,7 +24,7 @@
       "geometries": 70,
       "textures": 1,
       "programs": 14,
-      "desc": "große Steinburg mit Ring- und Außenmauer, Ecktürmen, Torhaus, Graben und Hofgebäuden"
+      "desc": "gro\u00dfe Steinburg mit Ring- und Au\u00dfenmauer, Eckt\u00fcrmen, Torhaus, Graben und Hofgeb\u00e4uden"
     },
     "siege": {
       "calls": 75,
@@ -32,7 +32,7 @@
       "geometries": 78,
       "textures": 1,
       "programs": 18,
-      "desc": "Belagerung: Burg mit Verteidigern, mehrere hundert Angreifer mit Rammböcken, Belagerungstürmen, Katapulten"
+      "desc": "Belagerung: Burg mit Verteidigern, mehrere hundert Angreifer mit Rammb\u00f6cken, Belagerungst\u00fcrmen, Katapulten"
     },
     "figures": {
       "calls": 47,
@@ -48,7 +48,7 @@
       "geometries": 37,
       "textures": 1,
       "programs": 13,
-      "desc": "Belagerungsgerät aus der Nähe: Katapult, Trebuchet, Rammbock, Belagerungsturm, Setzschild, Feuerballista"
+      "desc": "Belagerungsger\u00e4t aus der N\u00e4he: Katapult, Trebuchet, Rammbock, Belagerungsturm, Setzschild, Feuerballista"
     },
     "map": {
       "calls": 70,
@@ -56,7 +56,7 @@
       "geometries": 76,
       "textures": 1,
       "programs": 14,
-      "desc": "Übersicht einer vollständigen Spielkarte (160x160, 4 Spieler) mit Startsiedlungen"
+      "desc": "\u00dcbersicht einer vollst\u00e4ndigen Spielkarte (160x160, 4 Spieler) mit Startsiedlungen"
     },
     "ground": {
       "calls": 31,
@@ -64,12 +64,12 @@
       "geometries": 37,
       "textures": 1,
       "programs": 14,
-      "desc": "Nahansicht Boden: Steppe, Oase, Wüste, Übergänge, Wege und Feld bei den ersten Gebäuden"
+      "desc": "Nahansicht Boden: Steppe, Oase, W\u00fcste, \u00dcberg\u00e4nge, Wege und Feld bei den ersten Geb\u00e4uden"
     },
     "forest": {
-      "calls": 26,
-      "triangles": 122862,
-      "geometries": 32,
+      "calls": 23,
+      "triangles": 156412,
+      "geometries": 29,
       "textures": 1,
       "programs": 11,
       "desc": "Nahansicht Wald: dichteste Baumgruppe der Karte"
@@ -80,7 +80,7 @@
       "geometries": 31,
       "textures": 1,
       "programs": 11,
-      "desc": "Nahansicht Wasser: Gewässer mit Ufer und Schaum, Graben mit Pech"
+      "desc": "Nahansicht Wasser: Gew\u00e4sser mit Ufer und Schaum, Graben mit Pech"
     },
     "coast": {
       "calls": 32,
@@ -88,12 +88,12 @@
       "geometries": 38,
       "textures": 1,
       "programs": 11,
-      "desc": "Küste und Klippen aus mittlerer Entfernung"
+      "desc": "K\u00fcste und Klippen aus mittlerer Entfernung"
     },
     "deposits": {
-      "calls": 29,
-      "triangles": 113560,
-      "geometries": 35,
+      "calls": 26,
+      "triangles": 107380,
+      "geometries": 32,
       "textures": 1,
       "programs": 14,
       "desc": "Rohstoffvorkommen: Steinbruch auf dem Steinvorkommen, daneben Eisen und Pech"

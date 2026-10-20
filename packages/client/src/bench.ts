@@ -588,7 +588,7 @@ export function startBench(): void {
   const entities = new EntityRenderer(world);
   gs.root.add(entities.group);
   gs.setMap(world.map);
-  gs.decor?.setOccupancy(world.bldAt);
+  gs.decor?.setOccupancy(world.bldAt, world.buildings);
   entities.onBuildingsChanged = () => gs.decor?.markDirty();
   gs.onGfx = (qc, sh) => entities.applyQuality(qc, sh);
   gs.applyGfx({ quality, shadows: q.get('shadows') !== '0' });

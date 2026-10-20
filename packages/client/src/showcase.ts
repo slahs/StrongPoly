@@ -26,7 +26,7 @@ declare global {
       quality: string;
       frames: number;
       desc: string;
-      info: () => { calls: number; triangles: number; geometries: number; textures: number; programs: number };
+      info: () => { calls: number; triangles: number; geometries: number; textures: number; programs: number; decorMs: number; decorInstances: number };
       scene: GameScene;
       entities: EntityRenderer;
     };
@@ -92,7 +92,8 @@ export function startShowcase(): void {
     desc: spec.desc,
     info: () => {
       const i = gs.renderer.info;
-      return { calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, programs: i.programs?.length ?? 0 };
+      const st = gs.decor?.stats;
+      return { calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, programs: i.programs?.length ?? 0, decorMs: st?.ms ?? 0, decorInstances: st?.total ?? 0 };
     },
     scene: gs,
     entities,

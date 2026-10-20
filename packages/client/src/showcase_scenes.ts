@@ -123,7 +123,8 @@ export function findForest(map: GameMap): Spot {
   return bestSpot(map, 10, 2, (x, y) => {
     const trees = window2(map, x, y, 6, (i) => (map.trees[i] > 0 ? 1 : 0));
     const wet = window2(map, x, y, 6, (i) => (map.terrain[i] === T.Water ? 1 : 0));
-    return trees - wet * 2;
+    const sand = window2(map, x, y, 6, (i) => (map.terrain[i] === T.Desert ? 1 : 0));
+    return trees - wet * 2 - sand * 0.6;
   });
 }
 
@@ -599,7 +600,7 @@ export function sceneSpec(name: ShowName, seedOverride?: number): ShowSpec {
       if (pb) p.put(BT.PitchRig, pb.x0 + 1, pb.y0 + 1, 0, 0, 0, 1);
       if (sb) p.put(BT.OxTether, sb.x0 - 3, sb.y0 + 4, 0, 0, 0, 0);
       const c = sb ? { x: (sb.x0 + sb.x1) / 2 + 1, y: (sb.y0 + sb.y1) / 2 + 1 } : findDeposits(map, st.x, st.y);
-      cam = { x: c.x, y: c.y, dist: 21, yaw: Math.PI / 4, pitch: 46 };
+      cam = { x: c.x, y: c.y, dist: 21, yaw: -Math.PI / 4, pitch: 46 };
       break;
     }
   }
