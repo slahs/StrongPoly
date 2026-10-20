@@ -53,6 +53,7 @@ export class AiController {
   private retryAt = 0;
   private woodCheckAt = 0;
   private woodEmergencyAt = -1e9;
+  private taxAt = -1e9;
 
   constructor(
     sim: Sim,
@@ -197,13 +198,20 @@ export class AiController {
     const c = (t: number) => this.cnt(t);
     const t = sim.tick;
     // Steuern & Rationen
-    pl.tax = pl.popularity > 75 ? Math.min(pr.econ.tax + 2, 5) : pl.popularity > 58 ? pr.econ.tax : pl.popularity > 45 ? 0 : -1;
-    // Geldnot: Steuern anheben, solange die Beliebtheit es trägt (sonst bleibt die Armee klein)
-    // (unter 50 Beliebtheit wandern Bauern ab und keine kommen nach: nie darunter drücken)
-    if (pl.gold < 200 && pl.popularity > 56) pl.tax = Math.max(pl.tax, 1);
-    if (pl.gold < 80 && pl.popularity > 62) pl.tax = Math.max(pl.tax, 2);
-    if (pl.popularity < 52 && pl.peasants < pl.housing * 0.6) pl.tax = Math.min(pl.tax, -1);
-    pl.ration = pl.foodShort ? 1 : pl.popularity < 50 ? 3 : 2;
+    // Steuern: höchstens eine Stufe pro Minute und mit Hysterese (früher sprang der Satz bei Beliebtheit ~58 alle 30 s
+    // zwischen 0 und 2, die Bauernzahl schwankte mit). Unter 50 Beliebtheit wandern Bauern ab: nie darunter drücken.
+    if (sim.tick - this.taxAt >= 600) {
+      this.taxAt = sim.tick;
+      const cap = pl.popularity > 75 ? Math.min(pr.econ.tax + 2, 5) : pr.econ.tax;
+      const target = pl.gold < 300 ? Math.max(cap, 2) : cap;
+      const crowded = pl.peasants < pl.housing * 0.6 && pl.popularity < 56;
+      if (pl.popularity < 52 || crowded) pl.tax = Math.max(-3, pl.tax - 1);
+      else if (pl.popularity >= 60) pl.tax += Math.sign(target - pl.tax);
+    }
+    // Rationen mit Hysterese: Zusatzration bei Unzufriedenheit, zurück erst deutlich darüber
+    if (pl.foodShort) pl.ration = 1;
+    else if (pl.popularity < 48) pl.ration = 3;
+    else if (pl.popularity > 56 || pl.ration === 1) pl.ration = 2;
 
     const peas = pl.peasants;
     // Die Bevölkerung wächst mit der Spieldauer (mehr Steuern und Arbeiter, sonst erstarrt die Partie),
@@ -317,8 +325,6 @@ export class AiController {
       if (res === 'built') return;
       if (res === 'poor' && ++poor >= 3) return;
     }
-    // Waffenproduktion lenken
-    this.steerRecipes(sim);
   }
 
   private treeCache = { tick: -1e9, at: null as { x: number; y: number } | null };
@@ -406,10 +412,23 @@ export class AiController {
   /** Waffenbauer produzieren die Waren, die am dringendsten fehlen */
   private steerRecipes(sim: Sim): void {
     const pl = sim.players[this.p];
+    // Gibt es einen Hersteller (gebaut) oder Vorrat für die Ware?
+    const producers = new Set<number>();
+    for (const b of sim.buildings.values()) if (b.owner === this.p && b.def.prod) for (const r of b.def.prod.recipes) producers.add(r.out);
+    const reachable = (res: number): boolean => pl.stock[res] > 0 || producers.has(res);
+    // Bedarf an `res`: nur Einheiten, deren übrige Kosten (Waffen, Rüstung, Pferd) tatsächlich beschaffbar sind und
+    // bei denen die Ware nicht schon weit vor den Partnerwaren liegt (sonst entstehen 60 Streitkolben ohne Lederrüstung)
     const need = (res: number): number => {
       let w = 0;
       for (const [u, weight] of this.profile.army.units) {
-        for (const [r] of UNITS[u].cost.res ?? []) if (r === res) w += weight;
+        const cost = UNITS[u].cost;
+        if (!(cost.res ?? []).some(([r]) => r === res)) continue;
+        const others = (cost.res ?? []).filter(([r]) => r !== res).map(([r]) => r);
+        if (!others.every(reachable)) continue;
+        if (cost.horse && pl.horses < 1 && this.cnt(BT.Stable) === 0) continue;
+        const partner = others.length ? Math.min(...others.map((r) => pl.stock[r])) : 99;
+        if (pl.stock[res] >= 12 && pl.stock[res] > 4 * (1 + partner)) continue;
+        w += weight;
       }
       return w;
     };
@@ -512,10 +531,12 @@ export class AiController {
     const gx0 = gateBoxes[0] ? gateBoxes[0].x + gateBoxes[0].w / 2 : kx;
     const gy0 = gateBoxes[0] ? gateBoxes[0].y + gateBoxes[0].h / 2 : ky;
     const tiles = ringTiles(r).sort((a, b) => (a[0] - gx0) ** 2 + (a[1] - gy0) ** 2 - ((b[0] - gx0) ** 2 + (b[1] - gy0) ** 2));
-    for (const [x, y] of tiles) wallSteps.push({ type: c.wall, x, y, rot: 0, done: false, skip: 0 });
+    // Mauerstücke nie auf die Torflächen: sonst bleibt der Ring ohne Durchgang geschlossen, falls das Tor nicht gebaut werden konnte
+    const inGate = (x: number, y: number): boolean => gateBoxes.some((g) => x >= g.x && x < g.x + g.w && y >= g.y && y < g.y + g.h);
+    for (const [x, y] of tiles) if (!inGate(x, y)) wallSteps.push({ type: c.wall, x, y, rot: 0, done: false, skip: 0 });
     steps.push(...wallSteps);
     if (c.doubleWall) {
-      for (const [x, y] of ringTiles(r - 1)) steps.push({ type: c.wall, x, y, rot: 0, done: false, skip: 0 });
+      for (const [x, y] of ringTiles(r - 1)) if (!inGate(x, y)) steps.push({ type: c.wall, x, y, rot: 0, done: false, skip: 0 });
     }
     // Treppen innen an der Mauer: neben dem Tor und an den Ecken
     if (c.stairs) {
@@ -1132,6 +1153,8 @@ export class AiController {
   // ---------------- Haushalt ----------------
   private upkeepStep(sim: Sim): void {
     const pl = sim.players[this.p];
+    // Waffenproduktion lenken (hier, weil econStep bei Geld-/Holzmangel früh abbricht)
+    this.steerRecipes(sim);
     if (sim.tick - this.woodCheckAt >= 600) {
       this.woodCheckAt = sim.tick;
       this.relocateWoodcutters(sim);

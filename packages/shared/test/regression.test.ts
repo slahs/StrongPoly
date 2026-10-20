@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { AI_PROFILES, BT, generateMap, Sim, T, TREE_WOOD, U } from '../src';
+import { AI_PROFILES, BT, BUILDINGS, generateMap, R, Sim, T, TREE_WOOD, U } from '../src';
+import { autoPlace } from './helpers';
 
 describe('Regression: Burgbau der KI', () => {
   it('Startbereiche sind baumfrei (Mauerring, Gräben und Tore passen hinein)', () => {
@@ -121,4 +122,73 @@ describe('Regression: weit entfernte Arbeitsplätze', () => {
     for (let i = 0; i < 4000; i++) sim.step();
     expect(sim.players[1].produced[0] - before).toBeGreaterThan(0);
   }, 60000);
+});
+
+describe('Regression: KI-Waffenproduktion', () => {
+  it('Die KI steuert die Rezepte der Waffenbauer auch bei Holzmangel (econStep brach vorher früh ab, der Schmied blieb auf Streitkolben)', () => {
+    const map = generateMap({ seed: 14, size: 160, players: 2 });
+    const sim = new Sim({ map, seed: 14, players: [{ name: 'A', team: 0, kind: 'ai', ai: 3 }, { name: 'B', team: 1, kind: 'human' }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
+    autoPlace(sim, 0, BT.Armorer); // Schwerter nützen erst mit Rüstung
+    const smith = autoPlace(sim, 0, BT.Blacksmith);
+    expect(smith).not.toBeNull();
+    smith!.recipe = 0; // Streitkolben: Ritter Falk braucht Schwerter
+    for (let i = 0; i < 3000; i++) {
+      sim.players[0].stock[R.Wood] = 0; // Holzmangel: der Wirtschaftsplan kommt nie zum Zug
+      sim.step();
+    }
+    expect(smith!.recipe).toBe(1);
+  }, 60000);
+});
+
+describe('Regression: Burg mauert sich nicht ein', () => {
+  it('Kein Mauerstück des KI-Plans liegt auf einer Torfläche (alle Profile)', () => {
+    for (let ai = 0; ai < 9; ai++) {
+      const map = generateMap({ seed: 7, size: 160, players: 2 });
+      const sim = new Sim({ map, seed: 7, players: [{ name: 'A', team: 0, kind: 'ai', ai }, { name: 'B', team: 1, kind: 'human' }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
+      for (let i = 0; i < 2200; i++) sim.step();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const plan = (sim.players[0] as any).ai.plan as { type: number; x: number; y: number; rot: number; kind?: string }[];
+      expect(plan).toBeTruthy();
+      const gates = plan.filter((s) => BUILDINGS[s.type]?.gate);
+      expect(gates.length).toBeGreaterThan(0);
+      const walls = plan.filter((s) => BUILDINGS[s.type]?.wallTop && !BUILDINGS[s.type].gate && !BUILDINGS[s.type].stairs && BUILDINGS[s.type].w === 1 && (s.kind ?? 'place') === 'place');
+      for (const g of gates) {
+        const d = BUILDINGS[g.type];
+        const w = g.rot ? d.h : d.w;
+        const h = g.rot ? d.w : d.h;
+        for (const wl of walls) expect(wl.x >= g.x && wl.x < g.x + w && wl.y >= g.y && wl.y < g.y + h, `Profil ${ai}: Mauer ${wl.x},${wl.y} auf Tor ${g.x},${g.y}`).toBe(false);
+      }
+    }
+  }, 120000);
+});
+
+describe('Regression: zerstörte Tore werden neu gebaut', () => {
+  it('Ritter Falk baut ein zerstörtes Tor wieder auf', () => {
+    const map = generateMap({ seed: 7, size: 160, players: 2 });
+    const sim = new Sim({ map, seed: 7, players: [{ name: 'A', team: 0, kind: 'ai', ai: 3 }, { name: 'B', team: 1, kind: 'human' }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
+    const gates = () => [...sim.buildings.values()].filter((b) => b.owner === 0 && b.def.gate);
+    for (let i = 0; i < 16000 && gates().length < 2; i++) sim.step();
+    expect(gates().length).toBeGreaterThan(0);
+    for (const g of gates()) sim.removeBuilding(g, false);
+    expect(gates().length).toBe(0);
+    for (let i = 0; i < 12000 && gates().length === 0; i++) sim.step();
+    expect(gates().length).toBeGreaterThan(0);
+  }, 120000);
+});
+
+describe('Regression: Bevölkerungsschaukel', () => {
+  it('Die KI ändert den Steuersatz höchstens einmal pro Minute (früher alle 30 s zwischen 0 und 2 bei Beliebtheit ~58)', () => {
+    const map = generateMap({ seed: 15, size: 160, players: 2 });
+    const sim = new Sim({ map, seed: 15, players: [{ name: 'A', team: 0, kind: 'ai', ai: 0 }, { name: 'B', team: 1, kind: 'ai', ai: 1 }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
+    let last = sim.players[0].tax;
+    const changes: number[] = [];
+    for (let i = 0; i < 22 * 600; i++) {
+      sim.step();
+      if (sim.players[0].tax !== last) {
+        last = sim.players[0].tax;
+        changes.push(sim.tick);
+      }
+    }
+    for (let i = 1; i < changes.length; i++) expect(changes[i] - changes[i - 1]).toBeGreaterThanOrEqual(550);
+  }, 120000);
 });
