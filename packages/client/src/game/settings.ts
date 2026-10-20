@@ -29,6 +29,8 @@ export class Settings {
   /** Stummschaltung (Taste M) */
   muted = false;
   edgeScroll = true;
+  /** Blut bei Gefallenen darstellen (abschaltbar) */
+  blood = true;
 
   constructor() {
     try {
@@ -60,6 +62,7 @@ export class Settings {
           music: this.music,
           muted: this.muted,
           edgeScroll: this.edgeScroll,
+          blood: this.blood,
         }),
       );
     } catch {

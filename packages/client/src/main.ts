@@ -19,6 +19,12 @@ if (new URLSearchParams(location.search).has('icons')) {
   await new Promise<never>(() => {});
 }
 
+// Benchmark-Szene (?bench): eigener Einstieg ohne Netz und Sim-Worker
+if (new URLSearchParams(location.search).has('bench')) {
+  (await import('./bench')).startBench();
+  await new Promise<never>(() => {});
+}
+
 const canvas = document.getElementById('view') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLElement;
 const gs = new GameScene(canvas);

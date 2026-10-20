@@ -29,6 +29,8 @@ export const PART = {
   Sail: 10,
   /** Fahnentuch: flattert */
   Cloth: 11,
+  /** Torflügel/Fallgatter: hebt sich bei geöffnetem Tor */
+  Door: 12,
 } as const;
 
 /** Flags im Instanzattribut iAnim.y */
@@ -105,16 +107,23 @@ vec3 spAnimate(vec3 p) {
     if (moving) q = spRotX(p, c, -sin(wt) * 0.8);
   } else if (part < 3.5) {
     if (melee) {
-      a = mix(0.0, 0.9, spSaw(cyc, 0.0, 0.55));
-      a = mix(a, -1.9, spSaw(cyc, 0.55, 0.68));
-      a = mix(a, 0.0, spSaw(cyc, 0.68, 1.0));
-      q = spRotX(p, c, a);
+      if (aMeta.z > 0.5) {
+        float z = -0.12 * spSaw(cyc, 0.0, 0.5);
+        z = mix(z, 0.28, spSaw(cyc, 0.5, 0.6));
+        z = mix(z, 0.0, spSaw(cyc, 0.6, 1.0));
+        q = p + vec3(0.0, 0.0, z);
+      } else {
+        a = mix(0.0, -2.7, spSaw(cyc, 0.0, 0.5));
+        a = mix(a, -0.15, spSaw(cyc, 0.5, 0.64));
+        a = mix(a, 0.0, spSaw(cyc, 0.64, 1.0));
+        q = spRotX(p, c, a);
+      }
     } else if (shoot) {
       float pull = spSaw(cyc, 0.0, 0.7) * (1.0 - step(0.72, cyc));
       q = spRotX(p, c, -1.45);
       q.z -= 0.13 * pull;
     } else if (work) {
-      q = spRotX(p, c, -0.9 + sin(cyc * 6.2831853) * 1.0);
+      q = spRotX(p, c, -1.25 + sin(cyc * 6.2831853) * 0.95);
     } else if (moving) {
       q = spRotX(p, c, -sin(wt) * 0.6);
     }
@@ -152,10 +161,13 @@ vec3 spAnimate(vec3 p) {
   } else if (part > 9.5 && part < 10.5) {
     float sp = work ? 0.9 : 0.14;
     q = spRotZ(p, c, uTime * sp + ph * 6.2831853);
-  } else if (part > 10.5) {
+  } else if (part < 11.5) {
     vec3 d = p - c;
     float k = length(d.xz);
-    q = p + vec3(0.0, 0.0, sin(uTime * 4.0 + d.x * 7.0 + ph * 6.28) * 0.05 * k);
+    q = p + vec3(sin(uTime * 4.0 + d.z * 9.0 + ph * 6.28) * 0.2 * k, 0.0, 0.0);
+  } else {
+    // Tor: Fallgatter hebt sich (iAnim.w = Öffnungsgrad 0..1)
+    q = p + vec3(0.0, 1.7 * iAnim.w, 0.0);
   }
   return q + off;
 }

@@ -397,6 +397,8 @@ export class TerrainRenderer {
       const attr = new THREE.Float32BufferAttribute(acc.col, 3);
       geo.setAttribute('color', attr);
       if (withFoam) geo.setAttribute('aFoam', new THREE.Float32BufferAttribute(acc.foam, 1));
+      // Normalen werden für den Schattenversatz (normalBias) gebraucht, sonst empfängt das Terrain keine Schatten
+      geo.computeVertexNormals();
       geo.computeBoundingSphere();
       geo.computeBoundingBox();
       const mesh = new THREE.Mesh(geo, mat);

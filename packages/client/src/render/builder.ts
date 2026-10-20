@@ -31,7 +31,7 @@ class Acc {
   meta: number[] = [];
   team: number[] = [];
   count = 0;
-  add(geo: THREE.BufferGeometry, m: THREE.Matrix4, color: THREE.Color, team: boolean, part: number, pivot: V3, ao: number, aoH: number, cullDown: boolean): number {
+  add(geo: THREE.BufferGeometry, m: THREE.Matrix4, color: THREE.Color, team: boolean, part: number, pivot: V3, style: number, ao: number, aoH: number, cullDown: boolean): number {
     const g = geo.index ? geo.toNonIndexed() : geo;
     const p = g.getAttribute('position');
     const a = new THREE.Vector3();
@@ -56,7 +56,7 @@ class Acc {
         this.piv.push(pivot[0], pivot[1], pivot[2], part);
         const k = ao > 0 ? 1 - Math.min(1, Math.max(0, v.y / aoH)) : 0;
         const f = 1 - ao * k * k;
-        this.meta.push(team ? 1 : 0, f, 0);
+        this.meta.push(team ? 1 : 0, f, style);
         this.team.push(team ? 1 : 0);
       }
       added++;
@@ -125,6 +125,7 @@ export class ModelBuilder {
   private tris = 0;
   private part_ = 0;
   private pivot_: V3 = [0, 0, 0];
+  private style_ = 0;
   private ao: number;
   private aoH: number;
   private cullDown: boolean;
@@ -136,14 +137,15 @@ export class ModelBuilder {
   }
 
   /** Alle folgenden Teile gehören zu Animationsteil `id` mit Drehpunkt (px,py,pz); `part(0)` beendet das. */
-  part(id: number, px = 0, py = 0, pz = 0): this {
+  part(id: number, px = 0, py = 0, pz = 0, style = 0): this {
     this.part_ = id;
     this.pivot_ = [px, py, pz];
+    this.style_ = style;
     return this;
   }
 
   private put(geo: THREE.BufferGeometry, m: THREE.Matrix4, color: number, team: boolean, ao = this.ao): this {
-    this.tris += this.acc.add(geo, m, new THREE.Color(color), team, this.part_, this.pivot_, this.part_ ? Math.min(ao, 0.15) : ao, this.aoH, this.cullDown);
+    this.tris += this.acc.add(geo, m, new THREE.Color(color), team, this.part_, this.pivot_, this.style_, this.part_ ? Math.min(ao, 0.15) : ao, this.aoH, this.cullDown);
     return this;
   }
 
@@ -202,6 +204,21 @@ export class ModelBuilder {
       cylCache.set(key, g);
     }
     tmpM.compose(new THREE.Vector3(x, y + h / 2, z), tmpQ.identity(), new THREE.Vector3(1, h, 1));
+    return this.put(g, tmpM, color, team);
+  }
+
+  /** Spitze (vierseitig) entlang +z: Basis bei (x, y, z), Länge len */
+  spike(r: number, len: number, x: number, y: number, z: number, color: number, team = false): this {
+    const key = `spk|${r}`;
+    let g = cylCache.get(key);
+    if (!g) {
+      g = new THREE.ConeGeometry(r, 1, 4, 1);
+      g.rotateY(Math.PI / 4);
+      g.rotateX(Math.PI / 2);
+      g.translate(0, 0, 0.5);
+      cylCache.set(key, g);
+    }
+    tmpM.compose(new THREE.Vector3(x, y, z), tmpQ.identity(), new THREE.Vector3(1, 1, len));
     return this.put(g, tmpM, color, team);
   }
 
