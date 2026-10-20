@@ -17,7 +17,7 @@ describe('Regression: Burgbau der KI', () => {
     it(`Profil ${ai} (${AI_PROFILES[ai].name}) baut sein Torhaus (früher: Bäume ließen den Plan das Tor überspringen)`, () => {
       const seed = 7;
       const map = generateMap({ seed, size: 160, players: 2 });
-      const sim = new Sim({ map, seed, players: [{ name: 'A', team: 0, kind: 'ai', ai }, { name: 'B', team: 1, kind: 'ai', ai: 0 }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
+      const sim = new Sim({ map, seed, players: [{ name: 'A', team: 0, kind: 'ai', ai }, { name: 'B', team: 1, kind: 'human' }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
       for (let i = 0; i < 15000; i++) sim.step();
       let gates = 0;
       for (const b of sim.buildings.values()) if (b.owner === 0 && b.def.gate) gates++;
@@ -97,4 +97,28 @@ describe('Regression: KI-Duelle enden', () => {
     while (sim.tick < 90 * 600 && !sim.gameOver) sim.step();
     expect(sim.gameOver).toBe(true);
   }, 120000);
+});
+
+describe('Regression: weit entfernte Arbeitsplätze', () => {
+  it('Ein Holzfäller 30+ Tiles vom Lager entfernt wird bemannt und liefert Holz (Wegfeld war auf 14 Tiles begrenzt)', () => {
+    const map = generateMap({ seed: 14, size: 160, players: 2 });
+    const sim = new Sim({ map, seed: 14, players: [{ name: 'A', team: 0, kind: 'human' }, { name: 'B', team: 1, kind: 'human' }], startGold: 3000, troopLimit: 1000, fog: false, extreme: false });
+    const st = map.starts[1];
+    let spot: { x: number; y: number } | null = null;
+    outer: for (let r = 30; r < 50; r++)
+      for (let dy = -r; dy <= r; dy++)
+        for (let dx = -r; dx <= r; dx++) {
+          if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+          const x = st.x + dx, y = st.y + dy;
+          if (!map.inBounds(x, y) || !map.trees[map.idx(x, y)]) continue;
+          for (let ox = -3; ox <= 3 && !spot; ox++)
+            for (let oy = -3; oy <= 3 && !spot; oy++) if (!sim.checkPlace(1, BT.Woodcutter, x + ox, y + oy, 0, true)) spot = { x: x + ox, y: y + oy };
+          if (spot) break outer;
+        }
+    expect(spot).not.toBeNull();
+    const before = sim.players[1].produced[0];
+    sim.place(1, BT.Woodcutter, spot!.x, spot!.y, 0);
+    for (let i = 0; i < 4000; i++) sim.step();
+    expect(sim.players[1].produced[0] - before).toBeGreaterThan(0);
+  }, 60000);
 });

@@ -33,6 +33,13 @@ export const P = {
 
 const WORK_LIMIT = 14 * 60;
 
+/** Wegfeld-Reichweite: mindestens 14 Tiles, bei weit entferntem Ziel entsprechend mehr (sonst NoPath-Schleife) */
+function workLimit(sim: Sim, s: number): number {
+  const u = sim.units;
+  const d = Math.hypot(u.tx[s] - u.x[s], u.ty[s] - u.y[s]);
+  return Math.max(WORK_LIMIT, Math.ceil((d * 1.8 + 10) * 60));
+}
+
 export function prodMul(sim: Sim, p: number): number {
   return 1 + FEAR_PROD_STEP * sim.players[p].fear;
 }
@@ -276,7 +283,7 @@ export function workerTick(sim: Sim, s: number): void {
 
   switch (sub) {
     case P.ToWork: {
-      const r = followGoal(sim, s, false, 0.8, WORK_LIMIT);
+      const r = followGoal(sim, s, false, 0.8, workLimit(sim, s));
       if (r === MR.Arrived) onArriveWork(sim, s, b);
       else if (r === MR.NoPath) {
         const e = sim.entryOf(b);
@@ -338,7 +345,7 @@ export function workerTick(sim: Sim, s: number): void {
       break;
     }
     case P.ToRes: {
-      const r = followGoal(sim, s, false, 0.8, WORK_LIMIT);
+      const r = followGoal(sim, s, false, 0.8, workLimit(sim, s));
       if (r === MR.Arrived) {
         u.sub[s] = P.Gather;
         const rec = prod!.recipes[0];
@@ -383,7 +390,7 @@ export function workerTick(sim: Sim, s: number): void {
       break;
     }
     case P.ToStore: {
-      const r = followGoal(sim, s, false, 0.8, WORK_LIMIT);
+      const r = followGoal(sim, s, false, 0.8, workLimit(sim, s));
       if (r === MR.Arrived) {
         const res = u.carryRes[s];
         const acc = sim.deliver(u.owner[s], res, u.carryAmt[s]);
@@ -432,7 +439,7 @@ export function workerTick(sim: Sim, s: number): void {
       break;
     }
     case P.ToFetch: {
-      const r = followGoal(sim, s, false, 0.8, WORK_LIMIT);
+      const r = followGoal(sim, s, false, 0.8, workLimit(sim, s));
       if (r === MR.Arrived) {
         const rec = prod!.recipes[Math.min(b.recipe, prod!.recipes.length - 1)];
         const [res, need] = rec.in[0];
@@ -642,7 +649,7 @@ function digTick(sim: Sim, s: number): void {
       u.state[s] = S.Idle;
       return;
     }
-    const r = followGoal(sim, s, false, 0.8, WORK_LIMIT);
+    const r = followGoal(sim, s, false, 0.8, workLimit(sim, s));
     if (r === MR.Arrived) {
       u.sub[s] = P.Dig;
       u.timer[s] = 4;

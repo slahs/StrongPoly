@@ -52,6 +52,7 @@ export class AiController {
   private castleDone = false;
   private retryAt = 0;
   private woodCheckAt = 0;
+  private woodEmergencyAt = -1e9;
 
   constructor(
     sim: Sim,
@@ -381,7 +382,8 @@ export class AiController {
       if (this.treesAround(sim, Math.floor(b.cx), Math.floor(b.cy)) < 3) dead.push(b.id);
       else alive++;
     }
-    if (!dead.length || !this.treeAnchor(sim)) return;
+    // Ohne Holzreserve nicht abreißen: der Neubau kostet Holz, sonst bleibt die KI ohne Holzfäller liegen
+    if (!dead.length || sim.players[this.p].stock[R.Wood] < 10 * dead.length || !this.treeAnchor(sim)) return;
     applyCommand(sim, this.p, { c: 'demolish', ids: dead });
     this.counts[BT.Woodcutter] = alive;
     this.buildFail.delete(BT.Woodcutter);
@@ -1148,6 +1150,21 @@ export class AiController {
     // Notkauf von Nahrung
     const food = pl.stock[R.Apple] + pl.stock[R.Cheese] + pl.stock[R.Meat] + pl.stock[R.Bread];
     if (this.cnt(BT.Market) > 0 && food < 30 && pl.gold > 250) applyCommand(sim, this.p, { c: 'trade', res: R.Bread, amount: 25, buy: true });
+    // Holz-Notlage ohne Markt und ohne Holzfäller (z. B. vom Feind zerstört): ein entbehrliches Holzgebäude
+    // abreißen, die Rückerstattung bezahlt den neuen Holzfäller (sonst bleibt die KI dauerhaft ohne Holz)
+    if (sim.tick > 9000 && pl.stock[R.Wood] < 4 && this.cnt(BT.Woodcutter) === 0 && sim.tick - this.woodEmergencyAt >= 300) {
+      this.woodEmergencyAt = sim.tick;
+      let pick: Building | null = null;
+      for (const b of sim.buildings.values()) {
+        if (b.owner !== this.p || !b.def.cost.wood || b.def.cost.wood < 8 || b.def.cat === 'castle') continue;
+        if (([BT.Keep, BT.Campfire, BT.Stockpile, BT.Granary, BT.Armory, BT.Barracks, BT.Market, BT.Woodcutter] as number[]).includes(b.type)) continue;
+        if (!pick || b.def.cost.wood > (pick.def.cost.wood ?? 0)) pick = b;
+      }
+      if (pick) {
+        applyCommand(sim, this.p, { c: 'demolish', ids: [pick.id] });
+        this.buildFail.delete(BT.Woodcutter);
+      }
+    }
     // Holzmangel (Wälder abgeholzt): ohne Holz entsteht weder Kaserne noch Mauer noch Waffe
     if (this.cnt(BT.Market) > 0 && pl.stock[R.Wood] < 25 && pl.gold > 250) applyCommand(sim, this.p, { c: 'trade', res: R.Wood, amount: 25, buy: true });
     // Goldüberschuss in Waffen umsetzen, wenn die Werkstätten nicht hinterherkommen
