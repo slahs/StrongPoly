@@ -1,6 +1,7 @@
 import './style.css';
 import { GameSetup } from '@strongpoly/shared';
-import { AudioEngine } from './audio/audio';
+import { AudioEngine } from './audio';
+import { exposeAudioDebug } from './audio/debug';
 import { LocalConnection } from './game/connection';
 import { NetClient, RemoteConnection } from './game/netconn';
 import { Session } from './game/session';
@@ -17,7 +18,8 @@ const ui = document.getElementById('ui') as HTMLElement;
 const gs = new GameScene(canvas);
 const settings = new Settings();
 const audio = new AudioEngine();
-audio.setVolume(settings.volume);
+audio.configure(settings.audio());
+exposeAudioDebug(audio);
 const saves = new SaveStore();
 let session: Session | null = null;
 let net: NetClient | null = null;
@@ -29,7 +31,7 @@ const hooks = {
   applySettings: () => {
     session?.applySettings();
     gs.applyGfx({ shadows: settings.shadows, quality: settings.quality });
-    audio.setVolume(settings.volume);
+    audio.configure(settings.audio());
   },
   missions: MISSIONS.map((m) => ({ name: m.name, desc: m.desc })),
   inGame: false,
@@ -148,6 +150,7 @@ function exitToMenu(): void {
   if (wasOnline && net && net.connected) {
     // Raum bleibt bestehen: zurück zur Lobby (Server setzt den Raum nach dem Spiel zurück)
     hooks.clearResume();
+    audio.playTheme('menu');
     screens.returnToLobby(net);
     return;
   }
@@ -155,9 +158,11 @@ function exitToMenu(): void {
   net = null;
   hooks.clearResume();
   screens.playing = false;
+  audio.playTheme('menu');
   screens.main();
 }
 
+audio.playTheme('menu');
 screens.main();
 try {
   const r = JSON.parse(localStorage.getItem('strongpoly.resume') ?? 'null') as { url: string; name: string; at: number } | null;
