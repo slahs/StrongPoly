@@ -348,15 +348,15 @@ export function buildUnitModel(type: number): ModelGeos {
 }
 
 /** Getragene Waren: Form je Ressource (kleine Modelle am Rücken/in den Armen, Farbe per Teamfarb-Kanal). */
-export type CargoKind = 'bundle' | 'block' | 'ingot' | 'barrel' | 'sack' | 'basket' | 'wheel' | 'sticks' | 'roll';
-export const CARGO_KINDS: CargoKind[] = ['bundle', 'block', 'ingot', 'barrel', 'sack', 'basket', 'wheel', 'sticks', 'roll'];
+export type CargoKind = 'bundle' | 'block' | 'ingot' | 'barrel' | 'bucket' | 'sack' | 'basket' | 'wheel' | 'sticks' | 'roll';
+export const CARGO_KINDS: CargoKind[] = ['bundle', 'block', 'ingot', 'barrel', 'bucket', 'sack', 'basket', 'wheel', 'sticks', 'roll'];
 export const CARGO_OF_RES: CargoKind[] = [];
 CARGO_OF_RES[R.Wood] = 'bundle';
 CARGO_OF_RES[R.Stone] = 'block';
 CARGO_OF_RES[R.Iron] = 'ingot';
 CARGO_OF_RES[R.Pitch] = 'barrel';
 CARGO_OF_RES[R.Hops] = 'sack';
-CARGO_OF_RES[R.Ale] = 'barrel';
+CARGO_OF_RES[R.Ale] = 'bucket';
 CARGO_OF_RES[R.Wheat] = 'sack';
 CARGO_OF_RES[R.Flour] = 'sack';
 CARGO_OF_RES[R.Cow] = 'block';
@@ -394,6 +394,12 @@ export function buildCargoModel(kind: CargoKind): ModelGeos {
     case 'barrel':
       b.cyl(0.1, 0.1, 0.2, 6, 0, 0.44, -0.18, PAL.wood, true);
       b.cyl(0.105, 0.105, 0.03, 6, 0, 0.5, -0.18, PAL.black);
+      break;
+    case 'bucket':
+      // Eimer mit Bügel (Bier)
+      b.cyl(0.1, 0.075, 0.2, 6, 0, 0.42, -0.2, PAL.wood, true);
+      b.cyl(0.085, 0.085, 0.02, 6, 0, 0.61, -0.2, PAL.gold);
+      b.box(0.2, 0.025, 0.025, 0, 0.66, -0.2, PAL.black);
       break;
     case 'sack':
       b.box(0.2, 0.22, 0.14, 0, 0.44, -0.2, PAL.thatch, true);

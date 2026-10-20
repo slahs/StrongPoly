@@ -43,6 +43,8 @@ export interface BenchResult {
   projectiles: number;
   particles: number;
   quality: string;
+  /** Draw-Calls waren No-ops (reine JS-Zeit) */
+  nodraw: boolean;
   secs: number;
   frames: number;
   viewport: string;
@@ -571,6 +573,13 @@ export function startBench(): void {
   const canvas = document.getElementById('view') as HTMLCanvasElement;
   const gs = new GameScene(canvas);
   gs.gfx.pixelRatio = Number(q.get('pr') ?? 1);
+  // &nodraw=1: Draw-Calls werden zu No-ops. So misst man die reine JS-Zeit (Szenengraph, Instanzdaten, Uploads),
+  // unabhängig davon, wie langsam der Rasterizer (z. B. SwiftShader) den Befehlspuffer abarbeitet.
+  const nodraw = q.get('nodraw') === '1';
+  if (nodraw) {
+    const gl = gs.renderer.getContext() as unknown as Record<string, unknown>;
+    for (const n of ['drawElements', 'drawArrays', 'drawElementsInstanced', 'drawArraysInstanced', 'drawRangeElements']) gl[n] = () => undefined;
+  }
   const showcase = q.get('showcase');
   const bw = new BenchWorld(showcase ? 0 : total, seed, !!showcase);
   if (showcase === 'units') bw.showcaseUnits();
@@ -645,6 +654,7 @@ export function startBench(): void {
       projectiles: entities.stats.projectiles,
       particles: entities.fx.count,
       quality,
+      nodraw,
       secs,
       frames: frameMs.length,
       viewport: `${innerWidth}x${innerHeight}`,
