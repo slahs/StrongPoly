@@ -465,7 +465,10 @@ export class AudioEngine {
 
   /** Thema für Hauptmenü, Sieg, Niederlage; null = zurück zur Spielstimmung. */
   playTheme(t: ThemeId | null): void {
-    if (t === 'menu') this.ambience?.apply(SILENT_TARGETS, undefined, 0.6);
+    if (t === 'menu') {
+      this.ambience?.apply(SILENT_TARGETS, undefined, 0.6);
+      this.voice.stop('unit');
+    }
     if (this.theme === t) return;
     this.theme = t;
     this.music?.setTarget(t ?? this.mood, t ? THEME_PHRASES[t] : 0, !!t);

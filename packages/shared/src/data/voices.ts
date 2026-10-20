@@ -20,14 +20,16 @@ export type AdvisorLines = Record<string, { text: string; alarm?: boolean }>;
 /** Mindestanzahl Varianten je definiertem Ereignis */
 export const MIN_VARIANTS = 3;
 
-export type TtsModel = 'thorsten-high' | 'thorsten-medium' | 'thorsten-emotional' | 'kerstin';
+export type TtsModel = 'thorsten-high' | 'thorsten-medium' | 'thorsten-emotional' | 'kerstin' | 'en-joe' | 'en-john' | 'en-norman' | 'en-kathleen';
 export type VoiceFx = 'none' | 'room' | 'helm' | 'hall' | 'chapel' | 'air' | 'shop' | 'yard';
 
 export interface VoiceProfile {
   id: string;
   label: string;
-  /** Stimme des Generators (Piper/VITS-Modell, Sprecher-ID, nur bei `thorsten-emotional` > 0) */
+  /** Stimme des Generators für Deutsch (Piper/VITS-Modell, Sprecher-ID, nur bei `thorsten-emotional` > 0) */
   tts: { model: TtsModel; sid: number };
+  /** Stimme des Generators für Englisch */
+  ttsEn: { model: TtsModel; sid: number };
   /** Tonhöhenverschiebung in Halbtönen (negativ = tiefer) */
   pitch: number;
   /** Sprechgeschwindigkeit (1 = Modell-Standard) */
@@ -45,8 +47,34 @@ export interface VoiceProfile {
 const E = { amused: 0, angry: 1, disgusted: 2, drunk: 3, neutral: 4, sleepy: 5, surprised: 6, whisper: 7 } as const;
 
 function P(id: string, label: string, model: TtsModel, sid: number, pitch: number, speed: number, fx: VoiceFx, gain: number, browser: VoiceProfile['browser'], spatial = true): VoiceProfile {
-  return { id, label, tts: { model, sid }, pitch, speed, fx, gain, browser, spatial };
+  return { id, label, tts: { model, sid }, ttsEn: { model: EN_VOICE[id] ?? 'en-john', sid: 0 }, pitch, speed, fx, gain, browser, spatial };
 }
+
+/** Englische Sprecher je Profil (alle CC0/gemeinfrei: joe, john, norman, kathleen) */
+const EN_VOICE: Record<string, TtsModel> = {
+  swordsman: 'en-norman',
+  spearman: 'en-john',
+  archer: 'en-joe',
+  crossbow: 'en-john',
+  knight: 'en-norman',
+  mercenary: 'en-joe',
+  assassin: 'en-john',
+  siege: 'en-norman',
+  engineer: 'en-joe',
+  monk: 'en-john',
+  lord: 'en-norman',
+  peasant: 'en-kathleen',
+  woodcutter: 'en-joe',
+  mason: 'en-norman',
+  farmer: 'en-john',
+  baker: 'en-kathleen',
+  miller: 'en-joe',
+  brewer: 'en-john',
+  smith: 'en-norman',
+  trader: 'en-joe',
+  advisor: 'en-norman',
+  'advisor.alarm': 'en-joe',
+};
 
 /** Stimmprofile je Gruppe (+ `advisor`, `advisor.alarm`). Zwei echte Sprecher (männlich/weiblich) – Unterscheidung über Stil, Tonhöhe, Tempo und Klangfarbe. */
 export const VOICE_PROFILES: Record<string, VoiceProfile> = Object.fromEntries(
@@ -55,13 +83,13 @@ export const VOICE_PROFILES: Record<string, VoiceProfile> = Object.fromEntries(
     P('spearman', 'Speerkämpfer', 'thorsten-medium', 0, -1.0, 1.05, 'helm', 0, { pitch: 0.85, rate: 1.0 }),
     P('archer', 'Bogenschütze', 'thorsten-high', 0, 1.5, 1.08, 'air', 0, { pitch: 1.15, rate: 1.05 }),
     P('crossbow', 'Armbrustschütze', 'thorsten-medium', 0, 0.5, 1.0, 'air', 0, { pitch: 1.0, rate: 0.95 }),
-    P('knight', 'Ritter', 'thorsten-high', 0, -3.0, 0.95, 'helm', 0, { pitch: 0.5, rate: 0.9 }),
+    P('knight', 'Ritter', 'thorsten-high', 0, -2.5, 0.95, 'helm', 0, { pitch: 0.5, rate: 0.9 }),
     P('mercenary', 'Söldner', 'thorsten-emotional', E.amused, 0.5, 1.0, 'air', 0, { pitch: 1.05, rate: 1.0 }),
     P('assassin', 'Assassine', 'thorsten-emotional', E.whisper, 0, 1.0, 'none', 1, { pitch: 0.9, rate: 0.9 }),
     P('siege', 'Belagerungsmannschaft', 'thorsten-emotional', E.angry, -1.5, 1.0, 'yard', 0, { pitch: 0.6, rate: 0.95 }),
     P('engineer', 'Ingenieur', 'thorsten-medium', 0, 1.8, 1.08, 'air', 0, { pitch: 1.2, rate: 1.05 }),
     P('monk', 'Mönch', 'thorsten-emotional', E.sleepy, -0.5, 1.12, 'chapel', 0, { pitch: 0.95, rate: 0.85 }),
-    P('lord', 'Lord', 'thorsten-high', 0, -2.5, 0.95, 'hall', 0, { pitch: 0.55, rate: 0.9 }),
+    P('lord', 'Lord', 'thorsten-high', 0, -2.0, 0.95, 'hall', 0, { pitch: 0.55, rate: 0.9 }),
     P('peasant', 'Bauer', 'kerstin', 0, 0, 1.0, 'none', 0, { pitch: 1.1, rate: 1.0, female: true }),
     P('woodcutter', 'Holzfäller', 'thorsten-medium', 0, -2.0, 1.02, 'yard', 0, { pitch: 0.7, rate: 1.0 }),
     P('mason', 'Steinmetz', 'thorsten-emotional', E.disgusted, -1.5, 1.0, 'yard', 0, { pitch: 0.75, rate: 0.95 }),
@@ -69,7 +97,7 @@ export const VOICE_PROFILES: Record<string, VoiceProfile> = Object.fromEntries(
     P('baker', 'Bäckerin', 'kerstin', 0, 1.5, 1.04, 'shop', 0, { pitch: 1.3, rate: 1.0, female: true }),
     P('miller', 'Müller', 'thorsten-emotional', E.neutral, 0.5, 0.98, 'yard', 0, { pitch: 1.0, rate: 0.95 }),
     P('brewer', 'Brauer', 'thorsten-emotional', E.sleepy, -1.5, 1.1, 'shop', 0, { pitch: 0.8, rate: 0.95 }),
-    P('smith', 'Schmied', 'thorsten-emotional', E.angry, -2.5, 1.0, 'shop', 0, { pitch: 0.55, rate: 0.95 }),
+    P('smith', 'Schmied', 'thorsten-emotional', E.angry, -2.0, 1.0, 'shop', 0, { pitch: 0.55, rate: 0.95 }),
     P('trader', 'Händler', 'thorsten-emotional', E.amused, 2.0, 1.1, 'shop', 0, { pitch: 1.3, rate: 1.1 }),
     P('advisor', 'Hofberater', 'thorsten-high', 0, -1.0, 0.97, 'room', 0, { pitch: 0.9, rate: 0.95 }, false),
     P('advisor.alarm', 'Hofberater (dringend)', 'thorsten-emotional', E.surprised, -1.0, 1.08, 'room', 0, { pitch: 1.0, rate: 1.1 }, false),

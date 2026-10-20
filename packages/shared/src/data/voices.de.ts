@@ -11,7 +11,7 @@ export const VOICE_DE: VoiceLines = {
   swordsman: {
     select: ['Schwert bereit.', 'Wir hören, Herr.', 'Zu Euren Diensten.', 'Die Klingen sind geschliffen.'],
     move: ['Wir rücken vor.', 'Marsch, Männer!', 'Verstanden, wir marschieren.', 'Wir gehen.'],
-    attack: ['Auf sie!', 'Für die Burg!', 'Schilde hoch, dann zuschlagen!', 'Zum Angriff!'],
+    attack: ['Auf sie!', 'Für unsere Burg!', 'Schilde hoch, dann zuschlagen!', 'Zum Angriff!'],
     hold: ['Wir halten die Stellung.', 'Hier kommt keiner durch.', 'Schilde zusammen!', 'Wir stehen wie ein Fels.'],
     wounded: ['Das war ein harter Treffer!', 'Ich blute, aber ich kämpfe weiter.', 'Ich brauche Hilfe!'],
   },
@@ -25,9 +25,9 @@ export const VOICE_DE: VoiceLines = {
   archer: {
     select: ['Unsere Bögen sind bereit.', 'Die Pfeile sind im Köcher.', 'Wohin zielen wir?', 'Wir haben ein scharfes Auge.'],
     move: ['Wir beziehen Stellung.', 'Wir gehen in Position.', 'Schnell, bevor sie uns sehen.', 'Von der Anhöhe sehen wir besser.'],
-    attack: ['Bogen spannen!', 'Zielt und lasst fliegen!', 'Der Himmel wird dunkel von Pfeilen!', 'Freie Schussbahn, Feuer!'],
+    attack: ['Bogen spannen, Männer!', 'Zielt und lasst fliegen!', 'Der Himmel wird dunkel von Pfeilen!', 'Freie Schussbahn, Feuer!'],
     hold: ['Wir decken die Mauer.', 'Von hier haben wir jeden Feind im Visier.', 'Wir halten die Zinnen.'],
-    wounded: ['Ich bin getroffen!', 'Mein Bogenarm!', 'Deckung, ich bin verwundet!'],
+    wounded: ['Ich bin getroffen!', 'Mein Arm, mein Bogenarm!', 'Deckung, ich bin verwundet!'],
   },
   crossbow: {
     select: ['Bolzen gespannt.', 'Die Armbrust ist geladen.', 'Ruhige Hand, scharfes Auge.', 'Wir hören.'],
@@ -37,9 +37,9 @@ export const VOICE_DE: VoiceLines = {
     wounded: ['Mich hat ein Pfeil erwischt!', 'Ich kann kaum noch spannen!', 'Zurück, ich bin verletzt!'],
   },
   knight: {
-    select: ['Ich höre, Herr.', 'Das Pferd ist gesattelt.', 'Bereit zum Ritt.', 'Nennt das Ziel.'],
-    move: ['Im Galopp!', 'Ich reite.', 'Aus dem Weg, ich komme!', 'Die Hufe donnern, wir reiten.'],
-    attack: ['Zur Attacke!', 'Lanzen nieder und drauf!', 'Für Ehre und Burg!', 'Reiter, vor!'],
+    select: ['Ich höre, Herr.', 'Das Pferd ist gesattelt.', 'Bereit zum Ritt.', 'Nennt mir das Ziel.'],
+    move: ['Im Galopp voran!', 'Ich reite sofort.', 'Aus dem Weg, ich komme!', 'Die Hufe donnern, wir reiten.'],
+    attack: ['Zur Attacke!', 'Lanzen nieder und drauf!', 'Für Ehre und Burg!', 'Reiter, vorwärts!'],
     hold: ['Wir halten die Flanke.', 'Das Pferd steht ruhig, ich wache.', 'Hier kommt keiner vorbei.'],
     wounded: ['Mein Pferd ist verletzt!', 'Der Panzer hält noch.', 'Ich bin angeschlagen, aber nicht besiegt.'],
   },
@@ -82,22 +82,22 @@ export const VOICE_DE: VoiceLines = {
     special: ['Der Segen wirkt.', 'Du bist wieder heil.', 'Es war nur ein Kratzer.'],
   },
   lord: {
-    select: ['Sprecht.', 'Ich höre Euch.', 'Was gibt es?', 'Redet, ich höre zu.'],
+    select: ['Sprecht, ich höre.', 'Ich höre Euch.', 'Was gibt es?', 'Redet, ich höre zu.'],
     move: ['Ich gehe selbst.', 'Folgt mir.', 'Der Weg ist frei.'],
-    attack: ['Für mein Haus!', 'Dem Feind entgegen!', 'Folgt Eurem Lord!'],
+    attack: ['Für mein Haus!', 'Dem Feind entgegen!', 'Folgt Eurem Herrn!'],
     hold: ['Hier ist mein Platz.', 'Die Burg fällt nicht.', 'Ich weiche nicht.'],
     wounded: ['Das schmerzt, doch ich lebe.', 'Man hat mich getroffen!', 'Haltet sie von mir fern!'],
     special: ['Haus und Volk sind mir anvertraut.', 'Wir haben viel aufgebaut.', 'Diese Mauern werden bestehen.'],
   },
   // ---------------------------------------------------------------- Bewohner
   peasant: {
-    select: ['Die Felder warten.', 'Ja, Herr?', 'Gibt es Arbeit?', 'Womit kann ich helfen?'],
-    move: ['Ich gehe schon.', 'Bin schon unterwegs.', 'Dann eben dorthin.', 'Gleich da.'],
-    attack: ['Ich bin kein Kämpfer!', 'Mit der Heugabel?', 'Muss das sein?'],
+    select: ['Die Felder warten.', 'Ja, Herr, was gibt es?', 'Gibt es Arbeit?', 'Womit kann ich helfen?'],
+    move: ['Ja, ich gehe schon.', 'Bin schon unterwegs.', 'Dann eben dorthin.', 'Ich bin gleich da.'],
+    attack: ['Ich bin kein Kämpfer!', 'Mit der Heugabel?', 'Muss das wirklich sein?'],
     hold: ['Ich bleibe hier.', 'Dann warte ich eben.', 'Hier ist es sicher genug, oder?'],
     work: ['Die Arbeit macht sich nicht von allein.', 'Immer weiter, immer weiter.', 'Noch ein Handgriff.', 'Die Sonne steht schon hoch.'],
     done: ['Fertig!', 'So, das wäre geschafft.', 'Wieder ein Stück Arbeit weniger.'],
-    wounded: ['Aua, das tut weh!', 'Hilfe!', 'Lauft weg!'],
+    wounded: ['Aua, das tut weh!', 'Zu Hilfe!', 'Rettet euch!'],
   },
   woodcutter: {
     select: ['Ich mache mich an die Arbeit.', 'Die Axt ist scharf.', 'Holz wächst nicht auf dem Markt.', 'Was braucht Ihr?'],

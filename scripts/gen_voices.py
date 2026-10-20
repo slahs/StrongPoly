@@ -12,6 +12,8 @@ Keine Netzwerkzugriffe, keine API-Schlüssel. Modelle (nur nachweislich frei nut
       Sprecher Thorsten Müller, Datensatz "Thorsten-Voice", Lizenz CC0 (Modellkarte der Pakete: "License: CC0")
   vits-piper-de_DE-kerstin-low
       Sprecherin "kerstin", Datensatz rhasspy/dataset-voice-kerstin, Lizenz CC0 1.0
+  Englisch (--lang en im Export): vits-piper-en_US-joe-medium (CC0), -john-medium (gemeinfrei), -norman-medium (gemeinfrei),
+      -kathleen-low (CC0); Lizenzangaben jeweils aus der MODEL_CARD des Pakets
 
 Bezug der Modellpakete (Release "tts-models" von k2-fsa/sherpa-onnx), siehe scripts/gen-voices.sh und README.
 Nachbearbeitung mit ffmpeg: Tonhöhe (rubberband), Raum/Klangfarbe je Profil, Normalisierung, MP3 (mono).
@@ -31,7 +33,7 @@ import numpy as np
 import sherpa_onnx
 import soundfile as sf
 
-GEN_VERSION = 3
+GEN_VERSION = 5
 OUT_SR = 22050
 
 MODELS = {
@@ -39,18 +41,22 @@ MODELS = {
     'thorsten-medium': ('vits-piper-de_DE-thorsten-medium', 'de_DE-thorsten-medium.onnx'),
     'thorsten-emotional': ('vits-piper-de_DE-thorsten_emotional-medium', 'de_DE-thorsten_emotional-medium.onnx'),
     'kerstin': ('vits-piper-de_DE-kerstin-low', 'de_DE-kerstin-low.onnx'),
+    'en-joe': ('vits-piper-en_US-joe-medium', 'en_US-joe-medium.onnx'),
+    'en-john': ('vits-piper-en_US-john-medium', 'en_US-john-medium.onnx'),
+    'en-norman': ('vits-piper-en_US-norman-medium', 'en_US-norman-medium.onnx'),
+    'en-kathleen': ('vits-piper-en_US-kathleen-low', 'en_US-kathleen-low.onnx'),
 }
 
 # Klangfarbe/Raum je Profil (ffmpeg-Filterketten nach der Tonhöhenverschiebung)
 FX = {
     'none': 'highpass=f=70',
-    'room': 'highpass=f=80,aecho=0.85:0.9:38|71:0.16|0.09',
-    'helm': 'highpass=f=120,lowpass=f=6200,equalizer=f=1500:t=q:w=1.2:g=2,aecho=0.9:0.9:13|27:0.14|0.08',
-    'hall': 'highpass=f=70,equalizer=f=170:t=q:w=1:g=2.5,aecho=0.82:0.88:57|128|205:0.28|0.18|0.1',
-    'chapel': 'highpass=f=90,lowpass=f=6500,aecho=0.8:0.88:79|167|283:0.3|0.2|0.12',
-    'air': 'highpass=f=100,equalizer=f=3200:t=q:w=1.5:g=1.5,aecho=0.9:0.92:93:0.1',
-    'yard': 'highpass=f=90,lowpass=f=7000,aecho=0.88:0.9:113:0.12',
-    'shop':'highpass=f=90,lowpass=f=7000,aecho=0.88:0.9:27|46:0.16|0.1',
+    'room': 'highpass=f=80,aecho=0.9:0.9:38|71:0.1|0.05',
+    'helm': 'highpass=f=120,lowpass=f=6200,equalizer=f=1500:t=q:w=1.2:g=2,aecho=0.9:0.9:13|27:0.1|0.05',
+    'hall': 'highpass=f=70,equalizer=f=170:t=q:w=1:g=2,aecho=0.92:0.9:75|150:0.12|0.06',
+    'chapel': 'highpass=f=90,lowpass=f=6500,aecho=0.92:0.9:90|190:0.12|0.07',
+    'air': 'highpass=f=100,equalizer=f=3200:t=q:w=1.5:g=1.5,aecho=0.92:0.92:93:0.08',
+    'yard': 'highpass=f=90,lowpass=f=7000,aecho=0.9:0.9:113:0.09',
+    'shop': 'highpass=f=90,lowpass=f=7000,aecho=0.9:0.9:27|46:0.1|0.06',
 }
 
 
@@ -103,14 +109,16 @@ def finish(x, gain_db):
     return x.astype(np.float32)
 
 
-def render(line, prof, models_dir, tmp):
-    tts = load_tts(models_dir, prof['tts']['model'])
-    a = tts.generate(line['text'], sid=prof['tts']['sid'], speed=prof['speed'])
+def render(line, prof, models_dir, tmp, lang='de'):
+    spk = prof['ttsEn'] if lang == 'en' else prof['tts']
+    tts = load_tts(models_dir, spk['model'])
+    a = tts.generate(line['text'], sid=spk['sid'], speed=prof['speed'])
     x = np.asarray(a.samples, dtype=np.float32)
     x = trim(x, a.sample_rate)
     raw, fx_in, fx_out = (os.path.join(tmp, n) for n in ('raw.wav', 'in.wav', 'out.wav'))
     sf.write(raw, x, a.sample_rate, subtype='FLOAT')
-    ratio = 2 ** (prof['pitch'] / 12)
+    # englische Sprecher sind schon unterschiedlich tief; halbe Verschiebung hält die Verständlichkeit
+    ratio = 2 ** (prof['pitch'] * (0.5 if lang == 'en' else 1.0) / 12)
     chain = []
     if abs(prof['pitch']) > 0.01:
         chain.append(f'aresample={a.sample_rate},rubberband=pitch={ratio:.5f}:formant=shifted:pitchq=quality')
@@ -155,7 +163,9 @@ def main():
         for i, line in enumerate(data['lines']):
             key = line['key']
             prof = profiles[line['profile']]
-            h = hashlib.sha1(json.dumps([GEN_VERSION, line['text'], prof], sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:10]
+            other = 'tts' if lang == 'en' else 'ttsEn'
+            relevant = {k: v for k, v in prof.items() if k != other}
+            h = hashlib.sha1(json.dumps([GEN_VERSION, line['text'], relevant], sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:10]
             if line['voice'] == 'advisor':
                 rel = f"advisor/{key[len('advisor.'):]}.mp3"
             else:
@@ -169,7 +179,7 @@ def main():
                 continue
             if not selected:
                 continue
-            y, wav = render(line, prof, args.models, tmp)
+            y, wav = render(line, prof, args.models, tmp, lang)
             os.makedirs(os.path.dirname(path), exist_ok=True)
             encode(wav, path)
             if args.keep_wav:

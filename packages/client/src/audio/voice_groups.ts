@@ -40,7 +40,6 @@ export function groupOfUnit(unitType: number): string | null {
 }
 
 const BUILDING_GROUP: Record<number, string> = {
-  [BT.Keep]: 'lord',
   [BT.Woodcutter]: 'woodcutter',
   [BT.Quarry]: 'mason',
   [BT.IronMine]: 'mason',

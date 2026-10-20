@@ -367,8 +367,11 @@ export class Soundscape {
           }
           const working = WORK_PERIOD[sub] !== undefined && (type === U.Peasant || type === U.Engineer);
           const wasWorking = WORK_PERIOD[this.prevSub[s]] !== undefined;
-          if (working) this.offer(this.taskGroup(sub, x, y), 'work', x, y);
-          else if (wasWorking && !working && type === U.Peasant) this.offer(this.taskGroup(this.prevSub[s], x, y), 'done', x, y);
+          if (working) this.offer(() => this.taskGroup(sub, x, y), 'work', x, y);
+          else if (wasWorking && !working && type === U.Peasant) {
+            const was = this.prevSub[s];
+            this.offer(() => this.taskGroup(was, x, y), 'done', x, y);
+          }
           if (soldier && type !== U.Lord) {
             if (d2 < nearIdleD2) {
               nearIdleD2 = d2;
@@ -450,10 +453,12 @@ export class Soundscape {
   }
 
   /** Kandidat für Hintergrundgerede: gleichverteilte Zufallsauswahl (Reservoir) */
-  private offer(group: string | null, ev: 'work' | 'done', x: number, y: number): void {
+  private offer(group: string | (() => string | null) | null, ev: 'work' | 'done', x: number, y: number): void {
     if (!group) return;
     this.candN++;
-    if (Math.random() * this.candN < 1) this.cand = { group, ev, x, y };
+    if (Math.random() * this.candN >= 1) return;
+    const g = typeof group === 'function' ? group() : group;
+    if (g) this.cand = { group: g, ev, x, y };
   }
 
   /** Welche Gruppe arbeitet hier? Bäume → Holzfäller, Vorkommen → Steinmetz, Ernte → Landwirt, sonst Bauer. */
@@ -492,7 +497,7 @@ export class Soundscape {
 
   private buildingWork(t: number, id: number, cx: number, cy: number, dt: number): void {
     const bg = groupOfBuilding(t);
-    if (bg && bg !== 'lord' && t !== BT.Barracks && t !== BT.MercPost && t !== BT.Stable && t !== BT.EngineerGuild) {
+    if (bg && t !== BT.Barracks && t !== BT.MercPost && t !== BT.Stable && t !== BT.EngineerGuild) {
       const dxv = cx - (this.view?.camX ?? cx);
       const dyv = cy - (this.view?.camY ?? cy);
       const vr = viewRadius(this.view?.camDist ?? 30) * 0.85;

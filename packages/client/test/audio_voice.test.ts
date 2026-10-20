@@ -5,6 +5,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ClipRegistry, Lru, validateManifest } from '../src/audio/clips';
+import { migrateSettings, Settings } from '../src/game/settings';
 import type { AudioSettings } from '../src/audio/engine';
 import { DEFAULT_AUDIO } from '../src/audio/engine';
 import { VoiceSystem } from '../src/audio/voice';
@@ -492,5 +493,22 @@ describe('Sprachsystem (Attrappen)', () => {
     expect(subs[subs.length - 1]).toBe('advisor:Herr, das Holz wird knapp.');
     vs.stop('advisor');
     expect(vs.replayLast('nobody')).toBe(false);
+  });
+});
+
+describe('Einstellungen: Stimmen, Umgebung, Untertitel', () => {
+  it('Pegel werden begrenzt, ungültige Werte verworfen, Standardwerte liegen im Audioobjekt', () => {
+    const m = migrateSettings({ volVoice: 5, volAmbient: 'x', volAdvisor: -2 });
+    expect(m.volVoice).toBe(1);
+    expect('volAmbient' in m).toBe(false);
+    expect(m.volAdvisor).toBe(0);
+    const st = new Settings();
+    const a = st.audio();
+    expect(a.voice).toBe(st.volVoice);
+    expect(a.ambient).toBe(st.volAmbient);
+    expect(a.subtitles).toBe(st.subtitles);
+    expect(a.ttsFallback).toBe(true);
+    expect(DEFAULT_AUDIO.voice).toBeGreaterThan(0);
+    expect(DEFAULT_AUDIO.ambient).toBeGreaterThan(0);
   });
 });

@@ -2,7 +2,7 @@
 
 Browser-Echtzeitstrategie im Low-Poly-Stil: Burgenbau, Wirtschaftsketten, Beliebtheit, Belagerung, KI-Lords und Online-Mehrspieler.
 Alle Namen, Texte, Modelle, Sounds und die Oberfläche sind Eigenentwürfe – es werden keine Original-Assets verwendet.
-Sämtliche Modelle entstehen prozedural im Code aus Primitiven (Flat Shading, feste 24-Farben-Palette), Klänge per WebAudio-Synthese.
+Sämtliche Modelle entstehen prozedural im Code aus Primitiven (Flat Shading, feste 24-Farben-Palette), Effekte, Musik und Umgebungsklänge per WebAudio-Synthese; gesprochene Zeilen sind lokal mit freien Modellen erzeugte Clips (Herkunft und Lizenzen: `packages/client/public/voice/README.md`).
 
 ## Inhalt
 
@@ -130,20 +130,40 @@ node scripts/bench-fps.mjs --hw                  # echte GPU statt Software-GL
 
 Das Skript braucht `playwright-core` (normal installiert, per `NODE_PATH` oder `PLAYWRIGHT_CORE=<Verzeichnis>`) und ein Chromium (`CHROMIUM=<Pfad>` oder Autodetektion unter `/opt/pw-browsers`). Ohne `--hw` wird Software-GL (SwiftShader) erzwungen; deren FPS sind nur ein pessimistischer Richtwert.
 
-## Sound und Musik (`client/src/audio`)
+## Sound, Musik, Stimmen und Umgebung (`client/src/audio`)
 
-Alles entsteht zur Laufzeit per WebAudio-Synthese; es gibt keine Audiodateien und keine fremden Melodien.
+Effekte, Musik und Umgebungsklänge entstehen zur Laufzeit per WebAudio-Synthese (keine fremden Melodien). Gesprochene Zeilen
+(Einheiten, Bewohner, Hofberater) sind **vorab erzeugte Sprachclips** (`client/public/voice/<lang>/`, lokal mit freien neuronalen
+Modellen synthetisiert, siehe „Stimmen“); fehlt ein Clip, springt die Browser-Sprachausgabe ein oder die Zeile erscheint nur als Untertitel.
 
 | Datei | Aufgabe |
 | --- | --- |
-| `engine.ts` | Bus-Graph: Kanäle `effects`/`music`/`advisor`/`ui` mit eigenem Gain und Kompressor, danach Master, Limiter und Sichtbarkeits-Gain |
-| `sfx.ts`, `voices.ts`, `synth.ts` | Effekt-Synthese (Hammer, Axt, Pickel, Amboss, Mühle, Pfeile, Schwerter, Katapult, Einsturz, Feuer, Tore, Horn, Gong, Fanfaren …), Einheitentöne je Klasse (synthetische Formantsilben, Hufe, Sehne), Karplus-Strong-Laute, Flöte, Rahmentrommel; alles läuft auch auf einem `OfflineAudioContext` |
+| `engine.ts` | Bus-Graph: Kanäle `effects`/`music`/`advisor`/`ui`/`voice`/`ambient` mit eigenem Gain und Kompressor, danach Master, Limiter und Sichtbarkeits-Gain |
+| `sfx.ts`, `voices.ts`, `synth.ts` | Effekt-Synthese (Hammer, Axt, Pickel, Amboss, Mühle, Pfeile, Schwerter, Katapult, Einsturz, Feuer, Tore, Horn, Gong, Fanfaren …), Karplus-Strong-Laute, Flöte, Rahmentrommel; `voices.ts` ist nur noch der letzte Ausweg (kurze synthetische Rückmeldung), wenn weder Clip noch Browser-Stimme sprechen können; alles läuft auch auf einem `OfflineAudioContext` |
 | `music.ts`, `theory.ts` | Generativer Soundtrack: Hijaz-/Dorisch-/Phrygisch-/Hijaz-Kar-/Nahawand-/Ajam-Skalen, Rhythmuszyklen, Phrasen-Erzeugung aus einem Seed (`generatePhrase`), Schichten (Drone, Laute, Flöte, Trommel, Herzschlag, Tremolo-Pad) mit weichem Gain-Crossfade; Stimmungen `build`/`tension`/`battle`, Themen `menu`/`victory`/`defeat` |
 | `mix.ts`, `mood.ts`, `classes.ts` | reine Logik ohne WebAudio (getestet): Voice-Limiter je Soundtyp + global + Drosselung, Distanz/Zoom/Pan-Berechnung, Stimmungs-Hysterese, Einheitenklassen |
-| `index.ts` | `AudioEngine`: Autoplay-konforme Initialisierung (Kontext erst nach erster Geste), `play(id, x, y)`, `unitSelect/unitCommand`, `setMood`, `playTheme`, Mute, Debug-Zustand |
-| `../game/soundscape.ts` | leitet aus dem Client-Spiegel Klänge ab, die die Sim nicht meldet (Bauen, Abreißen, Arbeit, Geschosse, Tore, Rekrutierung), und die Musikstimmung (feindliche Soldaten nahe eigener Gebäude → Spannung, viele Kampfereignisse → Schlacht, mit Hysterese) |
+| `voice.ts`, `voice_logic.ts`, `voice_groups.ts`, `voice_api.ts` | Sprachsystem (`AudioEngine.voice`, Vertrag `VoiceApi`): Tor mit Prioritäten/Mindestabständen/Wiederholungssperre, Zeilenauswahl, Zuordnung Einheit/Gebäude → Sprecher, Clip- oder Ersatzwiedergabe, räumliche Mischung |
+| `clips.ts`, `clips_check.ts`, `subtitles.ts` | Clip-Register (Manifest, träges Laden, Vorladen, LRU), Browserprüfung aller Clips, Untertitel-Overlay |
+| `ambience.ts`, `ambience_logic.ts` | Umgebungsgeräusche: Klangbetten und Einzelereignisse (synthetisiert), reine Dichte-/Auswahlregeln |
+| `index.ts` | `AudioEngine`: Autoplay-konforme Initialisierung (Kontext erst nach erster Geste), `play(id, x, y)`, `selectionSelect/selectionCommand/buildingSelect/speakEvent`, `voice`, `updateAmbience`, `setMood`, `playTheme`, Mute, Debug-Zustand |
+| `../game/soundscape.ts` | leitet aus dem Client-Spiegel Klänge ab, die die Sim nicht meldet (Bauen, Abreißen, Arbeit, Geschosse, Tore, Rekrutierung), die Musikstimmung (feindliche Soldaten nahe eigener Gebäude → Spannung, viele Kampfereignisse → Schlacht, mit Hysterese), die Umgebungsbeobachtung (Wasser/Bäume um den Blickpunkt, Siedlungsdichte, Feuer, Kampf nah/fern) und die ereignisbezogenen Stimmen (Arbeit, Abschluss, verwundet, Lagewechsel) |
 
-Lautstärkeregler (Master, Effekte, Musik, Berater), Musik-Schalter und Stumm stehen in den Optionen (`audio/ui.ts`, `Settings.vol*`), **M** schaltet den Ton stumm. Prüfung ohne Lautsprecher: `window.__audio.state()` (Kontextstatus, Stimmung, Stimmen, Zähler gespielter Effekte) und `window.__audio.renderAll()` (rendert jede Synthese offline und meldet Spitzenpegel, RMS und NaN).
+Regler (Optionen, `audio/ui.ts`, `Settings.vol*`): Gesamt, Effekte, Musik, Berater, **Einheitenstimmen**, **Umgebung**; Schalter Musik, **Untertitel bei Sprache**, **Browser-Stimme als Ersatz**, Stumm. **M** schaltet den Ton stumm.
+Prüfung ohne Lautsprecher: `window.__audio.state()` (Kontext, Stimmung, Stimmen, Zähler, Sprachsystem, Umgebung), `window.__audio.renderAll()` (rendert jede Synthese – auch die der Umgebung – offline und meldet Spitzenpegel, RMS und NaN) und `window.__audio.checkClips()` (lädt und dekodiert alle Sprachclips, meldet Länge, Pegel, NaN).
+
+### Stimmen (Meilenstein 4D)
+
+- **Daten:** `shared/src/data/voices.de.ts` / `voices.en.ts` (originelle Sätze je Gruppe und Ereignis, Schlüssel `<gruppe>.<ereignis>.<nr>`), `voices.ts` (Ereignisse, Stimmprofile, Zeilenregister). 20 Gruppen: Schwertkämpfer, Speer/Pike, Bogenschütze, Armbrust, Ritter, Söldner (arabische Einheiten), Assassine, Belagerungsmannschaft, Ingenieur, Mönch, Lord, Bauer, Holzfäller, Steinmetz/Steinbruch, Landwirt, Bäckerin, Müller, Brauer, Schmied, Händler – dazu der Hofberater (`advisor`, ruhige und dringende Zeilen). Ereignisse: Auswahl, Bewegungsbefehl, Angriff, Halten/Verteidigung, Arbeiten, Abschluss, verwundet, Besonderes; mindestens drei Varianten je Ereignis (Test).
+- **Auslöser:** neue Auswahl (dieselbe Auswahl in kurzer Folge bleibt stumm), Befehle (Bewegen, Angriff/Angriffsmarsch, Stopp/Haltung), Anwählen eines Gebäudes (Bewohner: Schmied, Bäckerin, Händler …), Soundscape: Arbeit/Abschluss der Arbeiter und Werkstatt-Bewohner (selten, ein Kandidat je 16–36 s), verwundete Soldaten, Lagewechsel (erster Feind → Halten-Ruf, Schlachtbeginn → Angriffsruf), Mannschaft eigener Belagerungsgeräte beim Schuss.
+- **Verhalten (`voice_logic.ts`):** Mindestabstände global und je Stimme je Ereignisart (Auswahl 0,3/0,7 s, Arbeit 7/26 s …), gleiche Zeile nie zweimal hintereinander (Mischbeutel + Tor), höchstens eine Einheitenstimme zugleich (Spielerrückmeldung unterbricht Hintergrundgerede), Berater zusätzlich (eine Zeile, höhere Priorität verdrängt, wichtige Zeilen warten kurz in einer Schlange), Einheiten räumlich (Entfernung, Tiefpass, Pan; Spielerrückmeldung bleibt hörbar), Berater nicht räumlich. Stumm (M) und Lautstärke 0 werden respektiert; mit Lautstärke 0 bleiben die Untertitel.
+- **Untertitel:** Overlay unten mittig (`#voice-subtitles`), Option „Untertitel bei Sprache“, `voice.onSubtitle(text, voice)` für andere Oberflächenteile.
+- **Wiedergabe:** Clip aus dem Register (Vorrang) → sonst Browser-Sprachausgabe (`speechSynthesis`, `de-DE`/`en-US`, Tonhöhe/Tempo je Profil, abschaltbar) → sonst nur Untertitel. Ein Clip wird nur benutzt, wenn sein Text zur angefragten Zeile passt (sonst würde eine umformulierte Beraterzeile den falschen Satz sprechen).
+- **Clips erzeugen:** `scripts/gen-voices.sh` (exportiert die Zeilen, erzeugt alle Clips + `manifest.json`; `VOICE_LANG=en` für Englisch), Prüfung `scripts/check-voices.sh` (Signal + Rücktranskription). Quellen und Lizenzen der Stimmen: `client/public/voice/README.md`; eigene Aufnahmen einsetzen: ebenda („Eigene Aufnahmen oder ein anderes Paket“), oder `?voicepack=<URL-Präfix>`.
+- **Stand:** siehe `PROGRESS-4.md` Abschnitt 4D (Stimmen, Clipzahl, Qualitätseinschätzung, was Ersatz ist).
+
+### Umgebungsgeräusche (Meilenstein 4G)
+
+Klangbetten (Wind, Blätterrauschen, Wasser, Siedlungsgemurmel, Feuer, ferner Gefechtslärm) und seltene Einzelereignisse (Vogelrufe, Feuerknacken, ferne Waffenschläge) laufen auf dem Kanal `ambient` (Regler **Umgebung**). Pegel und Raten kommen aus `ambience_logic.ts`: abhängig vom Kamerazoom (nah = Details, fern = Wind), von der Umgebung des Blickpunkts (Wasseranteil und -richtung, Baumdichte, offenes Land), von Siedlungsdichte (Bauern, Gebäude, Märkte), brennenden Gebäuden, Kampf im Bild/außerhalb und der Spiellage (Frieden › Spannung › Schlacht dämpft Natur und Siedlung, in der Schlacht keine Vögel). Keine Hammerwand: Werkstattgeräusche je Typ nur von den 2–3 nächsten Gebäuden (Dichte-Dämpfung, Phasenversatz), Arbeitsgeräusche der Bauern mit begrenzter Gesamtrate, Einzelereignisse über das Voice-Limit (Vögel höchstens 2 zugleich). Alle Klänge sind synthetisiert (keine Dateien).
 
 ## Bedienung (Stronghold-Stil)
 

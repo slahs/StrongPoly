@@ -101,6 +101,8 @@ export class VoiceSystem implements VoiceApi {
     if (!text) return this.fail('no-text');
     const priority = req.priority ?? (category === 'advisor' ? 1 : 0);
 
+    // Sprache gewechselt (setLang): Manifest der neuen Sprache im Hintergrund nachladen, ab der nächsten Zeile gelten die Clips
+    if (this.clips && !this.clips.manifest(lang) && this.clips.stats.manifest !== 'loading') void this.clips.ensure(lang);
     // Manifest noch unterwegs: einmal kurz warten, damit die erste Zeile nicht fälschlich über den Ersatz läuft
     if (!retry && this.clips && this.clips.stats.manifest === 'loading') {
       void this.clips.ensure(lang).then(() => this.say(req, true));

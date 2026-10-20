@@ -2,7 +2,7 @@
 """
 Qualitätsprüfung der erzeugten Sprachclips (Meilenstein 4D).
 
-Je Clip: Dauer, Spitzenpegel, RMS, Anteil Stille, NaN/Clipping. Optional Rücktranskription mit Whisper (sherpa-onnx, lokal):
+Je Clip: Dauer, Spitzenpegel, RMS, Anteil Stille, NaN/Clipping. Optional Rücktranskription mit Whisper (sherpa-onnx, lokal; Sprache laut Manifest):
 Wortfehlerrate (WER) gegen den Sollsatz als Maß für Verständlichkeit.
 
 Aufruf:
@@ -72,7 +72,7 @@ def main():
         import sherpa_onnx
         rec = sherpa_onnx.OfflineRecognizer.from_whisper(
             encoder=f'{a.asr}/small-encoder.int8.onnx', decoder=f'{a.asr}/small-decoder.int8.onnx', tokens=f'{a.asr}/small-tokens.txt',
-            language='de', task='transcribe', num_threads=3)
+            language=man['lang'], task='transcribe', num_threads=3)
     rows = []
     for k in keys:
         c = man['clips'][k]
