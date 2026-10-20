@@ -100,7 +100,6 @@ export function wallParts(b: ModelBuilder, id: number, h: number, kind: 'arm' | 
     // Brüstung und Zinnen beiden Seiten
     for (const z of [-1, 1]) {
       b.box(0.5, 0.1, 0.12, sx * 0.25, h, z * (T / 2 - 0.05), stone);
-      for (const x of [0.14, 0.37]) b.box(0.15, 0.26, 0.12, sx * x, h + 0.1, z * (T / 2 - 0.05), stone);
     }
     b.surf(0);
     if (id === BT.WallHigh) {
@@ -379,55 +378,59 @@ export function gateWood(b: ModelBuilder, W: number, H: number): void {
 }
 
 export function gateStone(b: ModelBuilder, W: number, H: number): void {
-  const tx = W / 2 - 0.95;
-  // zwei Rundtürme mit Zinnenkranz (Krone 3.6)
+  // Durchgang 1,4 breit mittig; die Türme (r 0,65) stehen links und rechts daneben, innerhalb des Footprints
+  const pw = 1.4;
+  const r = 0.66;
+  const tx = pw / 2 + r;
   for (const sx of [-1, 1]) {
     b.det(0).surf(SURF.Stone);
-    b.cyl(0.98, 1.1, 0.35, 12, sx * tx, 0, 0, BP.stoneDark);
-    b.cyl(0.95, 0.98, 2.85, 12, sx * tx, 0.35, 0, BP.stone);
-    b.cyl(1.0, 1.0, 0.09, 12, sx * tx, 1.8, 0, BP.stoneMid);
-    b.cyl(1.2, 1.0, 0.4, 12, sx * tx, 3.2, 0, BP.stoneMid);
+    b.cyl(r + 0.03, r + 0.14, 0.35, 12, sx * tx, 0, 0, BP.stoneDark);
+    b.cyl(r, r + 0.03, 2.95, 12, sx * tx, 0.35, 0, BP.stone);
+    b.cyl(r + 0.05, r + 0.05, 0.09, 12, sx * tx, 1.8, 0, BP.stoneMid);
+    b.cyl(r + 0.22, r + 0.02, 0.4, 12, sx * tx, 3.2, 0, BP.stoneMid);
     b.surf(0);
-    roundCrenel(b, 1.18, 3.6, sx * tx, 0, BP.stoneLight, 10, 0.34);
+    roundCrenel(b, r + 0.2, 3.6, sx * tx, 0, BP.stoneLight, 8, 0.34);
     for (const f of [0, 1, 2, 3]) {
       const a = (f / 4) * Math.PI * 2 + 0.8;
-      b.det(1).box(0.07, 0.4, 0.06, sx * tx + Math.cos(a) * 0.96, 2.2, Math.sin(a) * 0.96, BP.black, false, -a + Math.PI / 2).det(0);
+      b.det(1).box(0.07, 0.4, 0.06, sx * tx + Math.cos(a) * (r + 0.005), 2.2, Math.sin(a) * (r + 0.005), BP.black, false, -a + Math.PI / 2).det(0);
     }
-    // Wimpel auf den Türmen
     pennant(b, sx * tx, 3.6, 0, 1.0, 0.6, 0.26);
   }
-  // Torhaus-Brücke
-  const bw = W - 2 * tx - 0.3;
-  masonry(b, bw, 1.5, H - 0.4, 0, 2.1, 0, BP.stone);
-  b.det(0).surf(SURF.Stone).box(bw + 0.1, 0.12, H - 0.3, 0, 3.48, 0, BP.stoneMid).surf(0);
-  crenel(b, bw + 0.1, H - 0.3, 3.6, BP.stoneLight, { step: 0.5, mh: 0.3 });
-  // Durchgang mit Bogen und Fallgitter
-  const n = (H - 0.4) / 2;
+  // Torhaus-Brücke zwischen den Türmen (Wehrgang auf 3.6)
+  const bw = 2 * tx;
+  const d = H - 0.5;
+  masonry(b, bw, 1.7, d, 0, 1.9, 0, BP.stone);
+  b.det(0).surf(SURF.Stone).box(bw + 0.1, 0.12, d + 0.1, 0, 3.48, 0, BP.stoneMid).surf(0);
+  crenel(b, bw + 0.1, d + 0.1, 3.6, BP.stoneLight, { step: 0.5, mh: 0.3 });
+  // Kranz-Konsolen unter dem Wehrgang
+  for (const f of [0, 2]) corbels(b, f, bw - 0.4, 3.28, d / 2 + 0.05, BP.stoneDark, 4);
+  // Durchgang: dunkle Öffnung mit Bogen, Rahmen aus Werkstein, Pechnasen
+  const n = d / 2;
   for (const f of [0, 2]) {
     const rot = FACE_ROT[f];
     const [x, z] = facePos(f, 0, n + 0.02);
-    b.det(0).surf(0).box(1.6, 2.0, 0.08, x, 0, z, BP.black, false, rot);
-    const [ax, az] = facePos(f, 0, n + 0.02);
-    b.arch(0.8, 0.08, ax, 2.0, az, BP.black, false, rot, 8);
-    // Rahmenbogen aus Werkstein
+    b.det(0).surf(0).box(pw, 1.9, 0.08, x, 0, z, BP.black, false, rot);
+    b.arch(pw / 2, 0.08, x, 1.9, z, BP.black, false, rot, 8);
     const [fx, fz] = facePos(f, 0, n + 0.04);
-    b.det(1).arch(0.96, 0.06, fx, 2.0, fz, BP.stoneLight, false, rot, 8);
+    b.det(1).arch(pw / 2 + 0.14, 0.06, fx, 1.9, fz, BP.stoneLight, false, rot, 8);
     for (const sx of [-1, 1]) {
-      const [px, pz] = facePos(f, sx * 0.9, n + 0.04);
-      b.box(0.16, 2.0, 0.07, px, 0, pz, BP.stoneLight, false, rot);
+      const [px, pz] = facePos(f, sx * (pw / 2 + 0.08), n + 0.04);
+      b.box(0.16, 1.9, 0.07, px, 0, pz, BP.stoneLight, false, rot);
     }
-    // Schlitze (Pechnasen) über dem Tor
     const [mx, mz] = facePos(f, 0, n + 0.03);
-    b.box(1.4, 0.06, 0.05, mx, 3.0, mz, BP.black, false, rot);
+    b.box(pw, 0.06, 0.05, mx, 3.0, mz, BP.black, false, rot);
     b.det(0);
-    banner(b, f, 0, 3.3, n + 0.07, 0.5, 1.0);
+    banner(b, f, 0, 3.4, n + 0.07, 0.42, 0.8);
   }
+  // Fallgitter (hebt sich beim Öffnen)
   b.part(PART.Door, 0, 0, 0);
-  b.det(0).surf(SURF.Plank).box(W - 2.2, 2.0, 0.16, 0, 0, 0, BP.woodDark).surf(0);
-  b.det(1);
-  for (let i = 0; i < 6; i++) b.box(0.06, 2.05, 0.22, -(W - 2.2) / 2 + 0.18 + i * ((W - 2.6) / 5), 0, 0, BP.iron);
-  for (const y of [0.35, 1.0, 1.65]) b.box(W - 2.2, 0.07, 0.2, 0, y, 0, BP.iron);
+  b.det(0).surf(0);
+  const gz = n + 0.1;
+  for (let i = 0; i < 7; i++) b.box(0.06, 2.0, 0.07, -pw / 2 + 0.1 + i * ((pw - 0.2) / 6), 0, gz, BP.iron);
+  for (const y of [0.4, 1.0, 1.6]) b.box(pw, 0.07, 0.09, 0, y, gz, BP.iron);
+  for (let i = 0; i < 7; i++) b.cyl(0.04, 0, 0.12, 4, -pw / 2 + 0.1 + i * ((pw - 0.2) / 6), 0.0, gz, BP.ironLight);
   b.part(0).det(0);
+  void W;
 }
 
 export function drawbridge(b: ModelBuilder, W: number, H: number): void {

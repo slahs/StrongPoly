@@ -511,9 +511,19 @@ export class BenchWorld {
         y += rowH + 2;
         rowH = 0;
       }
-      this.addBuilding(t, Math.round(x), Math.round(y), t % 2, 0, t === BT.Fletcher ? 1 : 0, 1);
+      const cb = this.addBuilding(t, Math.round(x), Math.round(y), t % 2, 0, t === BT.Fletcher ? 1 : 0, 1);
+      // Großer Turm mit Ballista, zweiter mit Mangonel (Geschütze sind ein Feld des Turms)
+      if (t === BT.TowerRound) cb.u = 1;
       x += def.w + 1.5;
       rowH = Math.max(rowH, def.h);
+    }
+    {
+      const tw = BUILDINGS[BT.TowerRound];
+      if (x + tw.w > cx + 44) {
+        x = cx - 42;
+        y += rowH + 2;
+      }
+      this.addBuilding(BT.TowerRound, Math.round(x), Math.round(y), 1, 0, 0, 1).u = 2;
     }
     // Mauerformen: gerade, Ecke, T, Kreuz, Treppe, Tor
     const wy = cy + 14;

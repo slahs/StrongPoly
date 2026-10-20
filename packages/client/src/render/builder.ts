@@ -41,6 +41,10 @@ interface PartState {
   grad: number;
 }
 
+/** Automatische Bauzeitfenster: Beginn 0,1 (nach Fundament), Aufbau bis 0,82, danach Gerüstabbau und Abschluss */
+export const AUTO_LO = 0.1;
+export const AUTO_SPAN = 0.72;
+
 class Acc {
   pos: number[] = [];
   col: number[] = [];
@@ -139,10 +143,11 @@ class Acc {
         if (bld[i * 4] < 0) {
           const y0 = bld[i * 4 + 2];
           const hh = bld[i * 4 + 3];
-          const s0 = 0.1 + 0.72 * Math.min(1, y0 / H);
-          const dur = Math.min(0.45, Math.max(0.08, 0.5 * (hh / H) + 0.06));
+          // Zeitfenster folgt der Höhe: ein Teil beginnt, wenn das darunterliegende fertig ist (kein schwebendes Dach)
+          const s0 = AUTO_LO + AUTO_SPAN * Math.min(1, Math.max(0, y0) / H);
+          const s1 = AUTO_LO + AUTO_SPAN * Math.min(1, Math.max(0, y0 + hh) / H);
           bld[i * 4] = s0;
-          bld[i * 4 + 1] = Math.min(0.97, s0 + dur);
+          bld[i * 4 + 1] = Math.max(s0 + 0.04, s1);
         }
       }
       g.setAttribute('aBuild', new THREE.Float32BufferAttribute(pick(bld, 4), 4));

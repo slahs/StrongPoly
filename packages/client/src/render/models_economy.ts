@@ -132,7 +132,7 @@ export function granary(b: ModelBuilder, W: number, H: number): void {
   flag(b, 0, 2.45, 0, 0.5, 0.3, 0.16);
   // Tür mit Rampe, Säcke, Garben
   doorOn(b, 0, 0, 0.28, 1.0, 0.5, 0.78, { frame: BP.woodDark });
-  b.beam(0, 0.0, 1.55, 0, 0.3, 1.02, 0.4, BP.wood);
+  b.surf(SURF.Plank).poly([[-1.58, 0], [-1.04, 0.3], [-1.04, 0]], 0.5, 0, 0.0, 0, BP.wood, false, Math.PI / 2).surf(0);
   b.det(1).surf(SURF.Plank).box(0.5, 0.05, 0.6, 0, 0.0, 1.3, BP.wood, false).surf(0);
   sack(b, 0.75, 1.15);
   sack(b, 0.95, 1.0);

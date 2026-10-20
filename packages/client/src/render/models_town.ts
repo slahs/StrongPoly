@@ -237,8 +237,8 @@ export function church(b: ModelBuilder, W: number, H: number): void {
     b.det(0).shed(0.6, 0.35, 2.3, sx * 1.2, 0.9, -0.3, BP.terracottaDark, false, sx > 0 ? 0 : Math.PI, 0.05);
   }
   // Apsis
-  b.det(0).surf(SURF.Stone).cyl(0.8, 0.88, 1.35, 8, 0, 0.0, -1.9, BP.stoneMid).surf(0);
-  coneRoof(b, 0.95, 0.75, 0, 1.33, -1.9, BP.slate, false, 8, SURF.Shingle);
+  b.det(0).surf(SURF.Stone).cyl(0.8, 0.88, 1.35, 8, 0, 0.0, -1.45, BP.stoneMid).surf(0);
+  coneRoof(b, 0.95, 0.75, 0, 1.33, -1.45, BP.slate, false, 8, SURF.Shingle);
   // Westturm mit Spitzhelm und Kreuz
   masonry(b, 1.15, 2.7, 1.15, 0, 0.0, 1.35, BP.stoneLight);
   b.det(0).surf(SURF.Stone).box(1.25, 0.1, 1.25, 0, 2.45, 1.35, BP.stoneMid).box(1.2, 0.14, 1.2, 0, 1.2, 1.35, BP.stoneMid).surf(0);
@@ -273,8 +273,8 @@ export function cathedral(b: ModelBuilder, W: number, H: number): void {
   masonry(b, 3.7, 1.8, 1.2, 0, 0.0, -0.4, BP.stoneMid);
   gableRoof(b, { w: 1.2, d: 3.7, x: 0, z: -0.4, y: 1.8, rise: 1.0, color: BP.slate, surf: SURF.Shingle, over: 0.1, rotY: Math.PI / 2, ridge: BP.woodDark, fascia: false });
   // Apsis
-  b.det(0).surf(SURF.Stone).cyl(1.05, 1.12, 1.9, 10, 0, 0.0, -2.15, BP.stoneMid).surf(0);
-  coneRoof(b, 1.2, 1.0, 0, 1.88, -2.15, BP.slate, false, 10, SURF.Shingle);
+  b.det(0).surf(SURF.Stone).cyl(1.05, 1.12, 1.9, 10, 0, 0.0, -1.75, BP.stoneMid).surf(0);
+  coneRoof(b, 1.2, 1.0, 0, 1.88, -1.75, BP.slate, false, 10, SURF.Shingle);
   // Zwei Westtürme mit Spitzhelmen
   for (const sx of [-1, 1]) {
     const x = sx * 1.3;
