@@ -83,11 +83,11 @@ input[type=checkbox] { accent-color: #a8741a; width: 16px; height: 16px; }
 .resbar .sep { height: 1px; background: #6b4a26; margin: 3px 0; opacity: 0.5; }
 
 /* ---------- Unteres Hauptpanel ---------- */
-.bottom { position: absolute; left: 0; right: 0; bottom: 0; height: 206px; display: flex; gap: 0; padding: 6px 8px 6px; align-items: stretch; pointer-events: none; z-index: 5; background: linear-gradient(#5a3b1e, #2f1d0f); border-top: 4px ridge #8a6137; box-shadow: 0 -3px 12px #000a; pointer-events: auto; }
+.bottom { position: absolute; left: 0; right: 0; bottom: 0; height: 222px; display: flex; gap: 0; padding: 6px 8px 6px; align-items: stretch; pointer-events: none; z-index: 5; background: linear-gradient(#5a3b1e, #2f1d0f); border-top: 4px ridge #8a6137; box-shadow: 0 -3px 12px #000a; pointer-events: auto; }
 .bottom > .panel { pointer-events: auto; margin: 0 4px; }
 .minimap { width: 190px; padding: 3px; flex: none; }
 .minimap canvas { width: 176px; height: 176px; display: block; border: 2px solid #5a3b1e; image-rendering: pixelated; cursor: crosshair; }
-.info { width: 330px; padding: 6px 8px; overflow: auto; flex: none; font-size: 13px; }
+.info { width: 410px; padding: 6px 8px; overflow: auto; flex: none; font-size: 13px; }
 .info h3 { margin: 0 0 3px; font-size: 15px; color: #4a2e0c; }
 .info .hpbar { height: 8px; background: #3a2a1a55; border-radius: 4px; overflow: hidden; margin: 3px 0 5px; border: 1px solid #6b4a26; }
 .info .hpbar > div { height: 100%; background: var(--good); }
@@ -127,8 +127,8 @@ input[type=checkbox] { accent-color: #a8741a; width: 16px; height: 16px; }
 /* Kontext: Rezepte, Rekrutierung, Truppen, Markt */
 .recipes { display: flex; gap: 4px; flex-wrap: wrap; margin: 4px 0; }
 .recipe { display: flex; align-items: center; gap: 4px; padding: 2px 6px; }
-.recruit { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 4px; margin: 4px 0; }
-.unitcard { display: flex; flex-direction: column; align-items: center; padding: 3px; font-size: 11px; line-height: 1.1; text-align: center; min-height: 78px; }
+.recruit { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 4px; margin: 4px 0; }
+.unitcard { display: flex; flex-direction: column; align-items: center; padding: 2px; font-size: 11px; line-height: 1.1; text-align: center; min-height: 74px; }
 .unitcard .nm { font-weight: 700; }
 .unitcard .cs { color: #f3e2b0; font-size: 10px; }
 .unitcard.off { opacity: 0.6; }
@@ -136,7 +136,7 @@ input[type=checkbox] { accent-color: #a8741a; width: 16px; height: 16px; }
 .typegrid { display: flex; flex-wrap: wrap; gap: 4px; margin: 3px 0; }
 .typebtn { position: relative; padding: 2px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; }
 .typebtn .cnt { position: absolute; right: 2px; bottom: 0; font-weight: 800; font-size: 13px; color: #fff; text-shadow: 0 0 3px #000, 0 0 3px #000; }
-.cmdrow { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 4px; }
+.cmdrow { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 3px; }
 .cmd { display: flex; align-items: center; gap: 3px; padding: 1px 6px 1px 3px; font-size: 11px; }
 .market { display: grid; grid-template-columns: 1fr 44px 62px 56px auto; gap: 2px 6px; align-items: center; margin-top: 6px; font-size: 12px; }
 .market .mname { display: flex; align-items: center; gap: 2px; }
@@ -171,13 +171,13 @@ input[type=checkbox] { accent-color: #a8741a; width: 16px; height: 16px; }
 .popup { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); min-width: 340px; max-width: 92vw; max-height: 70vh; overflow: auto; padding: 12px 14px; z-index: 20; }
 .popup h2 { margin: 0 0 8px; font-size: 18px; color: #4a2e0c; display: flex; justify-content: space-between; align-items: center; }
 .popup .close { padding: 0 8px; }
-.hint { position: absolute; left: 50%; bottom: 220px; transform: translateX(-50%); padding: 5px 12px; border-radius: 4px; background: var(--panel); z-index: 6; font-size: 13px; pointer-events: none; }
+.hint { position: absolute; left: 50%; bottom: 236px; transform: translateX(-50%); padding: 5px 12px; border-radius: 4px; background: var(--panel); z-index: 6; font-size: 13px; pointer-events: none; }
 .selbox { position: absolute; border: 1px solid #7fff7f; background: #7fff7f22; pointer-events: none; z-index: 4; }
 .ghostlabel { position: fixed; z-index: 15; pointer-events: none; padding: 4px 9px; border-radius: 4px; background: #1c130aee; border: 1px solid #8a6137; font-size: 12px; max-width: 280px; line-height: 1.3; }
 .ghostlabel.bad { border-color: #d8362f; }
 .ghostlabel .why { color: #ff9d94; font-weight: 600; }
 .banner-msg { position: absolute; left: 50%; top: 28%; transform: translateX(-50%); font-size: 42px; font-weight: 800; text-shadow: 0 2px 8px #000; z-index: 30; pointer-events: none; }
-.fps { position: absolute; right: 8px; bottom: 216px; font-size: 11px; color: #000a; z-index: 3; pointer-events: none; }
+.fps { position: absolute; right: 8px; bottom: 230px; font-size: 11px; color: #000a; z-index: 3; pointer-events: none; }
 .tip { position: fixed; z-index: 60; padding: 6px 10px; background: #1c130af0; border: 1px solid var(--edge2); border-radius: 4px; font-size: 12px; max-width: 300px; pointer-events: none; color: var(--text); }
 .mission { position: absolute; left: 6px; top: 320px; width: 270px; padding: 8px 10px; z-index: 4; font-size: 13px; }
 .mission h4 { margin: 0 0 6px; color: #4a2e0c; font-size: 14px; }

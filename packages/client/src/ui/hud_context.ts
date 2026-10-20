@@ -59,14 +59,42 @@ export class ContextPanel {
     private root: HTMLElement,
   ) {}
 
-  /** Schlüssel der sichtbaren Zustände: nur bei Änderung wird neu aufgebaut */
+  /** Schlüssel der sichtbaren Zustände: nur bei Änderung wird neu aufgebaut (so selten wie möglich, damit Klicks nicht ins Leere gehen) */
   key(b: ClientBuilding, v: PlayerView): string {
     const def = BUILDINGS[b.t];
     let s = `B|${b.i}|${b.hp}|${b.s}|${b.q}|${b.c}|${b.b}|${b.p >> 4}|${b.f}|${b.u}`;
     if (b.o !== this.api.me()) return s;
-    if (def.prod || def.store || b.t === BT.Keep || def.religion || b.t === BT.Inn || b.t === BT.Barracks || b.t === BT.MercPost || b.t === BT.EngineerGuild || b.t === BT.Market || b.t === BT.Cauldron || b.t === BT.Stable || b.t === BT.Hovel) {
-      s += `|${v.gold}|${v.stock.join(',')}|${v.tax}|${v.ration}|${v.peasants}|${v.troops}|${v.horses}|${v.popularity | 0}|${(v.aleCover * 20) | 0}|${(v.relCover * 20) | 0}`;
-      if (b.t === BT.Market) s += `|${v.priceMul.join(',')}`;
+    const st = (list: readonly number[]) => list.map((r) => v.stock[r]).join(',');
+    switch (b.t) {
+      case BT.Keep:
+        return s + `|${v.tax}|${v.ration}|${v.peasants}|${v.popularity | 0}|${v.popDelta.toFixed(1)}`;
+      case BT.Granary:
+        return s + `|${v.ration}|${v.peasants}|${st(FOOD_RES)}|${v.foodShort}`;
+      case BT.Stockpile:
+        return s + `|${st(STOCK_RES)}|${v.used[0]}`;
+      case BT.Armory:
+        return s + `|${st(ARMORY_RES)}|${v.used[2]}`;
+      case BT.Market:
+        return s + `|${v.gold}|${v.stock.join(',')}|${v.priceMul.join(',')}`;
+      case BT.Barracks:
+      case BT.MercPost:
+      case BT.EngineerGuild:
+        return s + `|${v.gold}|${st(ARMORY_RES)}|${v.horses}|${v.peasants}|${v.troops}`;
+      case BT.Inn:
+        return s + `|${(v.aleCover * 50) | 0}|${v.stock[R.Ale]}`;
+      case BT.Cauldron:
+        return s + `|${v.stock[R.Pitch]}`;
+      case BT.Stable:
+        return s + `|${v.horses}`;
+      case BT.Hovel:
+      case BT.Campfire:
+        return s + `|${v.peasants}|${v.housing}`;
+      default:
+    }
+    if (def.religion) return s + `|${(v.relCover * 50) | 0}`;
+    if (def.prod) {
+      const rec = def.prod.recipes[Math.min(b.c, def.prod.recipes.length - 1)];
+      return s + `|${rec.in.map(([r]) => v.stock[r]).join(',')}`;
     }
     return s;
   }

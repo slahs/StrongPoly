@@ -140,6 +140,9 @@ export class Hud {
     const bottom = h('div', { class: 'bottom' });
     this.build = new BuildMenu(this.sharedApi);
     this.info = h('div', { class: 'panel pp info' });
+    // Während die Maustaste im Infopanel gedrückt ist (Schieberegler, Klick) wird nicht neu aufgebaut
+    this.info.addEventListener('pointerdown', () => (this.infoFrozen = true));
+    window.addEventListener('pointerup', () => (this.infoFrozen = false));
     this.context = new ContextPanel(this.sharedApi, this.info);
     this.troops = new TroopPanel(this.sharedApi, this.info);
     this.troops.formationHandler = (f) => this.formationHandler?.(f);
@@ -321,6 +324,7 @@ export class Hud {
 
   // ---------- Info-Panel ----------
   private lastInfoKey = '';
+  private infoFrozen = false;
   private showIdleInfo(): void {
     clear(this.info);
     this.info.append(
@@ -330,6 +334,7 @@ export class Hud {
   }
 
   private updateInfo(sel: SelectionState): void {
+    if (this.infoFrozen) return;
     const w = this.world;
     const v = this.lastView;
     let key: string;
@@ -337,7 +342,20 @@ export class Hud {
       const b = w.buildings.get(sel.building);
       key = b && v ? this.context.key(b, v) : 'nob';
     } else if (sel.units.length || sel.pool.length) {
-      key = `U|${sel.pool.length}|${sel.units.length}|${sel.units[0] ?? 0}|${Math.floor(w.tick / 10)}|${this.actions.currentMode()}`;
+      // Lebensbalken nur in 10-%-Stufen und Typverteilung: so selten wie möglich neu aufbauen
+      let hp = 0;
+      let n = 0;
+      let alive = 0;
+      for (const id of sel.pool.length ? sel.pool : sel.units) {
+        const s = w.slotOf(id);
+        if (s < 0) continue;
+        alive++;
+        if (sel.units.includes(id)) {
+          hp += w.hp[s] / 255;
+          n++;
+        }
+      }
+      key = `U|${alive}|${sel.units.length}|${sel.units[0] ?? 0}|${n ? Math.round((hp / n) * 10) : 0}|${this.actions.currentMode()}`;
     } else key = 'idle';
     if (key === this.lastInfoKey) return;
     this.lastInfoKey = key;
