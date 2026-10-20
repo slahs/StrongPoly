@@ -46,11 +46,11 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 - [ ] Gate + Browser-Check
 
 ## 5. Meilenstein E – Sound und Musik
-- [ ] Effekte (räumlich, Voice-Limit)
-- [ ] Einheiten-Rückmeldungen
-- [ ] Generative Musik (3 Stimmungen + Themen)
-- [ ] Lautstärkeregler, M = Stumm, Autoplay-Regeln
-- [ ] Gate + Browser-Check
+- [x] Effekte (räumlich, Voice-Limit)
+- [x] Einheiten-Rückmeldungen
+- [x] Generative Musik (3 Stimmungen + Themen)
+- [x] Lautstärkeregler, M = Stumm, Autoplay-Regeln
+- [x] Gate + Browser-Check (Offline-Rendering aller 52 Synthesen ohne NaN/Übersteuerung, Autoplay ohne Konsolenwarnung)
 
 ## 6. Meilenstein F – Erklärungen
 - [ ] Tooltips Gebäude/Einheiten
@@ -67,3 +67,5 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 
 ## Gefundene Bugs / Erkenntnisse
 (laufend ergänzen)
+- **E (Sound):** `ClientWorld.apply` bekam `proj` (Float32Array) und `tiles` (Int32Array) nach dem msgpack-Weg als `Uint8Array` (Rohbytes) – Geschosse und Tile-Änderungen im Client-Spiegel waren Datenmüll. Fix in `shared/src/net/world.ts` (`asFloat32`/`asInt32`), Regressionstest in `shared/test/snapshot.test.ts`.
+- **E (Sound):** Hotkey `M` war mit Extreme-Fähigkeit 4 belegt; Fähigkeit 4 liegt jetzt standardmäßig auf `J`, `M` = Ton stumm (`toggleMute`).
