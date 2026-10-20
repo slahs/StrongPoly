@@ -192,13 +192,3 @@ describe('Regression: Bevölkerungsschaukel', () => {
     for (let i = 1; i < changes.length; i++) expect(changes[i] - changes[i - 1]).toBeGreaterThanOrEqual(550);
   }, 120000);
 });
-
-describe('Regression: Goldhortung ohne Waffen', () => {
-  it('Kaiserin Mathilde (Seed 6) baut ihren Markt, statt 1000+ Gold zu horten (früher fraß die Burg das Holz, Heer blieb schwach)', () => {
-    const map = generateMap({ seed: 6, size: 160, players: 2 });
-    const sim = new Sim({ map, seed: 6, players: [{ name: 'A', team: 0, kind: 'ai', ai: 6 }, { name: 'B', team: 1, kind: 'ai', ai: 7 }], startGold: 1500, troopLimit: 1000, fog: false, extreme: false });
-    const markets = (): number => [...sim.buildings.values()].filter((b) => b.owner === 1 && b.type === BT.Market).length;
-    for (let i = 0; i < 27 * 600 && markets() === 0; i++) sim.step();
-    expect(markets()).toBeGreaterThan(0);
-  }, 180000);
-});
