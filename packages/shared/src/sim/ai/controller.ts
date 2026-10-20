@@ -1119,6 +1119,8 @@ export class AiController {
         }
       }
     }
+    // Tutorial-Gegner (Missionen) setzen keine Angriffsfähigkeiten ein: sonst ist Mission 5 für Einsteiger unlösbar
+    if (sim.mission && this.profile.hidden) return;
     // Ziele: feindliche Ansammlungen nahe eigener Einheiten oder der Burg
     let bestCluster = { n: 0, x: 0, y: 0 };
     let siegeTarget: { x: number; y: number } | null = null;

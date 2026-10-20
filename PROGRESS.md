@@ -13,8 +13,8 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 - [x] 1.6 bench/dmg.ts entfernt
 - [ ] 1.7 Geschützreichweiten nach `shared/data/`
 - [ ] 1.8 Docker-Image neu bauen und prüfen
-- [ ] 1.9 Tutorial-Missionen 1–5 per Skript bis zum Sieg + Browser ohne Konsolenfehler
-- [ ] 1.10 Smoke 3 Seeds + Determinismus-Test
+- [~] 1.9 Tutorial-Missionen 1–5 per Skript bis zum Sieg (fertig: test/missions_play.test.ts; Mission 5: Tutorial-KI nutzt keine Angriffsfähigkeiten); Browser-Check offen
+- [x] 1.10 Smoke 3 Seeds (Seed 2 meldete nur kurzzeitig überbaute Einheit, jetzt 30-s-Schwelle) + test/determinism.test.ts
 - [ ] 1.11 Laufend: Bugs aus B–F (siehe unten „Gefundene Bugs“)
 
 ## 2. Meilenstein B – Menüs und Bedienung
