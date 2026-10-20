@@ -88,14 +88,14 @@ Bilder (`docs/phase4/movement/`): `idle-bauern.png` (stehende Bauern, Draufsicht
 Einschränkungen: Ein Safari-/GPU-Lauf fehlt; der Puffer wird im Betrieb adaptiv (Messlabor `local60`: ≈ 1,3 Ticks = 130 ms, in den stark ausgelasteten Browser-Messläufen bis 3 Ticks). Die Bahn-/Tempo-Verbesserung ist gemessen, der subjektive Eindruck auf dem MacBook ist es nicht.
 
 ## 4B Grafik
-- [ ] Materialsystem/Licht
-- [ ] Gebäude
+- [x] Materialsystem/Licht (siehe 4B-Welt)
+- [x] Gebäude (siehe unten)
 - [x] Menschen/Einheiten (siehe „4B-Menschen“ unten)
 - [x] Gebäude (alle 57 Typen neu; siehe README „Gebäude (4B)“, Details unten)
-- [ ] Menschen/Einheiten
-- [ ] Gelände/Vegetation/Wasser
-- [ ] Lebendige Welt (Gebäudeanteil erledigt: Rauch/Dampf/Funken/Staub/Mehl/Späne, Mühlenflügel, Fahnen – Rest bei den anderen Teilen)
-- [ ] Vergleichsszenen, Vorher/Nachher
+- [x] Menschen/Einheiten (siehe 4B-Menschen)
+- [x] Gelände/Vegetation/Wasser (siehe 4B-Welt)
+- [x] Lebendige Welt (Gebäudeanteil erledigt: Rauch/Dampf/Funken/Staub/Mehl/Späne, Mühlenflügel, Fahnen – Umgebungsleben und Figuren-/Wasser-Effekte in 4B-Welt und -Menschen)
+- [x] Vergleichsszenen, Vorher/Nachher (`docs/phase4/COMPARE.md`, `docs/phase4/final/`)
 
 ### 4B-Welt (Gelände, Vegetation, Wasser, Licht/Materialsystem, Atmosphäre, Vergleichsszenen)
 
