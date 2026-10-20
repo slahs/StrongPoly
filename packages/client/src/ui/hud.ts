@@ -5,6 +5,7 @@ import {
   Command,
   FOOD_RES,
   MissionView,
+  PLAYER_COLORS,
   PlayerView,
   RES_INFO,
   STOCK_RES,
@@ -20,6 +21,7 @@ import {
 import { clear, h, MONTHS } from './dom';
 import { buildingIcon, iconEl, popFaceIcon, popFactorIcon, resourceIcon, toolIcon, abilityIcon } from './icons';
 import { Minimap } from './minimap';
+import { abilityTooltip, attachTooltip, buildingTooltip, resourceTooltip, unitTooltip } from './tooltip';
 import { BuildMenu } from './hud_build';
 import { ContextPanel } from './hud_context';
 import { TroopPanel } from './hud_troops';
@@ -105,8 +107,26 @@ export class Hud {
   me = 0;
   private extremeMode = false;
   /** Wird von der Enzyklopädie/Tooltip-Anbindung überschrieben */
-  tipHook: HudShared['tip'] = (el, _kind, _id, text) => {
-    if (text) el.title = text;
+  tipHook: HudShared['tip'] = (el, kind, id, text) => {
+    const me = this.world.players[this.me];
+    const col = me ? PLAYER_COLORS[me.color % PLAYER_COLORS.length] : undefined;
+    const v = () => this.lastView;
+    switch (kind) {
+      case 'building':
+        attachTooltip(el, () => buildingTooltip(id), { placement: 'element' });
+        break;
+      case 'unit':
+        attachTooltip(el, () => unitTooltip(id, col), { placement: 'element' });
+        break;
+      case 'resource':
+        attachTooltip(el, () => resourceTooltip(id, { stock: v()?.stock[id], priceMul: v()?.priceMul[id] }), { placement: 'element' });
+        break;
+      case 'ability':
+        attachTooltip(el, () => abilityTooltip(id), { placement: 'element' });
+        break;
+      default:
+        if (text) attachTooltip(el, text, { placement: 'element' });
+    }
   };
   private sharedApi: HudShared;
   formationHandler: ((f: number) => void) | null = null;

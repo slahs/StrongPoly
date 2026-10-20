@@ -40,8 +40,8 @@ export class TroopPanel {
     const grid = h('div', { class: 'typegrid' });
     for (const [t, c] of [...counts.entries()].sort((a, b) => a[0] - b[0])) {
       const ud = UNITS[t];
-      const b = h('button', { class: 'typebtn' + (activeType === t ? ' active' : ''), title: `${ud.name}: Klick wählt nur diesen Typ` , onclick: () => this.api.actions.filterSelection(activeType === t ? null : t) }, h('div', { class: 'ic', html: unitIcon(t, col, 40) }), h('span', { class: 'cnt', text: String(c) }));
-      this.api.tip(b, 'unit', t, b.title);
+      const b = h('button', { class: 'typebtn' + (activeType === t ? ' active' : ''), onclick: () => this.api.actions.filterSelection(activeType === t ? null : t) }, h('div', { class: 'ic', html: unitIcon(t, col, 40) }), h('span', { class: 'cnt', text: String(c) }));
+      this.api.tip(b, 'unit', t);
       grid.append(b);
     }
     el.append(grid);

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { BUILDINGS, BT, BuildingDef, checkPlaceRules, ClientWorld, Formation, UNITS, U } from '@strongpoly/shared';
 import type { GhostPlacement } from '../render/ghost';
 import { comboOf, loadHotkeys, HotkeyAction } from './hotkeys';
-import { ENEMY_BUILD_RADIUS, RES_INFO } from '@strongpoly/shared';
+import { explainPlacementError } from '../ui/tooltip';
 import type { Session } from './session';
 import { groundYAt } from '../render/util';
 
@@ -279,7 +279,7 @@ export class InputController {
     el.style.left = this.mouse.x + 18 + 'px';
     el.style.top = this.mouse.y + 18 + 'px';
     const bad = info.reason && info.okCount < info.n;
-    const reason = bad ? (info.reason === 'Feinde in der Nähe' ? `Feinde in der Nähe (Bauverbot im Umkreis von ${ENEMY_BUILD_RADIUS} Tiles um feindliche Soldaten)` : info.reason) : null;
+    const reason = bad && info.reason ? explainPlacementError(info.reason) ?? info.reason : null;
     el.className = 'ghostlabel' + (bad && info.okCount === 0 ? ' bad' : '');
     el.textContent = '';
     const b = document.createElement('b');
@@ -400,7 +400,7 @@ export class InputController {
             s.send({ c: 'place', type: def.id, x: pl[0].x, y: pl[0].y, rot: mode.rot });
             s.audio?.build();
           } else if (pl[0]) {
-            s.hud.toast('Hier kann nicht gebaut werden', true);
+            s.hud.toast(this.placeInfo?.reason ? `${explainPlacementError(this.placeInfo.reason) ?? this.placeInfo.reason}` : 'Hier kann nicht gebaut werden', true);
             s.audio?.error();
           }
         }

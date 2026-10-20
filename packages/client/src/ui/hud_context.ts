@@ -244,14 +244,13 @@ export class ContextPanel {
         'button',
         {
           class: 'unitcard' + (ok ? '' : ' off'),
-          title: `${ud.name}\n${unitCostText(ud)}\nTP ${ud.hp}, Schaden ${ud.dmg}, Reichweite ${ud.range}\n${ok ? 'Umschalt+Klick: 5 Einheiten' : 'Fehlt: ' + miss.join(', ')}`,
           onclick: (e) => this.api.actions.send({ c: 'recruit', building: b.i, unit: ud.id, count: e.shiftKey ? 5 : 1 }),
         },
         h('div', { class: 'ic', html: unitIcon(ud.id, me ? PLAYER_COLORS[me.color % PLAYER_COLORS.length] : undefined, 38) }),
         h('div', { class: 'nm', text: ud.name }),
         h('div', { class: 'cs' + (ok ? '' : ' neg'), text: ok ? unitCostText(ud) : 'Fehlt: ' + miss.join(', ') }),
       );
-      this.api.tip(card, 'unit', ud.id, card.title);
+      this.api.tip(card, 'unit', ud.id);
       grid.append(card);
     }
     el.append(grid, h('div', { class: 'crumb', text: 'Umschalt+Klick: 5 Einheiten auf einmal' }));

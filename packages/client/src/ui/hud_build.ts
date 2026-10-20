@@ -37,7 +37,8 @@ export class BuildMenu {
 
   private buildTools(): void {
     const mk = (key: string, icon: string, label: string, title: string, onclick: () => void): HTMLElement => {
-      const b = h('button', { class: 'tool', title, onclick }, iconEl(toolIcon(icon, 26)), h('span', { class: 'tl', text: label }));
+      const b = h('button', { class: 'tool', onclick }, iconEl(toolIcon(icon, 26)), h('span', { class: 'tl', text: label }));
+      this.api.tip(b, 'text', 0, title);
       this.toolBtns.set(key, b);
       this.tools.append(b);
       return b;
@@ -90,7 +91,7 @@ export class BuildMenu {
         h('div', { class: 'nm', text: def.name }),
         h('div', { class: 'cs', text: fmtCost(def.cost) }),
       );
-      this.api.tip(el, 'building', id, `${def.name}\n${def.desc ?? ''}\nKosten: ${fmtCost(def.cost)}\nGröße: ${def.w}×${def.h}`);
+      this.api.tip(el, 'building', id);
       this.items.set(id, el);
       this.grid.append(el);
     }
