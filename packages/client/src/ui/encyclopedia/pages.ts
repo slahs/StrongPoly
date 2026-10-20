@@ -501,9 +501,11 @@ function chainPage(id: ChainId): Doc {
 function chainsOverview(): Doc {
   const blocks: Block[] = [p(t('enc.chains.intro'))];
   for (const id of CHAIN_IDS) {
-    blocks.push(h3(t(`enc.chain.${id}.title`)));
+    const g = chainGraph(id);
+    blocks.push(h2(t(`enc.chain.${id}.title`), buildingIcon(id === 'horses' ? BT.Stable : chainBuildings(g)[0], 28)));
     blocks.push(p(tf(`enc.chain.${id}.intro`)));
-    blocks.push({ k: 'chips', items: [{ label: t(`enc.chain.${id}.title`), link: P.chain(id), icon: buildingIcon(id === 'horses' ? BT.Stable : chainBuildings(chainGraph(id))[0], 24) }] });
+    blocks.push({ k: 'svg', svg: chainSvg(layoutChain(g)) });
+    blocks.push({ k: 'chips', items: [{ label: t(`enc.chain.${id}.title`), link: P.chain(id), icon: buildingIcon(id === 'horses' ? BT.Stable : chainBuildings(g)[0], 24) }] });
   }
   return { title: t('enc.nav.chains'), icon: resourceIcon(RES_INFO.findIndex((r) => r.key === 'bread'), 64), blocks };
 }

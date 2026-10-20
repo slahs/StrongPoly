@@ -45,12 +45,12 @@ export function defenseRich(e: DefenseEntry, limit: number, links = false): Rich
 }
 
 /** Zeilen „Stark gegen / Schwach gegen / Verwundbar durch / Widersteht“ für den Tooltip */
-export function matchupRows(m: Matchups, limit = 4): { label: string; value: Rich }[] {
+export function matchupRows(m: Matchups, limit = 3): { label: string; value: Rich }[] {
   const rows: { label: string; value: Rich }[] = [];
   const join = (groups: Rich[]): Rich => {
     const out: Rich = [];
     groups.forEach((g, i) => {
-      if (i) out.push(' · ');
+      if (i) out.push({ br: true });
       out.push(...g);
     });
     return out;

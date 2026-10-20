@@ -19,6 +19,7 @@ function svgNode(svg: string): Node {
 
 export function renderInline(i: Inline, o: RenderOpts): Node {
   if (typeof i === 'string') return document.createTextNode(i);
+  if ('br' in i) return document.createElement('br');
   if ('link' in i) {
     const a = h('a', { class: 'doc-link', href: '#', title: i.text });
     if (i.icon) a.append(h('span', { class: 'doc-ic' }, svgNode(i.icon)));
@@ -78,7 +79,7 @@ export function renderBlock(b: Block, o: RenderOpts): HTMLElement {
     case 'tip':
       return h('div', { class: 'doc-tip' }, h('b', { text: (b.label ?? '') + ' ' }), b.text);
     case 'rule':
-      return h('div', { class: 'doc-rule ' + (b.tone ?? 'info'), text: b.text });
+      return h('div', { class: 'doc-rule tone-' + (b.tone ?? 'info'), text: b.text });
     case 'table': {
       const tb = h('table', { class: 'doc-table' });
       const hr = h('tr', {});

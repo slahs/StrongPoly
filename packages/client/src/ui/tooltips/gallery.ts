@@ -14,7 +14,7 @@ export function showTooltipGallery(): void {
   document.body.style.cssText = 'overflow:auto;background:#241b12;user-select:text';
   const app = document.getElementById('app');
   if (app) app.style.display = 'none';
-  const root = h('div', { style: 'position:absolute;inset:0;overflow:auto;padding:14px 16px 60px;color:#f2ede0;font-family:Segoe UI,system-ui,sans-serif' });
+  const root = h('div', { id: 'tipgal', style: 'position:absolute;inset:0;overflow:auto;padding:14px 16px 60px;color:#f2ede0;font-family:Segoe UI,system-ui,sans-serif' });
   document.body.append(root);
   root.append(h('h1', { text: 'Tooltips', style: 'margin:0 0 4px;color:#f0c040' }), h('div', { class: 'crumb', style: 'margin-bottom:10px', text: 'Hover-Test: Maus über die Icons. Darunter alle Tooltip-Inhalte statisch.' }));
 

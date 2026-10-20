@@ -9,7 +9,9 @@ export type Inline =
   | string
   | { icon: string; text?: string; cls?: string; title?: string }
   | { text: string; cls?: string; bold?: boolean; title?: string }
-  | { link: string; text: string; icon?: string };
+  | { link: string; text: string; icon?: string }
+  /** Zeilenumbruch */
+  | { br: true };
 
 export type Rich = Inline[];
 
@@ -53,6 +55,7 @@ export interface Doc {
 
 export function inlineText(i: Inline): string {
   if (typeof i === 'string') return i;
+  if ('br' in i) return ' ';
   if ('link' in i) return i.text + ' ';
   // Icon-Chips: der Titel nennt Menge und Namen („15 Gold“), sonst der sichtbare Text
   if ('icon' in i) return (i.title || i.text || '') + ' ';

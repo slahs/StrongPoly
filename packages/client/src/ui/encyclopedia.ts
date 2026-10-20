@@ -92,8 +92,8 @@ export function openEncyclopedia(page?: string, opts: OpenOptions = {}): void {
         { class: 'enc-top' },
         back,
         h('h2', { text: t('enc.title') }),
-        h('div', { class: 'search' }, search),
-        h('div', { class: 'sp' }),
+        h('div', { class: 'enc-search' }, search),
+        h('div', { class: 'enc-sp' }),
         h('button', { text: '✕  ' + t('enc.close'), onclick: () => closeEncyclopedia() }),
       ),
       h('div', { class: 'enc-main' }, nav, content),
@@ -159,7 +159,7 @@ function go(id: string, push = true, fromBack = false): void {
   s.back.disabled = s.history.length < 2;
   const p = s.pages.get(page)!;
   const group = s.groups.find((g) => g.id === p.group);
-  if (group) s.open.add(group.id);
+  if (group) s.open = new Set([group.id]);
   renderNav();
   clear(s.content);
   const crumb = h('div', { class: 'enc-crumb' }, h('a', { text: t('enc.title'), onclick: () => go('start') }));
@@ -168,7 +168,7 @@ function go(id: string, push = true, fromBack = false): void {
   } else if (group && !group.page && group.title && p.id !== 'start') crumb.append(' › ', group.title);
   s.content.append(crumb, renderDoc(p.build(), { onLink: (l) => go(l) }));
   s.content.scrollTop = 0;
-  const cur = s.nav.querySelector('.item.cur');
+  const cur = s.nav.querySelector('.enc-item.cur');
   if (cur) (cur as HTMLElement).scrollIntoView({ block: 'nearest' });
 }
 
@@ -194,10 +194,10 @@ function renderNav(): void {
     const isOpen = s.open.has(g.id);
     const head = h(
       'div',
-      { class: 'grp' + (g.page && g.page === s.current ? ' cur' : ''), role: 'button' },
+      { class: 'enc-grp' + (g.page && g.page === s.current ? ' cur' : ''), role: 'button' },
       h('span', { class: 'doc-ic' }, iconEl(g.icon)),
       h('span', { text: g.title }),
-      g.sections.length ? h('span', { class: 'arr', text: isOpen ? '▾' : '▸' }) : null,
+      g.sections.length ? h('span', { class: 'enc-arr', text: isOpen ? '▾' : '▸' }) : null,
     );
     head.onclick = () => {
       if (g.sections.length) {
@@ -210,12 +210,12 @@ function renderNav(): void {
     s.nav.append(head);
     if (!isOpen) continue;
     for (const sec of g.sections) {
-      const box = h('div', { class: 'sub' });
-      if (sec.title) box.append(h('div', { class: 'subhead', text: sec.title }));
+      const box = h('div', { class: 'enc-sub' });
+      if (sec.title) box.append(h('div', { class: 'enc-subhead', text: sec.title }));
       for (const id of sec.pages) {
         const p = s.pages.get(id);
         if (!p) continue;
-        const item = h('div', { class: 'item' + (id === s.current ? ' cur' : ''), role: 'button' }, h('span', { class: 'doc-ic' }, iconEl(p.icon)), h('span', { text: p.title }));
+        const item = h('div', { class: 'enc-item' + (id === s.current ? ' cur' : ''), role: 'button' }, h('span', { class: 'doc-ic' }, iconEl(p.icon)), h('span', { text: p.title }));
         item.onclick = () => go(id);
         const tip = pageTooltip(id);
         if (tip) attachTooltip(item, tip, { placement: 'cursor' });

@@ -35,6 +35,8 @@ let timer = 0;
 let watch = 0;
 let cursor = { x: 0, y: 0 };
 let globalsBound = false;
+/** nach einem Klick erscheinen Tooltips erst wieder, wenn sich die Maus bewegt (kein Wiederauftauchen unter dem ruhenden Zeiger) */
+let suppressUntil = 0;
 
 function ensure(): HTMLElement {
   if (!tipEl) {
@@ -101,6 +103,14 @@ function bindGlobals(): void {
   if (globalsBound) return;
   globalsBound = true;
   window.addEventListener('blur', hideTooltip);
+  window.addEventListener(
+    'pointerdown',
+    () => {
+      suppressUntil = performance.now() + 500;
+      hideTooltip();
+    },
+    true,
+  );
   window.addEventListener('wheel', hideTooltip, { passive: true });
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Escape') hideTooltip();
@@ -116,15 +126,23 @@ export function attachTooltip(el: HTMLElement, content: TooltipContent | string,
   const delay = opts.delay ?? TOOLTIP_DELAY_MS;
   const placement = opts.placement ?? 'cursor';
   const fn: TooltipContent = typeof content === 'string' ? () => content : content;
-  const onEnter = (e: PointerEvent): void => {
-    if (e.pointerType === 'touch') return;
-    cursor = { x: e.clientX, y: e.clientY };
+  const arm = (e: PointerEvent): void => {
+    if (e.pointerType === 'touch' || performance.now() < suppressUntil) return;
     window.clearTimeout(timer);
-    timer = window.setTimeout(() => show(el, fn, placement), delay);
+    timer = window.setTimeout(() => {
+      timer = 0;
+      show(el, fn, placement);
+    }, delay);
+  };
+  const onEnter = (e: PointerEvent): void => {
+    cursor = { x: e.clientX, y: e.clientY };
+    arm(e);
   };
   const onMove = (e: PointerEvent): void => {
     cursor = { x: e.clientX, y: e.clientY };
-    if (owner === el && tooltipVisible() && placement === 'cursor') position(placement);
+    if (owner === el && tooltipVisible()) {
+      if (placement === 'cursor') position(placement);
+    } else if (!timer && owner !== el) arm(e);
   };
   const onLeave = (): void => {
     if (owner === el || timer) hideTooltip();

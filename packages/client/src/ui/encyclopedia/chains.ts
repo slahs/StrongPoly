@@ -165,10 +165,10 @@ export function buildingGraph(def: BuildingDef): ChainGraph | null {
 
 // ---------- Layout ----------
 
-export const NODE_W = 128;
-export const NODE_H = 78;
-export const COL_GAP = 84;
-export const ROW_GAP = 16;
+export const NODE_W = 108;
+export const NODE_H = 72;
+export const COL_GAP = 54;
+export const ROW_GAP = 14;
 export const PAD = 14;
 
 export interface PlacedNode extends ChainNode {
@@ -210,6 +210,14 @@ export function layoutChain(graph: ChainGraph): ChainLayout {
       }
     }
     if (!changed) break;
+  }
+  // Quellen und Zwischenstufen so spät wie möglich setzen: kurze Ketten rücken an ihr Ziel, es gibt weniger lange Pfeile
+  const byRankDesc = [...ids].sort((a, b) => (rank.get(b) ?? 0) - (rank.get(a) ?? 0));
+  for (const id of byRankDesc) {
+    const outs = outgoing.get(id) ?? [];
+    if (!outs.length) continue;
+    const latest = Math.min(...outs.map((o) => rank.get(o) ?? 0)) - 1;
+    if (latest > (rank.get(id) ?? 0)) rank.set(id, latest);
   }
   const cols: string[][] = [];
   for (const id of ids) {
@@ -266,7 +274,7 @@ function esc(s: string): string {
 }
 
 /** Beschriftung auf höchstens zwei Zeilen verteilen */
-export function wrapLabel(label: string, max = 17): string[] {
+export function wrapLabel(label: string, max = 15): string[] {
   if (label.length <= max) return [label];
   const words = label.split(' ');
   const lines: string[] = [''];
@@ -304,9 +312,9 @@ export function chainSvg(layout: ChainLayout): string {
     const attrs = n.link ? ` data-link="${esc(n.link)}" style="cursor:pointer"` : '';
     s += `<g class="chain-node"${attrs}><title>${esc(n.label)}</title>`;
     s += `<rect x="${n.x}" y="${n.y}" width="${NODE_W}" height="${NODE_H}" rx="7" fill="${FILL[n.kind]}" stroke="${STROKE[n.kind]}" stroke-width="${n.kind === 'bld' ? 2 : 1.5}"/>`;
-    s += `<g transform="translate(${n.x + NODE_W / 2 - 20} ${n.y + 5})">${n.icon}</g>`;
+    s += `<g transform="translate(${n.x + NODE_W / 2 - 20} ${n.y + 4})">${n.icon}</g>`;
     lines.forEach((ln, i) => {
-      s += `<text x="${n.x + NODE_W / 2}" y="${n.y + 56 + i * 13}" text-anchor="middle" font-size="12" font-weight="600" fill="#f2ede0" font-family="Segoe UI, system-ui, sans-serif">${esc(ln)}</text>`;
+      s += `<text x="${n.x + NODE_W / 2}" y="${n.y + 54 + i * 12}" text-anchor="middle" font-size="12" font-weight="600" fill="#f2ede0" font-family="Segoe UI, system-ui, sans-serif">${esc(ln)}</text>`;
     });
     s += `</g>`;
   }
