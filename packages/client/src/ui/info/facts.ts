@@ -176,7 +176,15 @@ export function placementRules(def: BuildingDef, verbose = false): RuleLine[] {
   return out;
 }
 
-/** Bauverbot in der Nähe feindlicher Soldaten: gilt für jedes baubare Gebäude außer Geschützen auf Türmen (sie werden trotzdem geprüft) */
+/**
+ * Gilt das Bauverbot in der Nähe feindlicher Soldaten? Für jedes baubare Gebäude, nicht für Bergfried und Lagerfeuer
+ * (nicht baubar) und nicht für Geschütze, die auf einen vorhandenen Turm gesetzt werden (sim/placement.ts prüft sie vorher).
+ */
+export function hasEnemyBuildBan(def: BuildingDef): boolean {
+  return def.id !== BT.Keep && def.id !== BT.Campfire && def.placement !== 'onWall';
+}
+
+/** Die Regel selbst als Zeile */
 export function enemyRule(): RuleLine {
   return { text: tf('rule.enemy', { radius: ENEMY_BUILD_RADIUS }), tone: 'warn' };
 }

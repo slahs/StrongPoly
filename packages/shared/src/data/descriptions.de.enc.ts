@@ -251,7 +251,7 @@ const ABILITIES: Record<string, string> = {
 const RULES: Record<string, string> = {
   'enc.rules.intro': 'Diese Regeln unterscheiden sich vom Gewohnten. Sie gelten für alle Spieler, Menschen wie KI.',
   'enc.rules.build.title': 'Bauverbot in Feindesnähe',
-  'enc.rules.build.text': 'Solange feindliche Soldaten weniger als {radius} Felder von einem Bauplatz entfernt sind, darf dort nichts gebaut werden. Das gilt für alle Gebäude, auch für Mauern und Tore, und verhindert den Neubau eines Tores mitten im Sturm. Bauern, Ochsen, Tunnelgräber unter der Erde und noch unentdeckte Assassinen zählen nicht.',
+  'enc.rules.build.text': 'Solange feindliche Soldaten weniger als {radius} Felder von einem Bauplatz entfernt sind, darf dort nichts gebaut werden. Das gilt für alle Gebäude, auch für Mauern und Tore, und verhindert den Neubau eines Tores mitten im Sturm. Ausgenommen sind nur Geschütze, die auf einen bereits stehenden Turm gesetzt werden. Bauern, Ochsen, Tunnelgräber unter der Erde und noch unentdeckte Assassinen zählen nicht.',
   'enc.rules.target.title': 'Zielwahl der Belagerungswaffen',
   'enc.rules.target.text': 'Katapult, Trebuchet und Feuerballista suchen sich von selbst nur feindliches Gerät als Ziel, keine Fußtruppen. Du kannst sie weiterhin von Hand auf Soldaten oder Gebäude richten.',
   'enc.rules.range.title': 'Reichweite der Mauergeschütze',

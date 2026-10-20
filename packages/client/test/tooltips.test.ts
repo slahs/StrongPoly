@@ -99,9 +99,11 @@ describe('Gebäude-Tooltips', () => {
     expect(docText(buildingTipDoc(BT.Drawbridge))).toContain('über Wasser');
     expect(docText(buildingTipDoc(BT.Woodcutter))).toContain(`Braucht Bäume im Umkreis von ${BUILDINGS[BT.Woodcutter].prod!.radius} Feldern.`);
     for (const b of BUILDINGS) {
-      if (b.id === BT.Keep || b.id === BT.Campfire) continue;
+      if (b.id === BT.Keep || b.id === BT.Campfire || b.placement === 'onWall') continue;
       expect(docText(buildingTipDoc(b.id)), b.key).toContain(tf('rule.enemy', { radius: ENEMY_BUILD_RADIUS }));
     }
+    // Geschütze auf Türmen sind vom Bauverbot ausgenommen (die Sim prüft sie vorher)
+    expect(docText(buildingTipDoc(BT.TurretBallista))).not.toContain('Kein Bau, solange');
     expect(ENEMY_BUILD_RADIUS).toBe(8);
   });
 

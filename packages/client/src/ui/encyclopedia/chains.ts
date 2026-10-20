@@ -293,7 +293,7 @@ const STROKE: Record<NodeKind, string> = { res: '#7fa05a', bld: '#c49a5a', unit:
 
 export function chainSvg(layout: ChainLayout): string {
   const { width, height } = layout;
-  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="chain-svg" viewBox="0 0 ${Math.ceil(width)} ${Math.ceil(height)}" width="${Math.ceil(width)}" height="${Math.ceil(height)}" role="img">`;
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="chain-svg" viewBox="0 0 ${Math.ceil(width)} ${Math.ceil(height)}" width="${Math.ceil(width)}" height="${Math.ceil(height)}" style="max-width:${Math.ceil(width * 1.1)}px" role="img">`;
   s += `<defs><marker id="arr-${esc(layout.id)}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="#e3c98a"/></marker></defs>`;
   // Pfeile zuerst (unter den Knoten)
   for (const e of layout.edges) {

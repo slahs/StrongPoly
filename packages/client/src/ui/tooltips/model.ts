@@ -25,6 +25,7 @@ import {
   costRich,
   dtypeName,
   enemyRule,
+  hasEnemyBuildBan,
   haulerKey,
   num,
   placementRules,
@@ -116,7 +117,7 @@ export function buildingTipDoc(typeId: number): Doc {
   blocks.push({ k: 'kv', rows: kv });
 
   const rules = placementRules(def);
-  if (def.id !== BT.Keep && def.id !== BT.Campfire) rules.push(enemyRule());
+  if (hasEnemyBuildBan(def)) rules.push(enemyRule());
   if (rules.length) {
     blocks.push({ k: 'h', text: t('ui.rule'), level: 3 });
     for (const r of rules) blocks.push({ k: 'rule', text: r.text, tone: r.tone });

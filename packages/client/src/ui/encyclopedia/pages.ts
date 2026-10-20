@@ -58,10 +58,8 @@ import {
   WELL_RADIUS,
   ARMOR_CLASSES,
   DAMAGE_TYPES,
-  matchups,
   t,
   tf,
-  TERRAIN_NAMES,
 } from '@strongpoly/shared';
 import type { Block, Doc, Rich } from '../doc/blocks';
 import { docText } from '../doc/blocks';
@@ -75,6 +73,7 @@ import {
   costRich,
   dtypeName,
   enemyRule,
+  hasEnemyBuildBan,
   linkBuilding,
   linkRes,
   linkUnit,
@@ -87,14 +86,12 @@ import {
   recruitList,
   requirements,
   resLink,
-  storeBuilding,
   storeOfRes,
   uIcon,
   unitCostRich,
   unitLink,
   unitSpecials,
   unitsUsingRes,
-  haulerKey,
 } from '../info/facts';
 import { matchupBlocks, multText } from '../info/matchupDoc';
 import { FACE_NAMES } from '../icons/ui';
@@ -285,7 +282,7 @@ export function buildingPage(def: BuildingDef): Doc {
   const cat = CATEGORIES.find((c) => c.id === def.cat);
   const blocks: Block[] = [p(desc), kv(buildingKvRows(def))];
   const rules = placementRules(def, true);
-  if (def.id !== BT.Keep && def.id !== BT.Campfire) rules.push(enemyRule());
+  if (hasEnemyBuildBan(def)) rules.push(enemyRule());
   blocks.push(h3(t('ui.rule')));
   for (const r of rules) blocks.push({ k: 'rule', text: r.text, tone: r.tone });
   const reqs = requirements(def);
@@ -536,8 +533,6 @@ function faceRanges(): { level: number; from: number; to: number }[] {
 }
 
 function popFactorHead(key: string): Block {
-  const name = TOOL_ICONS[key]?.name;
-  void name;
   return { k: 'h', text: t(`enc.pop.f.${key}`), level: 3, icon: popFactorIcon(key, 28) };
 }
 
