@@ -12,6 +12,12 @@ import { openEditor } from './editor/editor';
 import { MISSIONS } from '@strongpoly/shared';
 import { SaveStore, makeSave } from './game/saves';
 
+// Icon-Galerie (?icons): rendern und den normalen Start überspringen
+if (new URLSearchParams(location.search).has('icons')) {
+  (await import('./ui/icons/gallery')).showGallery();
+  await new Promise<never>(() => {});
+}
+
 const canvas = document.getElementById('view') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLElement;
 const gs = new GameScene(canvas);
