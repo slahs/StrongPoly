@@ -12,7 +12,9 @@ import {
 import { EntityRenderer } from '../render/entities';
 import { GhostRenderer } from '../render/ghost';
 import { GameScene } from '../render/scene';
-import { Hud, HudActions } from '../ui/hud';
+import { Hud, HudActions, ModeName } from '../ui/hud';
+import { AdvisorLogic, AdvisorPanel } from '../ui/advisor';
+import { showEndScreen } from '../ui/endscreen';
 import type { GameConnection } from './connection';
 import { FogOfWar } from './fog';
 import { InputController } from './input';
@@ -29,6 +31,9 @@ export interface SessionOptions {
   onMenu: () => void;
   settings: Settings;
   audio: AudioEngine | null;
+  /** Hotkey-Übersicht (F1) und Enzyklopädie (F2) */
+  onHelp?: () => void;
+  onEncyclopedia?: () => void;
 }
 
 /** Eine laufende Partie auf Client-Seite: Welt-Spiegel, Rendering, Eingabe und HUD. */
@@ -39,7 +44,10 @@ export class Session {
   readonly hud: Hud;
   readonly input: InputController;
   fog: FogOfWar | null = null;
-  selection = { units: [] as number[], building: 0 };
+  selection = { units: [] as number[], pool: [] as number[], building: 0 };
+  readonly advisor: AdvisorLogic;
+  private advisorPanel: AdvisorPanel | null = null;
+  private advisorTimer = 0;
   controlGroups: number[][] = [];
   teamOf: number[] = [];
   myTeam = 0;
@@ -79,6 +87,14 @@ export class Session {
       startPlacement: (t) => this.startPlacement(t),
       cancelPlacement: () => this.input.setMode({ k: 'normal' }),
       startDig: (fill) => this.input.setMode({ k: 'dig', fill }),
+      startMode: (m) => this.input.setMode({ k: m } as never),
+      currentMode: () => this.input.mode.k as ModeName,
+      placingType: () => (this.input.mode.k === 'place' ? this.input.mode.type : -1),
+      undo: () => this.undo(),
+      openHelp: () => this.opts.onHelp?.(),
+      openEncyclopedia: () => this.opts.onEncyclopedia?.(),
+      selectBuilding: (id) => this.setSelection([], id),
+      filterSelection: (t) => this.filterSelection(t),
       openMenu: () => this.openMenu(),
       setSpeed: (d) => this.changeSpeed(d),
       togglePause: () => this.togglePause(),
@@ -93,6 +109,12 @@ export class Session {
       },
     });
     this.hud.setMe(this.me);
+    this.advisor = new AdvisorLogic(this.world, () => this.me, () => this.teamOf);
+    this.advisorPanel = new AdvisorPanel(this.hud.topRight, this.advisor, (x, y) => this.gs.cam.lookAt(x, y), () => this.world.tick);
+    this.advisor.onMessage = (m) => {
+      this.advisorPanel?.notify();
+      this.audio?.advisor(m.kind === 'info' ? 'info' : 'alert');
+    };
     this.hud.formationHandler = (f) => {
       this.input.formation = f;
       this.hud.toast('Formation geändert');
@@ -164,8 +186,8 @@ export class Session {
     this.setSelection([], 0);
   }
 
-  setSelection(units: number[], building: number): void {
-    this.selection = { units, building };
+  setSelection(units: number[], building: number, keepPool = false): void {
+    this.selection = { units, pool: keepPool ? this.selection.pool : units, building };
     if (units.length) {
       const w = this.world;
       const types: number[] = [];
@@ -175,6 +197,52 @@ export class Session {
       }
       this.audio?.selectionSelect(types);
     } else if (building) this.audio?.ui('click');
+  }
+
+  /** Truppenpanel: Auswahl auf einen Typ einschränken (null = alle Typen der Gesamtauswahl) */
+  filterSelection(type: number | null): void {
+    const w = this.world;
+    const pool = this.selection.pool.filter((id) => w.slotOf(id) >= 0);
+    const units = type === null ? pool : pool.filter((id) => w.type[w.slotOf(id)] === type);
+    this.selection = { units, pool, building: 0 };
+    if (units.length) this.audio?.ui('click');
+  }
+
+  /** Strg+Z */
+  undo(): void {
+    this.send({ c: 'undo' });
+    this.audio?.ui('click');
+  }
+
+  /** Bergfried, Kornspeicher, Kaserne, Markt, Lager, Waffenkammer direkt anwählen (Kamera folgt) */
+  selectBuildingType(type: number): void {
+    let best: { id: number; x: number; y: number } | null = null;
+    for (const b of this.world.buildings.values()) if (b.o === this.me && b.t === type) {
+      best = { id: b.i, x: b.x + b.w / 2, y: b.y + b.h / 2 };
+      break;
+    }
+    if (!best) {
+      this.hud.toast(`${BUILDINGS[type].name} ist nicht gebaut`, true);
+      this.audio?.ui('error');
+      return;
+    }
+    this.setSelection([], best.id);
+    this.gs.cam.lookAt(best.x, best.y);
+  }
+
+  /** Leertaste: Kamera zur letzten Meldung */
+  jumpToAlert(): void {
+    const list = this.advisor.list;
+    for (let i = list.length - 1; i >= 0; i--) {
+      const m = list[i];
+      if (m.x !== undefined && m.y !== undefined) {
+        m.read = true;
+        this.gs.cam.lookAt(m.x, m.y);
+        this.advisorPanel?.render();
+        return;
+      }
+    }
+    this.hud.toast('Keine Meldung mit Ort vorhanden');
   }
 
   selectAllArmy(): void {
@@ -238,6 +306,8 @@ export class Session {
     const st = this.opts.settings;
     this.gs.applyGfx({ shadows: st.shadows, quality: st.quality });
     this.entities.setShadows(st.shadows);
+    this.gs.cam.scrollSpeed = 1.4 * st.scrollSpeed;
+    this.uiRoot.style.setProperty('--ui-scale', String(st.uiScale));
     this.audio?.configure(st.audio());
   }
 
@@ -254,11 +324,18 @@ export class Session {
   togglePause(): void {
     this.paused = !this.paused;
     this.conn.setPaused?.(this.paused);
+    this.hud.setPaused(this.paused);
     this.hud.toast(this.paused ? 'Pausiert' : 'Fortgesetzt');
   }
 
   openMenu(): void {
     this.opts.onMenu();
+  }
+  openHelp(): void {
+    this.opts.onHelp?.();
+  }
+  openEncyclopedia(): void {
+    this.opts.onEncyclopedia?.();
   }
 
   // ----- Frame -----
@@ -278,6 +355,7 @@ export class Session {
         this.hud.minimap.patchTile(t);
       }
       this.world.tileChanges.length = 0;
+      this.advisor.checkRemoved(this.world.tick);
       this.handleEvents(s.events);
       this.sound?.onSnapshot(this.soundView());
       if (s.winner !== undefined && !this.ended) this.onEnd(s.winner);
@@ -287,12 +365,10 @@ export class Session {
   private handleEvents(events: Snapshot['events']): void {
     for (const e of events) {
       if (e.e === 'msg' && e.p === this.me) {
-        this.hud.toast(e.text);
-        this.audio?.advisor('info');
+        this.advisor.push('info', e.text, this.world.tick);
       } else if (e.e === 'alert' && e.p === this.me && this.alertCooldown <= 0) {
         this.alertCooldown = 6;
-        this.hud.toast(e.k === 'attack' ? 'Wir werden angegriffen!' : 'Achtung!', true);
-        this.audio?.advisor('alert');
+        if (e.k !== 'attack') this.advisor.push('warn', 'Achtung!', this.world.tick);
       } else if (e.e === 'lose' && e.p === this.me) {
         this.hud.banner('Niederlage', '#d8362f');
         this.audio?.defeat();
@@ -314,7 +390,11 @@ export class Session {
       this.audio?.playTheme('defeat');
     }
     this.themed = true;
-    setTimeout(() => this.opts.onExit(), 4500);
+    // Endbildschirm mit Statistik und Siegerpodest; die Statistik kommt im Snapshot nach Spielende
+    setTimeout(() => {
+      const w = this.world;
+      showEndScreen(this.uiRoot, { world: w, myTeam: this.myTeam, me: this.me, winnerTeam: winner, onExit: () => this.opts.onExit() });
+    }, 1800);
   }
 
   frame(dt: number, nowSec: number): void {
@@ -322,6 +402,12 @@ export class Session {
     if (!this.gotFirst && !this.queue.some((s) => s.full)) return;
     this.applySnapshots(nowMs);
     this.alertCooldown -= dt;
+    this.advisorTimer -= dt;
+    if (this.advisorTimer <= 0) {
+      this.advisorTimer = 1;
+      this.advisor.update(this.view, this.world.tick);
+      this.advisorPanel?.render();
+    }
     if (this.opts.mission) this.hud.setMission(this.world.mission);
     // Eingabe/Kamera
     this.input.update(dt);
@@ -434,6 +520,7 @@ export class Session {
   destroy(): void {
     this.conn.close();
     this.input.destroy();
+    this.advisorPanel?.destroy();
     this.hud.destroy();
     this.gs.root.remove(this.entities.group, this.ghost.group);
   }

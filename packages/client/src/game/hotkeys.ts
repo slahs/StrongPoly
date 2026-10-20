@@ -3,12 +3,15 @@ export type HotkeyAction =
   | 'rotateLeft' | 'rotateRight'
   | 'zoomIn' | 'zoomOut'
   | 'stop' | 'hold' | 'defensive' | 'aggressive'
-  | 'attackMove' | 'patrol' | 'attackGround'
+  | 'attackMove' | 'patrol' | 'attackGround' | 'tunnel'
   | 'rotateBuilding' | 'cancel' | 'pause'
-  | 'demolish' | 'repair'
+  | 'demolish' | 'repair' | 'undo'
   | 'cat1' | 'cat2' | 'cat3' | 'cat4' | 'cat5' | 'cat6'
   | 'ability1' | 'ability2' | 'ability3' | 'ability4' | 'ability5'
   | 'toggleStock' | 'toggleMarket' | 'togglePopularity' | 'toggleAdmin'
+  | 'selectKeep' | 'selectGranary' | 'selectBarracks' | 'selectMarket' | 'selectStock' | 'selectArmory'
+  | 'jumpAlert' | 'centerSelection'
+  | 'help' | 'encyclopedia'
   | 'selectAllArmy' | 'toggleShadows' | 'centerKeep' | 'toggleMute';
 
 export const HOTKEY_LABELS: Record<HotkeyAction, string> = {
@@ -16,26 +19,44 @@ export const HOTKEY_LABELS: Record<HotkeyAction, string> = {
   rotateLeft: 'Kamera links drehen', rotateRight: 'Kamera rechts drehen',
   zoomIn: 'Hineinzoomen', zoomOut: 'Herauszoomen',
   stop: 'Stopp', hold: 'Stellung halten', defensive: 'Defensiv', aggressive: 'Aggressiv',
-  attackMove: 'Angriffsmarsch', patrol: 'Patrouille', attackGround: 'Bodenangriff',
-  rotateBuilding: 'Gebäude drehen', cancel: 'Abbrechen', pause: 'Pause',
-  demolish: 'Abreißen', repair: 'Reparieren',
-  cat1: 'Menü Burg', cat2: 'Menü Industrie', cat3: 'Menü Landwirtschaft', cat4: 'Menü Stadt', cat5: 'Menü Waffen', cat6: 'Menü Nahrung',
+  attackMove: 'Angriffsmarsch', patrol: 'Patrouille', attackGround: 'Bodenangriff', tunnel: 'Tunnel graben',
+  rotateBuilding: 'Gebäude drehen', cancel: 'Abbrechen / Menü', pause: 'Pause',
+  demolish: 'Abreißen', repair: 'Reparieren', undo: 'Rückgängig (letzte Platzierung)',
+  cat1: 'Baumenü Burg', cat2: 'Baumenü Industrie', cat3: 'Baumenü Landwirtschaft', cat4: 'Baumenü Stadt', cat5: 'Baumenü Waffen', cat6: 'Baumenü Nahrung',
   ability1: 'Fähigkeit 1', ability2: 'Fähigkeit 2', ability3: 'Fähigkeit 3', ability4: 'Fähigkeit 4', ability5: 'Fähigkeit 5',
   toggleStock: 'Lager', toggleMarket: 'Markt', togglePopularity: 'Beliebtheit', toggleAdmin: 'Verwaltung',
+  selectKeep: 'Bergfried anwählen', selectGranary: 'Kornspeicher anwählen', selectBarracks: 'Kaserne anwählen',
+  selectMarket: 'Markt anwählen', selectStock: 'Lager anwählen', selectArmory: 'Waffenkammer anwählen',
+  jumpAlert: 'Kamera zur letzten Meldung', centerSelection: 'Kamera auf Auswahl',
+  help: 'Hotkey-Übersicht', encyclopedia: 'Enzyklopädie',
   selectAllArmy: 'Alle Truppen wählen', toggleShadows: 'Schatten umschalten', centerKeep: 'Zum Bergfried', toggleMute: 'Ton stumm/an',
 };
+
+/** Reihenfolge und Gruppen für Optionsmenü und F1-Übersicht */
+export const HOTKEY_GROUPS: { name: string; actions: HotkeyAction[] }[] = [
+  { name: 'Kamera', actions: ['panUp', 'panDown', 'panLeft', 'panRight', 'rotateLeft', 'rotateRight', 'zoomIn', 'zoomOut', 'centerKeep', 'centerSelection', 'jumpAlert'] },
+  { name: 'Bauen', actions: ['cat1', 'cat2', 'cat3', 'cat4', 'cat5', 'cat6', 'rotateBuilding', 'demolish', 'repair', 'undo', 'cancel'] },
+  { name: 'Gebäude anwählen', actions: ['selectKeep', 'selectGranary', 'selectBarracks', 'selectMarket', 'selectStock', 'selectArmory'] },
+  { name: 'Einheiten', actions: ['selectAllArmy', 'hold', 'defensive', 'aggressive', 'attackMove', 'patrol', 'attackGround', 'tunnel', 'stop'] },
+  { name: 'Fenster', actions: ['toggleStock', 'toggleMarket', 'togglePopularity', 'toggleAdmin', 'help', 'encyclopedia'] },
+  { name: 'Extreme', actions: ['ability1', 'ability2', 'ability3', 'ability4', 'ability5'] },
+  { name: 'Spiel', actions: ['pause', 'toggleShadows', 'toggleMute'] },
+];
 
 export const DEFAULT_HOTKEYS: Record<HotkeyAction, string> = {
   panUp: 'KeyW', panDown: 'KeyS', panLeft: 'KeyA', panRight: 'KeyD',
   rotateLeft: 'KeyQ', rotateRight: 'KeyE',
   zoomIn: 'Equal', zoomOut: 'Minus',
   stop: 'KeyX', hold: 'KeyH', defensive: 'KeyV', aggressive: 'KeyB',
-  attackMove: 'KeyF', patrol: 'KeyP', attackGround: 'KeyG',
-  rotateBuilding: 'KeyR', cancel: 'Escape', pause: 'Space',
-  demolish: 'Delete', repair: 'KeyU',
-  cat1: 'F1', cat2: 'F2', cat3: 'F3', cat4: 'F4', cat5: 'F5', cat6: 'F6',
+  attackMove: 'KeyF', patrol: 'KeyP', attackGround: 'KeyG', tunnel: 'Alt+KeyT',
+  rotateBuilding: 'KeyR', cancel: 'Escape', pause: 'Pause',
+  demolish: 'Delete', repair: 'KeyU', undo: 'Ctrl+KeyZ',
+  cat1: 'F3', cat2: 'F4', cat3: 'F5', cat4: 'F6', cat5: 'F7', cat6: 'F8',
   ability1: 'KeyZ', ability2: 'KeyC', ability3: 'KeyN', ability4: 'KeyJ', ability5: 'KeyK',
   toggleStock: 'KeyI', toggleMarket: 'KeyO', togglePopularity: 'KeyL', toggleAdmin: 'KeyT',
+  selectKeep: 'Alt+KeyK', selectGranary: 'Alt+KeyG', selectBarracks: 'Alt+KeyB', selectMarket: 'Alt+KeyM', selectStock: 'Alt+KeyS', selectArmory: 'Alt+KeyW',
+  jumpAlert: 'Space', centerSelection: 'Enter',
+  help: 'F1', encyclopedia: 'F2',
   selectAllArmy: 'KeyY', toggleShadows: 'F9', centerKeep: 'Home', toggleMute: 'KeyM',
 };
 
@@ -44,7 +65,13 @@ const KEY = 'strongpoly.hotkeys';
 export function loadHotkeys(): Record<HotkeyAction, string> {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return { ...DEFAULT_HOTKEYS, ...(JSON.parse(raw) as Partial<Record<HotkeyAction, string>>) };
+    if (raw) {
+      const saved = JSON.parse(raw) as Partial<Record<HotkeyAction, string>>;
+      // Eigene Belegungen bleiben, unbekannte Schlüssel werden verworfen
+      const out = { ...DEFAULT_HOTKEYS };
+      for (const k of Object.keys(DEFAULT_HOTKEYS) as HotkeyAction[]) if (typeof saved[k] === 'string') out[k] = saved[k] as string;
+      return out;
+    }
   } catch {
     /* ignorieren */
   }
@@ -59,6 +86,31 @@ export function saveHotkeys(h: Record<HotkeyAction, string>): void {
   }
 }
 
-export function keyLabel(code: string): string {
-  return code.replace(/^Key/, '').replace(/^Digit/, '').replace('Equal', '+').replace('Minus', '-');
+/** Tastenkombination eines Ereignisses als Text: Strg und Alt gehören dazu, Umschalt nicht (Umschalt ist Wegpunkt/Mehrfachwahl). */
+export function comboOf(e: { code: string; ctrlKey: boolean; metaKey: boolean; altKey: boolean }): string {
+  return `${e.ctrlKey || e.metaKey ? 'Ctrl+' : ''}${e.altKey ? 'Alt+' : ''}${e.code}`;
+}
+
+const KEY_NAMES: Record<string, string> = {
+  Equal: '+', Minus: '-', Escape: 'Esc', Space: 'Leertaste', Pause: 'Pause', Delete: 'Entf', Home: 'Pos1', End: 'Ende', Enter: 'Eingabe',
+  Backquote: '^', ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', PageUp: 'Bild↑', PageDown: 'Bild↓', Insert: 'Einfg',
+};
+
+export function keyLabel(combo: string): string {
+  return combo
+    .split('+')
+    .map((p) => {
+      if (p === 'Ctrl') return 'Strg';
+      if (p === 'Alt') return 'Alt';
+      return KEY_NAMES[p] ?? p.replace(/^Key/, '').replace(/^Digit/, '');
+    })
+    .join('+');
+}
+
+/** Doppelt belegte Kombinationen (für die Warnung im Optionsmenü) */
+export function hotkeyConflicts(h: Record<HotkeyAction, string>): Map<string, HotkeyAction[]> {
+  const m = new Map<string, HotkeyAction[]>();
+  for (const a of Object.keys(h) as HotkeyAction[]) m.set(h[a], [...(m.get(h[a]) ?? []), a]);
+  for (const [k, v] of [...m]) if (v.length < 2) m.delete(k);
+  return m;
 }

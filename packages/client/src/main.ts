@@ -4,6 +4,7 @@ import { AudioEngine } from './audio';
 import { exposeAudioDebug } from './audio/debug';
 import { LocalConnection } from './game/connection';
 import { NetClient, RemoteConnection } from './game/netconn';
+import { toggleHelp } from './ui/help';
 import { Session } from './game/session';
 import { Settings } from './game/settings';
 import { GameScene } from './render/scene';
@@ -44,6 +45,8 @@ const hooks = {
   resume: null as (() => void) | null,
   saveGame: null as (() => void) | null,
   quitGame: null as (() => void) | null,
+  surrender: null as (() => void) | null,
+  openEncyclopedia: undefined as (() => void) | undefined,
   startSkirmish: (setup: GameSetup) => launch(setup, false),
   startOnline: (n: NetClient, me: number, setup: GameSetup) => {
     // Wiederverbindung: Sitzung läuft weiter, der Server schickt nur einen neuen Voll-Snapshot
@@ -119,6 +122,8 @@ function launch(setup: GameSetup, online: boolean, n?: NetClient, missionId?: st
     onMenu: () => showPauseMenu(),
     settings,
     audio,
+    onHelp: () => toggleHelp(ui),
+    onEncyclopedia: () => hooks.openEncyclopedia?.(),
   });
   session = s;
   s.applySettings();
@@ -137,6 +142,7 @@ function launch(setup: GameSetup, online: boolean, n?: NetClient, missionId?: st
       }
     : null;
   hooks.quitGame = () => exitToMenu();
+  hooks.surrender = () => s.send({ c: 'surrender' });
 }
 
 function showPauseMenu(): void {
@@ -153,6 +159,7 @@ function exitToMenu(): void {
   hooks.resume = null;
   hooks.saveGame = null;
   hooks.quitGame = null;
+  hooks.surrender = null;
   if (wasOnline && net && net.connected) {
     // Raum bleibt bestehen: zurück zur Lobby (Server setzt den Raum nach dem Spiel zurück)
     hooks.clearResume();

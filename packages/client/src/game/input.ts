@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { BUILDINGS, BT, BuildingDef, checkPlaceRules, ClientWorld, Formation, UNITS, U } from '@strongpoly/shared';
 import type { GhostPlacement } from '../render/ghost';
-import { loadHotkeys, HotkeyAction } from './hotkeys';
+import { comboOf, loadHotkeys, HotkeyAction } from './hotkeys';
+import { ENEMY_BUILD_RADIUS, RES_INFO } from '@strongpoly/shared';
 import type { Session } from './session';
 import { groundYAt } from '../render/util';
 
@@ -12,7 +13,11 @@ export type Mode =
   | { k: 'ability'; id: number }
   | { k: 'attackMove' }
   | { k: 'patrol' }
-  | { k: 'attackGround' };
+  | { k: 'attackGround' }
+  | { k: 'demolish' }
+  | { k: 'repair' }
+  | { k: 'tunnel' }
+  | { k: 'ignite' };
 
 function bresenham(x1: number, y1: number, x2: number, y2: number): [number, number][] {
   const pts: [number, number][] = [];
@@ -47,6 +52,8 @@ export class InputController {
   private groupTap = { n: 0, t: 0 };
   private disposers: (() => void)[] = [];
   private hover: { x: number; y: number; fx: number; fy: number } | null = null;
+  private ghostLabel: HTMLElement;
+  private placeInfo: { n: number; okCount: number; reason: string | null; cost: string; name: string; hint: string | null } | null = null;
 
   constructor(private s: Session) {
     const canvas = s.gs.canvas;
@@ -54,6 +61,10 @@ export class InputController {
     this.boxEl.className = 'selbox';
     this.boxEl.style.display = 'none';
     s.uiRoot.append(this.boxEl);
+    this.ghostLabel = document.createElement('div');
+    this.ghostLabel.className = 'ghostlabel';
+    this.ghostLabel.style.display = 'none';
+    s.uiRoot.append(this.ghostLabel);
     const on = <K extends keyof WindowEventMap>(target: Window | HTMLElement, ev: string, fn: (e: never) => void, opts?: AddEventListenerOptions) => {
       target.addEventListener(ev, fn as EventListener, opts);
       this.disposers.push(() => target.removeEventListener(ev, fn as EventListener));
@@ -67,7 +78,12 @@ export class InputController {
     add(window, 'mousemove', (e: MouseEvent) => this.onMove(e));
     add(window, 'mouseup', (e: MouseEvent) => this.onUp(e));
     add(canvas, 'contextmenu', (e: Event) => e.preventDefault());
-    add(canvas, 'wheel', (e: WheelEvent) => { e.preventDefault(); s.gs.cam.zoom(e.deltaY); }, { passive: false });
+    add(canvas, 'wheel', (e: WheelEvent) => {
+      e.preventDefault();
+      // Beim Platzieren dreht das Mausrad das Gebäude (Umschalt+Rad zoomt)
+      if (this.mode.k === 'place' && !e.shiftKey && BUILDINGS[this.mode.type].placement !== 'onWall') this.mode.rot ^= 1;
+      else s.gs.cam.zoom(e.deltaY);
+    }, { passive: false });
     add(window, 'keydown', (e: KeyboardEvent) => this.onKey(e, true));
     add(window, 'keyup', (e: KeyboardEvent) => this.onKey(e, false));
     add(document, 'mouseleave', () => (this.mouse.inside = false));
@@ -77,6 +93,7 @@ export class InputController {
   destroy(): void {
     for (const d of this.disposers) d();
     this.boxEl.remove();
+    this.ghostLabel.remove();
   }
 
   reloadHotkeys(): void {
@@ -87,13 +104,18 @@ export class InputController {
     this.mode = m;
     this.dragTile = null;
     this.s.ghost.hide();
+    this.ghostLabel.style.display = 'none';
     this.s.hud.setHint(
       m.k === 'place' ? `${BUILDINGS[m.type].name} platzieren – Linksklick bauen${BUILDINGS[m.type].line ? ' (ziehen für Linie)' : ''}, R drehen, Rechtsklick/Esc abbrechen`
       : m.k === 'dig' ? (m.fill ? 'Rechteck ziehen: Graben zuschütten' : 'Rechteck ziehen: Wassergraben ausheben')
       : m.k === 'ability' ? 'Zielgebiet anklicken – Esc abbrechen'
       : m.k === 'attackMove' ? 'Angriffsmarsch: Ziel anklicken'
       : m.k === 'patrol' ? 'Patrouille: Zielpunkt anklicken'
-      : m.k === 'attackGround' ? 'Bodenangriff: Zielpunkt anklicken' : null,
+      : m.k === 'attackGround' ? 'Bodenangriff: Zielpunkt anklicken'
+      : m.k === 'demolish' ? 'Abreißen: Gebäude anklicken (halbes Holz/Stein/Eisen zurück) – Rechtsklick/Esc beendet'
+      : m.k === 'repair' ? 'Reparieren: beschädigtes Gebäude anklicken – Rechtsklick/Esc beendet'
+      : m.k === 'tunnel' ? 'Tunnel: Zielpunkt anklicken (Tunnelgräber)'
+      : m.k === 'ignite' ? 'Pechgraben anklicken, um ihn zu entzünden (Ingenieur in der Nähe nötig)' : null,
     );
   }
 
@@ -161,22 +183,30 @@ export class InputController {
     let list: [number, number][];
     if (def.line && this.dragTile) list = bresenham(this.dragTile.x, this.dragTile.y, Math.floor(hx), Math.floor(hy));
     else list = [tile(hx, hy)];
-    // Gesamtkosten gegen Bestand prüfen
+    // Gesamtkosten gegen Bestand prüfen; der erste Grund, warum nicht gebaut werden kann, wird am Cursor angezeigt
     let n = 0;
+    let reason: string | null = null;
+    let okCount = 0;
     for (const [x, y] of list) {
       const err = checkPlaceRules(s.world, s.me, def.id, x, y, rot);
       n++;
       const c = def.cost;
-      const ok =
-        !err &&
-        !!view &&
-        (c.gold ?? 0) * n <= view.gold &&
-        (c.wood ?? 0) * n <= view.stock[0] &&
-        (c.stone ?? 0) * n <= view.stock[1] &&
-        (c.iron ?? 0) * n <= view.stock[2] &&
-        (c.pitch ?? 0) * n <= view.stock[3];
+      const poor =
+        !view ||
+        (c.gold ?? 0) * n > view.gold ||
+        (c.wood ?? 0) * n > view.stock[0] ||
+        (c.stone ?? 0) * n > view.stock[1] ||
+        (c.iron ?? 0) * n > view.stock[2] ||
+        (c.pitch ?? 0) * n > view.stock[3];
+      const ok = !err && !poor;
+      if (ok) okCount++;
+      else if (!reason) reason = err ?? 'Zu wenig Ressourcen';
       out.push({ x, y, valid: ok });
     }
+    const c = def.cost;
+    const parts: string[] = [];
+    for (const [key, label] of [['gold', 'Gold'], ['wood', 'Holz'], ['stone', 'Stein'], ['iron', 'Eisen'], ['pitch', 'Pech']] as const) if (c[key]) parts.push(`${(c[key] ?? 0) * n} ${label}`);
+    this.placeInfo = { n, okCount, reason, cost: parts.join(', ') || 'kostenlos', name: def.name, hint: reason === null ? null : null };
     return out;
   }
 
@@ -223,10 +253,46 @@ export class InputController {
         s.ghost.showRect(s.world, tx, ty, tx, ty, err ? [1, 0.25, 0.25] : [0.3, 1, 0.3]);
         void px;
         void py;
-      } else s.ghost.show(s.world, def, mode.rot, this.placementsFor(def, mode.rot, ground.x, ground.y));
+      } else {
+        s.ghost.show(s.world, def, mode.rot, this.placementsFor(def, mode.rot, ground.x, ground.y));
+        this.updateGhostLabel(def);
+      }
     } else if (mode.k === 'dig' && this.dragTile && ground) {
       s.ghost.showRect(s.world, this.dragTile.x, this.dragTile.y, Math.floor(ground.x), Math.floor(ground.y), mode.fill ? [0.9, 0.7, 0.3] : [0.3, 0.6, 1]);
-    } else if (mode.k === 'place' || mode.k === 'dig') s.ghost.hide();
+    } else if (mode.k === 'place' || mode.k === 'dig') {
+      s.ghost.hide();
+      this.ghostLabel.style.display = 'none';
+    }
+    if (mode.k !== 'place') this.ghostLabel.style.display = 'none';
+  }
+
+  /** Kosten (bei Linien für die ganze Linie) und Grund am Cursor */
+  private updateGhostLabel(def: BuildingDef): void {
+    const info = this.placeInfo;
+    const el = this.ghostLabel;
+    if (!info) {
+      el.style.display = 'none';
+      return;
+    }
+    const lineTxt = def.line && info.n > 1 ? ` (${info.okCount}/${info.n} Stück)` : '';
+    el.style.display = '';
+    el.style.left = this.mouse.x + 18 + 'px';
+    el.style.top = this.mouse.y + 18 + 'px';
+    const bad = info.reason && info.okCount < info.n;
+    const reason = bad ? (info.reason === 'Feinde in der Nähe' ? `Feinde in der Nähe (Bauverbot im Umkreis von ${ENEMY_BUILD_RADIUS} Tiles um feindliche Soldaten)` : info.reason) : null;
+    el.className = 'ghostlabel' + (bad && info.okCount === 0 ? ' bad' : '');
+    el.textContent = '';
+    const b = document.createElement('b');
+    b.textContent = `${info.name}${lineTxt}`;
+    const c = document.createElement('div');
+    c.textContent = `Kosten: ${info.cost}`;
+    el.append(b, c);
+    if (reason) {
+      const r = document.createElement('div');
+      r.className = 'why';
+      r.textContent = reason;
+      el.append(r);
+    }
   }
 
   // ----- Maus -----
@@ -257,6 +323,30 @@ export class InputController {
     if (mode.k === 'ability') {
       if (g) s.useAbility(mode.id, g.x, g.y);
       if (!e.shiftKey) this.setMode({ k: 'normal' });
+      return;
+    }
+    if (mode.k === 'demolish' || mode.k === 'repair') {
+      if (g) {
+        const tx = Math.floor(g.x);
+        const ty = Math.floor(g.y);
+        const bid = s.world.map.inBounds(tx, ty) ? s.world.bldAt[s.world.map.idx(tx, ty)] : 0;
+        const b = bid ? s.world.buildings.get(bid) : null;
+        if (b && b.o === s.me && b.t !== BT.Keep && b.t !== BT.Campfire) {
+          if (mode.k === 'demolish') s.send({ c: 'demolish', ids: [bid] });
+          else s.send({ c: 'repair', building: bid });
+          s.audio?.ui('confirm');
+        } else s.audio?.ui('error');
+      }
+      return;
+    }
+    if (mode.k === 'tunnel') {
+      if (g && s.selection.units.length) s.send({ c: 'tunnel', units: s.selection.units, x: g.x, y: g.y });
+      this.setMode({ k: 'normal' });
+      return;
+    }
+    if (mode.k === 'ignite') {
+      if (g) s.send({ c: 'igniteDitch', x: Math.floor(g.x), y: Math.floor(g.y) });
+      this.setMode({ k: 'normal' });
       return;
     }
     if (mode.k === 'attackMove' || mode.k === 'patrol' || mode.k === 'attackGround') {
@@ -456,9 +546,10 @@ export class InputController {
     this.keys.add(e.code);
     const s = this.s;
     const hk = this.hotkeys;
-    const is = (a: HotkeyAction) => hk[a] === e.code;
+    const combo = comboOf(e);
+    const is = (a: HotkeyAction) => hk[a] === combo;
     if (e.code.startsWith('F') && /^F\d+$/.test(e.code)) e.preventDefault();
-    if (e.code === 'Space') e.preventDefault();
+    if (e.code === 'Space' || (e.ctrlKey && e.code === 'KeyZ') || (e.altKey && /^Key/.test(e.code))) e.preventDefault();
     if (is('rotateLeft')) s.gs.cam.rotate(-1);
     else if (is('rotateRight')) s.gs.cam.rotate(1);
     else if (is('cancel')) {
@@ -468,6 +559,18 @@ export class InputController {
       else s.openMenu();
     } else if (is('rotateBuilding') && this.mode.k === 'place') this.mode.rot ^= 1;
     else if (is('pause')) s.togglePause();
+    else if (is('undo')) s.undo();
+    else if (is('jumpAlert')) s.jumpToAlert();
+    else if (is('centerSelection')) s.centerOnSelection();
+    else if (is('help')) s.openHelp();
+    else if (is('encyclopedia')) s.openEncyclopedia();
+    else if (is('tunnel') && s.selection.units.length) this.setMode({ k: 'tunnel' });
+    else if (is('selectKeep')) s.selectBuildingType(BT.Keep);
+    else if (is('selectGranary')) s.selectBuildingType(BT.Granary);
+    else if (is('selectBarracks')) s.selectBuildingType(BT.Barracks);
+    else if (is('selectMarket')) s.selectBuildingType(BT.Market);
+    else if (is('selectStock')) s.selectBuildingType(BT.Stockpile);
+    else if (is('selectArmory')) s.selectBuildingType(BT.Armory);
     else if (is('stop') && s.selection.units.length) s.send({ c: 'stop', units: s.selection.units });
     else if (is('hold') && s.selection.units.length) s.send({ c: 'stance', units: s.selection.units, stance: 0 });
     else if (is('defensive') && s.selection.units.length) s.send({ c: 'stance', units: s.selection.units, stance: 1 });
@@ -475,8 +578,8 @@ export class InputController {
     else if (is('attackMove') && s.selection.units.length) this.setMode({ k: 'attackMove' });
     else if (is('patrol') && s.selection.units.length) this.setMode({ k: 'patrol' });
     else if (is('attackGround') && s.selection.units.length) this.setMode({ k: 'attackGround' });
-    else if (is('demolish') && s.selection.building) s.send({ c: 'demolish', ids: [s.selection.building] });
-    else if (is('repair') && s.selection.building) s.send({ c: 'repair', building: s.selection.building });
+    else if (is('demolish')) { if (s.selection.building) s.send({ c: 'demolish', ids: [s.selection.building] }); else this.setMode({ k: 'demolish' }); }
+    else if (is('repair')) { if (s.selection.building) s.send({ c: 'repair', building: s.selection.building }); else this.setMode({ k: 'repair' }); }
     else if (is('toggleStock')) s.hud.togglePopup('stock');
     else if (is('toggleMarket')) s.hud.togglePopup('market');
     else if (is('togglePopularity')) s.hud.togglePopup('popularity');
@@ -486,8 +589,8 @@ export class InputController {
     else if (is('centerKeep')) s.centerOnKeep();
     else if (is('selectAllArmy')) s.selectAllArmy();
     else {
-      for (let i = 1; i <= 5; i++) if (hk[`ability${i}` as HotkeyAction] === e.code) s.armAbility(i - 1);
-      for (let i = 1; i <= 6; i++) if (hk[`cat${i}` as HotkeyAction] === e.code) s.hud.openCategory(i - 1);
+      for (let i = 1; i <= 5; i++) if (hk[`ability${i}` as HotkeyAction] === combo) s.armAbility(i - 1);
+      for (let i = 1; i <= 6; i++) if (hk[`cat${i}` as HotkeyAction] === combo) s.hud.openCategory(i - 1);
     }
     // Kontrollgruppen
     const m = /^Digit([1-9])$/.exec(e.code);

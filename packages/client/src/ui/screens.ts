@@ -17,9 +17,10 @@ import {
 import type { AudioEngine } from '../audio/audio';
 import { audioOptionRows } from '../audio/ui';
 import { NetClient } from '../game/netconn';
-import { HOTKEY_LABELS, DEFAULT_HOTKEYS, HotkeyAction, keyLabel, loadHotkeys, saveHotkeys } from '../game/hotkeys';
+import { HOTKEY_GROUPS, HOTKEY_LABELS, DEFAULT_HOTKEYS, HotkeyAction, comboOf, hotkeyConflicts, keyLabel, loadHotkeys, saveHotkeys } from '../game/hotkeys';
 import type { Settings } from '../game/settings';
 import { clear, h, hex } from './dom';
+import { iconEl, toolIcon } from './icons';
 
 export interface AppHooks {
   startSkirmish(setup: GameSetup): void;
@@ -38,6 +39,10 @@ export interface AppHooks {
   inGame: boolean;
   saveGame: (() => void) | null;
   quitGame: (() => void) | null;
+  /** Pausenmenü: Partie aufgeben */
+  surrender?: (() => void) | null;
+  /** Enzyklopädie (Hauptmenü) */
+  openEncyclopedia?: () => void;
 }
 
 interface SkSlot {
@@ -89,8 +94,8 @@ export class Screens {
 
   private show(content: HTMLElement[]): HTMLElement {
     this.hide();
-    const box = h('div', { class: 'panel box' }, ...content);
-    this.el = h('div', { class: 'screen' }, box);
+    const box = h('div', { class: 'panel pp box' }, ...content);
+    this.el = h('div', { class: 'screen' + (this.hooks.inGame ? ' overlay' : '') }, box);
     this.root.append(this.el);
     return box;
   }
@@ -98,25 +103,45 @@ export class Screens {
   // ---------------- Hauptmenü ----------------
   main(): void {
     const btns = h('div', { class: 'menu-btns' });
-    const add = (text: string, fn: () => void, primary = false) => btns.append(h('button', { text, class: primary ? 'primary' : '', onclick: fn }));
+    const add = (text: string, fn: () => void, primary = false, icon?: string) => btns.append(h('button', { class: primary ? 'primary' : '', onclick: fn }, icon ? iconEl(toolIcon(icon, 26)) : null, text));
     if (this.hooks.inGame) {
-      add('Fortsetzen', () => this.hooks.resume?.(), true);
-      if (this.hooks.saveGame) add('Spiel speichern', () => this.hooks.saveGame?.());
-      add('Optionen', () => this.options());
-      add('Spiel beenden', () => this.hooks.quitGame?.());
+      add('Fortsetzen', () => this.hooks.resume?.(), true, 'play');
+      if (this.hooks.saveGame) add('Spiel speichern', () => this.hooks.saveGame?.(), false, 'save');
+      if (this.hooks.saveGame) add('Spiel laden', () => this.loadMenu(), false, 'load');
+      add('Optionen', () => this.options(), false, 'options');
+      if (this.hooks.surrender) add('Aufgeben', () => this.confirmSurrender(), false, 'cancel');
+      add('Spiel beenden', () => this.hooks.quitGame?.(), false, 'menu');
     } else {
-      add('Gefecht gegen KI', () => this.skirmish(), true);
-      add('Online spielen', () => this.online());
-      add('Tutorial-Missionen', () => this.missions());
-      add('Karteneditor', () => this.hooks.openEditor());
-      add('Spiel laden', () => this.loadMenu());
-      add('Optionen', () => this.options());
+      add('Gefecht gegen KI', () => this.skirmish(), true, 'attack');
+      add('Online spielen', () => this.online(), false, 'group');
+      add('Tutorial-Missionen', () => this.missions(), false, 'help');
+      add('Karteneditor', () => this.hooks.openEditor(), false, 'repair');
+      add('Spiel laden', () => this.loadMenu(), false, 'load');
+      if (this.hooks.openEncyclopedia) add('Enzyklopädie', () => this.hooks.openEncyclopedia?.(), false, 'encyclopedia');
+      add('Optionen', () => this.options(), false, 'options');
+      add('Credits', () => this.credits(), false, 'advisor');
     }
     this.show([
-      h('h1', { text: 'STRONGPOLY' }),
-      h('div', { class: 'sub', text: 'Burgenbau-Echtzeitstrategie im Low-Poly-Stil' }),
+      h('div', { class: 'menu-flag' }, h('div', { html: LOGO_SVG }), h('div', {}, h('h1', { text: this.hooks.inGame ? 'PAUSE' : 'STRONGPOLY' }), h('div', { class: 'sub', text: 'Burgenbau-Echtzeitstrategie im Low-Poly-Stil' }))),
       btns,
       h('div', { class: 'crumb', style: 'margin-top:18px', text: 'Alle Namen, Modelle und Klänge sind Eigenentwürfe.' }),
+    ]);
+  }
+
+  private confirmSurrender(): void {
+    this.show([
+      h('h2', { text: 'Partie aufgeben?' }),
+      h('div', { class: 'crumb', text: 'Dein Bergfried fällt und du scheidest aus. Das lässt sich nicht zurücknehmen.' }),
+      h('div', { class: 'row', style: 'margin-top:14px' }, this.backButton(() => this.main()), h('button', { class: 'danger', text: 'Ja, aufgeben', onclick: () => { this.hooks.surrender?.(); this.hooks.resume?.(); } })),
+    ]);
+  }
+
+  // ---------------- Credits ----------------
+  credits(): void {
+    this.show([
+      h('h2', { text: 'Credits' }),
+      h('div', { class: 'crumb', html: 'StrongPoly ist ein Eigenentwurf. Alle Grafiken, Icons, Modelle, Klänge, Musik, Texte, Namen und Logos wurden eigens für dieses Spiel gestaltet und per Code erzeugt.<br><br><b>Technik:</b> TypeScript, Three.js, Vite, Node.js, ws, MessagePack, Vitest.<br><b>Musik und Klang:</b> prozedural per WebAudio (modale Skalen, synthetische Laute, Flöte, Rahmentrommel).<br><b>Berater:</b> Tamsin, die Wegkundige.<br><br>Bedienung und Spielablauf orientieren sich an klassischen Burgenbau-Strategiespielen; Inhalte und Gestaltung sind unabhängig.' }),
+      h('div', { style: 'margin-top:12px' }, this.backButton(() => this.main())),
     ]);
   }
 
@@ -501,39 +526,76 @@ export class Screens {
     };
     const quality = h('select', { onchange: (e) => { st.quality = (e.target as HTMLSelectElement).value as 'low' | 'medium' | 'high'; apply(); } });
     for (const [v, l] of [['low', 'Niedrig'], ['medium', 'Mittel'], ['high', 'Hoch']]) quality.append(h('option', { value: v, text: l, selected: st.quality === v }));
+    const num = (label: string, value: number, min: number, max: number, step: number, set: (v: number) => void, fmt: (v: number) => string) => {
+      const out = h('span', { class: 'crumb', text: fmt(value) });
+      const input = h('input', { type: 'range', min: String(min), max: String(max), step: String(step), value: String(value), oninput: (e) => { const v = Number((e.target as HTMLInputElement).value); set(v); out.textContent = fmt(v); apply(); } });
+      return [h('span', { text: label }), h('div', { class: 'row' }, input, out)];
+    };
+    // Tastenbelegung (frei belegbar, mit Strg/Alt-Kombinationen, Konflikte werden markiert)
     const hk = loadHotkeys();
-    const table = h('div', { style: 'display:grid;grid-template-columns:1fr auto;gap:3px 12px;max-height:230px;overflow:auto;padding-right:8px' });
-    (Object.keys(HOTKEY_LABELS) as HotkeyAction[]).forEach((a) => {
-      const btn = h('button', { text: keyLabel(hk[a]), style: 'min-width:80px' });
-      btn.onclick = () => {
-        btn.textContent = 'Taste drücken…';
-        const on = (e: KeyboardEvent) => {
-          e.preventDefault();
-          e.stopPropagation();
-          window.removeEventListener('keydown', on, true);
-          if (e.code !== 'Escape') {
-            hk[a] = e.code;
-            saveHotkeys(hk);
-          }
-          btn.textContent = keyLabel(hk[a]);
-        };
-        window.addEventListener('keydown', on, true);
-      };
-      table.append(h('span', { text: HOTKEY_LABELS[a] }), btn);
-    });
+    const keys = h('div', { style: 'max-height:260px;overflow:auto;padding-right:8px' });
+    const renderKeys = () => {
+      clear(keys);
+      const conflicts = hotkeyConflicts(hk);
+      for (const g of HOTKEY_GROUPS) {
+        keys.append(h('div', { class: 'keygroup', text: g.name }));
+        const rows = h('div', { class: 'keyrows' });
+        for (const a of g.actions) {
+          const dup = conflicts.has(hk[a]);
+          const kc = h('span', { class: 'kc' + (dup ? ' conflict' : ''), text: keyLabel(hk[a]), title: dup ? 'Doppelt belegt mit: ' + (conflicts.get(hk[a]) ?? []).filter((x) => x !== a).map((x) => HOTKEY_LABELS[x]).join(', ') : '' });
+          const change = h('button', { class: 'small', text: 'Ändern' });
+          change.onclick = () => {
+            kc.textContent = 'Taste drücken…';
+            const on = (e: KeyboardEvent) => {
+              if (['ControlLeft', 'ControlRight', 'AltLeft', 'AltRight', 'ShiftLeft', 'ShiftRight', 'MetaLeft', 'MetaRight'].includes(e.code)) return;
+              e.preventDefault();
+              e.stopPropagation();
+              window.removeEventListener('keydown', on, true);
+              if (e.code !== 'Escape') {
+                hk[a] = comboOf(e);
+                saveHotkeys(hk);
+              }
+              renderKeys();
+            };
+            window.addEventListener('keydown', on, true);
+          };
+          const reset = h('button', { class: 'small', text: '↺', title: 'Standard', onclick: () => { hk[a] = DEFAULT_HOTKEYS[a]; saveHotkeys(hk); renderKeys(); } });
+          rows.append(h('span', { text: HOTKEY_LABELS[a] }), kc, h('span', { class: 'row' }, change, reset));
+        }
+        keys.append(rows);
+      }
+    };
+    renderKeys();
+    const aaBox = h('input', { type: 'checkbox', checked: st.aa, onchange: (e) => { st.aa = (e.target as HTMLInputElement).checked; apply(); } });
     this.show([
       h('h2', { text: 'Optionen' }),
+      h('h3', { text: 'Grafik' }),
       h('div', { class: 'form' },
-        h('span', { text: 'Grafikqualität' }), quality,
+        h('span', { text: 'Grafikstufe' }), quality,
         h('span', { text: 'Schatten' }), h('input', { type: 'checkbox', checked: st.shadows, onchange: (e) => { st.shadows = (e.target as HTMLInputElement).checked; apply(); } }),
-        ...audioOptionRows(this.hooks.audio, st, apply),
+        h('span', { text: 'Kantenglättung' }), h('div', { class: 'row' }, aaBox, h('span', { class: 'crumb', text: 'wirkt beim nächsten Start' })),
+        ...num('UI-Skalierung', st.uiScale, 0.8, 1.5, 0.05, (v) => (st.uiScale = v), (v) => `${Math.round(v * 100)} %`),
       ),
+      h('h3', { text: 'Steuerung' }),
+      h('div', { class: 'form' },
+        ...num('Scrollgeschwindigkeit', st.scrollSpeed, 0.4, 2.5, 0.1, (v) => (st.scrollSpeed = v), (v) => `${v.toFixed(1)}×`),
+        h('span', { text: 'Kantenscrollen' }), h('input', { type: 'checkbox', checked: st.edgeScroll, onchange: (e) => { st.edgeScroll = (e.target as HTMLInputElement).checked; apply(); } }),
+      ),
+      h('h3', { text: 'Ton' }),
+      h('div', { class: 'form' }, ...audioOptionRows(this.hooks.audio, st, apply)),
       h('h3', { text: 'Tastenbelegung' }),
-      table,
+      keys,
       h('div', { class: 'row', style: 'margin-top:12px' },
         this.backButton(() => this.main()),
-        h('button', { text: 'Standard', onclick: () => { saveHotkeys({ ...DEFAULT_HOTKEYS }); this.options(); } }),
+        h('button', { text: 'Alle Tasten auf Standard', onclick: () => { saveHotkeys({ ...DEFAULT_HOTKEYS }); this.options(); } }),
       ),
     ]);
   }
 }
+
+/** Eigenes Logo: Bergfried mit Wimpel */
+const LOGO_SVG = `<svg viewBox="0 0 64 64" width="84" height="84" xmlns="http://www.w3.org/2000/svg"><g stroke="#241a12" stroke-width="2.6" stroke-linejoin="round">
+<polygon points="8,56 8,26 14,26 14,22 20,22 20,26 26,26 26,18 38,18 38,26 44,26 44,22 50,22 50,26 56,26 56,56" fill="#b9b4aa"/>
+<polygon points="32,56 56,56 56,26 50,26 50,22 44,22 44,26 38,26 38,18 32,18" fill="#8e897f"/>
+<polygon points="26,56 26,40 38,40 38,56" fill="#5a3b1e"/><polygon points="26,40 32,34 38,40" fill="#7d5a30"/>
+<polygon points="32,18 32,6" fill="none"/><line x1="32" y1="18" x2="32" y2="5"/><polygon points="32,5 46,10 32,15" fill="#d8362f"/></g></svg>`;

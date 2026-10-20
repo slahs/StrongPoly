@@ -11,6 +11,15 @@ export interface GfxSettings {
 }
 
 /** Besitzt Renderer, Szene, Licht und Kamera. Der Renderer liest nur Zustand. */
+/** Kantenglättung aus den gespeicherten Einstellungen (wirkt beim Start) */
+function readAA(): boolean {
+  try {
+    return (JSON.parse(localStorage.getItem('strongpoly.settings') ?? '{}') as { aa?: boolean }).aa !== false;
+  } catch {
+    return true;
+  }
+}
+
 export class GameScene {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
@@ -23,7 +32,7 @@ export class GameScene {
   readonly root = new THREE.Group();
 
   constructor(readonly canvas: HTMLCanvasElement) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: readAA(), powerPreference: 'high-performance' });
     this.renderer.setClearColor(FOG_COLOR);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;

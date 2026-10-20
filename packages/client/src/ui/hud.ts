@@ -1,65 +1,72 @@
 import {
   ARMORY_RES,
   BT,
-  BUILDINGS,
-  BuildingDef,
-  CATEGORIES,
-  ClientBuilding,
   ClientWorld,
   Command,
   FOOD_RES,
-  PLAYER_COLORS,
+  MissionView,
   PlayerView,
-  RATION_NAMES,
   RES_INFO,
-  SELL_RATIO,
   STOCK_RES,
   TAX_GOLD,
   TAX_LEVELS,
   TAX_POP,
-  TICKS_PER_MONTH,
-  U,
-  UNITS,
-  UnitDef,
-  Cat,
-  RES_COUNT,
   R,
-  SIEGE_UNITS,
-  Stance,
-  Formation,
+  RES_COUNT,
+  RATION_NAMES,
+  SELL_RATIO,
+  TICKS_PER_MONTH,
 } from '@strongpoly/shared';
-import { clear, fmtCost, h, hex, MONTHS } from './dom';
+import { clear, h, MONTHS } from './dom';
+import { buildingIcon, iconEl, popFaceIcon, popFactorIcon, resourceIcon, toolIcon, abilityIcon } from './icons';
 import { Minimap } from './minimap';
+import { BuildMenu } from './hud_build';
+import { ContextPanel } from './hud_context';
+import { TroopPanel } from './hud_troops';
+
+export type ModeName = 'normal' | 'place' | 'dig' | 'ability' | 'attackMove' | 'patrol' | 'attackGround' | 'demolish' | 'repair' | 'tunnel' | 'ignite';
 
 export interface HudActions {
   send(cmd: Command): void;
   startPlacement(type: number): void;
   cancelPlacement(): void;
   startDig(fill: boolean): void;
+  startMode(m: 'attackMove' | 'patrol' | 'attackGround' | 'tunnel' | 'ignite' | 'demolish' | 'repair'): void;
+  currentMode(): ModeName;
+  /** Typ des gerade zu platzierenden Gebäudes oder -1 */
+  placingType(): number;
+  undo(): void;
   openMenu(): void;
+  openHelp(): void;
+  openEncyclopedia(): void;
   setSpeed(x: number): void;
   togglePause(): void;
   centerOn(x: number, y: number): void;
+  selectBuilding(id: number): void;
+  /** Auswahl auf einen Typ einschränken (Truppenpanel); `null` = alle wieder */
+  filterSelection(type: number | null): void;
   isLocal: boolean;
 }
 
 export interface SelectionState {
   units: number[];
+  /** gesamte Auswahl vor dem Filtern nach Typ (Truppenpanel) */
+  pool: number[];
   building: number;
 }
 
-const ICON_COLORS: Record<string, number> = {
-  castle: 0xb9b4aa,
-  industry: 0x8b8378,
-  farm: 0x6fae4a,
-  town: 0xb0452f,
-  weapons: 0x7d5a30,
-  food: 0xd9b84e,
-};
+/** Gemeinsame Sicht der HUD-Bausteine */
+export interface HudShared {
+  world: ClientWorld;
+  actions: HudActions;
+  view: () => PlayerView | null;
+  me: () => number;
+  /** Tooltip an ein Element hängen (Standard: title-Text, wird später durch die Enzyklopädie-Tooltips ersetzt) */
+  tip: (el: HTMLElement, kind: 'building' | 'unit' | 'resource' | 'ability' | 'text', id: number, text?: string) => void;
+  togglePopup: (kind: string) => void;
+}
 
-const RES_SWATCH: number[] = [0x6b4a2b, 0xb9b4aa, 0x24211e, 0x2a2622, 0x6fae4a, 0xa97c45, 0xd9b84e, 0xf2ede0, 0xf2ede0, 0xb0452f, 0xf0c040, 0xb0452f, 0xd1b073, 0xa97c45, 0x7d5a30, 0x7d5a30, 0x7d5a30, 0x8e897f, 0xb9b4aa, 0xa97c45, 0x8e897f];
-
-/** Gesamte Spielzeit-HUD: Leisten, Bau-Menü, Info-Panel, Popups, Toasts */
+/** Gesamte Spielzeit-HUD: Leisten, Bau-Menü, Kontext-/Truppenpanel, Popups, Toasts */
 export class Hud {
   readonly root: HTMLElement;
   readonly minimap: Minimap;
@@ -67,7 +74,8 @@ export class Hud {
   private topGold!: HTMLElement;
   private topPop!: HTMLElement;
   private topPopularity!: HTMLElement;
-  private topPopBar!: HTMLElement;
+  private topFace!: HTMLElement;
+  private topDelta!: HTMLElement;
   private topDate!: HTMLElement;
   private topTroops!: HTMLElement;
   private topFear!: HTMLElement;
@@ -76,24 +84,32 @@ export class Hud {
   private powerText!: HTMLElement;
   private resRows: HTMLElement[] = [];
   private resBar!: HTMLElement;
-  private menuItems!: HTMLElement;
   private info!: HTMLElement;
   private toasts!: HTMLElement;
   private hint!: HTMLElement;
   private popupEl: HTMLElement | null = null;
   private popupKind = '';
-  private cat: Cat = 'castle';
-  private tabButtons = new Map<string, HTMLButtonElement>();
-  private itemEls = new Map<number, HTMLElement>();
   private lastView: PlayerView | null = null;
-  private lastInfoKey = '';
+  private lastFace = -1;
   private abilityBar!: HTMLElement;
   private speedLabel!: HTMLElement;
+  private pauseBtn: HTMLElement | null = null;
   fpsEl!: HTMLElement;
   private missionEl: HTMLElement | null = null;
   private missionSig = '';
+  readonly build: BuildMenu;
+  private context: ContextPanel;
+  private troops: TroopPanel;
+  /** Platz für Meldungsliste etc. */
+  readonly topRight: HTMLElement;
   me = 0;
   private extremeMode = false;
+  /** Wird von der Enzyklopädie/Tooltip-Anbindung überschrieben */
+  tipHook: HudShared['tip'] = (el, _kind, _id, text) => {
+    if (text) el.title = text;
+  };
+  private sharedApi: HudShared;
+  formationHandler: ((f: number) => void) | null = null;
 
   constructor(
     parent: HTMLElement,
@@ -105,32 +121,33 @@ export class Hud {
     this.extremeMode = opts.extreme;
     this.root = h('div', { class: 'hud', style: 'position:absolute;inset:0;pointer-events:none' });
     parent.append(this.root);
+    this.sharedApi = {
+      world,
+      actions,
+      view: () => this.lastView,
+      me: () => this.me,
+      tip: (el, k, id, text) => this.tipHook(el, k, id, text),
+      togglePopup: (k) => this.togglePopup(k),
+    };
     this.buildTop();
     this.buildResBar();
+    this.topRight = h('div', { class: 'topright' });
     this.toasts = h('div', { class: 'toasts' });
     this.hint = h('div', { class: 'hint', style: 'display:none' });
     this.fpsEl = h('div', { class: 'fps' });
-    this.root.append(this.toasts, this.hint, this.fpsEl);
+    this.root.append(this.topRight, this.toasts, this.hint, this.fpsEl);
+    // Unteres Hauptpanel: Baumenü links, Kontext in der Mitte, Minikarte rechts
     const bottom = h('div', { class: 'bottom' });
+    this.build = new BuildMenu(this.sharedApi);
+    this.info = h('div', { class: 'panel pp info' });
+    this.context = new ContextPanel(this.sharedApi, this.info);
+    this.troops = new TroopPanel(this.sharedApi, this.info);
+    this.troops.formationHandler = (f) => this.formationHandler?.(f);
     this.minimap = new Minimap(world, opts.onMinimapMove, opts.onMinimapOrder);
-    const mm = h('div', { class: 'panel minimap' }, this.minimap.canvas);
-    this.info = h('div', { class: 'panel info' });
-    const menu = h('div', { class: 'panel menu' });
-    const tabs = h('div', { class: 'tabs' });
-    for (const c of CATEGORIES) {
-      const b = h('button', { text: c.name, onclick: () => this.setCat(c.id) });
-      this.tabButtons.set(c.id, b);
-      tabs.append(b);
-    }
-    tabs.append(
-      h('button', { text: 'Graben', title: 'Wassergraben ausheben (Rechteck ziehen)', onclick: () => this.actions.startDig(false) }),
-      h('button', { text: 'Zuschütten', title: 'Graben zuschütten', onclick: () => this.actions.startDig(true) }),
-    );
-    this.menuItems = h('div', { class: 'items' });
-    menu.append(tabs, this.menuItems);
-    bottom.append(mm, this.info, menu);
+    const mm = h('div', { class: 'panel pp minimap' }, this.minimap.canvas);
+    bottom.append(this.build.root, this.info, mm);
     this.root.append(bottom);
-    this.setCat('castle');
+    this.showIdleInfo();
   }
 
   setMe(me: number): void {
@@ -143,38 +160,48 @@ export class Hud {
     this.topGold = h('span', { text: '0' });
     this.topPop = h('span', { text: '0/0' });
     this.topPopularity = h('span', { text: '60' });
-    this.topPopBar = h('div', { style: 'width:60%;background:#6fae4a' });
+    this.topFace = h('span', { class: 'face', html: popFaceIcon(60, 28) });
+    this.topDelta = h('span', { class: 'delta', text: '' });
     this.topDate = h('span', { text: 'Januar 1' });
     this.topTroops = h('span', { text: '0' });
     this.topFear = h('span', { text: '0' });
     this.speedLabel = h('span', { text: '1×' });
+    const stat = (ic: string | null, title: string, ...kids: (Node | string)[]) => h('div', { class: 'stat', title }, ic ? iconEl(ic) : null, ...kids);
+    const pop = h('div', { class: 'stat click pop', title: 'Beliebtheit – Klick: Aufschlüsselung und Monatsprognose', onclick: () => this.togglePopup('popularity') }, this.topFace, this.topPopularity, this.topDelta);
     bar.append(
-      h('div', { class: 'stat', title: 'Gold' }, h('span', { class: 'dot', style: 'background:#f0c040' }), this.topGold),
-      h('div', { class: 'stat click', title: 'Bevölkerung / Limit – Klick: Verwaltung', onclick: () => this.togglePopup('admin') }, 'Bauern ', this.topPop),
-      h('div', { class: 'stat click', title: 'Beliebtheit – Klick für Aufschlüsselung', onclick: () => this.togglePopup('popularity') }, 'Beliebtheit ', this.topPopularity, h('div', { class: 'popbar' }, this.topPopBar)),
-      h('div', { class: 'stat', title: 'Truppen / Limit' }, 'Truppen ', this.topTroops),
-      h('div', { class: 'stat', title: 'Angstfaktor: Produktivität +, Kampfmoral −' }, 'Angst ', this.topFear),
+      stat(coinIcon(), 'Gold', this.topGold),
+      h('div', { class: 'stat click', title: 'Bauern / Wohnraum – Klick: Verwaltung (Steuern, Rationen)', onclick: () => this.togglePopup('admin') }, iconEl(popFactorIcon('crowd', 24)), this.topPop),
+      pop,
+      stat(toolIcon('troops', 24), 'Truppen / Limit', this.topTroops),
+      stat(popFactorIcon('fear', 24), 'Angstfaktor: Produktivität +, Kampfmoral −', this.topFear),
     );
     this.powerFill = h('div', { style: 'width:0%' });
     this.powerText = h('span', { text: '' });
     this.powerWrap = h('div', { class: 'power', title: 'Machtleiste (Extreme)', style: this.extremeMode ? '' : 'display:none' }, this.powerFill, this.powerText);
-    this.abilityBar = h('div', { style: 'display:flex;gap:4px' });
+    this.abilityBar = h('div', { class: 'abilities' });
     bar.append(this.powerWrap, this.abilityBar, h('div', { class: 'spacer' }));
-    bar.append(h('div', { class: 'stat' }, this.topDate));
+    bar.append(h('div', { class: 'stat', title: 'Spielzeit' }, iconEl(toolIcon('time', 22)), this.topDate));
     if (this.actions.isLocal) {
-      bar.append(
-        h('button', { text: '−', title: 'Langsamer', onclick: () => this.actions.setSpeed(-1) }),
-        h('div', { class: 'stat' }, this.speedLabel),
-        h('button', { text: '+', title: 'Schneller', onclick: () => this.actions.setSpeed(1) }),
-        h('button', { text: 'Pause', onclick: () => this.actions.togglePause() }),
-      );
+      this.pauseBtn = this.iconBtn('pause', 'Pause (Pause-Taste)', () => this.actions.togglePause());
+      bar.append(this.iconBtn('zoom', 'Langsamer', () => this.actions.setSpeed(-1), '−'), h('div', { class: 'stat' }, this.speedLabel), this.iconBtn('speed', 'Schneller', () => this.actions.setSpeed(1), '+'), this.pauseBtn);
     }
-    bar.append(h('button', { text: 'Menü', onclick: () => this.actions.openMenu() }));
+    bar.append(
+      this.iconBtn('help', 'Hotkey-Übersicht (F1)', () => this.actions.openHelp()),
+      this.iconBtn('encyclopedia', 'Enzyklopädie (F2)', () => this.actions.openEncyclopedia()),
+      this.iconBtn('menu', 'Menü (Esc)', () => this.actions.openMenu()),
+    );
     this.root.append(bar);
   }
 
+  private iconBtn(tool: string, title: string, onclick: () => void, label?: string): HTMLElement {
+    const b = h('button', { class: 'ibtn', title, onclick: () => onclick() });
+    if (label) b.append(label);
+    else b.append(iconEl(toolIcon(tool, 22)));
+    return b;
+  }
+
   /** Missionsziele anzeigen (nur bei Änderung neu aufbauen) */
-  setMission(m: import('@strongpoly/shared').MissionView | null): void {
+  setMission(m: MissionView | null): void {
     if (!m) {
       this.missionEl?.remove();
       this.missionEl = null;
@@ -182,10 +209,9 @@ export class Hud {
     }
     const sig = JSON.stringify(m);
     if (sig === this.missionSig) return;
-    const prevDone = this.missionSig ? (JSON.parse(this.missionSig) as typeof m).objectives.filter((o) => o.done).length : 0;
     this.missionSig = sig;
     if (!this.missionEl) {
-      this.missionEl = h('div', { class: 'panel mission' });
+      this.missionEl = h('div', { class: 'panel pp mission' });
       this.root.append(this.missionEl);
     }
     const el = this.missionEl;
@@ -193,16 +219,19 @@ export class Hud {
     el.append(h('h4', { text: `${m.name} – Stufe ${m.stage}/${m.stages}: ${m.title}` }));
     for (const o of m.objectives) el.append(h('div', { class: o.done ? 'obj done' : 'obj', text: (o.done ? '✔ ' : '☐ ') + o.text }));
     el.append(h('div', { class: 'crumb', text: m.hint }));
-    if (m.complete) el.append(h('b', { text: 'Mission erfüllt!', style: 'color:#f0c040' }));
-    void prevDone;
+    if (m.complete) el.append(h('b', { text: 'Mission erfüllt!', style: 'color:#7a5a00' }));
   }
 
   setSpeedLabel(s: number): void {
     this.speedLabel.textContent = `${s}×`;
   }
 
+  setPaused(p: boolean): void {
+    this.pauseBtn?.classList.toggle('active', p);
+  }
+
   private buildResBar(): void {
-    this.resBar = h('div', { class: 'panel resbar' });
+    this.resBar = h('div', { class: 'panel pp resbar' });
     const groups: [string, number[]][] = [
       ['stock', [R.Wood, R.Stone, R.Iron, R.Pitch]],
       ['food', [R.Apple, R.Cheese, R.Meat, R.Bread, R.Ale]],
@@ -210,7 +239,8 @@ export class Hud {
     for (const [g, list] of groups) {
       for (const r of list) {
         const val = h('b', { text: '0' });
-        const row = h('div', { class: 'row', title: RES_INFO[r].name, onclick: () => this.togglePopup(g === 'food' ? 'granary' : 'stock') }, h('span', { class: 'dot', style: { background: hex(RES_SWATCH[r]) } }), RES_INFO[r].name, val);
+        const row = h('div', { class: 'row', onclick: () => this.togglePopup(g === 'food' ? 'granary' : 'stock') }, iconEl(resourceIcon(r, 20)), h('span', { class: 'nm', text: RES_INFO[r].name }), val);
+        this.sharedApi.tip(row, 'resource', r, `${RES_INFO[r].name} – Klick: ${g === 'food' ? 'Kornspeicher' : 'Lager'}`);
         row.dataset.res = String(r);
         this.resRows[r] = row;
         this.resBar.append(row);
@@ -218,47 +248,13 @@ export class Hud {
       this.resBar.append(h('div', { class: 'sep' }));
     }
     const arm = h('b', { text: '0' });
-    this.resBar.append(h('div', { class: 'row', onclick: () => this.togglePopup('armory') }, h('span', { class: 'dot', style: 'background:#8e897f' }), 'Waffen', arm));
+    this.resBar.append(h('div', { class: 'row', title: 'Waffenkammer', onclick: () => this.togglePopup('armory') }, iconEl(resourceIcon(R.Sword, 20)), h('span', { class: 'nm', text: 'Waffen' }), arm));
     this.resRows[999] = arm.parentElement as HTMLElement;
     this.root.append(this.resBar);
   }
 
-  // ---------- Bau-Menü ----------
-  private setCat(c: Cat): void {
-    this.cat = c;
-    for (const [id, b] of this.tabButtons) b.classList.toggle('active', id === c);
-    clear(this.menuItems);
-    this.itemEls.clear();
-    for (const def of BUILDINGS) {
-      if (!def || def.cat !== c || def.id === BT.Keep || def.id === BT.Campfire) continue;
-      const el = h(
-        'button',
-        {
-          class: 'item',
-          title: `${def.name}\n${def.desc ?? ''}\nKosten: ${fmtCost(def.cost)}\nGröße: ${def.w}×${def.h}`,
-          onclick: () => this.actions.startPlacement(def.id),
-        },
-        h('div', { class: 'ic', style: { background: hex(ICON_COLORS[def.cat] ?? 0x888888) } }),
-        h('div', { class: 'nm', text: def.name }),
-        h('div', { class: 'cs', text: fmtCost(def.cost) }),
-      );
-      this.itemEls.set(def.id, el);
-      this.menuItems.append(el);
-    }
-    if (this.lastView) this.refreshAffordability(this.lastView);
-  }
-
-  private refreshAffordability(v: PlayerView): void {
-    for (const [id, el] of this.itemEls) {
-      const c = BUILDINGS[id].cost;
-      const ok = (c.gold ?? 0) <= v.gold && (c.wood ?? 0) <= v.stock[R.Wood] && (c.stone ?? 0) <= v.stock[R.Stone] && (c.iron ?? 0) <= v.stock[R.Iron] && (c.pitch ?? 0) <= v.stock[R.Pitch];
-      el.classList.toggle('off', !ok);
-    }
-  }
-
   openCategory(i: number): void {
-    const c = CATEGORIES[i];
-    if (c) this.setCat(c.id);
+    this.build.openCategory(i);
   }
 
   setHint(text: string | null): void {
@@ -272,8 +268,8 @@ export class Hud {
   toast(text: string, bad = false): void {
     const t = h('div', { class: 'toast' + (bad ? ' bad' : ''), text });
     this.toasts.append(t);
-    while (this.toasts.children.length > 5) this.toasts.firstChild?.remove();
-    setTimeout(() => t.remove(), 5000);
+    while (this.toasts.children.length > 4) this.toasts.firstChild?.remove();
+    setTimeout(() => t.remove(), 4500);
   }
 
   // ---------- Update ----------
@@ -283,8 +279,13 @@ export class Hud {
       this.topGold.textContent = String(view.gold);
       this.topPop.textContent = `${view.peasants}/${view.housing}`;
       this.topPopularity.textContent = String(Math.round(view.popularity));
-      this.topPopBar.style.width = `${view.popularity}%`;
-      this.topPopBar.style.background = view.popularity >= 50 ? '#6fae4a' : '#d8362f';
+      const face = Math.round(view.popularity / 5);
+      if (face !== this.lastFace) {
+        this.lastFace = face;
+        this.topFace.innerHTML = popFaceIcon(view.popularity, 28);
+      }
+      this.topDelta.textContent = view.popDelta > 0.05 ? `▲${view.popDelta.toFixed(1)}` : view.popDelta < -0.05 ? `▼${(-view.popDelta).toFixed(1)}` : '';
+      this.topDelta.className = 'delta ' + (view.popDelta > 0.05 ? 'pos' : view.popDelta < -0.05 ? 'neg' : '');
       this.topTroops.textContent = `${view.troops}/${view.troopLimit}`;
       this.topFear.textContent = (view.fear > 0 ? '+' : '') + view.fear;
       const month = this.world.month;
@@ -296,7 +297,7 @@ export class Hud {
       let arm = 0;
       for (const r of ARMORY_RES) arm += view.stock[r];
       if (this.resRows[999]) (this.resRows[999].lastElementChild as HTMLElement).textContent = String(arm);
-      this.refreshAffordability(view);
+      this.build.refresh(view, this.actions.currentMode());
       if (this.extremeMode) {
         this.powerFill.style.width = `${(view.power / view.powerMax) * 100}%`;
         this.powerText.textContent = `${Math.floor(view.power)} / ${view.powerMax}`;
@@ -312,132 +313,48 @@ export class Hud {
     for (const a of items) {
       const cd = view?.abilityCd[a.id] ?? 0;
       const ok = view ? view.power >= a.cost && cd <= 0 : false;
-      this.abilityBar.append(
-        h('button', { text: `${a.name}${cd > 0 ? ` (${Math.ceil(cd)}s)` : ''}`, title: `${a.name} – ${a.cost} Macht [${a.hotkey}]`, disabled: !ok, onclick: () => onPick(a.id) }),
-      );
+      const b = h('button', { class: 'ability' + (ok ? '' : ' off'), disabled: !ok, onclick: () => onPick(a.id) }, iconEl(abilityIcon(a.id, 24)), h('span', { class: 'cost', text: String(a.cost) }), cd > 0 ? h('span', { class: 'cd', text: `${Math.ceil(cd)}s` }) : null);
+      this.sharedApi.tip(b, 'ability', a.id, `${a.name} – ${a.cost} Macht [${a.hotkey.replace(/^Key/, '')}]`);
+      this.abilityBar.append(b);
     }
   }
 
   // ---------- Info-Panel ----------
-  private updateInfo(sel: SelectionState): void {
-    const w = this.world;
-    const key = `${sel.building}|${sel.units.length}|${sel.units[0] ?? 0}|${Math.floor(w.tick / 5)}`;
-    if (key === this.lastInfoKey) return;
-    this.lastInfoKey = key;
+  private lastInfoKey = '';
+  private showIdleInfo(): void {
     clear(this.info);
-    if (sel.building) {
-      const b = w.buildings.get(sel.building);
-      if (b) return this.infoBuilding(b);
-    }
-    if (sel.units.length) return this.infoUnits(sel.units);
     this.info.append(
       h('h3', { text: 'StrongPoly' }),
-      h('div', { class: 'crumb', html: 'Linksklick: auswählen · Rahmen ziehen: Truppen wählen<br>Rechtsklick: Befehl · WASD: Kamera · Q/E: drehen<br>Strg+1..9: Gruppe festlegen · 1..9: Gruppe wählen' }),
+      h('div', { class: 'crumb', html: 'Linksklick: auswählen · Rahmen ziehen: Truppen wählen<br>Rechtsklick: Befehl / Bauen abbrechen<br>Strg+Z: letzte Platzierung zurücknehmen<br>F1: Hotkeys · F2: Enzyklopädie · Leertaste: letzte Meldung' }),
     );
   }
 
-  private infoBuilding(b: ClientBuilding): void {
-    const def = BUILDINGS[b.t];
-    const mine = b.o === this.me;
-    this.info.append(h('h3', { text: def.name }));
-    const maxHp = def.hp;
-    this.info.append(h('div', { class: 'hpbar' }, h('div', { style: `width:${Math.min(100, (b.hp / maxHp) * 100)}%` })));
-    this.info.append(h('div', { class: 'kv' }, 'Zustand', h('b', { text: `${b.hp}/${maxHp}${b.f & 1 ? ' – brennt!' : ''}` })));
-    if (!mine) {
-      const p = this.world.players[b.o];
-      this.info.append(h('div', { class: 'kv' }, 'Besitzer', h('b', { text: p?.name ?? '?' })));
-      return;
-    }
-    if (def.workers) this.info.append(h('div', { class: 'kv' }, 'Arbeiter', h('b', { text: `${b.s}/${def.workers}` })));
-    if (def.prod) {
-      const prod = def.prod;
-      this.info.append(h('div', { class: 'kv' }, 'Ausgabepuffer', h('b', { text: String(b.b) })));
-      if (prod.recipes.length > 1) {
-        const sel = h('select', {
-          onchange: (e) => this.actions.send({ c: 'setRecipe', building: b.i, recipe: Number((e.target as HTMLSelectElement).value) }),
-        });
-        prod.recipes.forEach((r, i) => sel.append(h('option', { value: String(i), text: r.name, selected: i === b.c })));
-        this.info.append(h('div', { class: 'kv' }, 'Produziert', sel));
-      } else this.info.append(h('div', { class: 'kv' }, 'Produziert', h('b', { text: prod.recipes[0].name })));
-      if (prod.recipes[b.c]?.in.length) this.info.append(h('div', { class: 'kv' }, 'Benötigt', h('b', { text: prod.recipes[b.c].in.map(([r, a]) => `${a} ${RES_INFO[r].name}`).join(', ') })));
-    }
-    if (def.desc) this.info.append(h('div', { class: 'crumb', text: def.desc }));
-    const btns = h('div', { class: 'btns' });
-    if (b.t === BT.Barracks || b.t === BT.MercPost || b.t === BT.EngineerGuild) {
-      const producer = b.t === BT.Barracks ? 'barracks' : b.t === BT.MercPost ? 'merc' : 'guild';
-      this.info.append(h('div', { class: 'kv' }, 'Warteschlange', h('b', { text: String(b.q) })));
-      for (const ud of UNITS) {
-        if (ud.producer !== producer) continue;
-        btns.append(
-          h('button', {
-            text: ud.name,
-            title: `${ud.name}\n${this.unitCostText(ud)}\nTP ${ud.hp}, Schaden ${ud.dmg}, Reichweite ${ud.range}`,
-            onclick: (e) => this.actions.send({ c: 'recruit', building: b.i, unit: ud.id, count: e.shiftKey ? 5 : 1 }),
-          }),
-        );
-      }
-      this.info.append(h('div', { class: 'crumb', text: 'Umschalt+Klick: 5 Einheiten' }));
-    }
-    if (b.t === BT.Market) btns.append(h('button', { text: 'Handeln…', onclick: () => this.togglePopup('market') }));
-    if (def.store) btns.append(h('button', { text: 'Bestand', onclick: () => this.togglePopup(def.store === 'granary' ? 'granary' : def.store === 'armory' ? 'armory' : 'stock') }));
-    if (b.t === BT.Campfire || b.t === BT.Hovel) btns.append(h('button', { text: 'Verwaltung', onclick: () => this.togglePopup('admin') }));
-    if (b.hp < maxHp && def.hp > 0) btns.append(h('button', { text: 'Reparieren', onclick: () => this.actions.send({ c: 'repair', building: b.i }) }));
-    if (b.t !== BT.Keep && b.t !== BT.Campfire) btns.append(h('button', { class: 'danger', text: 'Abreißen', onclick: () => this.actions.send({ c: 'demolish', ids: [b.i] }) }));
-    if (b.t === BT.PitchDitch) btns.append(h('button', { text: 'Entzünden', title: 'Benötigt einen Ingenieur in der Nähe', onclick: () => this.actions.send({ c: 'igniteDitch', x: b.x, y: b.y }) }));
-    this.info.append(btns);
-  }
-
-  private unitCostText(ud: UnitDef): string {
-    const parts = [`${ud.cost.gold} Gold`];
-    for (const [r, a] of ud.cost.res ?? []) parts.push(`${a} ${RES_INFO[r].name}`);
-    if (ud.cost.horse) parts.push('1 Pferd');
-    if (ud.cost.crew) parts.push(`${ud.cost.crew} Bauern`);
-    else parts.push('1 Bauer');
-    return parts.join(', ');
-  }
-
-  private infoUnits(ids: number[]): void {
+  private updateInfo(sel: SelectionState): void {
     const w = this.world;
-    const counts = new Map<number, number>();
-    let hp = 0;
-    let maxHp = 0;
-    for (const id of ids) {
-      const s = w.slotOf(id);
-      if (s < 0) continue;
-      const t = w.type[s];
-      counts.set(t, (counts.get(t) ?? 0) + 1);
-      hp += w.hp[s] / 255;
-      maxHp += 1;
+    const v = this.lastView;
+    let key: string;
+    if (sel.building) {
+      const b = w.buildings.get(sel.building);
+      key = b && v ? this.context.key(b, v) : 'nob';
+    } else if (sel.units.length || sel.pool.length) {
+      key = `U|${sel.pool.length}|${sel.units.length}|${sel.units[0] ?? 0}|${Math.floor(w.tick / 10)}|${this.actions.currentMode()}`;
+    } else key = 'idle';
+    if (key === this.lastInfoKey) return;
+    this.lastInfoKey = key;
+    if (sel.building) {
+      const b = w.buildings.get(sel.building);
+      if (b && v) return this.context.render(b, v);
     }
-    this.info.append(h('h3', { text: ids.length === 1 ? UNITS[[...counts.keys()][0]]?.name ?? 'Einheit' : `${ids.length} Einheiten` }));
-    this.info.append(h('div', { class: 'hpbar' }, h('div', { style: `width:${maxHp ? (hp / maxHp) * 100 : 0}%` })));
-    const list = h('div', { class: 'crumb' });
-    list.textContent = [...counts.entries()].map(([t, n]) => `${n}× ${UNITS[t].name}`).join(', ');
-    this.info.append(list);
-    const mk = (label: string, cmd: Command, title?: string) => h('button', { text: label, title, onclick: () => this.actions.send(cmd) });
-    const btns = h('div', { class: 'btns' });
-    btns.append(
-      mk('Halten', { c: 'stance', units: ids, stance: Stance.Hold }, 'Stellung halten'),
-      mk('Defensiv', { c: 'stance', units: ids, stance: Stance.Defensive }),
-      mk('Aggressiv', { c: 'stance', units: ids, stance: Stance.Aggressive }),
-      mk('Stopp', { c: 'stop', units: ids }),
-    );
-    this.info.append(btns);
-    const fb = h('div', { class: 'btns' }, h('span', { class: 'crumb', text: 'Formation:' }));
-    const f = (label: string, fm: number) => h('button', { text: label, onclick: () => (this.formationHandler?.(fm)) });
-    fb.append(f('Frei', Formation.Free), f('Linie', Formation.Line), f('Block', Formation.Box), f('Keil', Formation.Wedge));
-    this.info.append(fb);
-    this.info.append(h('div', { class: 'crumb', html: 'Rechtsklick: Bewegen/Angreifen · A+Klick: Angriffsmarsch<br>P+Klick: Patrouille · G: Bodenangriff · Umschalt: Wegpunkt' }));
+    if (sel.units.length || sel.pool.length) return this.troops.render(sel);
+    this.showIdleInfo();
   }
-
-  formationHandler: ((f: number) => void) | null = null;
 
   // ---------- Popups ----------
   togglePopup(kind: string): void {
     if (this.popupEl && this.popupKind === kind) return this.closePopup();
     this.closePopup();
     this.popupKind = kind;
-    this.popupEl = h('div', { class: 'panel popup' });
+    this.popupEl = h('div', { class: 'panel pp popup' });
     this.root.append(this.popupEl);
     this.popupEl.style.pointerEvents = 'auto';
     this.refreshPopup(true);
@@ -477,7 +394,7 @@ export class Hud {
     const g = h('div', { class: 'grid2' });
     for (let r = 0; r < RES_COUNT; r++) {
       if (RES_INFO[r].store !== kind) continue;
-      g.append(h('span', { class: 'dot', style: { background: hex(RES_SWATCH[r]) } }), h('span', { text: RES_INFO[r].name }), h('b', { text: String(v.stock[r]) }));
+      g.append(iconEl(resourceIcon(r, 22)), h('span', { text: RES_INFO[r].name }), h('b', { text: String(v.stock[r]) }));
     }
     el.append(g);
     el.append(h('div', { class: 'bar', style: 'margin-top:10px' }, h('div', { style: `width:${v.cap[idx] ? (v.used[idx] / v.cap[idx]) * 100 : 0}%` })));
@@ -485,60 +402,16 @@ export class Hud {
   }
 
   private popupMarket(el: HTMLElement, v: PlayerView): void {
-    el.append(h('div', { class: 'crumb', text: `Gold: ${v.gold} · Verkauf zu ${Math.round(SELL_RATIO * 100)}% des Preises. Preise schwanken mit Angebot und Nachfrage.` }));
-    const g = h('div', { style: 'display:grid;grid-template-columns:1fr 40px 54px 54px auto;gap:3px 8px;align-items:center;margin-top:8px' });
-    g.append(h('b', { text: 'Ware' }), h('b', { text: 'Bst.' }), h('b', { text: 'Kauf' }), h('b', { text: 'Verk.' }), h('b', { text: '' }));
-    for (let r = 0; r < RES_COUNT; r++) {
-      const price = RES_INFO[r].price * v.priceMul[r];
-      const mk = (buy: boolean, n: number) => h('button', { text: `${buy ? '+' : '−'}${n}`, onclick: () => this.actions.send({ c: 'trade', res: r, amount: n, buy }) });
-      g.append(
-        h('span', {}, h('span', { class: 'dot', style: { background: hex(RES_SWATCH[r]) } }), ' ' + RES_INFO[r].name),
-        h('span', { text: String(v.stock[r]) }),
-        h('span', { text: price.toFixed(1) }),
-        h('span', { text: (price * SELL_RATIO).toFixed(1) }),
-        h('span', { style: 'display:flex;gap:2px' }, mk(true, 1), mk(true, 10), mk(false, 1), mk(false, 10)),
-      );
-    }
-    el.append(g);
+    el.append(h('div', { class: 'crumb', text: `Gold: ${v.gold} · Verkauf zu ${Math.round(SELL_RATIO * 100)} % des Preises. Preise schwanken mit Angebot und Nachfrage.` }));
+    el.append(marketGrid(this.sharedApi, v));
   }
 
   private popupPopularity(el: HTMLElement, v: PlayerView): void {
-    el.append(h('div', { html: `Beliebtheit: <b>${v.popularity.toFixed(1)}</b> / 100 &nbsp; <span class="${v.popDelta >= 0 ? 'pos' : 'neg'}">${v.popDelta >= 0 ? '+' : ''}${v.popDelta.toFixed(1)} pro Monat</span>` }));
-    el.append(h('div', { class: 'crumb', text: 'Unter 50 verlassen Bauern die Burg, darüber kommen neue.' }));
-    const g = h('div', { class: 'grid2', style: 'margin-top:8px' });
-    for (const f of v.factors) {
-      g.append(h('span'), h('span', { text: f.label }), h('b', { class: f.value > 0.05 ? 'pos' : f.value < -0.05 ? 'neg' : '', text: (f.value > 0 ? '+' : '') + f.value.toFixed(1) }));
-    }
-    el.append(g);
-    el.append(h('div', { class: 'crumb', style: 'margin-top:8px', text: `Nahrungssorten: ${v.foodTypes}${v.foodShort ? ' · NAHRUNGSMANGEL' : ''} · Angstfaktor: ${v.fear}` }));
+    popularityBreakdown(el, v);
   }
 
   private popupAdmin(el: HTMLElement, v: PlayerView): void {
-    const taxSlider = h('input', {
-      type: 'range',
-      min: String(TAX_LEVELS[0]),
-      max: String(TAX_LEVELS[TAX_LEVELS.length - 1]),
-      step: '1',
-      value: String(v.tax),
-      oninput: (e) => this.actions.send({ c: 'setTax', level: Number((e.target as HTMLInputElement).value) }),
-    });
-    const rationSlider = h('input', {
-      type: 'range',
-      min: '0',
-      max: '4',
-      step: '1',
-      value: String(v.ration),
-      oninput: (e) => this.actions.send({ c: 'setRation', level: Number((e.target as HTMLInputElement).value) }),
-    });
-    el.append(
-      h('div', { class: 'form' },
-        h('span', { text: 'Steuern' }),
-        h('div', {}, taxSlider, h('div', { class: 'crumb', text: v.tax < 0 ? `Bestechung: ${-TAX_GOLD[v.tax]} Gold/Bauer/Monat, Beliebtheit +${TAX_POP[v.tax]}` : v.tax === 0 ? 'Keine Steuern' : `Steuer: ${TAX_GOLD[v.tax]} Gold/Bauer/Monat, Beliebtheit ${TAX_POP[v.tax]}` })),
-        h('span', { text: 'Rationen' }),
-        h('div', {}, rationSlider, h('div', { class: 'crumb', text: RATION_NAMES[v.ration] })),
-      ),
-    );
-    el.append(h('div', { class: 'crumb', text: `Bauern ${v.peasants} / ${v.housing} · Pferde ${v.horses}` }));
+    adminControls(el, v, this.actions);
   }
 
   /** Meldung groß einblenden */
@@ -554,3 +427,87 @@ export class Hud {
   }
 }
 
+function coinIcon(): string {
+  return `<svg viewBox="0 0 64 64" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><g stroke="#241a12" stroke-width="3" stroke-linejoin="round"><polygon points="32,6 52,16 52,44 32,56 12,44 12,16" fill="#f0c040"/><polygon points="32,6 52,16 52,44 32,32" fill="#d9a520"/><polygon points="32,32 12,16 12,44 32,56" fill="#f7d96a"/></g></svg>`;
+}
+
+/** Marktliste: Kaufen/Verkaufen je 1 und 5, Preise live */
+export function marketGrid(api: HudShared, v: PlayerView): HTMLElement {
+  const g = h('div', { class: 'market' });
+  g.append(h('b', { text: 'Ware' }), h('b', { text: 'Bestand' }), h('b', { text: 'Kauf' }), h('b', { text: 'Verkauf' }), h('b', { text: '' }));
+  for (let r = 0; r < RES_COUNT; r++) {
+    const price = RES_INFO[r].price * v.priceMul[r];
+    const mk = (buy: boolean, n: number) => {
+      const can = buy ? v.gold >= price * n : v.stock[r] >= n;
+      return h('button', { class: buy ? 'buy' : 'sell', text: `${buy ? '+' : '−'}${n}`, disabled: !can, title: `${n} ${buy ? 'kaufen' : 'verkaufen'}: ${(price * n * (buy ? 1 : SELL_RATIO)).toFixed(1)} Gold`, onclick: () => api.actions.send({ c: 'trade', res: r, amount: n, buy }) });
+    };
+    const trend = v.priceMul[r] > 1.02 ? '▲' : v.priceMul[r] < 0.98 ? '▼' : '';
+    g.append(
+      h('span', { class: 'mname' }, iconEl(resourceIcon(r, 20)), ' ' + RES_INFO[r].name),
+      h('span', { text: String(v.stock[r]) }),
+      h('span', { text: `${price.toFixed(1)} ${trend}`, class: v.priceMul[r] > 1.02 ? 'neg' : v.priceMul[r] < 0.98 ? 'pos' : '' }),
+      h('span', { text: (price * SELL_RATIO).toFixed(1) }),
+      h('span', { class: 'mbtns' }, mk(true, 1), mk(true, 5), mk(false, 1), mk(false, 5)),
+    );
+  }
+  return g;
+}
+
+/** Beliebtheit: Zahl, Gesicht, alle Faktoren mit Vorzeichen, Monatsprognose */
+export function popularityBreakdown(el: HTMLElement, v: PlayerView): void {
+  const next = Math.max(0, Math.min(100, v.popularity + v.popDelta));
+  el.append(
+    h('div', { class: 'popwrap' },
+      h('span', { class: 'face', html: popFaceIcon(v.popularity, 56) }),
+      h('div', {},
+        h('div', { class: 'popnum', html: `<b>${v.popularity.toFixed(1)}</b> / 100` }),
+        h('div', { class: v.popDelta >= 0 ? 'pos' : 'neg', text: `${v.popDelta >= 0 ? '+' : ''}${v.popDelta.toFixed(1)} pro Monat` }),
+        h('div', { class: 'crumb', text: `Prognose: in einem Monat ≈ ${next.toFixed(0)}` }),
+      ),
+    ),
+  );
+  el.append(h('div', { class: 'crumb', text: 'Unter 50 verlassen Bauern die Burg, ab 50 kommen neue.' }));
+  const g = h('div', { class: 'grid2', style: 'margin-top:8px' });
+  let sum = 0;
+  for (const f of v.factors) {
+    sum += f.value;
+    const key = f.key;
+    g.append(iconEl(popFactorIcon(key, 22)), h('span', { text: f.label }), h('b', { class: f.value > 0.05 ? 'pos' : f.value < -0.05 ? 'neg' : '', text: (f.value > 0 ? '+' : '') + f.value.toFixed(1) }));
+  }
+  g.append(h('span'), h('b', { text: 'Summe' }), h('b', { class: sum >= 0 ? 'pos' : 'neg', text: (sum > 0 ? '+' : '') + sum.toFixed(1) }));
+  el.append(g);
+  el.append(h('div', { class: 'crumb', style: 'margin-top:8px', text: `Nahrungssorten: ${v.foodTypes}${v.foodShort ? ' · NAHRUNGSMANGEL' : ''} · Angstfaktor: ${v.fear} · Bierabdeckung ${(v.aleCover * 100).toFixed(0)} % · Glaubensabdeckung ${(v.relCover * 100).toFixed(0)} %` }));
+}
+
+/** Steuern und Rationen (Bergfried / Verwaltung) */
+export function adminControls(el: HTMLElement, v: PlayerView, actions: HudActions): void {
+  const taxSlider = h('input', {
+    type: 'range',
+    min: String(TAX_LEVELS[0]),
+    max: String(TAX_LEVELS[TAX_LEVELS.length - 1]),
+    step: '1',
+    value: String(v.tax),
+    oninput: (e) => actions.send({ c: 'setTax', level: Number((e.target as HTMLInputElement).value) }),
+  });
+  const rationSlider = h('input', {
+    type: 'range',
+    min: '0',
+    max: '4',
+    step: '1',
+    value: String(v.ration),
+    oninput: (e) => actions.send({ c: 'setRation', level: Number((e.target as HTMLInputElement).value) }),
+  });
+  const monthGold = v.peasants * TAX_GOLD[v.tax];
+  el.append(
+    h('div', { class: 'form' },
+      h('span', { text: 'Steuern' }),
+      h('div', {}, taxSlider, h('div', { class: 'crumb', text: v.tax < 0 ? `Bestechung: ${-TAX_GOLD[v.tax]} Gold je Bauer/Monat, Beliebtheit +${TAX_POP[v.tax]}` : v.tax === 0 ? 'Keine Steuern' : `${TAX_GOLD[v.tax]} Gold je Bauer/Monat, Beliebtheit ${TAX_POP[v.tax]}` }), h('div', { class: monthGold >= 0 ? 'pos crumb' : 'neg crumb', text: `≈ ${monthGold >= 0 ? '+' : ''}${monthGold.toFixed(0)} Gold pro Monat (${TICKS_PER_MONTH / 10} s)` })),
+      h('span', { text: 'Rationen' }),
+      h('div', {}, rationSlider, h('div', { class: 'crumb', text: RATION_NAMES[v.ration] })),
+    ),
+  );
+  el.append(h('div', { class: 'crumb', text: `Bauern ${v.peasants} / ${v.housing} · Pferde ${v.horses}` }));
+}
+
+void BT;
+void buildingIcon;

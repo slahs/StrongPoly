@@ -224,3 +224,12 @@ export const MAX_BUILDING_FOOTPRINT = 5;
 export const STORE_CAP_PER_MODULE = { stock: 150, granary: 150, armory: 60 } as const;
 export const STORE_MODULE_CAP = 150;
 export const HORSES_PER_STABLE = 4;
+
+/** Untermenüs der Burg-Kategorie im Baumenü (Reihenfolge = Anzeige) */
+export const CASTLE_SUBCATS: { id: string; name: string; types: number[] }[] = [
+  { id: 'walls', name: 'Mauern', types: [BT.WallWood, BT.WallLow, BT.WallHigh, BT.Stairs, BT.WaterPot] },
+  { id: 'towers', name: 'Türme', types: [BT.TowerLookout, BT.TowerGuard, BT.TowerRound, BT.TurretBallista, BT.TurretMangonel] },
+  { id: 'gates', name: 'Tore', types: [BT.GateWood, BT.GateStone, BT.Drawbridge] },
+  { id: 'troops', name: 'Truppen', types: [BT.Barracks, BT.MercPost, BT.Stable] },
+  { id: 'siege', name: 'Belagerungsbau', types: [BT.EngineerGuild, BT.Pit, BT.KillingPit, BT.PitchDitch, BT.Cauldron] },
+];

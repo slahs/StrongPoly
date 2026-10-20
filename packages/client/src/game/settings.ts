@@ -29,6 +29,12 @@ export class Settings {
   /** Stummschaltung (Taste M) */
   muted = false;
   edgeScroll = true;
+  /** Kantenglättung (wirkt beim nächsten Start) */
+  aa = true;
+  /** UI-Skalierung 0.8 .. 1.5 */
+  uiScale = 1;
+  /** Kamera-Scrollgeschwindigkeit (Faktor) */
+  scrollSpeed = 1;
 
   constructor() {
     try {
@@ -60,6 +66,9 @@ export class Settings {
           music: this.music,
           muted: this.muted,
           edgeScroll: this.edgeScroll,
+          aa: this.aa,
+          uiScale: this.uiScale,
+          scrollSpeed: this.scrollSpeed,
         }),
       );
     } catch {
