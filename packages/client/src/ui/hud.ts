@@ -24,10 +24,10 @@ import { Minimap } from './minimap';
 import { abilityTooltip, attachTooltip, buildingTooltip, resourceTooltip, unitTooltip } from './tooltip';
 import { renderDoc } from './doc/render';
 import type { Doc } from './doc/blocks';
-import { explainPopularity } from '@strongpoly/shared';
+import { explainPopularity, popText } from '@strongpoly/shared';
 import { foodLevel, foodSupply, foodWarnText, fearTipDoc, goldLevel, goldTipDoc, peasantLevel, peasantsTipDoc, popularityLevel, resLevel, resWarnText, RES_LIMITS, troopLevel, troopsTipDoc } from './hud_stats';
 import type { Level } from './hud_stats';
-import { popularityTooltip, renderPopularityDetail, renderPopularitySummary } from './popularity';
+import { popularityTooltip, renderPopularityDetail } from './popularity';
 import { deltaText } from './popularity_model';
 import { BuildMenu } from './hud_build';
 import { ContextPanel } from './hud_context';
@@ -497,7 +497,7 @@ export class Hud {
     const el = this.popupEl;
     const scroll = el.scrollTop;
     clear(el);
-    const title = { stock: 'Lager', granary: 'Kornspeicher', armory: 'Waffenkammer', market: 'Markt', popularity: 'Beliebtheit', admin: 'Verwaltung' }[this.popupKind] ?? '';
+    const title = this.popupKind === 'popularity' ? popText('pop.ui.title') : ({ stock: 'Lager', granary: 'Kornspeicher', armory: 'Waffenkammer', market: 'Markt', admin: 'Verwaltung' } as Record<string, string>)[this.popupKind] ?? '';
     el.append(h('h2', {}, title, h('button', { class: 'close', text: '✕', onclick: () => this.closePopup() })));
     if (this.popupKind === 'stock' || this.popupKind === 'granary' || this.popupKind === 'armory') this.popupStore(el, v, this.popupKind);
     else if (this.popupKind === 'market') this.popupMarket(el, v);
@@ -608,8 +608,6 @@ export function adminControls(el: HTMLElement, v: PlayerView, actions: HudAction
 
 void BT;
 void buildingIcon;
-void renderPopularitySummary;
-void TAX_POP;
 
 /** Kleines Warndreieck (eigenes Symbol) für Mangelanzeigen */
 const WARN_SVG = `<svg viewBox="0 0 20 20" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="10,2 19,18 1,18" fill="#f0b030" stroke="#3a2512" stroke-width="1.6" stroke-linejoin="round"/><rect x="9" y="7.5" width="2" height="5.5" fill="#3a2512"/><rect x="9" y="14" width="2" height="2" fill="#3a2512"/></svg>`;

@@ -127,5 +127,7 @@ describe('Hotkeys', () => {
     expect(DEFAULT_HOTKEYS.jumpAlert).toBe('Space');
     expect(DEFAULT_HOTKEYS.help).toBe('F1');
     expect(DEFAULT_HOTKEYS.encyclopedia).toBe('F2');
+    expect(DEFAULT_HOTKEYS.advisorReplay).toBe('Alt+KeyH');
+    expect(keyLabel(DEFAULT_HOTKEYS.advisorReplay)).toBe('Alt+H');
   });
 });

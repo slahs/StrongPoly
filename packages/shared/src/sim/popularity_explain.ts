@@ -219,7 +219,7 @@ export function explainPopularity(v: PopView): PopExplain {
     const gain = TAX_POP[lower] - TAX_POP[v.tax];
     const goldLoss = n * (TAX_GOLD[v.tax] - TAX_GOLD[lower]);
     if (gain > 0 && v.tax > 0) advice.push({ code: 'tax', gain, action: 'admin', params: { gain, gold: Math.round(goldLoss) } });
-    else if (gain > 0 && !by('tax')?.blocked && (direction === 'down' || pop < 60)) advice.push({ code: 'bribe', gain, action: 'admin', params: { gain, gold: Math.round(-goldLoss) } });
+    else if (gain > 0 && !by('tax')?.blocked && (direction === 'down' || pop < 60)) advice.push({ code: 'bribe', gain, action: 'admin', params: { gain, gold: Math.round(goldLoss) } });
   }
   if (v.foodShort) {
     const gain = RATION_POP[v.ration] - RATION_POP[0];
@@ -239,7 +239,7 @@ export function explainPopularity(v: PopView): PopExplain {
   if (rel && !(rel.atCap && v.relCover >= 1 - EPS)) {
     // Gewinn durch volle Abdeckung bzw. ein weiteres Gotteshaus, höchstens bis zur Obergrenze
     const pts = v.relCover > 0 ? rel.value / v.relCover : 0;
-    const gain = v.relCover > 0 ? Math.min(RELIGION_POP_CAP, pts) * (1 - Math.min(1, v.relCover)) : RELIGION_POP.church;
+    const gain = v.relCover > 0 ? Math.min(RELIGION_POP_CAP, pts) * (1 - Math.min(1, v.relCover)) : Math.min(RELIGION_POP_CAP, RELIGION_POP.cathedral);
     if (gain > EPS) advice.push({ code: 'religion', gain, action: 'build', params: { gain, cover: Math.round(v.relCover * 100) } });
   }
   const good = by('good');

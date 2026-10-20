@@ -6,8 +6,6 @@ import {
   ClientWorld,
   FOOD_RES,
   PlayerView,
-  R,
-  RATION_FOOD,
   RES_INFO,
   Snapshot,
   U,
@@ -23,6 +21,7 @@ import type { AdvisorKind, AdvisorPrio, AdvisorTopic, Lang, Params, PopExplain }
 import { AdvisorQueue, joinList, prioOf } from './advisor_queue';
 import { RES_LIMITS, foodSupply } from './hud_stats';
 import type { AdvisorCandidate, Delivery } from './advisor_queue';
+import { keyLabel, loadHotkeys } from '../game/hotkeys';
 import { clear, h } from './dom';
 import { iconEl, toolIcon } from './icons';
 import { attachTooltip } from './tooltip';
@@ -275,7 +274,7 @@ export class AdvisorLogic {
 
   /** Alle ~1 s aufrufen */
   update(view: PlayerView | null, tick: number): void {
-    if (!view) return;
+    if (!view || view.alive === false) return;
     this.view = view;
     this.economy(view, tick);
     this.foodEvents(view, tick);
@@ -343,7 +342,7 @@ export class AdvisorLogic {
       if (this.offer(noprod ? 'food.low.noprod' : 'food.low', 'food.low', tick, { months }, { ...loc, valid: () => !this.view?.foodShort })) f.low = true;
     } else if (f.low && !f.empty && (need <= 0 || total >= need * FOOD_OK_MONTHS)) {
       if (this.offer('food.recovered', 'food.recovered', tick, {}, loc)) f.low = false;
-    } else if (f.low && f.empty === false && total >= need * FOOD_OK_MONTHS) f.low = false;
+    }
   }
 
   private storage(view: PlayerView, tick: number): void {
@@ -675,8 +674,6 @@ export class AdvisorLogic {
 /** Abklingzeit roher Meldungen (Ticks) */
 const RAW_COOLDOWN: Record<string, number> = { attack: 250, breach: 150, lord: 300, aid: 100 };
 
-void R;
-
 // ============================================================================================================
 // Panel
 // ============================================================================================================
@@ -711,7 +708,7 @@ export class AdvisorPanel {
     this.speechBtn = h('button', { class: 'adv-btn', onclick: (e) => { e.stopPropagation(); this.hooks.toggleSpeech(); this.syncSpeech(); } });
     const head = h('div', { class: 'adv-head', title: 'Meldungsliste ein-/ausklappen', onclick: () => this.toggle() }, this.face, h('span', { class: 'adv-name', text: ADVISOR_NAME }), h('span', { class: 'spacer' }), this.speechBtn, replay);
     this.root = h('div', { class: 'panel pp advisor' }, head, this.listEl);
-    attachTooltip(replay, 'Letzten Hinweis erneut abspielen (Alt+H)', { placement: 'element' });
+    attachTooltip(replay, () => `Letzten Hinweis erneut abspielen (${keyLabel(loadHotkeys().advisorReplay)})`, { placement: 'element' });
     attachTooltip(this.speechBtn, () => (this.hooks.speechOn() ? 'Berater spricht – Klick: Sprache aus (Text bleibt)' : 'Berater schweigt – Klick: Sprache an'), { placement: 'element' });
     parent.append(this.root);
     this.syncSpeech();
@@ -796,5 +793,3 @@ const ADVISOR_FACE = `<svg viewBox="0 0 64 64" width="38" height="38" xmlns="htt
 <polygon points="30,40 34,40 33,46 31,46" fill="#b4784a"/>
 <polygon points="29,12 35,12 34,19 30,19" fill="#f0c040"/></g></svg>`;
 
-void UNITS;
-void advisorKey;

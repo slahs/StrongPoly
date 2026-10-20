@@ -176,6 +176,15 @@ describe('Beliebtheits-Erklärung stimmt mit der Simulation überein', () => {
     const tax = ex.factors.find((f) => f.key === 'tax')!;
     expect(tax.value).toBe(0);
     expect(tax.blocked).toBe(true);
+    // Konstanten statt Zahlen: Bestechung kostet Gold, die Kosten in der Stellschraube sind positiv
+    sim.players[0].gold = 3000;
+    sim.players[0].tax = 0;
+    run(sim, POP_INTERVAL * 3);
+    const v2 = playerView(sim, 0);
+    const e2 = explainPopularity({ ...v2, popularity: 40 });
+    const bribe = e2.advice.find((a) => a.code === 'bribe');
+    expect(bribe).toBeDefined();
+    expect(Number(bribe!.params.gold)).toBeGreaterThan(0);
     expect(ex.warnings.some((w) => w.code === 'bribeBlocked')).toBe(true);
   });
 

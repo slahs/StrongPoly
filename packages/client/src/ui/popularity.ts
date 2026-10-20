@@ -5,8 +5,8 @@
 import { explainPopularity, getLang, popNum, popText, popularityTexts } from '@strongpoly/shared';
 import type { PlayerView, PopExplain, PopFactorInfo, PopView } from '@strongpoly/shared';
 import { renderDoc } from './doc/render';
-import { clear, h } from './dom';
-import { iconEl, popFaceIcon, popFactorIcon, toolIcon } from './icons';
+import { h } from './dom';
+import { iconEl, popFaceIcon, popFactorIcon } from './icons';
 import { effectClass, effectText, factorLabel, forecastLines, popularityTipDoc, timeNote, trendText } from './popularity_model';
 
 /** Inhalt für `attachTooltip` an der Beliebtheitsanzeige */
@@ -139,5 +139,3 @@ export function renderPopularitySummary(el: HTMLElement, v: PlayerView): void {
   );
 }
 
-void clear;
-void toolIcon;
