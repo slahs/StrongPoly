@@ -11,24 +11,24 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 - [x] 1.4 Bevölkerungsschaukel (Steuer/Rationen-Hysterese; Rest = Raubzüge)
 - [x] 1.5 Burg mauert sich nicht ein / zerstörte Tore werden neu gebaut (Test)
 - [x] 1.6 bench/dmg.ts entfernt
-- [ ] 1.7 Geschützreichweiten nach `shared/data/`
+- [x] 1.7 Geschützreichweiten nach `shared/data/` (`TURRETS`, `CAULDRON` in data/balance.ts; durch F)
 - [ ] 1.8 Docker-Image neu bauen und prüfen
 - [~] 1.9 Tutorial-Missionen 1–5 per Skript bis zum Sieg (fertig: test/missions_play.test.ts; Mission 5: Tutorial-KI nutzt keine Angriffsfähigkeiten); Browser-Check offen
 - [x] 1.10 Smoke 3 Seeds (Seed 2 meldete nur kurzzeitig überbaute Einheit, jetzt 30-s-Schwelle) + test/determinism.test.ts
 - [ ] 1.11 Laufend: Bugs aus B–F (siehe unten „Gefundene Bugs“)
 
 ## 2. Meilenstein B – Menüs und Bedienung
-- [ ] Unteres Hauptpanel (Reiter, Unterkategorien, Kontextfeld, Minikarte)
-- [ ] Kontextpanels (Bergfried, Kornspeicher, Lager, Waffenkammer, Kaserne, Söldner, Ingenieurgilde, Markt, Werkstätten, Schenke, Kirche)
-- [ ] Beliebtheitsanzeige mit Aufschlüsselung + Prognose
-- [ ] Werkzeuge (Abreißen, Reparieren, Rückgängig, Bau abbrechen, Rechtsklick)
-- [ ] Platzieren (Geist grün/rot + Grund, Kosten am Cursor, Linien-Vorschau)
-- [ ] Truppenpanel (Typen, Haltung, Formation, Patrouille, Bodenangriff, Stopp, Graben, Öl)
-- [ ] Hotkeys frei belegbar + F1-Übersicht
-- [ ] Berater + Meldungsliste + Kamerasprung
-- [ ] Hauptmenü / Pausenmenü / Endbildschirm mit Statistik
-- [ ] Optionen
-- [ ] Gate + Browser-Check
+- [x] Unteres Hauptpanel (Reiter, Unterkategorien, Kontextfeld, Minikarte)
+- [x] Kontextpanels (Bergfried, Kornspeicher, Lager, Waffenkammer, Kaserne, Söldner, Ingenieurgilde, Markt, Werkstätten, Schenke, Kirche)
+- [x] Beliebtheitsanzeige mit Aufschlüsselung + Prognose
+- [x] Werkzeuge (Abreißen, Reparieren, Rückgängig, Bau abbrechen, Rechtsklick)
+- [x] Platzieren (Geist grün/rot + Grund, Kosten am Cursor, Linien-Vorschau)
+- [x] Truppenpanel (Typen, Haltung, Formation, Patrouille, Bodenangriff, Stopp, Graben, Öl)
+- [x] Hotkeys frei belegbar + F1-Übersicht
+- [x] Berater + Meldungsliste + Kamerasprung
+- [x] Hauptmenü / Pausenmenü / Endbildschirm mit Statistik
+- [x] Optionen
+- [x] Gate + Browser-Check (`uitest.mjs`: 17 Interaktionsprüfungen, 0 Konsolenfehler; Tooltips aus F an Bau-/Truppenleiste angebunden)
 
 ## 3. Meilenstein C – Icons
 - [x] SVG-Icons für alles (Gebäude, Einheiten, Ressourcen, Fähigkeiten, Werkzeuge, Beliebtheit) – `packages/client/src/ui/icons/` (API in `index.ts`)
@@ -63,7 +63,7 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 - [x] Tests: `shared/test/descriptions.test.ts`, `shared/test/matchups.test.ts`, `client/test/tooltips.test.ts`, `client/test/encyclopedia.test.ts`, `client/test/chains.test.ts` (Text + Icon für jedes Gebäude/jede Einheit, keine Zahlen in Texten, keine verwaisten/toten Schlüssel, Englisch ⊆ Deutsch, Tooltip-Zahlen exakt aus den Daten, Seitenliste vollständig, Links lösen auf, Suche, Kettengraph/Layout/SVG, Positionierung)
 - [x] Hotkey `encyclopedia` (Standard F2) in `game/hotkeys.ts`; die Kategorie-Hotkeys cat2..cat6 rutschen von F2..F6 auf F3..F7 (F2 war belegt); im Einzelspieler pausiert die Partie, solange die Enzyklopädie offen ist
 - [x] Gate (typecheck, build, test) + Browser-Check (Hauptmenü, F2 im Spiel, Pausenmenü, alle Seitentypen, `?tooltips`, 820/1024/1280 px, de/en, keine Konsolenfehler)
-- Offen für den Hauptagenten: Tooltips an Bau-/Truppenleiste anbinden (`attachTooltip(el, () => buildingTooltip(typeId))` usw.), Platzierungsfehler mit `explainPlacementError(reason)` erläutern, README ergänzen
+- Angebunden (B): Tooltips an Bau-/Truppenleiste/Kontextpanels über `Hud.tipHook`, Platzierungsfehler über `explainPlacementError`
 
 ## Abschluss
 - [ ] Turnier-Endlauf (≥ 90 %, Median)
