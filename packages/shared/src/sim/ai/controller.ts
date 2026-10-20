@@ -917,9 +917,6 @@ export class AiController {
       const superior = strength >= 10 && strength >= this.enemyArmy(sim) * 1.6;
       const frac = sim.tick > LATE_GAME ? 0.4 : overdue ? 0.5 : 0.7;
       if (strength < waveTarget * frac && !superior) return;
-      // Nicht in ein ebenbürtiges Heer anrennen (Angriff gegen Mauern verliert ~3:1): erst anwachsen, bis die Welle
-      // dem Gegnerheer deutlich überlegen ist (Spätphase und sehr große Heere schlagen trotzdem los)
-      if (sim.tick < LATE_GAME && strength < waveTarget * 1.6 && strength < this.enemyArmy(sim) * 1.4) return;
       // Belagerungsgerät abwarten (max. 3 Minuten Verzögerung)
       const doc = this.doctrine(sim.tick);
       const siegeWant = this.siegeWanted(doc.siegePer10, waveTarget);
