@@ -79,7 +79,7 @@ export const TOOL_ICONS: Record<string, ToolDef> = {
     name: 'Abreißen',
     draw: () =>
       cube(4, 34, 30, 22, 8, PAL.stone) + poly([4, 34, 14, 34, 18, 44, 10, 48, 14, 56, 4, 56], PAL.stoneDark, 0, 0.0) +
-      line([14, 34, 20, 42, 14, 48, 22, 56], 1.8, INK) + at(38, 24, hammerP(), 40, 1.25) +
+      line([14, 34, 20, 42, 14, 48, 22, 56], 1.8, INK) + at(40, 28, hammerP(), 40, 1.0) +
       poly([42, 46, 47, 42, 49, 48], PAL.stone, 1.8) + poly([52, 54, 58, 50, 58, 57], PAL.stoneDark, 1.8) + poly([36, 52, 40, 49, 42, 55], PAL.stone, 1.8),
   },
   repair: {
@@ -124,7 +124,7 @@ export const TOOL_ICONS: Record<string, ToolDef> = {
   },
   stance_defensive: {
     name: 'Defensiv',
-    draw: () => at(32, 30, swordP(), 40, 1.2) + at(28, 36, shieldP(PAL.wood, PAL.gold), 0, 1.9),
+    draw: () => at(42, 24, swordP(), 28, 1.15) + at(26, 38, shieldP(PAL.wood, PAL.gold), 0, 1.9),
   },
   stance_aggressive: {
     name: 'Aggressiv',

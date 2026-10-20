@@ -31,10 +31,10 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 - [ ] Gate + Browser-Check
 
 ## 3. Meilenstein C – Icons
-- [ ] SVG-Icons für alles (Gebäude, Einheiten, Ressourcen, Fähigkeiten, Werkzeuge, Beliebtheit)
-- [ ] Galerie `?icons`
-- [ ] Test: jedes Datenelement hat ein Icon
-- [ ] Gate + Browser-Check
+- [x] SVG-Icons für alles (Gebäude, Einheiten, Ressourcen, Fähigkeiten, Werkzeuge, Beliebtheit) – `packages/client/src/ui/icons/` (API in `index.ts`)
+- [x] Galerie `?icons` (32/48/64/96 px, Spielerfarbe, Filter)
+- [x] Test: `packages/client/test/icons.test.ts` (Client hat jetzt vitest)
+- [x] Gate + Browser-Check
 
 ## 4. Meilenstein D – Grafik
 - [ ] Beleuchtung/Schatten, Terrain, Wasser/Gräben

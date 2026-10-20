@@ -55,7 +55,7 @@ export const BUILDING_ICONS: Record<number, Drawer> = {
     flame(32, 48, 1.5) +
     ngon(14, 54, 4, PAL.rock, 2, 6) + ngon(50, 54, 4, PAL.rock, 2, 6) + ngon(22, 57, 3.4, PAL.rockDark, 2, 6) + ngon(42, 57, 3.4, PAL.rockDark, 2, 6),
 
-  [BT.Hovel]: () => shadow(30, 57, 26) + house(10, 34, 28, 21, 9, PAL.wood, PAL.thatch, 15) + win(14, 40, 5, X.night),
+  [BT.Hovel]: () => shadow(30, 57, 26) + house(6, 30, 30, 25, 11, PAL.wood, PAL.thatch, 18) + win(10, 38, 6, X.night),
 
   [BT.Stockpile]: () =>
     groundPatch() +
@@ -448,7 +448,7 @@ export const BUILDING_ICONS: Record<number, Drawer> = {
     shadow(32, 58, 28) +
     house(5, 28, 38, 27, 10, PAL.wood, PAL.roof, 15, null) +
     rect(14, 38, 20, 17, X.night, 2.4) +
-    poly([22, 55, 22, 46, 24, 40, 28, 38, 30, 42, 32, 48, 30, 55], PAL.woodDark, 0) + poly([26, 38, 30, 36, 32, 40, 29, 41], PAL.woodDark, 0) + dot(27.2, 43, 1, X.cream) +
+    poly([20, 55, 20, 48, 24, 41, 30, 41, 32, 46, 32, 55], lite(X.brown, 0.3), 1.8) + poly([22, 41, 28, 41, 28, 49, 22, 49], lite(X.brown, 0.5), 1.8) + poly([24, 41, 26, 41, 26, 49, 24, 49], PAL.white, 0) + dot(26.5, 44, 1, INK) +
     line([14, 38, 34, 55], 2.2, PAL.wood) + line([34, 38, 14, 55], 2.2, PAL.wood) + rect(14, 38, 20, 17, null, 2.4) +
     cube(48, 46, 10, 9, 4, PAL.thatch),
 
