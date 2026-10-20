@@ -68,11 +68,11 @@ function dryingRack(b: ModelBuilder, x: number, z: number, w: number, rot = 0, c
   const c = Math.cos(rot);
   const s = Math.sin(rot);
   b.det(1).surf(0);
-  for (const sx of [-1, 1]) b.box(0.05, 0.9, 0.05, x + sx * (w / 2) * c, 0, z - sx * (w / 2) * s, BP.woodDark);
-  b.box(w + 0.06, 0.05, 0.05, x, 0.88, z, BP.wood, false, rot);
+  for (const sx of [-1, 1]) b.box(0.05, 1.15, 0.05, x + sx * (w / 2) * c, 0, z - sx * (w / 2) * s, BP.woodDark);
+  b.box(w + 0.06, 0.05, 0.05, x, 1.13, z, BP.wood, false, rot);
   for (let i = 0; i < 2; i++) {
     const u = (i - 0.5) * (w * 0.5);
-    b.box(w * 0.38, 0.5, 0.025, x + u * c, 0.38, z - u * s, i ? color : BP.shingle, false, rot);
+    b.box(w * 0.38, 0.7, 0.025, x + u * c, 0.45, z - u * s, i ? color : BP.shingle, false, rot);
   }
   b.det(0);
 }
@@ -590,6 +590,13 @@ export function fletcher(b: ModelBuilder): void {
   b.box(0.7, 0.05, 0.3, 0.0, 0.32, 1.0, BP.woodLight);
   for (const sx of [-1, 1]) b.box(0.05, 0.32, 0.05, sx * 0.3, 0, 1.0, BP.woodDark);
   logPile(b, 1.0, -0.1, 0.5, 2, 0, 0.07);
+  // großes Bogenschild an einer Stange über dem Eingang (Silhouette)
+  b.det(0).box(0.06, 1.9, 0.06, -1.2, 0, 0.95, BP.woodDark);
+  b.beam(-1.2, 1.2, 0.95, -0.7, 1.55, 0.95, 0.07, BP.woodLight);
+  b.beam(-1.2, 1.2, 0.95, -0.7, 0.85, 0.95, 0.07, BP.woodLight);
+  b.beam(-0.7, 1.55, 0.95, -0.7, 0.85, 0.95, 0.02, BP.cloth);
+  b.beam(-1.2, 1.2, 0.97, -0.62, 1.2, 0.97, 0.03, BP.ironLight);
+  b.spike(0.04, 0.16, -0.62, 1.2, 0.97, BP.ironLight);
   b.det(0);
 }
 
@@ -597,7 +604,8 @@ export function poleturner(b: ModelBuilder): void {
   workshopShell(b, { wall: BP.plasterWarm, roof: BP.woodDark, roofSurf: SURF.Shingle });
   // lange Stangen an der Wand und Drechselbank
   b.det(1).surf(0);
-  for (let i = 0; i < 5; i++) b.beam(0.62 + i * 0.1, 0.0, 0.5, 0.62 + i * 0.1 + 0.2, 1.3, -0.1, 0.035, i % 2 ? BP.woodLight : BP.wood);
+  for (let i = 0; i < 6; i++) b.beam(0.78 + i * 0.1, 0.0, 0.62, 0.78 + i * 0.1 + 0.25, 2.3, -0.05, 0.04, i % 2 ? BP.woodLight : BP.wood);
+  for (let i = 0; i < 3; i++) b.spike(0.04, 0.18, 1.03 + i * 0.1 + 0.0, 2.3, -0.05, BP.ironLight);
   b.box(0.9, 0.06, 0.28, -0.2, 0.34, 1.05, BP.woodDark);
   for (const sx of [-1, 1]) b.box(0.05, 0.34, 0.05, -0.2 + sx * 0.38, 0, 1.05, BP.woodDark);
   b.disc(0.22, 0.05, 8, -0.55, 0.5, 1.05, BP.woodDark);
@@ -631,8 +639,9 @@ export function blacksmith(b: ModelBuilder): void {
 
 export function tanner(b: ModelBuilder): void {
   workshopShell(b, { wall: BP.woodDark, surf: SURF.Plank, roof: BP.thatch, roofSurf: SURF.Thatch });
-  dryingRack(b, 0.75, 0.55, 0.8, 0.0, BP.clay);
-  dryingRack(b, -0.3, 1.1, 0.8, 0.0, BP.shingle);
+  dryingRack(b, 0.85, 0.7, 1.0, 0.0, BP.clay);
+  dryingRack(b, -0.3, 1.1, 1.0, 0.0, BP.shingle);
+  dryingRack(b, 1.2, 0.0, 0.8, 1.57, BP.clay);
   // Gerbbottiche
   for (let i = 0; i < 3; i++) {
     b.det(1).surf(0).cyl(0.2, 0.18, 0.28, 8, 0.4 + i * 0.5, 0.0, 1.15, BP.woodDark);

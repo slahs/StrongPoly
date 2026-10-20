@@ -114,13 +114,10 @@ export function wallParts(b: ModelBuilder, id: number, h: number, kind: 'arm' | 
     b.box(P + 0.06, 0.05, P + 0.06, 0, 0.14, 0, BP.stoneMid);
     b.box(P + 0.07, 0.07, P + 0.07, 0, body - 0.2, 0, BP.stoneMid);
     b.box(P + 0.03, 0.05, P + 0.03, 0, body, 0, BP.stoneDark);
-    const o = P / 2 - 0.1;
+    // Zinnen im gleichmäßigen Abstand 0,5 (Tile-Mitte ± 0,25), egal in welcher Richtung die Mauer läuft
+    const o = 0.25;
     for (const [x, z] of [[-o, -o], [o, -o], [-o, o], [o, o]]) b.box(0.22, 0.34, 0.22, x, h, z, stone);
-    if (kind === 'stub') {
-      b.pyramid(P * 0.7, 0.55, 0, h + 0.05, 0, BP.stoneDark);
-    } else {
-      b.box(P * 0.6, 0.1, P * 0.6, 0, h, 0, BP.stoneMid);
-    }
+    if (kind === 'stub') b.pyramid(P * 0.7, 0.55, 0, h + 0.05, 0, BP.stoneDark);
     b.surf(0);
   }
 }

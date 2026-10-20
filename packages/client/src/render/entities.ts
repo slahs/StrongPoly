@@ -748,7 +748,8 @@ export class EntityRenderer {
     this.frames.instanceMatrix.needsUpdate = true;
     (this.frames.instanceColor as THREE.InstancedBufferAttribute).needsUpdate = true;
     // Kantenlinien des überfahrenen Gebäudes
-    if (hov && !WALL_TYPES.includes(hov.t) && BUILDINGS[hov.t].height >= 0.7) {
+    // (während der Bauphase keine Kontur des fertigen Gebäudes anzeigen)
+    if (hov && !WALL_TYPES.includes(hov.t) && BUILDINGS[hov.t].height >= 0.7 && !this.building.has(hov.i)) {
       let eg = this.edgeCache.get(hov.t);
       if (!eg) {
         eg = new THREE.EdgesGeometry(buildBuildingModel(BUILDINGS[hov.t], 0).merged, 28);

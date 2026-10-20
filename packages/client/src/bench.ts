@@ -720,7 +720,10 @@ export function startBench(): void {
     world.buildingsDirty = true;
     world.events.push({ e: 'fx', k: def.wood ? 'collapseWood' : 'collapse', x: b.x + b.w / 2, y: b.y + b.h / 2, z: def.height });
   };
-  window.__bench = { ready: true, done: false, result, scene: gs, entities, world, setCamera, setTick: (t: number) => (world.tick = t), destroy, selected, ui: ctl };
+  window.__bench = { ready: true, done: false, result, scene: gs, entities, world, setCamera, setTick: (t: number) => {
+      world.tick = t;
+      world.buildingsDirty = true;
+    }, destroy, selected, ui: ctl };
 
   const loop = (nowMs: number): void => {
     const dtReal = (nowMs - last) / 1000;
