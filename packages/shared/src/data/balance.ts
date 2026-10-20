@@ -39,6 +39,14 @@ export const RELIGION_COVER = { chapel: 25, church: 50, cathedral: 100 };
 export const GOOD_POP = 0.7;
 export const BAD_POP = -0.5;
 export const CROWD_POP = -4;
+/** Obergrenzen der Beliebtheits-Summanden (Gute Dinge, Schlechte Dinge, Religion) */
+export const POP_GOOD_CAP = 8;
+export const POP_BAD_CAP = 8;
+export const RELIGION_POP_CAP = 12;
+/** Ab dieser Beliebtheit kommen Bauern, darunter wandern sie ab */
+export const POP_THRESHOLD = 50;
+/** Ticks zwischen zwei Abwanderungen bei Beliebtheit unter POP_THRESHOLD */
+export const LEAVE_INTERVAL_TICKS = 40;
 /** Angstfaktor: pro Stufe Produktivität/Moral +- */
 export const FEAR_PROD_STEP = 0.05;
 export const FEAR_DMG_STEP = 0.04;
