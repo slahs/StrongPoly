@@ -62,6 +62,8 @@ declare global {
       entities: EntityRenderer;
       world: ClientWorld;
       setCamera: (x: number, y: number, dist?: number) => void;
+      /** Weltzeit (Tick) setzen – Prüfszene `showcase=build`: Alter der Baustellen reproduzierbar einstellen */
+      setTick: (tick: number) => void;
       /** Gebäude zerstören (Einsturz, Staub, Trümmer) – Prüfhilfe */
       destroy: (id: number) => void;
       /** Auswahl/Hover für Prüfaufnahmen */
@@ -124,6 +126,9 @@ const ARMY_B: [number, number][] = [
   [U.Mantlet, 0.02],
 ];
 
+/** Platzierungs-Tick der Baustellen in der Prüfszene `showcase=build` */
+export const BUILD_BORN = 1000;
+
 export class BenchWorld {
   readonly w = new ClientWorld();
   private hpf = new Float32Array(8192);
@@ -180,10 +185,10 @@ export class BenchWorld {
     }
   }
 
-  private addBuilding(t: number, x: number, y: number, o: number, rot = 0, f = 0, staffed = 0): ClientBuilding {
+  private addBuilding(t: number, x: number, y: number, o: number, rot = 0, f = 0, staffed = 0, born = 0): ClientBuilding {
     const w = this.w;
     const id = w.buildings.size + 1;
-    const rec: BuildingRec = { i: id, t, o, x, y, r: rot, hp: BUILDINGS[t].hp, f, u: 0, q: 0, s: staffed, c: 0, b: 0, p: 0, n: 0 };
+    const rec: BuildingRec = { i: id, t, o, x, y, r: rot, hp: BUILDINGS[t].hp, f, u: 0, q: 0, s: staffed, c: 0, b: 0, p: 0, n: born };
     const cb = rec as ClientBuilding;
     w.placeBuilding(cb);
     w.buildings.set(id, cb);
@@ -530,6 +535,31 @@ export class BenchWorld {
     this.addBuilding(BT.TowerLookout, wx + 36, wy + 6, 0);
   }
 
+  /**
+   * Prüfszene Bauanimation: ausgewählte Typen in einer Reihe, alle mit Platzierungs-Tick `BUILD_BORN`.
+   * Das Alter stellt der Aufrufer über `__bench.setTick(BUILD_BORN + Alter)` ein (Ticks, 10 je Sekunde).
+   */
+  showcaseBuild(): void {
+    const { cx, cy } = this;
+    const row1: number[] = [BT.Hovel, BT.Mill, BT.Bakery, BT.Brewery, BT.Inn, BT.Church, BT.WheatFarm];
+    const row2: number[] = [BT.TowerLookout, BT.TowerGuard, BT.GateStone, BT.Barracks, BT.Quarry, BT.Market, BT.Blacksmith];
+    let x = cx - 40;
+    for (const t of row1) {
+      this.addBuilding(t, Math.round(x), Math.round(cy - 14), 0, 0, 0, 1, BUILD_BORN);
+      x += BUILDINGS[t].w + 3;
+    }
+    x = cx - 40;
+    for (const t of row2) {
+      this.addBuilding(t, Math.round(x), Math.round(cy - 4), 0, 0, 0, 1, BUILD_BORN);
+      x += BUILDINGS[t].w + 3;
+    }
+    // gezogene Mauerlinien (Holz, niedrig, hoch) und ein Winkel
+    for (let i = 0; i < 14; i++) this.addBuilding(BT.WallHigh, cx - 40 + i, cy + 8, 0, 0, 0, 0, BUILD_BORN);
+    for (let i = 0; i < 10; i++) this.addBuilding(BT.WallLow, cx - 40 + i, cy + 12, 0, 0, 0, 0, BUILD_BORN);
+    for (let i = 0; i < 10; i++) this.addBuilding(BT.WallWood, cx - 40 + i, cy + 16, 0, 0, 0, 0, BUILD_BORN);
+    for (let j = 1; j < 5; j++) this.addBuilding(BT.WallWood, cx - 31, cy + 16 - j, 0, 0, 0, 0, BUILD_BORN);
+  }
+
   /** schreibt den Projektilpuffer im Snapshot-Format */
   private commitTick(_dt: number): void {
     const w = this.w;
@@ -581,9 +611,15 @@ export function startBench(): void {
     for (const n of ['drawElements', 'drawArrays', 'drawElementsInstanced', 'drawArraysInstanced', 'drawRangeElements']) gl[n] = () => undefined;
   }
   const showcase = q.get('showcase');
+  /** &still=1: Kamera ohne Schwenk (reproduzierbare Vergleichsaufnahmen) */
+  const still = q.get('still') === '1';
   const bw = new BenchWorld(showcase ? 0 : total, seed, !!showcase);
   if (showcase === 'units') bw.showcaseUnits();
   else if (showcase === 'buildings') bw.showcaseBuildings();
+  else if (showcase === 'build') {
+    bw.showcaseBuild();
+    bw.w.tick = BUILD_BORN - 5;
+  }
   const world = bw.w;
   const entities = new EntityRenderer(world);
   gs.root.add(entities.group);
@@ -674,7 +710,7 @@ export function startBench(): void {
     world.buildingsDirty = true;
     world.events.push({ e: 'fx', k: def.wood ? 'collapseWood' : 'collapse', x: b.x + b.w / 2, y: b.y + b.h / 2, z: def.height });
   };
-  window.__bench = { ready: true, done: false, result, scene: gs, entities, world, setCamera, destroy, selected, ui: ctl };
+  window.__bench = { ready: true, done: false, result, scene: gs, entities, world, setCamera, setTick: (t: number) => (world.tick = t), destroy, selected, ui: ctl };
 
   const loop = (nowMs: number): void => {
     const dtReal = (nowMs - last) / 1000;
@@ -699,7 +735,8 @@ export function startBench(): void {
     const nowS = nowMs / 1000;
     // Kamera: leichter Schwenk, damit Schatten- und Dekor-Updates mitlaufen
     const t = (nowMs - begin) / 1000;
-    gs.cam.lookAt(camX + Math.sin(t * 0.35) * 5, camY + Math.cos(t * 0.27) * 2);
+    if (still) gs.cam.lookAt(camX, camY);
+    else gs.cam.lookAt(camX + Math.sin(t * 0.35) * 5, camY + Math.cos(t * 0.27) * 2);
     const alpha = (performance.now() - world.lastSnapMs) / 100;
     const tU0 = performance.now();
     entities.consumeEvents();
