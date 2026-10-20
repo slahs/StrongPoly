@@ -90,7 +90,7 @@ export class BuildSites {
   private conMesh(t: number): TypeMesh {
     let m = this.conMeshes[t];
     if (!m) {
-      const g = buildBuildingModel(BUILDINGS[t], this.detail).merged;
+      const g = buildBuildingModel(BUILDINGS[t], this.detail, true).merged;
       this.tops[t] = g.boundingBox?.max.y ?? BUILDINGS[t].height;
       m = new TypeMesh(g, this.parent, { anim: true, shadow: this.shadows, cap: 16, material: constructionMaterial(), depthMaterial: constructionDepthMaterial() }, this.team);
       this.conMeshes[t] = m;
@@ -102,7 +102,7 @@ export class BuildSites {
     const key = `${t}:${kind}`;
     let m = this.conWalls.get(key);
     if (!m) {
-      const g = buildWallModel(t, BUILDINGS[t].height, kind, this.detail).merged;
+      const g = buildWallModel(t, BUILDINGS[t].height, kind, this.detail, true).merged;
       m = new TypeMesh(g, this.parent, { anim: true, shadow: this.shadows, cap: 128, material: constructionMaterial(), depthMaterial: constructionDepthMaterial() }, this.team);
       this.conWalls.set(key, m);
     }

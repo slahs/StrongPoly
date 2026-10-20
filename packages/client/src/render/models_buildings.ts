@@ -135,7 +135,7 @@ const builders = new Map<number, ModelBuilder>();
  * Gebäudemodell. `detail` filtert Teile nach Detailstufe (Niedrig nutzt 1, Mittel/Hoch 2). Jeder Aufruf liefert
  * eigene Geometrien (ein TypeMesh hängt Instanzattribute daran); der Aufbau der Teile selbst wird je Typ nur einmal gemacht.
  */
-export function buildBuildingModel(def: BuildingDef, detail: ModelDetail = 2): ModelGeos {
+export function buildBuildingModel(def: BuildingDef, detail: ModelDetail = 2, mergedOnly = false): ModelGeos {
   let b = builders.get(def.id);
   if (!b) {
     b = newBuilder();
@@ -144,21 +144,21 @@ export function buildBuildingModel(def: BuildingDef, detail: ModelDetail = 2): M
     else b.box(def.w - 0.2, Math.max(0.3, def.height * 0.6), def.h - 0.2, 0, 0, 0, 0xb2aa9b);
     builders.set(def.id, b);
   }
-  return b.build(detail);
+  return b.build(detail, mergedOnly);
 }
 
 /** Mauerstück (Pfosten, Arm oder Einzelpfosten) als Instanzmodell; Arme liegen auf x ∈ [0, 0.5] */
-export function buildWallModel(id: number, height: number, kind: 'arm' | 'post' | 'stub', detail: ModelDetail = 2): ModelGeos {
+export function buildWallModel(id: number, height: number, kind: 'arm' | 'post' | 'stub', detail: ModelDetail = 2, mergedOnly = false): ModelGeos {
   const b = new ModelBuilder({ ao: 0.34, aoH: 0.8, extras: true, jitter: 0.04, grad: 0.12 });
   wallParts(b, id, height, kind, 1);
-  return b.build(detail);
+  return b.build(detail, mergedOnly);
 }
 
 /** Geschütz, das auf einem Großen Turm sitzt (Ursprung auf der Turmkrone) */
-export function buildTurretModel(kind: 'ballista' | 'mangonel', detail: ModelDetail = 2): ModelGeos {
+export function buildTurretModel(kind: 'ballista' | 'mangonel', detail: ModelDetail = 2, mergedOnly = false): ModelGeos {
   const b = newBuilder(0.2, 0.4);
   turretModel(b, kind);
-  return b.build(detail);
+  return b.build(detail, mergedOnly);
 }
 
 /** Gebäude, deren Dreiecksbudget (Bergfried bis ~8k, normale Gebäude ~1,5k) im Test geprüft wird */

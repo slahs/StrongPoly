@@ -325,7 +325,7 @@ export class EntityRenderer {
   private bldMesh(t: number): TypeMesh {
     let m = this.bldMeshes[t];
     if (!m) {
-      m = new TypeMesh(buildBuildingModel(BUILDINGS[t], this.bDetail).merged, this.group, { anim: true, shadow: this.shadows, cap: 64, material: buildingMaterial() }, TEAM);
+      m = new TypeMesh(buildBuildingModel(BUILDINGS[t], this.bDetail, true).merged, this.group, { anim: true, shadow: this.shadows, cap: 64, material: buildingMaterial() }, TEAM);
       this.bldMeshes[t] = m;
     }
     return m;
@@ -335,7 +335,7 @@ export class EntityRenderer {
     const key = `${t}:${kind}`;
     let m = this.wallMeshes.get(key);
     if (!m) {
-      m = new TypeMesh(buildWallModel(t, BUILDINGS[t].height, kind, this.bDetail).merged, this.group, { anim: true, shadow: this.shadows, cap: 256, material: buildingMaterial() }, TEAM);
+      m = new TypeMesh(buildWallModel(t, BUILDINGS[t].height, kind, this.bDetail, true).merged, this.group, { anim: true, shadow: this.shadows, cap: 256, material: buildingMaterial() }, TEAM);
       this.wallMeshes.set(key, m);
     }
     return m;
@@ -496,8 +496,6 @@ export class EntityRenderer {
   private rewriteBuildings(dt: number, o: RenderOpts, rebuildLists: boolean): void {
     const w = this.world;
     const now = o.now;
-    const hasCam = !!o.camera;
-    void hasCam;
     for (const m of this.bldMeshes) m?.begin();
     for (const m of this.wallMeshes.values()) m.begin();
     this.sites.begin();
@@ -667,7 +665,7 @@ export class EntityRenderer {
     const kind = b.u === 2 ? 2 : 1;
     let m = this.turretMeshes[kind];
     if (!m) {
-      m = new TypeMesh(buildTurretModel(kind === 1 ? 'ballista' : 'mangonel', this.bDetail).merged, this.group, { anim: true, shadow: this.shadows, cap: 16, material: buildingMaterial() }, TEAM);
+      m = new TypeMesh(buildTurretModel(kind === 1 ? 'ballista' : 'mangonel', this.bDetail, true).merged, this.group, { anim: true, shadow: this.shadows, cap: 16, material: buildingMaterial() }, TEAM);
       this.turretMeshes[kind] = m;
       m.begin();
     }
@@ -752,7 +750,7 @@ export class EntityRenderer {
     if (hov && !WALL_TYPES.includes(hov.t) && BUILDINGS[hov.t].height >= 0.7 && !this.building.has(hov.i)) {
       let eg = this.edgeCache.get(hov.t);
       if (!eg) {
-        eg = new THREE.EdgesGeometry(buildBuildingModel(BUILDINGS[hov.t], 0).merged, 28);
+        eg = new THREE.EdgesGeometry(buildBuildingModel(BUILDINGS[hov.t], 0, true).merged, 28);
         this.edgeCache.set(hov.t, eg);
       }
       if (this.hoverLines.geometry !== eg) this.hoverLines.geometry = eg;

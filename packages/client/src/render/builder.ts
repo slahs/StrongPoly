@@ -505,9 +505,11 @@ export class ModelBuilder {
   }
 
   /** Ergebnis. `maxDetail` filtert Teile nach Detailstufe (det): 0 = nur Grundform, 2 = alles. */
-  build(maxDetail = 99): ModelGeos {
-    const body = this.acc.geometry(0, maxDetail);
-    const accent = this.acc.team.includes(1) ? this.acc.geometry(1, maxDetail) : null;
+  build(maxDetail = 99, mergedOnly = false): ModelGeos {
+    // mergedOnly: nur die gemergte Geometrie (Instanz-Meshes brauchen weder Körper noch Akzent einzeln)
+    const empty = new THREE.BufferGeometry();
+    const body = mergedOnly ? empty : this.acc.geometry(0, maxDetail);
+    const accent = mergedOnly ? null : this.acc.team.includes(1) ? this.acc.geometry(1, maxDetail) : null;
     const merged = this.acc.geometry(undefined, maxDetail);
     const tris = maxDetail >= 99 ? this.tris : merged.getAttribute('position').count / 3;
     return { body, accent, merged, tris };
