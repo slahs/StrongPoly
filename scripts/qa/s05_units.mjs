@@ -5,7 +5,7 @@
  * Alle Eingaben über echte Maus-/Tastaturereignisse; die gesendeten Befehle werden mitgeschnitten und geprüft.
  *   node scripts/qa/s05_units.mjs
  */
-import { startQA, sleep } from './lib.mjs';
+import { startQA, sleep, clickAt } from './lib.mjs';
 
 const q = await startQA('s05_units', { query: 'quick=1&dev=1&size=128&seed=1', settings: { quality: 'low', shadows: false } });
 const { page, S, ok } = q;
@@ -86,7 +86,7 @@ const sw = await units([8]);
 ok('16 Schwertkämpfer, 9 Bogenschützen, 4 Ritter gespawnt', sw.length === 16 && (await units([3])).length === 9 && (await units([9])).length === 4, sw.length);
 const one = sw[0];
 let p = await screenOf(one.x, one.y);
-await page.mouse.click(p.x, p.y);
+await clickAt(page, p.x, p.y);
 await sleep(600);
 let sl = await sel();
 ok('Einzelklick wählt genau die Einheit', sl.length >= 1 && sl.length <= 3 && sl.includes(one.id), JSON.stringify(sl));
@@ -153,9 +153,7 @@ for (const [name, f] of formations) {
     return e && `${e.tagName}#${e.id}.${e.className}`;
   }, [tp.x, tp.y]);
   console.log('Rechtsklick auf', JSON.stringify(tp), el, 'Auswahl', (await sel()).length);
-  await page.mouse.move(tp.x, tp.y);
-  await page.mouse.down({ button: 'right' });
-  await page.mouse.up({ button: 'right' });
+  await clickAt(page, tp.x, tp.y, 'right');
   await sleep(400);
   const sent = await cmds();
   const mv = sent.find((c) => c.c === 'move');
@@ -232,7 +230,7 @@ for (const c of cands) {
   }
 }
 console.log('Patrouillenziel', JSON.stringify([pt, ptScreen, cands.length]));
-await page.mouse.click(ptScreen.x, ptScreen.y);
+await clickAt(page, ptScreen.x, ptScreen.y);
 await sleep(400);
 const sentP = await cmds();
 const pc = sentP.find((c) => c.c === 'patrol');
@@ -257,7 +255,7 @@ await q.shot('5_patrouille');
 
 // 4) Angriffsmarsch (nach der Patrouille, weil die Gegner sonst die Patrouille beenden)
 // Angriffsmarsch: F, dann Linksklick auf das Ziel; Gegner dort aufstellen
-const enemyAt = await groundOf(1000, 240);
+const enemyAt = await groundOf(1000, 360);
 await q.dev('spawn', { type: 8, owner: 1, n: 5, x: enemyAt.x, y: enemyAt.y, stance: 0 });
 await S(() => window.session().setSelection([], 0));
 await page.keyboard.press('KeyY');
@@ -268,10 +266,10 @@ await sleep(200);
 const mode = await S(() => window.session().input.mode.k);
 ok('F schaltet den Angriffsmarsch-Modus ein', mode === 'attackMove', mode);
 // auf den Boden neben den Gegnern klicken (ein Klick auf einen Gegner wäre ein gezielter Angriff, kein Angriffsmarsch)
-const am = await groundOf(960, 300);
+const am = await groundOf(700, 330); // links vom Beraterpanel (das nach den Gegner-Meldungen bis y≈300 reicht)
 const amScreen = await screenOf(am.x, am.y);
 console.log('Angriffsmarsch-Klick', JSON.stringify({ am, amScreen, sel: (await sel()).length, mode: await S(() => window.session().input.mode.k) }));
-await page.mouse.click(amScreen.x, amScreen.y);
+await clickAt(page, amScreen.x, amScreen.y);
 await sleep(400);
 const sentF = await cmds();
 console.log('danach', JSON.stringify(sentF.map((c) => c.c)), 'Auswahl', (await sel()).length, 'Modus', await S(() => window.session().input.mode.k));

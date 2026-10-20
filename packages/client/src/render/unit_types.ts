@@ -134,6 +134,8 @@ export function buildInfantry(b: UnitBuilder, type: number, job = 0): void {
       const up = body(b, rig);
       torso(b, up);
       b.box(0.2, 0.12, 0.13, 0, HIP + 0.1, 0, C.leather, { taper: [1.25, 1.0] }); // Lederweste
+      // Kurzer Waffenrock in Teamfarbe vor Brust und Bauch: der Köcher sitzt auf dem Rücken und ist aus der RTS-Ansicht nicht zu sehen (4H)
+      b.quad([-0.075, HIP + 0.25, 0.085], [-0.082, HIP + 0.0, 0.09], [0.082, HIP + 0.0, 0.09], [0.075, HIP + 0.25, 0.085], C.white, false, { team: true });
       quiver(b, { team: true });
       arm(b, rig, 'R', ARM.Slash, (h) => {
         b.limb([h[0], h[1] - 0.01, h[2]], [h[0], h[1] + 0.1, h[2] + 0.02], 0.007, 0.007, C.bone, { capA: false, capB: false });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { comboOf, DEFAULT_HOTKEYS, hotkeyConflicts, HotkeyAction, tracksHeldKey } from '../src/game/hotkeys';
+import { comboAliases, comboOf, DEFAULT_HOTKEYS, hotkeyConflicts, HotkeyAction, tracksHeldKey } from '../src/game/hotkeys';
 
 /** 4H-Befund: Kombinationen mit Alt/Strg/Cmd dürfen nicht zugleich die Kamera bewegen und müssen sauber unterscheidbar sein. */
 describe('Hotkeys', () => {
@@ -21,5 +21,13 @@ describe('Hotkeys', () => {
     const alt = (Object.keys(DEFAULT_HOTKEYS) as HotkeyAction[]).filter((a) => DEFAULT_HOTKEYS[a].startsWith('Alt+')).map((a) => DEFAULT_HOTKEYS[a].replace('Alt+', ''));
     const pan = [DEFAULT_HOTKEYS.panUp, DEFAULT_HOTKEYS.panDown, DEFAULT_HOTKEYS.panLeft, DEFAULT_HOTKEYS.panRight];
     expect(alt.filter((k) => pan.includes(k)).sort()).toEqual(['KeyS', 'KeyW']);
+  });
+
+  it('MacBook: Backspace löst die Entf-Belegung (Abreißen) ebenfalls aus', () => {
+    const none = { ctrlKey: false, metaKey: false, altKey: false };
+    expect(DEFAULT_HOTKEYS.demolish).toBe('Delete');
+    expect(comboAliases({ code: 'Delete', ...none })).toEqual(['Delete']);
+    expect(comboAliases({ code: 'Backspace', ...none })).toContain(DEFAULT_HOTKEYS.demolish);
+    expect(comboAliases({ code: 'KeyH', ...none })).toEqual(['KeyH']);
   });
 });

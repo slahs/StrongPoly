@@ -158,7 +158,8 @@ q.result.data.level = { peak: lvl.peak, rmsMax: lvl.rmsMax, clip: lvl.clip, samp
 ok('Es wird gekämpft: Verluste auf beiden Seiten', lastC[0] < c0[0] - 5 && lastC[1] < c0[1] - 5, `${JSON.stringify(c0)} -> ${JSON.stringify(lastC)}`);
 ok('Atmosphäre/Musik wechseln in die Schlachtstimmung', series.some((s) => /battle|fight|war|tension|combat/i.test(String(s.mood))), JSON.stringify(series.map((s) => s.mood)));
 ok('Kein Übersteuern am Bus (Spitze ≤ 1,0, höchstens 2 Messpunkte ≥ 0,99)', lvl.peak <= 1.0 && lvl.clip <= 2, `Spitze ${lvl.peak.toFixed(3)}, Clips ${lvl.clip}/${lvl.n}`);
-ok('Keine Soundwand: gleichzeitige Effekt-Stimmen begrenzt (≤ 32) und Effektivwert ≤ 0,35', lvl.voices <= 32 && lvl.rmsMax <= 0.35, `Stimmen ${lvl.voices}, RMS ${lvl.rmsMax.toFixed(3)}`);
+// Alle Regler stehen hier auf 1,0 (ungünstigster Fall); RMS über 46-ms-Fenster, Maximum über die Schlacht
+ok('Keine Soundwand: gleichzeitige Effekt-Stimmen begrenzt (≤ 32) und Effektivwert am Bus ≤ 0,45 bei allen Reglern auf Maximum', lvl.voices <= 32 && lvl.rmsMax <= 0.45, `Stimmen ${lvl.voices}, RMS ${lvl.rmsMax.toFixed(3)}`);
 ok('Einheitenstimmen: nie mehr als 2 zugleich im Gefecht', lvl.active <= 2, `${lvl.active}`);
 const stAfter = await S(() => window.__audio.state());
 q.note('klaenge_gespielt', stAfter.played);

@@ -6,7 +6,7 @@
  * Vorlage: walk.mjs (Scratchpad), hier mit festem Zufallsgenerator (reproduzierbar).
  *   node scripts/qa/s14_missions.mjs [--secs=20]
  */
-import { startQA, sleep, args } from './lib.mjs';
+import { startQA, sleep, args, openPauseMenu } from './lib.mjs';
 
 const secs = Number(args.secs ?? 20);
 const q = await startQA('s14_missions', { query: '', waitGame: false, viewport: { width: 1000, height: 600 }, settings: { quality: 'low', shadows: false } });
@@ -44,11 +44,12 @@ async function play(sec) {
   }
 }
 async function backToMenu() {
-  for (let i = 0; i < 3; i++) {
-    if (await page.getByText('Spiel beenden', { exact: true }).count()) break;
+  // Zufallsbedienung lässt Enzyklopädie/Hilfe offen: zuerst schließen, dann Pausenmenü → „Spiel beenden“
+  for (let i = 0; i < 4 && (await page.locator('.enc, .help').count()); i++) {
     await page.keyboard.press('Escape');
-    await sleep(400);
+    await sleep(300);
   }
+  await openPauseMenu(page);
   if (await page.getByText('Spiel beenden', { exact: true }).count()) await page.getByText('Spiel beenden', { exact: true }).click();
   await sleep(600);
 }

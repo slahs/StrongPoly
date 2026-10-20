@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { BUILDINGS, BT, BuildingDef, checkPlaceRules, ClientWorld, Formation, UNITS, U } from '@strongpoly/shared';
 import type { GhostPlacement } from '../render/ghost';
 import { isMac, isSecondaryClick, wheelPixels } from './pointer';
-import { comboOf, loadHotkeys, HotkeyAction, tracksHeldKey } from './hotkeys';
+import { comboAliases, loadHotkeys, HotkeyAction, tracksHeldKey } from './hotkeys';
 import { explainPlacementError } from '../ui/tooltip';
 import type { Session } from './session';
 import { groundYAt } from '../render/util';
@@ -570,10 +570,10 @@ export class InputController {
     if (tracksHeldKey(e)) this.keys.add(e.code);
     const s = this.s;
     const hk = this.hotkeys;
-    const combo = comboOf(e);
-    const is = (a: HotkeyAction) => hk[a] === combo;
+    const combos = comboAliases(e);
+    const is = (a: HotkeyAction) => combos.includes(hk[a]);
     if (e.code.startsWith('F') && /^F\d+$/.test(e.code)) e.preventDefault();
-    if (e.code === 'Space' || (e.ctrlKey && e.code === 'KeyZ') || (e.altKey && /^Key/.test(e.code))) e.preventDefault();
+    if (e.code === 'Backspace' || e.code === 'Space' || (e.ctrlKey && e.code === 'KeyZ') || (e.altKey && /^Key/.test(e.code))) e.preventDefault();
     if (is('rotateLeft')) s.gs.cam.rotate(-1);
     else if (is('rotateRight')) s.gs.cam.rotate(1);
     else if (is('cancel')) {
@@ -614,8 +614,8 @@ export class InputController {
     else if (is('centerKeep')) s.centerOnKeep();
     else if (is('selectAllArmy')) s.selectAllArmy();
     else {
-      for (let i = 1; i <= 5; i++) if (hk[`ability${i}` as HotkeyAction] === combo) s.armAbility(i - 1);
-      for (let i = 1; i <= 6; i++) if (hk[`cat${i}` as HotkeyAction] === combo) s.hud.openCategory(i - 1);
+      for (let i = 1; i <= 5; i++) if (combos.includes(hk[`ability${i}` as HotkeyAction])) s.armAbility(i - 1);
+      for (let i = 1; i <= 6; i++) if (combos.includes(hk[`cat${i}` as HotkeyAction])) s.hud.openCategory(i - 1);
     }
     // Kontrollgruppen
     const m = /^Digit([1-9])$/.exec(e.code);

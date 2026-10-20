@@ -98,6 +98,15 @@ export function comboOf(e: { code: string; ctrlKey: boolean; metaKey: boolean; a
  */
 export const tracksHeldKey = (e: { ctrlKey: boolean; metaKey: boolean; altKey: boolean }): boolean => !(e.ctrlKey || e.metaKey || e.altKey);
 
+/**
+ * Kombinationen, auf die ein Tastendruck anspricht: MacBook-Tastaturen haben keine Entf-Taste (⌫ sendet `Backspace`, Entf erst mit Fn),
+ * deshalb löst Backspace jede „Entf“-Belegung (Standard: Abreißen) ebenfalls aus.
+ */
+export function comboAliases(e: { code: string; ctrlKey: boolean; metaKey: boolean; altKey: boolean }): string[] {
+  const c = comboOf(e);
+  return e.code === 'Backspace' ? [c, comboOf({ ...e, code: 'Delete' })] : [c];
+}
+
 const KEY_NAMES: Record<string, string> = {
   Equal: '+', Minus: '-', Escape: 'Esc', Space: 'Leertaste', Pause: 'Pause', Delete: 'Entf', Home: 'Pos1', End: 'Ende', Enter: 'Eingabe',
   Backquote: '^', ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', PageUp: 'Bild↑', PageDown: 'Bild↓', Insert: 'Einfg',

@@ -166,3 +166,14 @@ export async function closePauseMenu(page) {
   if (await page.getByText('Fortsetzen', { exact: true }).count()) await page.getByText('Fortsetzen', { exact: true }).click();
   await sleep(400);
 }
+
+/**
+ * Mausklick wie von Hand: erst bewegen und mindestens zwei Bilder abwarten, damit der Eingabecontroller (Hover wird je Bild berechnet)
+ * den Zeiger kennt – unter Software-GL (1–5 FPS) würde ein sofortiger Klick sonst ins Leere gehen.
+ */
+export async function clickAt(page, x, y, button = 'left') {
+  await page.mouse.move(x, y);
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  await page.mouse.down({ button });
+  await page.mouse.up({ button });
+}
