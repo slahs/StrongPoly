@@ -48,6 +48,16 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 - [x] `?bench` (synthetische ClientWorld mit 2.000 kämpfenden Einheiten, 10-Hz-Ticks, Projektile, Partikel, Burgen) + `scripts/bench-fps.mjs` (alle Stufen, Markdown-Tabelle, `--hw`)
 - [x] Gate (typecheck, build, test) + Browser-Check (Konsole sauber, Screenshots gesichtet)
 
+Messung `?bench` (2.000 Einheiten, `node scripts/bench-fps.mjs --secs=12 --warm=4`, 1280x720; Testumgebung: Chromium 141 mit **Software-GL (SwiftShader)**, 4 Kerne Xeon 2,8 GHz, Rechner zeitgleich mit anderen Läufen ausgelastet, Load ≈ 9). Die FPS sind deshalb nur ein pessimistischer Richtwert, **60 FPS auf echter GPU sind nicht verifiziert**:
+
+| Stufe | FPS (SwiftShader) | JS ohne Raster Ø / p95 | Draw-Calls | Dreiecke | gezeichnete Einheiten |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Niedrig | 0,9 | 3,2 / 5,2 ms | 67 | 287k | 1677 |
+| Mittel | 0,6 | 3,2 / 6,0 ms | 70 | 370k | 1729 |
+| Hoch | 0,5 | 4,2 / 7,1 ms | 70 | 423k | 1719 |
+
+Ziele: Draw-Calls < 150 erreicht (70 inkl. Schattenpass), JS-Zeit ≤ 8 ms auf Mittel erreicht (3,2 ms; gemessen mit `&nodraw=1`, d. h. Draw-Calls als No-ops, damit der langsame Software-Rasterizer die JS-Zeit nicht verfälscht). Im echten Spiel liegen die Draw-Calls bei 45–50.
+
 Entscheidungen und offene Punkte (D):
 - **SSAO nicht umgesetzt:** EffectComposer verliert das Canvas-MSAA, die Normal-/Tiefenpasses passen nicht zur Vertex-Animation der Instanzen, das Bundle würde wachsen. Ersatz: eingebackene AO, Kontaktschatten, weiche Schatten. Das Feld `ssao` in `quality.ts` bleibt `false`.
 - **Baufortschritt:** Die Sim setzt Gebäude sofort. Minimal erweitert: `Building.born` (Tick der Platzierung, reine Ausgabe, wird mitgespeichert) → `BuildingRec.n` im Snapshot. Der Client leitet daraus die Baustufe ab (Dauer nur visuell, `buildTicks` in `render/entities.ts`); Pause und Spielgeschwindigkeit wirken mit, Reconnect zeigt den richtigen Stand.
