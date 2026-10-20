@@ -12,8 +12,8 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 - [x] 1.5 Burg mauert sich nicht ein / zerstörte Tore werden neu gebaut (Test)
 - [x] 1.6 bench/dmg.ts entfernt
 - [x] 1.7 Geschützreichweiten nach `shared/data/` (`TURRETS`, `CAULDRON` in data/balance.ts; durch F)
-- [ ] 1.8 Docker-Image neu bauen und prüfen
-- [~] 1.9 Tutorial-Missionen 1–5 per Skript bis zum Sieg (fertig: test/missions_play.test.ts; Mission 5: Tutorial-KI nutzt keine Angriffsfähigkeiten); Browser-Check offen
+- [x] 1.8 Docker-Image neu gebaut (Stand b76a3f0-Vorgänger; Build nur mit temporärem Dockerfile + Proxy-CA, Repo-Dockerfile unverändert), Container gestartet: `/healthz` ok, Client wird ausgeliefert, Missionen 1–5 im Browser gegen den Container gestartet ohne Konsolenfehler
+- [x] 1.9 Tutorial-Missionen 1–5 per Skript bis zum Sieg (fertig: test/missions_play.test.ts; Mission 5: Tutorial-KI nutzt keine Angriffsfähigkeiten); Browser: Missionen 1–5 starten und laufen ohne Konsolenfehler (walk.mjs gegen Docker-Container)
 - [x] 1.10 Smoke 3 Seeds (Seed 2 meldete nur kurzzeitig überbaute Einheit, jetzt 30-s-Schwelle) + test/determinism.test.ts
 - [ ] 1.11 Laufend: Bugs aus B–F (siehe unten „Gefundene Bugs“)
 
@@ -61,7 +61,7 @@ Ziele: Draw-Calls < 150 erreicht (70 inkl. Schattenpass), JS-Zeit ≤ 8 ms auf M
 Entscheidungen und offene Punkte (D):
 - **SSAO nicht umgesetzt:** EffectComposer verliert das Canvas-MSAA, die Normal-/Tiefenpasses passen nicht zur Vertex-Animation der Instanzen, das Bundle würde wachsen. Ersatz: eingebackene AO, Kontaktschatten, weiche Schatten. Das Feld `ssao` in `quality.ts` bleibt `false`.
 - **Baufortschritt:** Die Sim setzt Gebäude sofort. Minimal erweitert: `Building.born` (Tick der Platzierung, reine Ausgabe, wird mitgespeichert) → `BuildingRec.n` im Snapshot. Der Client leitet daraus die Baustufe ab (Dauer nur visuell, `buildTicks` in `render/entities.ts`); Pause und Spielgeschwindigkeit wirken mit, Reconnect zeigt den richtigen Stand.
-- **Blut-Schalter ohne Options-UI:** `Settings.blood` existiert und wird gespeichert; ein Kontrollkästchen müsste in `ui/screens.ts` (Hauptagent) ergänzt werden.
+- Blut-Schalter: Kontrollkästchen in den Optionen (Grafik) ergänzt.
 - **Bench mit synthetischer Welt statt Sim-Worker:** isoliert den Renderer und ist deterministisch (eigener Zufallsgenerator, Test in `render.test.ts`). Die echte Sim ist für 2.000 Einheiten nicht nötig, um den Renderer zu belasten.
 - Die Bench-FPS stammen aus Software-GL (SwiftShader, 4 Kerne); 60 FPS auf echter GPU sind **nicht verifiziert**. Belegt sind Draw-Calls, Dreiecke und die JS-Zeit (`&nodraw=1`).
 - Dig-Planung (`digMask`) wird weiterhin nur über die Geister-Rechtecke angezeigt, nicht im Terrain.
