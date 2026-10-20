@@ -27,3 +27,7 @@ export * from './sim/serialize';
 export * from './data/matchups';
 export { ARMOR_KEYS, DTYPE_KEYS, SPECIAL_KEYS, LANGS, TEXTS, fill, fmtNum, getLang, hasText, placeholders, setLang, t, tf, trackTextUsage } from './data/descriptions';
 export type { Lang, Params } from './data/descriptions';
+export * from './sim/popularity_explain';
+export { popularityFactors, popularityTarget, spawnIntervalTicks } from './sim/popularity';
+export type { PopInputs } from './sim/popularity';
+export * from './data/popularity_text';

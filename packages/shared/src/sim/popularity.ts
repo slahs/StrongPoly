@@ -36,6 +36,63 @@ export function foodTypes(sim: Sim, p: number): number {
   return n;
 }
 
+/** Eingaben der Faktoren-Zerlegung: alles, was nach den Nebenwirkungen (Essen, Gold, Bier) feststeht. */
+export interface PopInputs {
+  ration: number;
+  /** Nahrung ging in diesem Schritt aus (zählt wie Rationsstufe 0) */
+  foodShort: boolean;
+  foodTypes: number;
+  tax: number;
+  /** Bestechung nicht bezahlbar: die Stimmungswirkung der Steuerstufe entfällt */
+  taxBlocked: boolean;
+  /** Anteil der Bauern mit Bier (0..1, 0 = nicht versorgt) */
+  aleCover: number;
+  /** Punkte und Abdeckung (Bauern) der besetzten Gotteshäuser */
+  religionPts: number;
+  religionCover: number;
+  /** Summe der guten bzw. schlechten Dinge (positive Beträge) */
+  good: number;
+  bad: number;
+  crowded: boolean;
+  /** aktive Ereignisse */
+  events: { label: string; value: number }[];
+}
+
+/**
+ * Zerlegung der Beliebtheitsänderung pro Monat in Faktoren. EINZIGE Stelle, an der die Formeln stehen:
+ * die Simulation ruft sie je Intervall (`applyInterval`), die Anzeige zeigt das Ergebnis (`explainPopularity`).
+ */
+export function popularityFactors(i: PopInputs): PopFactor[] {
+  const factors: PopFactor[] = [];
+  const effRation = i.foodShort && i.ration > 0 ? 0 : i.ration;
+  factors.push({ key: 'ration', label: i.foodShort ? 'Hunger (keine Nahrung)' : 'Rationen', value: RATION_POP[effRation] });
+  factors.push({ key: 'variety', label: 'Nahrungsvielfalt', value: Math.max(0, i.foodTypes - 1) * VARIETY_POP });
+  factors.push({ key: 'tax', label: i.tax < 0 ? 'Bestechung' : 'Steuern', value: i.taxBlocked ? 0 : TAX_POP[i.tax] });
+  factors.push({ key: 'ale', label: 'Bier', value: ALE_POP_MAX * i.aleCover });
+  factors.push({ key: 'religion', label: 'Religion', value: Math.min(RELIGION_POP_CAP, i.religionPts) * i.religionCover });
+  factors.push({ key: 'good', label: 'Gute Dinge', value: Math.min(POP_GOOD_CAP, i.good * GOOD_POP) });
+  factors.push({ key: 'bad', label: 'Schlechte Dinge', value: Math.max(-POP_BAD_CAP, i.bad * BAD_POP) });
+  factors.push({ key: 'crowd', label: 'Überfüllung', value: i.crowded ? CROWD_POP : 0 });
+  if (i.events.length) {
+    let ev = 0;
+    for (const e of i.events) ev += e.value;
+    factors.push({ key: 'events', label: i.events.map((e) => e.label).join(', '), value: ev });
+  }
+  return factors;
+}
+
+/** Summe der Faktoren = Änderung der Beliebtheit pro Monat (`TICKS_PER_MONTH` Ticks) */
+export function popularityTarget(factors: readonly PopFactor[]): number {
+  let sum = 0;
+  for (const f of factors) sum += f.value;
+  return sum;
+}
+
+/** Ticks zwischen zwei Neuzugängen bei gegebener Beliebtheit (ab `POP_THRESHOLD`) */
+export function spawnIntervalTicks(popularity: number): number {
+  return Math.max(6, SPAWN_INTERVAL_TICKS * (1 - Math.min(0.6, (popularity - POP_THRESHOLD) / 100)));
+}
+
 /** Beliebtheit, Steuern, Rationen, Bevölkerungswachstum. */
 export function updatePopularity(sim: Sim): void {
   const u = sim.units;
@@ -68,8 +125,6 @@ export function updatePopularity(sim: Sim): void {
 function applyInterval(sim: Sim, pid: number): void {
   const pl = sim.players[pid];
   const n = pl.peasants;
-  const factors: PopFactor[] = [];
-
   // Fear: gute vs. schlechte Dinge
   let good = 0;
   let bad = 0;
@@ -114,23 +169,18 @@ function applyInterval(sim: Sim, pid: number): void {
   }
   pl.foodShort = short;
   pl.foodTypes = foodTypes(sim, pid);
-  const effRation = short && pl.ration > 0 ? 0 : pl.ration;
-  factors.push({ key: 'ration', label: short ? 'Hunger (keine Nahrung)' : 'Rationen', value: RATION_POP[effRation] });
-  factors.push({ key: 'variety', label: 'Nahrungsvielfalt', value: Math.max(0, pl.foodTypes - 1) * VARIETY_POP });
-
   // Steuern
   const gold = (n * TAX_GOLD[pl.tax]) / POP_STEPS_PER_MONTH;
-  let taxPop = TAX_POP[pl.tax];
+  let taxBlocked = false;
   if (gold < 0 && pl.gold + gold < 0) {
-    taxPop = 0;
+    taxBlocked = true;
   } else {
     pl.gold += gold;
     if (gold > 0) pl.stats.goldEarned += gold;
   }
-  factors.push({ key: 'tax', label: pl.tax < 0 ? 'Bestechung' : 'Steuern', value: taxPop });
 
   // Bier
-  let aleF = 0;
+  let aleCover = 0;
   pl.aleCover = 0;
   if (inns > 0 && n > 0) {
     const served = Math.min(n, inns * INN_SERVES);
@@ -138,7 +188,7 @@ function applyInterval(sim: Sim, pid: number): void {
     const have = pl.stock[R.Ale];
     const cov = served / n;
     if (have >= Math.max(1, Math.floor(need))) {
-      aleF = ALE_POP_MAX * cov;
+      aleCover = cov;
       pl.aleCover = cov;
       pl.aleAcc += need;
       const whole = Math.floor(pl.aleAcc);
@@ -148,28 +198,29 @@ function applyInterval(sim: Sim, pid: number): void {
       }
     }
   }
-  factors.push({ key: 'ale', label: 'Bier', value: aleF });
 
   // Religion
   const relCov = n > 0 ? Math.min(1, cover.n / n) : 0;
   pl.relCover = relCov;
-  factors.push({ key: 'religion', label: 'Religion', value: Math.min(RELIGION_POP_CAP, cover.pts) * relCov });
-
-  // Gute/schlechte Dinge (direkter Beliebtheitseffekt)
-  factors.push({ key: 'good', label: 'Gute Dinge', value: Math.min(POP_GOOD_CAP, good * GOOD_POP) });
-  factors.push({ key: 'bad', label: 'Schlechte Dinge', value: Math.max(-POP_BAD_CAP, bad * BAD_POP) });
-
-  // Überfüllung
-  factors.push({ key: 'crowd', label: 'Überfüllung', value: n > pl.housing ? CROWD_POP : 0 });
 
   // Ereignisse
   pl.events = pl.events.filter((e) => e.until > sim.tick);
-  let ev = 0;
-  for (const e of pl.events) ev += e.value;
-  if (pl.events.length) factors.push({ key: 'events', label: pl.events.map((e) => e.label).join(', '), value: ev });
 
-  let sum = 0;
-  for (const f of factors) sum += f.value;
+  const factors = popularityFactors({
+    ration: pl.ration,
+    foodShort: short,
+    foodTypes: pl.foodTypes,
+    tax: pl.tax,
+    taxBlocked,
+    aleCover,
+    religionPts: cover.pts,
+    religionCover: relCov,
+    good,
+    bad,
+    crowded: n > pl.housing,
+    events: pl.events,
+  });
+  const sum = popularityTarget(factors);
   pl.factors = factors;
   pl.popTarget = sum;
   pl.popularity = Math.max(0, Math.min(100, pl.popularity + sum / POP_STEPS_PER_MONTH));
@@ -180,7 +231,7 @@ function spawnAndLeave(sim: Sim, pid: number): void {
   const u = sim.units;
   if (pl.popularity >= POP_THRESHOLD && pl.peasants < pl.housing) {
     pl.spawnTimer++;
-    const interval = Math.max(6, SPAWN_INTERVAL_TICKS * (1 - Math.min(0.6, (pl.popularity - POP_THRESHOLD) / 100)));
+    const interval = spawnIntervalTicks(pl.popularity);
     if (pl.spawnTimer >= interval) {
       pl.spawnTimer = 0;
       if (sim.spawnPeasant(pid) >= 0) pl.peasants++;
