@@ -4,7 +4,7 @@
  * Ziel: ≥ 80 % der Partien enden mit Keep-Fall.
  */
 import { spawn } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { AI_PROFILES } from '../src';
 
 const seeds = Number(process.argv[2] ?? 3);
@@ -27,6 +27,19 @@ if (process.env.RERUN) {
 
 interface Res { job: Job; ended: boolean; min: number; text: string }
 const results: Res[] = [];
+// Zwischenstand je Partie (JSON-Zeilen): ein abgebrochenes Turnier setzt dort wieder an
+const partial = (process.env.OUT ?? 'tournament.json') + '.partial.jsonl';
+if (existsSync(partial)) {
+  const key = (j: Job) => `${j.a}-${j.b}-${j.seed}`;
+  const done = new Map<string, Res>();
+  for (const line of readFileSync(partial, 'utf8').split('\n')) if (line.trim()) { const r = JSON.parse(line) as Res; done.set(key(r.job), r); }
+  for (let i = jobs.length - 1; i >= 0; i--) {
+    const r = done.get(key(jobs[i]));
+    if (r) { results.push(r); jobs.splice(i, 1); }
+  }
+  if (results.length) console.log(`Fortsetzung: ${results.length} Partien aus ${partial} übernommen`);
+}
+const total = jobs.length + results.length;
 let next = 0;
 let running = 0;
 
@@ -44,8 +57,9 @@ function launch(): void {
       const last = out.trim().split('\n').slice(-2).join('\n');
       const r: Res = { job, ended: m?.[1] === 'ENDED', min: m ? Number(m[2]) : -1, text: m ? last : 'CRASH\n' + out.slice(-400) };
       results.push(r);
-      console.log(`${r.ended ? 'ENDED  ' : 'TIMEOUT'} ${AI_PROFILES[job.a].name} vs ${AI_PROFILES[job.b].name} seed ${job.seed} ${r.min}min  (${results.length}/${jobs.length})`);
-      if (results.length === jobs.length) finish();
+      appendFileSync(partial, JSON.stringify(r) + '\n');
+      console.log(`${r.ended ? 'ENDED  ' : 'TIMEOUT'} ${AI_PROFILES[job.a].name} vs ${AI_PROFILES[job.b].name} seed ${job.seed} ${r.min}min  (${results.length}/${total})`);
+      if (results.length === total) finish();
       else launch();
     });
   }
@@ -57,4 +71,5 @@ function finish(): void {
   for (const r of results.filter((x) => !x.ended)) console.log(`TIMEOUT ${r.job.a} vs ${r.job.b} seed ${r.job.seed}: ${r.text.split('\n')[0].slice(0, 220)}`);
   writeFileSync(process.env.OUT ?? 'tournament.json', JSON.stringify(results, null, 1));
 }
-launch();
+if (!jobs.length) finish();
+else launch();

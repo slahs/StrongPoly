@@ -100,7 +100,7 @@ Linksklick wählen / Rahmen ziehen · Doppelklick: alle gleichen Einheiten · Re
 | Skript | Zweck |
 | --- | --- |
 | `duel.ts <A> <B> [seed] [min]` | KI gegen KI, headless, läuft bis zum Keep-Fall |
-| `tournament.ts [seeds] [min] [parallel]` | alle KI-Profile paarweise (Ziel: ≥ 80 % der Partien enden innerhalb von 90 Min); `RERUN=<json>` wiederholt nur Timeouts |
+| `tournament.ts [seeds] [min] [parallel]` | alle KI-Profile paarweise (Ziel: ≥ 80 % der Partien enden innerhalb von 90 Min); `RERUN=<json>` wiederholt nur Timeouts; ein abgebrochenes Turnier setzt beim nächsten Start mit gleichem `OUT` dort an (`<OUT>.partial.jsonl`) |
 | `aistate.ts`, `diag.ts`, `econ.ts`, `gates.ts`, `iron.ts` | Zustands- und Wirtschaftsdiagnose einzelner KI-Lords |
 | `smoke.ts [seed] [min]` | feuert jeden Befehlstyp (auch Unsinnsparameter) gegen eine laufende Sim und prüft Invarianten (keine NaN, Bestände ≥ 0, keine Bodeneinheit in festen Gebäuden, HP ≤ Max); läuft auch als Test |
 | `units.bench.ts` | Leistung bei 2.000 Einheiten |
