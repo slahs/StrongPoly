@@ -241,6 +241,7 @@ export class Session {
         kind = 'move';
         break;
       case 'stop':
+      case 'stance':
         kind = 'stop';
         break;
       default:
@@ -248,11 +249,15 @@ export class Session {
     }
     const w = this.world;
     const types: number[] = [];
+    let pos: { x: number; y: number } | undefined;
     for (const id of cmd.units) {
       const s = w.slotOf(id);
-      if (s >= 0) types.push(w.type[s]);
+      if (s >= 0) {
+        types.push(w.type[s]);
+        pos ??= { x: w.curX[s], y: w.curY[s] };
+      }
     }
-    if (types.length) this.audio.selectionCommand(types, kind);
+    if (types.length) this.audio.selectionCommand(types, kind, pos);
   }
 
   /** Sprachausgabe des Sprachsystems (null, solange es fehlt: der Berater zeigt dann nur Text) */
@@ -316,12 +321,21 @@ export class Session {
     if (units.length) {
       const w = this.world;
       const types: number[] = [];
+      let pos: { x: number; y: number } | undefined;
       for (const id of units) {
         const s = w.slotOf(id);
-        if (s >= 0) types.push(w.type[s]);
+        if (s >= 0) {
+          types.push(w.type[s]);
+          pos ??= { x: w.curX[s], y: w.curY[s] };
+        }
       }
-      this.audio?.selectionSelect(types);
-    } else if (building) this.audio?.ui('click');
+      // Signatur: dieselbe Auswahl in kurzer Folge bleibt stumm (Einheiten reden nur bei neuer Auswahl)
+      this.audio?.selectionSelect(types, pos, `${units.length}:${units[0]}:${units[units.length - 1]}`);
+    } else if (building) {
+      this.audio?.ui('click');
+      const b = this.world.buildings.get(building);
+      if (b) this.audio?.buildingSelect(b.t, { x: b.x + b.w / 2, y: b.y + b.h / 2 });
+    }
   }
 
   /** Truppenpanel: Auswahl auf einen Typ einschränken (null = alle Typen der Gesamtauswahl) */

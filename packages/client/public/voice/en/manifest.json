@@ -1,0 +1,2613 @@
+{
+ "lang": "en",
+ "format": "mp3",
+ "sampleRate": 22050,
+ "generator": "scripts/gen_voices.py v5 (Piper/VITS via sherpa-onnx, ffmpeg)",
+ "clips": {
+  "advisor.army.lost": {
+   "f": "advisor/army.lost.mp3",
+   "d": 1.74,
+   "h": "142a3ebe37",
+   "t": "We have heavy losses, my lord.",
+   "v": "advisor"
+  },
+  "advisor.army.ready": {
+   "f": "advisor/army.ready.mp3",
+   "d": 0.99,
+   "h": "7d6e30191e",
+   "t": "Our army is ready.",
+   "v": "advisor"
+  },
+  "advisor.better": {
+   "f": "advisor/better.mp3",
+   "d": 1.38,
+   "h": "c414431151",
+   "t": "The situation is easing.",
+   "v": "advisor"
+  },
+  "advisor.chain.recovered.1": {
+   "f": "advisor/chain.recovered.1.mp3",
+   "d": 2.72,
+   "h": "45cc710f3e",
+   "t": "The workshops are running again. The wheels turn.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.defeat": {
+   "f": "advisor/defeat.mp3",
+   "d": 1.23,
+   "h": "2ba758149d",
+   "t": "The castle is lost.",
+   "v": "advisor"
+  },
+  "advisor.enemy.attack": {
+   "f": "advisor/enemy.attack.mp3",
+   "d": 1.09,
+   "h": "12c5bba12a",
+   "t": "We are under attack!",
+   "v": "advisor"
+  },
+  "advisor.enemy.gate": {
+   "f": "advisor/enemy.gate.mp3",
+   "d": 0.85,
+   "h": "12490cb8c0",
+   "t": "They are at the gate!",
+   "v": "advisor"
+  },
+  "advisor.enemy.near": {
+   "f": "advisor/enemy.near.mp3",
+   "d": 1.22,
+   "h": "96e9e3948c",
+   "t": "Enemies are approaching!",
+   "v": "advisor"
+  },
+  "advisor.enemy.siege": {
+   "f": "advisor/enemy.siege.mp3",
+   "d": 1.65,
+   "h": "7f1dda1e9a",
+   "t": "They are bringing siege engines!",
+   "v": "advisor"
+  },
+  "advisor.fire": {
+   "f": "advisor/fire.mp3",
+   "d": 1.09,
+   "h": "e6c0de4689",
+   "t": "Fire in the castle!",
+   "v": "advisor"
+  },
+  "advisor.food.empty.1": {
+   "f": "advisor/food.empty.1.mp3",
+   "d": 3.03,
+   "h": "09f4d87a41",
+   "t": "Hunger, sire! The peasants have nothing left to eat.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.food.empty.2": {
+   "f": "advisor/food.empty.2.mp3",
+   "d": 2.47,
+   "h": "97e918db96",
+   "t": "The granary is empty! The people are starving.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.food.low": {
+   "f": "advisor/food.low.mp3",
+   "d": 1.37,
+   "h": "3354787d98",
+   "t": "The granary is emptying.",
+   "v": "advisor"
+  },
+  "advisor.food.none": {
+   "f": "advisor/food.none.mp3",
+   "d": 1.65,
+   "h": "e430335008",
+   "t": "The people are starving, my lord!",
+   "v": "advisor"
+  },
+  "advisor.food.recovered.1": {
+   "f": "advisor/food.recovered.1.mp3",
+   "d": 2.94,
+   "h": "95540af9a2",
+   "t": "The granaries are filling again. The people can breathe easy.",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.food.variety": {
+   "f": "advisor/food.variety.mp3",
+   "d": 1.87,
+   "h": "e41d9638a2",
+   "t": "The people lack variety in their food.",
+   "v": "advisor"
+  },
+  "advisor.gate.fallen.1": {
+   "f": "advisor/gate.fallen.1.mp3",
+   "d": 1.06,
+   "h": "e8e1db5c8a",
+   "t": "The gate has fallen!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.gold.low": {
+   "f": "advisor/gold.low.mp3",
+   "d": 1.7,
+   "h": "de66d4ad05",
+   "t": "The treasury is almost empty.",
+   "v": "advisor"
+  },
+  "advisor.growth": {
+   "f": "advisor/growth.mp3",
+   "d": 1.51,
+   "h": "22c1a19f04",
+   "t": "Our settlement is growing.",
+   "v": "advisor"
+  },
+  "advisor.hello": {
+   "f": "advisor/hello.mp3",
+   "d": 3.21,
+   "h": "8f4e5ddde9",
+   "t": "Welcome back, my lord. The castle awaits your orders.",
+   "v": "advisor"
+  },
+  "advisor.housing.full": {
+   "f": "advisor/housing.full.mp3",
+   "d": 1.02,
+   "h": "9d8b6e0ac1",
+   "t": "We lack housing.",
+   "v": "advisor"
+  },
+  "advisor.idle.build": {
+   "f": "advisor/idle.build.mp3",
+   "d": 2.48,
+   "h": "513002b0e6",
+   "t": "A strong wall costs stone, but saves blood.",
+   "v": "advisor"
+  },
+  "advisor.idle.calm": {
+   "f": "advisor/idle.calm.mp3",
+   "d": 2.7,
+   "h": "38e588a23c",
+   "t": "All is quiet, my lord. Perhaps too quiet.",
+   "v": "advisor"
+  },
+  "advisor.idle.market": {
+   "f": "advisor/idle.market.mp3",
+   "d": 2.65,
+   "h": "7407faf580",
+   "t": "The market pays well, if one knows how to use it.",
+   "v": "advisor"
+  },
+  "advisor.iron.low": {
+   "f": "advisor/iron.low.mp3",
+   "d": 1.97,
+   "h": "f26cc043ea",
+   "t": "The iron will not last much longer.",
+   "v": "advisor"
+  },
+  "advisor.keep.danger": {
+   "f": "advisor/keep.danger.mp3",
+   "d": 1.23,
+   "h": "ad10eb4366",
+   "t": "The keep is in danger!",
+   "v": "advisor"
+  },
+  "advisor.lord.danger.1": {
+   "f": "advisor/lord.danger.1.mp3",
+   "d": 1.25,
+   "h": "55fa881c2e",
+   "t": "The lord is in danger!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.lord.hurt.1": {
+   "f": "advisor/lord.hurt.1.mp3",
+   "d": 1.48,
+   "h": "81bf915009",
+   "t": "The lord is badly wounded!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.pop.crowded": {
+   "f": "advisor/pop.crowded.mp3",
+   "d": 1.48,
+   "h": "96d0c09f7b",
+   "t": "The castle is overcrowded.",
+   "v": "advisor"
+  },
+  "advisor.pop.falling": {
+   "f": "advisor/pop.falling.mp3",
+   "d": 1.37,
+   "h": "35d0953de9",
+   "t": "The mood of the people is sinking.",
+   "v": "advisor"
+  },
+  "advisor.pop.good": {
+   "f": "advisor/pop.good.mp3",
+   "d": 1.23,
+   "h": "c6c21c7fed",
+   "t": "The people are content.",
+   "v": "advisor"
+  },
+  "advisor.pop.leaving": {
+   "f": "advisor/pop.leaving.mp3",
+   "d": 1.97,
+   "h": "bbe62fca81",
+   "t": "The first peasants are leaving the castle.",
+   "v": "advisor"
+  },
+  "advisor.pop.rations": {
+   "f": "advisor/pop.rations.mp3",
+   "d": 1.79,
+   "h": "65a4b83d53",
+   "t": "The scarce rations weigh on the mood.",
+   "v": "advisor"
+  },
+  "advisor.pop.taxes": {
+   "f": "advisor/pop.taxes.mp3",
+   "d": 1.35,
+   "h": "905c76c9f0",
+   "t": "Your taxes weigh on the people.",
+   "v": "advisor"
+  },
+  "advisor.production.stalled": {
+   "f": "advisor/production.stalled.mp3",
+   "d": 1.46,
+   "h": "abc0563cf0",
+   "t": "A workshop stands idle.",
+   "v": "advisor"
+  },
+  "advisor.solved": {
+   "f": "advisor/solved.mp3",
+   "d": 1.53,
+   "h": "4382f0f692",
+   "t": "The bottleneck is resolved.",
+   "v": "advisor"
+  },
+  "advisor.stone.low": {
+   "f": "advisor/stone.low.mp3",
+   "d": 1.28,
+   "h": "d8bd72e0fa",
+   "t": "The stone is running out.",
+   "v": "advisor"
+  },
+  "advisor.tower.fallen": {
+   "f": "advisor/tower.fallen.mp3",
+   "d": 1.17,
+   "h": "22e30562ae",
+   "t": "A tower has fallen!",
+   "v": "advisor"
+  },
+  "advisor.victory": {
+   "f": "advisor/victory.mp3",
+   "d": 2.04,
+   "h": "6b1c70eee8",
+   "t": "Victory is ours, my lord!",
+   "v": "advisor"
+  },
+  "advisor.wall.breach": {
+   "f": "advisor/wall.breach.mp3",
+   "d": 1.07,
+   "h": "e04bb6b312",
+   "t": "The wall is breached!",
+   "v": "advisor"
+  },
+  "advisor.wall.breach.1": {
+   "f": "advisor/wall.breach.1.mp3",
+   "d": 1.4,
+   "h": "6a1ccbad12",
+   "t": "The wall has been breached!",
+   "v": "advisor",
+   "x": 1
+  },
+  "advisor.wood.low": {
+   "f": "advisor/wood.low.mp3",
+   "d": 1.63,
+   "h": "57f5606711",
+   "t": "My lord, wood is running short.",
+   "v": "advisor"
+  },
+  "advisor.wood.none": {
+   "f": "advisor/wood.none.mp3",
+   "d": 1.09,
+   "h": "219b871105",
+   "t": "We have no wood left!",
+   "v": "advisor"
+  },
+  "advisor.workers.few": {
+   "f": "advisor/workers.few.mp3",
+   "d": 1.08,
+   "h": "8d31a5d4ee",
+   "t": "We lack workers.",
+   "v": "advisor"
+  },
+  "archer.attack.1": {
+   "f": "archer/attack_1.mp3",
+   "d": 1.36,
+   "h": "9f13e66d00",
+   "t": "Draw your bows, men!",
+   "v": "archer"
+  },
+  "archer.attack.2": {
+   "f": "archer/attack_2.mp3",
+   "d": 1.11,
+   "h": "05ed01da5a",
+   "t": "Aim and let fly!",
+   "v": "archer"
+  },
+  "archer.attack.3": {
+   "f": "archer/attack_3.mp3",
+   "d": 1.74,
+   "h": "d117646abf",
+   "t": "The sky will darken with arrows!",
+   "v": "archer"
+  },
+  "archer.attack.4": {
+   "f": "archer/attack_4.mp3",
+   "d": 1.24,
+   "h": "9c1ddddeaf",
+   "t": "Clear shot, fire!",
+   "v": "archer"
+  },
+  "archer.hold.1": {
+   "f": "archer/hold_1.mp3",
+   "d": 1.07,
+   "h": "566c31e1c1",
+   "t": "We cover the wall.",
+   "v": "archer"
+  },
+  "archer.hold.2": {
+   "f": "archer/hold_2.mp3",
+   "d": 2.12,
+   "h": "0e041bce11",
+   "t": "From here we have every enemy in sight.",
+   "v": "archer"
+  },
+  "archer.hold.3": {
+   "f": "archer/hold_3.mp3",
+   "d": 1.34,
+   "h": "d889e408eb",
+   "t": "We hold the battlements.",
+   "v": "archer"
+  },
+  "archer.move.1": {
+   "f": "archer/move_1.mp3",
+   "d": 1.0,
+   "h": "6b7d4ca399",
+   "t": "We take position.",
+   "v": "archer"
+  },
+  "archer.move.2": {
+   "f": "archer/move_2.mp3",
+   "d": 1.23,
+   "h": "859ee497ce",
+   "t": "Moving into position.",
+   "v": "archer"
+  },
+  "archer.move.3": {
+   "f": "archer/move_3.mp3",
+   "d": 1.52,
+   "h": "2bed61f5e9",
+   "t": "Quick, before they see us.",
+   "v": "archer"
+  },
+  "archer.move.4": {
+   "f": "archer/move_4.mp3",
+   "d": 1.45,
+   "h": "2d1de360db",
+   "t": "We see better from the heights.",
+   "v": "archer"
+  },
+  "archer.select.1": {
+   "f": "archer/select_1.mp3",
+   "d": 1.09,
+   "h": "c711007218",
+   "t": "Our bows are ready.",
+   "v": "archer"
+  },
+  "archer.select.2": {
+   "f": "archer/select_2.mp3",
+   "d": 1.01,
+   "h": "cdd556a852",
+   "t": "Arrows in the quiver.",
+   "v": "archer"
+  },
+  "archer.select.3": {
+   "f": "archer/select_3.mp3",
+   "d": 0.92,
+   "h": "05a7789b58",
+   "t": "Where do we aim?",
+   "v": "archer"
+  },
+  "archer.select.4": {
+   "f": "archer/select_4.mp3",
+   "d": 1.08,
+   "h": "8d47c64e1e",
+   "t": "We have a sharp eye.",
+   "v": "archer"
+  },
+  "archer.wounded.1": {
+   "f": "archer/wounded_1.mp3",
+   "d": 0.64,
+   "h": "bb0abc0156",
+   "t": "I am hit!",
+   "v": "archer"
+  },
+  "archer.wounded.2": {
+   "f": "archer/wounded_2.mp3",
+   "d": 1.37,
+   "h": "e610119a2b",
+   "t": "My arm, my bow arm!",
+   "v": "archer"
+  },
+  "archer.wounded.3": {
+   "f": "archer/wounded_3.mp3",
+   "d": 1.38,
+   "h": "815f1d8a2c",
+   "t": "Take cover, I am wounded!",
+   "v": "archer"
+  },
+  "assassin.attack.1": {
+   "f": "assassin/attack_1.mp3",
+   "d": 1.72,
+   "h": "32ab470ca5",
+   "t": "The dagger strikes first.",
+   "v": "assassin"
+  },
+  "assassin.attack.2": {
+   "f": "assassin/attack_2.mp3",
+   "d": 1.87,
+   "h": "53fbca201e",
+   "t": "One stab, no sound.",
+   "v": "assassin"
+  },
+  "assassin.attack.3": {
+   "f": "assassin/attack_3.mp3",
+   "d": 1.6,
+   "h": "944d43a66b",
+   "t": "For you it is too late.",
+   "v": "assassin"
+  },
+  "assassin.hold.1": {
+   "f": "assassin/hold_1.mp3",
+   "d": 0.61,
+   "h": "91dbae7e4f",
+   "t": "I lurk.",
+   "v": "assassin"
+  },
+  "assassin.hold.2": {
+   "f": "assassin/hold_2.mp3",
+   "d": 1.19,
+   "h": "76b5816320",
+   "t": "I wait in the dark.",
+   "v": "assassin"
+  },
+  "assassin.hold.3": {
+   "f": "assassin/hold_3.mp3",
+   "d": 1.42,
+   "h": "0056721bd8",
+   "t": "Patience is my weapon.",
+   "v": "assassin"
+  },
+  "assassin.move.1": {
+   "f": "assassin/move_1.mp3",
+   "d": 0.82,
+   "h": "fac2f7684c",
+   "t": "I sneak.",
+   "v": "assassin"
+  },
+  "assassin.move.2": {
+   "f": "assassin/move_2.mp3",
+   "d": 1.39,
+   "h": "dde133ecf3",
+   "t": "No one will see me.",
+   "v": "assassin"
+  },
+  "assassin.move.3": {
+   "f": "assassin/move_3.mp3",
+   "d": 1.56,
+   "h": "372458ce56",
+   "t": "Unnoticed like smoke.",
+   "v": "assassin"
+  },
+  "assassin.select.1": {
+   "f": "assassin/select_1.mp3",
+   "d": 1.48,
+   "h": "ae5482217c",
+   "t": "I am only a shadow.",
+   "v": "assassin"
+  },
+  "assassin.select.2": {
+   "f": "assassin/select_2.mp3",
+   "d": 1.42,
+   "h": "f72707e7d7",
+   "t": "Say who is to fall.",
+   "v": "assassin"
+  },
+  "assassin.select.3": {
+   "f": "assassin/select_3.mp3",
+   "d": 1.72,
+   "h": "b088dd0f5e",
+   "t": "Silent as the wind.",
+   "v": "assassin"
+  },
+  "assassin.wounded.1": {
+   "f": "assassin/wounded_1.mp3",
+   "d": 1.06,
+   "h": "ffc49da335",
+   "t": "I was seen!",
+   "v": "assassin"
+  },
+  "assassin.wounded.2": {
+   "f": "assassin/wounded_2.mp3",
+   "d": 0.61,
+   "h": "613fffe9e6",
+   "t": "That hurt.",
+   "v": "assassin"
+  },
+  "assassin.wounded.3": {
+   "f": "assassin/wounded_3.mp3",
+   "d": 2.52,
+   "h": "9346583dcc",
+   "t": "Discovered, back into the shadows!",
+   "v": "assassin"
+  },
+  "baker.done.1": {
+   "f": "baker/done_1.mp3",
+   "d": 1.21,
+   "h": "48a6c0bd9f",
+   "t": "Fresh from the oven!",
+   "v": "baker"
+  },
+  "baker.done.2": {
+   "f": "baker/done_2.mp3",
+   "d": 0.97,
+   "h": "198b17d0dc",
+   "t": "The bread is ready.",
+   "v": "baker"
+  },
+  "baker.done.3": {
+   "f": "baker/done_3.mp3",
+   "d": 1.61,
+   "h": "7c91786cac",
+   "t": "The scent drifts through the lanes.",
+   "v": "baker"
+  },
+  "baker.move.1": {
+   "f": "baker/move_1.mp3",
+   "d": 1.52,
+   "h": "a92c7a9f39",
+   "t": "I will bring bread soon.",
+   "v": "baker"
+  },
+  "baker.move.2": {
+   "f": "baker/move_2.mp3",
+   "d": 1.74,
+   "h": "e89b2aa2f7",
+   "t": "I only have to close the oven.",
+   "v": "baker"
+  },
+  "baker.move.3": {
+   "f": "baker/move_3.mp3",
+   "d": 0.93,
+   "h": "a8cf593616",
+   "t": "On my way.",
+   "v": "baker"
+  },
+  "baker.select.1": {
+   "f": "baker/select_1.mp3",
+   "d": 1.1,
+   "h": "fec3c207cc",
+   "t": "The oven is hot.",
+   "v": "baker"
+  },
+  "baker.select.2": {
+   "f": "baker/select_2.mp3",
+   "d": 1.47,
+   "h": "40356942a0",
+   "t": "Fresh bread, my lord?",
+   "v": "baker"
+  },
+  "baker.select.3": {
+   "f": "baker/select_3.mp3",
+   "d": 1.21,
+   "h": "51c2ac20af",
+   "t": "What may it be?",
+   "v": "baker"
+  },
+  "baker.work.1": {
+   "f": "baker/work_1.mp3",
+   "d": 1.4,
+   "h": "aa74992339",
+   "t": "The dough is rising.",
+   "v": "baker"
+  },
+  "baker.work.2": {
+   "f": "baker/work_2.mp3",
+   "d": 1.65,
+   "h": "3b208d5d4f",
+   "t": "It smells wonderful already.",
+   "v": "baker"
+  },
+  "baker.work.3": {
+   "f": "baker/work_3.mp3",
+   "d": 1.47,
+   "h": "ad1bd28645",
+   "t": "Another loaf into the oven.",
+   "v": "baker"
+  },
+  "baker.work.4": {
+   "f": "baker/work_4.mp3",
+   "d": 1.33,
+   "h": "4a1b57ff98",
+   "t": "Bread for everyone.",
+   "v": "baker"
+  },
+  "brewer.done.1": {
+   "f": "brewer/done_1.mp3",
+   "d": 1.3,
+   "h": "dcb05fc4ba",
+   "t": "The cask is full.",
+   "v": "brewer"
+  },
+  "brewer.done.2": {
+   "f": "brewer/done_2.mp3",
+   "d": 1.49,
+   "h": "9ae8ffa6ee",
+   "t": "Freshly brewed!",
+   "v": "brewer"
+  },
+  "brewer.done.3": {
+   "f": "brewer/done_3.mp3",
+   "d": 1.05,
+   "h": "1862cc9381",
+   "t": "To your health!",
+   "v": "brewer"
+  },
+  "brewer.move.1": {
+   "f": "brewer/move_1.mp3",
+   "d": 1.86,
+   "h": "4bd099ee8a",
+   "t": "I will bring a cask soon.",
+   "v": "brewer"
+  },
+  "brewer.move.2": {
+   "f": "brewer/move_2.mp3",
+   "d": 0.85,
+   "h": "b2928a0f7a",
+   "t": "On my way.",
+   "v": "brewer"
+  },
+  "brewer.move.3": {
+   "f": "brewer/move_3.mp3",
+   "d": 1.23,
+   "h": "6d77ea93b0",
+   "t": "Just closing the tap.",
+   "v": "brewer"
+  },
+  "brewer.select.1": {
+   "f": "brewer/select_1.mp3",
+   "d": 1.36,
+   "h": "3ff3117741",
+   "t": "The beer is brewing.",
+   "v": "brewer"
+  },
+  "brewer.select.2": {
+   "f": "brewer/select_2.mp3",
+   "d": 1.16,
+   "h": "8d7f8deb58",
+   "t": "A mug, perhaps?",
+   "v": "brewer"
+  },
+  "brewer.select.3": {
+   "f": "brewer/select_3.mp3",
+   "d": 1.21,
+   "h": "13ee97387c",
+   "t": "What can I pour you?",
+   "v": "brewer"
+  },
+  "brewer.work.1": {
+   "f": "brewer/work_1.mp3",
+   "d": 1.59,
+   "h": "156ae9616e",
+   "t": "The hops smell wonderful.",
+   "v": "brewer"
+  },
+  "brewer.work.2": {
+   "f": "brewer/work_2.mp3",
+   "d": 1.29,
+   "h": "c4e9b3f82e",
+   "t": "The wort must rest.",
+   "v": "brewer"
+  },
+  "brewer.work.3": {
+   "f": "brewer/work_3.mp3",
+   "d": 1.76,
+   "h": "0029badde7",
+   "t": "A little sip does no harm.",
+   "v": "brewer"
+  },
+  "brewer.work.4": {
+   "f": "brewer/work_4.mp3",
+   "d": 1.83,
+   "h": "320c07e5cf",
+   "t": "This will be a strong beer.",
+   "v": "brewer"
+  },
+  "crossbow.attack.1": {
+   "f": "crossbow/attack_1.mp3",
+   "d": 1.08,
+   "h": "ef10fae38e",
+   "t": "Bolts away!",
+   "v": "crossbow"
+  },
+  "crossbow.attack.2": {
+   "f": "crossbow/attack_2.mp3",
+   "d": 1.78,
+   "h": "6aa4d201ac",
+   "t": "Target locked, fire!",
+   "v": "crossbow"
+  },
+  "crossbow.attack.3": {
+   "f": "crossbow/attack_3.mp3",
+   "d": 1.21,
+   "h": "1bc456a47a",
+   "t": "Through any armor!",
+   "v": "crossbow"
+  },
+  "crossbow.hold.1": {
+   "f": "crossbow/hold_1.mp3",
+   "d": 1.17,
+   "h": "4691812b06",
+   "t": "We hold the line.",
+   "v": "crossbow"
+  },
+  "crossbow.hold.2": {
+   "f": "crossbow/hold_2.mp3",
+   "d": 1.94,
+   "h": "a4a514c090",
+   "t": "Not one step further for them.",
+   "v": "crossbow"
+  },
+  "crossbow.hold.3": {
+   "f": "crossbow/hold_3.mp3",
+   "d": 2.1,
+   "h": "ebac435888",
+   "t": "The string is drawn, we wait.",
+   "v": "crossbow"
+  },
+  "crossbow.move.1": {
+   "f": "crossbow/move_1.mp3",
+   "d": 0.93,
+   "h": "be6bebc943",
+   "t": "We relocate.",
+   "v": "crossbow"
+  },
+  "crossbow.move.2": {
+   "f": "crossbow/move_2.mp3",
+   "d": 1.36,
+   "h": "a2bd3d3733",
+   "t": "Cocking as we go!",
+   "v": "crossbow"
+  },
+  "crossbow.move.3": {
+   "f": "crossbow/move_3.mp3",
+   "d": 1.57,
+   "h": "1c22739dee",
+   "t": "New position, understood.",
+   "v": "crossbow"
+  },
+  "crossbow.select.1": {
+   "f": "crossbow/select_1.mp3",
+   "d": 0.89,
+   "h": "7c7c2cfe1a",
+   "t": "Bolt cocked.",
+   "v": "crossbow"
+  },
+  "crossbow.select.2": {
+   "f": "crossbow/select_2.mp3",
+   "d": 1.6,
+   "h": "56a76761c1",
+   "t": "The crossbow is loaded.",
+   "v": "crossbow"
+  },
+  "crossbow.select.3": {
+   "f": "crossbow/select_3.mp3",
+   "d": 1.73,
+   "h": "2bacdd97ee",
+   "t": "Steady hand, sharp eye.",
+   "v": "crossbow"
+  },
+  "crossbow.select.4": {
+   "f": "crossbow/select_4.mp3",
+   "d": 0.91,
+   "h": "f1f4809d7d",
+   "t": "We are listening.",
+   "v": "crossbow"
+  },
+  "crossbow.wounded.1": {
+   "f": "crossbow/wounded_1.mp3",
+   "d": 1.42,
+   "h": "ab452b7444",
+   "t": "An arrow got me!",
+   "v": "crossbow"
+  },
+  "crossbow.wounded.2": {
+   "f": "crossbow/wounded_2.mp3",
+   "d": 1.57,
+   "h": "f941d9b1ca",
+   "t": "I can barely draw!",
+   "v": "crossbow"
+  },
+  "crossbow.wounded.3": {
+   "f": "crossbow/wounded_3.mp3",
+   "d": 1.84,
+   "h": "ef2aea095c",
+   "t": "Fall back, I am hurt!",
+   "v": "crossbow"
+  },
+  "engineer.attack.1": {
+   "f": "engineer/attack_1.mp3",
+   "d": 1.55,
+   "h": "ef9ff59d79",
+   "t": "We handle this with brains.",
+   "v": "engineer"
+  },
+  "engineer.attack.2": {
+   "f": "engineer/attack_2.mp3",
+   "d": 1.22,
+   "h": "01c1dd7cd9",
+   "t": "Ladders to the wall!",
+   "v": "engineer"
+  },
+  "engineer.attack.3": {
+   "f": "engineer/attack_3.mp3",
+   "d": 1.47,
+   "h": "a4b3edb09a",
+   "t": "We undermine the foundation.",
+   "v": "engineer"
+  },
+  "engineer.hold.1": {
+   "f": "engineer/hold_1.mp3",
+   "d": 1.52,
+   "h": "4368696d09",
+   "t": "I am securing the engine.",
+   "v": "engineer"
+  },
+  "engineer.hold.2": {
+   "f": "engineer/hold_2.mp3",
+   "d": 1.6,
+   "h": "aa5f2501ea",
+   "t": "Everything stays stable here.",
+   "v": "engineer"
+  },
+  "engineer.hold.3": {
+   "f": "engineer/hold_3.mp3",
+   "d": 1.37,
+   "h": "a92dea1722",
+   "t": "I stay with the machines.",
+   "v": "engineer"
+  },
+  "engineer.move.1": {
+   "f": "engineer/move_1.mp3",
+   "d": 1.0,
+   "h": "2ccb1b5b81",
+   "t": "I am on my way.",
+   "v": "engineer"
+  },
+  "engineer.move.2": {
+   "f": "engineer/move_2.mp3",
+   "d": 1.27,
+   "h": "8c3084e93a",
+   "t": "Plans under my arm.",
+   "v": "engineer"
+  },
+  "engineer.move.3": {
+   "f": "engineer/move_3.mp3",
+   "d": 0.79,
+   "h": "b456cf6009",
+   "t": "Be right there.",
+   "v": "engineer"
+  },
+  "engineer.select.1": {
+   "f": "engineer/select_1.mp3",
+   "d": 0.96,
+   "h": "305fd5d7d5",
+   "t": "Time to tinker.",
+   "v": "engineer"
+  },
+  "engineer.select.2": {
+   "f": "engineer/select_2.mp3",
+   "d": 1.06,
+   "h": "8c44bf0416",
+   "t": "The tools are ready.",
+   "v": "engineer"
+  },
+  "engineer.select.3": {
+   "f": "engineer/select_3.mp3",
+   "d": 1.03,
+   "h": "9fda49d1a0",
+   "t": "Let me calculate.",
+   "v": "engineer"
+  },
+  "engineer.select.4": {
+   "f": "engineer/select_4.mp3",
+   "d": 0.92,
+   "h": "bc9b52ffa8",
+   "t": "What shall I build?",
+   "v": "engineer"
+  },
+  "engineer.special.1": {
+   "f": "engineer/special_1.mp3",
+   "d": 1.07,
+   "h": "14c744407d",
+   "t": "Patched up quickly.",
+   "v": "engineer"
+  },
+  "engineer.special.2": {
+   "f": "engineer/special_2.mp3",
+   "d": 0.98,
+   "h": "4c3e07201a",
+   "t": "That holds again.",
+   "v": "engineer"
+  },
+  "engineer.special.3": {
+   "f": "engineer/special_3.mp3",
+   "d": 1.72,
+   "h": "f52198b16e",
+   "t": "A few nails, and it runs.",
+   "v": "engineer"
+  },
+  "engineer.wounded.1": {
+   "f": "engineer/wounded_1.mp3",
+   "d": 0.84,
+   "h": "dda6414175",
+   "t": "My plans!",
+   "v": "engineer"
+  },
+  "engineer.wounded.2": {
+   "f": "engineer/wounded_2.mp3",
+   "d": 1.83,
+   "h": "4b1f4d311c",
+   "t": "Ouch, I still need these hands.",
+   "v": "engineer"
+  },
+  "engineer.wounded.3": {
+   "f": "engineer/wounded_3.mp3",
+   "d": 0.66,
+   "h": "6effec1ee3",
+   "t": "I am hit!",
+   "v": "engineer"
+  },
+  "farmer.done.1": {
+   "f": "farmer/done_1.mp3",
+   "d": 1.33,
+   "h": "0dc5097b1b",
+   "t": "The cart is full.",
+   "v": "farmer"
+  },
+  "farmer.done.2": {
+   "f": "farmer/done_2.mp3",
+   "d": 1.33,
+   "h": "5f3dded36d",
+   "t": "The harvest is in.",
+   "v": "farmer"
+  },
+  "farmer.done.3": {
+   "f": "farmer/done_3.mp3",
+   "d": 1.29,
+   "h": "0d05493dc9",
+   "t": "Enough for today.",
+   "v": "farmer"
+  },
+  "farmer.move.1": {
+   "f": "farmer/move_1.mp3",
+   "d": 1.63,
+   "h": "febdfa0bb2",
+   "t": "I will look at the field.",
+   "v": "farmer"
+  },
+  "farmer.move.2": {
+   "f": "farmer/move_2.mp3",
+   "d": 0.98,
+   "h": "3623f39d15",
+   "t": "I am coming.",
+   "v": "farmer"
+  },
+  "farmer.move.3": {
+   "f": "farmer/move_3.mp3",
+   "d": 1.4,
+   "h": "d9749e5d54",
+   "t": "Then to the other field.",
+   "v": "farmer"
+  },
+  "farmer.select.1": {
+   "f": "farmer/select_1.mp3",
+   "d": 1.62,
+   "h": "b642bc82c7",
+   "t": "The grain stands well.",
+   "v": "farmer"
+  },
+  "farmer.select.2": {
+   "f": "farmer/select_2.mp3",
+   "d": 1.51,
+   "h": "990c57bad0",
+   "t": "What is it, my lord?",
+   "v": "farmer"
+  },
+  "farmer.select.3": {
+   "f": "farmer/select_3.mp3",
+   "d": 1.66,
+   "h": "36842ae751",
+   "t": "The harvest will not wait.",
+   "v": "farmer"
+  },
+  "farmer.work.1": {
+   "f": "farmer/work_1.mp3",
+   "d": 1.44,
+   "h": "87d996bef8",
+   "t": "It will be a good year.",
+   "v": "farmer"
+  },
+  "farmer.work.2": {
+   "f": "farmer/work_2.mp3",
+   "d": 1.38,
+   "h": "9c5859047f",
+   "t": "The ears are heavy.",
+   "v": "farmer"
+  },
+  "farmer.work.3": {
+   "f": "farmer/work_3.mp3",
+   "d": 1.72,
+   "h": "b790eca76f",
+   "t": "A sip of water, then on.",
+   "v": "farmer"
+  },
+  "farmer.work.4": {
+   "f": "farmer/work_4.mp3",
+   "d": 1.92,
+   "h": "64317c6a40",
+   "t": "Without us nobody eats.",
+   "v": "farmer"
+  },
+  "knight.attack.1": {
+   "f": "knight/attack_1.mp3",
+   "d": 1.91,
+   "h": "8b0d995f0f",
+   "t": "Charge!",
+   "v": "knight"
+  },
+  "knight.attack.2": {
+   "f": "knight/attack_2.mp3",
+   "d": 1.57,
+   "h": "a2d7f0eb36",
+   "t": "Lances down and at them!",
+   "v": "knight"
+  },
+  "knight.attack.3": {
+   "f": "knight/attack_3.mp3",
+   "d": 1.23,
+   "h": "25c1ef03bc",
+   "t": "For honor and castle!",
+   "v": "knight"
+  },
+  "knight.attack.4": {
+   "f": "knight/attack_4.mp3",
+   "d": 1.27,
+   "h": "2d6b85562f",
+   "t": "Riders, move forward!",
+   "v": "knight"
+  },
+  "knight.hold.1": {
+   "f": "knight/hold_1.mp3",
+   "d": 0.98,
+   "h": "95dfdfd0e3",
+   "t": "We hold the flank.",
+   "v": "knight"
+  },
+  "knight.hold.2": {
+   "f": "knight/hold_2.mp3",
+   "d": 2.4,
+   "h": "c785943045",
+   "t": "The horse stands calm, I keep watch.",
+   "v": "knight"
+  },
+  "knight.hold.3": {
+   "f": "knight/hold_3.mp3",
+   "d": 1.26,
+   "h": "991b35b3ed",
+   "t": "No one passes here.",
+   "v": "knight"
+  },
+  "knight.move.1": {
+   "f": "knight/move_1.mp3",
+   "d": 1.26,
+   "h": "8b3dfd552f",
+   "t": "Forward at a gallop!",
+   "v": "knight"
+  },
+  "knight.move.2": {
+   "f": "knight/move_2.mp3",
+   "d": 1.01,
+   "h": "fe6021ddba",
+   "t": "I ride at once.",
+   "v": "knight"
+  },
+  "knight.move.3": {
+   "f": "knight/move_3.mp3",
+   "d": 1.66,
+   "h": "2c70f3f3b1",
+   "t": "Out of my way, I am coming!",
+   "v": "knight"
+  },
+  "knight.move.4": {
+   "f": "knight/move_4.mp3",
+   "d": 1.74,
+   "h": "b15e9a1291",
+   "t": "The hooves thunder, we ride.",
+   "v": "knight"
+  },
+  "knight.select.1": {
+   "f": "knight/select_1.mp3",
+   "d": 1.51,
+   "h": "c3ee1e3e96",
+   "t": "I am listening, my lord.",
+   "v": "knight"
+  },
+  "knight.select.2": {
+   "f": "knight/select_2.mp3",
+   "d": 1.25,
+   "h": "037476df81",
+   "t": "The horse is saddled.",
+   "v": "knight"
+  },
+  "knight.select.3": {
+   "f": "knight/select_3.mp3",
+   "d": 1.03,
+   "h": "51ef8e26c5",
+   "t": "Ready to ride.",
+   "v": "knight"
+  },
+  "knight.select.4": {
+   "f": "knight/select_4.mp3",
+   "d": 1.3,
+   "h": "c1628e951b",
+   "t": "Name the target for me.",
+   "v": "knight"
+  },
+  "knight.wounded.1": {
+   "f": "knight/wounded_1.mp3",
+   "d": 1.67,
+   "h": "2551eaccea",
+   "t": "My horse is hurt!",
+   "v": "knight"
+  },
+  "knight.wounded.2": {
+   "f": "knight/wounded_2.mp3",
+   "d": 1.29,
+   "h": "35e8761b65",
+   "t": "The armor still holds.",
+   "v": "knight"
+  },
+  "knight.wounded.3": {
+   "f": "knight/wounded_3.mp3",
+   "d": 1.46,
+   "h": "c7312ae946",
+   "t": "I am shaken, but not beaten.",
+   "v": "knight"
+  },
+  "lord.attack.1": {
+   "f": "lord/attack_1.mp3",
+   "d": 1.17,
+   "h": "18e2641e8e",
+   "t": "For my house!",
+   "v": "lord"
+  },
+  "lord.attack.2": {
+   "f": "lord/attack_2.mp3",
+   "d": 1.32,
+   "h": "d3464995f0",
+   "t": "Meet the enemy!",
+   "v": "lord"
+  },
+  "lord.attack.3": {
+   "f": "lord/attack_3.mp3",
+   "d": 1.46,
+   "h": "dce060041b",
+   "t": "Follow your master!",
+   "v": "lord"
+  },
+  "lord.hold.1": {
+   "f": "lord/hold_1.mp3",
+   "d": 1.15,
+   "h": "b7926ed5b9",
+   "t": "This is my place.",
+   "v": "lord"
+  },
+  "lord.hold.2": {
+   "f": "lord/hold_2.mp3",
+   "d": 1.51,
+   "h": "592e81f041",
+   "t": "The castle will not fall.",
+   "v": "lord"
+  },
+  "lord.hold.3": {
+   "f": "lord/hold_3.mp3",
+   "d": 1.18,
+   "h": "e3d49e919f",
+   "t": "I will not yield.",
+   "v": "lord"
+  },
+  "lord.move.1": {
+   "f": "lord/move_1.mp3",
+   "d": 1.19,
+   "h": "4cd8057c26",
+   "t": "I will go myself.",
+   "v": "lord"
+  },
+  "lord.move.2": {
+   "f": "lord/move_2.mp3",
+   "d": 1.56,
+   "h": "6569be8447",
+   "t": "Follow me.",
+   "v": "lord"
+  },
+  "lord.move.3": {
+   "f": "lord/move_3.mp3",
+   "d": 1.13,
+   "h": "b7929ad1ce",
+   "t": "The way is clear.",
+   "v": "lord"
+  },
+  "lord.select.1": {
+   "f": "lord/select_1.mp3",
+   "d": 1.52,
+   "h": "ac1e8b201c",
+   "t": "Speak, I am listening.",
+   "v": "lord"
+  },
+  "lord.select.2": {
+   "f": "lord/select_2.mp3",
+   "d": 1.21,
+   "h": "33303f06b5",
+   "t": "I hear you.",
+   "v": "lord"
+  },
+  "lord.select.3": {
+   "f": "lord/select_3.mp3",
+   "d": 0.65,
+   "h": "18e9630465",
+   "t": "What is it?",
+   "v": "lord"
+  },
+  "lord.select.4": {
+   "f": "lord/select_4.mp3",
+   "d": 1.4,
+   "h": "6f1ce5ef37",
+   "t": "Talk, I am listening.",
+   "v": "lord"
+  },
+  "lord.special.1": {
+   "f": "lord/special_1.mp3",
+   "d": 2.09,
+   "h": "9a9b8574ea",
+   "t": "House and people are entrusted to me.",
+   "v": "lord"
+  },
+  "lord.special.2": {
+   "f": "lord/special_2.mp3",
+   "d": 1.11,
+   "h": "3768ffb050",
+   "t": "We have built much.",
+   "v": "lord"
+  },
+  "lord.special.3": {
+   "f": "lord/special_3.mp3",
+   "d": 1.33,
+   "h": "9ad532f1a3",
+   "t": "These walls will endure.",
+   "v": "lord"
+  },
+  "lord.wounded.1": {
+   "f": "lord/wounded_1.mp3",
+   "d": 1.3,
+   "h": "62badf260a",
+   "t": "That hurts, but I live.",
+   "v": "lord"
+  },
+  "lord.wounded.2": {
+   "f": "lord/wounded_2.mp3",
+   "d": 1.75,
+   "h": "e22c762f65",
+   "t": "I have been hit!",
+   "v": "lord"
+  },
+  "lord.wounded.3": {
+   "f": "lord/wounded_3.mp3",
+   "d": 1.32,
+   "h": "830ac8aef8",
+   "t": "Keep them away from me!",
+   "v": "lord"
+  },
+  "mason.done.1": {
+   "f": "mason/done_1.mp3",
+   "d": 0.98,
+   "h": "0c67fc967e",
+   "t": "A clean block.",
+   "v": "mason"
+  },
+  "mason.done.2": {
+   "f": "mason/done_2.mp3",
+   "d": 1.04,
+   "h": "230700388a",
+   "t": "The cart is loaded.",
+   "v": "mason"
+  },
+  "mason.done.3": {
+   "f": "mason/done_3.mp3",
+   "d": 1.0,
+   "h": "0b3cd2075b",
+   "t": "Firm as the mountain.",
+   "v": "mason"
+  },
+  "mason.move.1": {
+   "f": "mason/move_1.mp3",
+   "d": 1.24,
+   "h": "7db9690f55",
+   "t": "I will take the hammer.",
+   "v": "mason"
+  },
+  "mason.move.2": {
+   "f": "mason/move_2.mp3",
+   "d": 0.78,
+   "h": "aebd29f2bf",
+   "t": "To the quarry.",
+   "v": "mason"
+  },
+  "mason.move.3": {
+   "f": "mason/move_3.mp3",
+   "d": 1.54,
+   "h": "8cd34beb0e",
+   "t": "Already on my way.",
+   "v": "mason"
+  },
+  "mason.select.1": {
+   "f": "mason/select_1.mp3",
+   "d": 1.26,
+   "h": "7df977a5de",
+   "t": "Stone by stone.",
+   "v": "mason"
+  },
+  "mason.select.2": {
+   "f": "mason/select_2.mp3",
+   "d": 1.33,
+   "h": "8829333cd9",
+   "t": "The chisel never rests.",
+   "v": "mason"
+  },
+  "mason.select.3": {
+   "f": "mason/select_3.mp3",
+   "d": 1.53,
+   "h": "6c95c32a63",
+   "t": "I am listening, my lord.",
+   "v": "mason"
+  },
+  "mason.select.4": {
+   "f": "mason/select_4.mp3",
+   "d": 1.32,
+   "h": "d240f5b407",
+   "t": "The rock is already waiting.",
+   "v": "mason"
+  },
+  "mason.work.1": {
+   "f": "mason/work_1.mp3",
+   "d": 1.9,
+   "h": "9be58b0128",
+   "t": "Stone by stone one builds a castle.",
+   "v": "mason"
+  },
+  "mason.work.2": {
+   "f": "mason/work_2.mp3",
+   "d": 1.08,
+   "h": "319d231958",
+   "t": "The rock yields.",
+   "v": "mason"
+  },
+  "mason.work.3": {
+   "f": "mason/work_3.mp3",
+   "d": 1.67,
+   "h": "17de7eaf71",
+   "t": "That sounds like good stone.",
+   "v": "mason"
+  },
+  "mason.work.4": {
+   "f": "mason/work_4.mp3",
+   "d": 1.06,
+   "h": "0e9b47fd10",
+   "t": "One more chunk.",
+   "v": "mason"
+  },
+  "mercenary.attack.1": {
+   "f": "mercenary/attack_1.mp3",
+   "d": 0.7,
+   "h": "a404b853d7",
+   "t": "For the pay!",
+   "v": "mercenary"
+  },
+  "mercenary.attack.2": {
+   "f": "mercenary/attack_2.mp3",
+   "d": 1.41,
+   "h": "54001111dc",
+   "t": "Show them desert steel!",
+   "v": "mercenary"
+  },
+  "mercenary.attack.3": {
+   "f": "mercenary/attack_3.mp3",
+   "d": 2.24,
+   "h": "e6dd724020",
+   "t": "Attack, like the storm over the dunes!",
+   "v": "mercenary"
+  },
+  "mercenary.hold.1": {
+   "f": "mercenary/hold_1.mp3",
+   "d": 2.02,
+   "h": "aab5869146",
+   "t": "We hold as long as the pay lasts.",
+   "v": "mercenary"
+  },
+  "mercenary.hold.2": {
+   "f": "mercenary/hold_2.mp3",
+   "d": 0.89,
+   "h": "16996457b1",
+   "t": "We do not move.",
+   "v": "mercenary"
+  },
+  "mercenary.hold.3": {
+   "f": "mercenary/hold_3.mp3",
+   "d": 1.32,
+   "h": "b75b7a0fa0",
+   "t": "The dunes are our shield.",
+   "v": "mercenary"
+  },
+  "mercenary.move.1": {
+   "f": "mercenary/move_1.mp3",
+   "d": 0.74,
+   "h": "538fad2758",
+   "t": "We set off.",
+   "v": "mercenary"
+  },
+  "mercenary.move.2": {
+   "f": "mercenary/move_2.mp3",
+   "d": 1.52,
+   "h": "1d887209b5",
+   "t": "Swift as the desert wind.",
+   "v": "mercenary"
+  },
+  "mercenary.move.3": {
+   "f": "mercenary/move_3.mp3",
+   "d": 1.24,
+   "h": "d5c5171b56",
+   "t": "One order, one road.",
+   "v": "mercenary"
+  },
+  "mercenary.move.4": {
+   "f": "mercenary/move_4.mp3",
+   "d": 1.22,
+   "h": "179b5cd22c",
+   "t": "We follow the order.",
+   "v": "mercenary"
+  },
+  "mercenary.select.1": {
+   "f": "mercenary/select_1.mp3",
+   "d": 1.86,
+   "h": "a11528db50",
+   "t": "The pay is right, what is to be done?",
+   "v": "mercenary"
+  },
+  "mercenary.select.2": {
+   "f": "mercenary/select_2.mp3",
+   "d": 0.61,
+   "h": "720a4a0734",
+   "t": "Say where.",
+   "v": "mercenary"
+  },
+  "mercenary.select.3": {
+   "f": "mercenary/select_3.mp3",
+   "d": 2.32,
+   "h": "f84057b791",
+   "t": "We are yours as long as the coins ring.",
+   "v": "mercenary"
+  },
+  "mercenary.select.4": {
+   "f": "mercenary/select_4.mp3",
+   "d": 1.67,
+   "h": "59237c422f",
+   "t": "By the dunes, I am listening.",
+   "v": "mercenary"
+  },
+  "mercenary.wounded.1": {
+   "f": "mercenary/wounded_1.mp3",
+   "d": 1.36,
+   "h": "ff0835cb4b",
+   "t": "That will cost extra!",
+   "v": "mercenary"
+  },
+  "mercenary.wounded.2": {
+   "f": "mercenary/wounded_2.mp3",
+   "d": 1.41,
+   "h": "7acc9607a9",
+   "t": "I am bleeding, my lord.",
+   "v": "mercenary"
+  },
+  "mercenary.wounded.3": {
+   "f": "mercenary/wounded_3.mp3",
+   "d": 1.21,
+   "h": "319397764e",
+   "t": "That was a good blow.",
+   "v": "mercenary"
+  },
+  "miller.done.1": {
+   "f": "miller/done_1.mp3",
+   "d": 1.1,
+   "h": "f0ae6871b3",
+   "t": "The flour is sacked.",
+   "v": "miller"
+  },
+  "miller.done.2": {
+   "f": "miller/done_2.mp3",
+   "d": 0.94,
+   "h": "3472316a56",
+   "t": "A full sack.",
+   "v": "miller"
+  },
+  "miller.done.3": {
+   "f": "miller/done_3.mp3",
+   "d": 0.93,
+   "h": "73e77b3190",
+   "t": "Finely ground.",
+   "v": "miller"
+  },
+  "miller.move.1": {
+   "f": "miller/move_1.mp3",
+   "d": 1.12,
+   "h": "8162a6b3f2",
+   "t": "I will check the wind.",
+   "v": "miller"
+  },
+  "miller.move.2": {
+   "f": "miller/move_2.mp3",
+   "d": 2.21,
+   "h": "81077eae61",
+   "t": "I come as soon as the stone stops.",
+   "v": "miller"
+  },
+  "miller.move.3": {
+   "f": "miller/move_3.mp3",
+   "d": 0.82,
+   "h": "839df77582",
+   "t": "On my way.",
+   "v": "miller"
+  },
+  "miller.select.1": {
+   "f": "miller/select_1.mp3",
+   "d": 1.15,
+   "h": "4a4b330ef5",
+   "t": "The sails are turning.",
+   "v": "miller"
+  },
+  "miller.select.2": {
+   "f": "miller/select_2.mp3",
+   "d": 1.54,
+   "h": "d7dbce2279",
+   "t": "Grind, grind, grind.",
+   "v": "miller"
+  },
+  "miller.select.3": {
+   "f": "miller/select_3.mp3",
+   "d": 0.97,
+   "h": "c168d37c09",
+   "t": "Here is the mill.",
+   "v": "miller"
+  },
+  "miller.work.1": {
+   "f": "miller/work_1.mp3",
+   "d": 1.38,
+   "h": "448cd7ce29",
+   "t": "The wind is favorable.",
+   "v": "miller"
+  },
+  "miller.work.2": {
+   "f": "miller/work_2.mp3",
+   "d": 1.42,
+   "h": "af96d501f7",
+   "t": "The grain becomes flour.",
+   "v": "miller"
+  },
+  "miller.work.3": {
+   "f": "miller/work_3.mp3",
+   "d": 1.39,
+   "h": "269cb51543",
+   "t": "The stone grinds fine.",
+   "v": "miller"
+  },
+  "miller.work.4": {
+   "f": "miller/work_4.mp3",
+   "d": 1.45,
+   "h": "869f8714f1",
+   "t": "The sails turn nicely.",
+   "v": "miller"
+  },
+  "monk.attack.1": {
+   "f": "monk/attack_1.mp3",
+   "d": 1.62,
+   "h": "c1a9182e22",
+   "t": "May God forgive me.",
+   "v": "monk"
+  },
+  "monk.attack.2": {
+   "f": "monk/attack_2.mp3",
+   "d": 1.78,
+   "h": "816b215db9",
+   "t": "A staff is a weapon too.",
+   "v": "monk"
+  },
+  "monk.attack.3": {
+   "f": "monk/attack_3.mp3",
+   "d": 1.76,
+   "h": "de9db513fd",
+   "t": "I attack, in humility.",
+   "v": "monk"
+  },
+  "monk.hold.1": {
+   "f": "monk/hold_1.mp3",
+   "d": 1.79,
+   "h": "68e440d5ce",
+   "t": "I pray for our walls.",
+   "v": "monk"
+  },
+  "monk.hold.2": {
+   "f": "monk/hold_2.mp3",
+   "d": 1.47,
+   "h": "99f048e6e1",
+   "t": "Here I keep watch.",
+   "v": "monk"
+  },
+  "monk.hold.3": {
+   "f": "monk/hold_3.mp3",
+   "d": 1.71,
+   "h": "e9d7d901e7",
+   "t": "I stay with the wounded.",
+   "v": "monk"
+  },
+  "monk.move.1": {
+   "f": "monk/move_1.mp3",
+   "d": 1.57,
+   "h": "6f98de7c0a",
+   "t": "I go where need calls.",
+   "v": "monk"
+  },
+  "monk.move.2": {
+   "f": "monk/move_2.mp3",
+   "d": 1.76,
+   "h": "fe4860870c",
+   "t": "At a brisk pace, my lord.",
+   "v": "monk"
+  },
+  "monk.move.3": {
+   "f": "monk/move_3.mp3",
+   "d": 0.81,
+   "h": "aaa3d08d81",
+   "t": "I hurry.",
+   "v": "monk"
+  },
+  "monk.select.1": {
+   "f": "monk/select_1.mp3",
+   "d": 1.12,
+   "h": "b2f9acb2d9",
+   "t": "Peace be with you.",
+   "v": "monk"
+  },
+  "monk.select.2": {
+   "f": "monk/select_2.mp3",
+   "d": 1.22,
+   "h": "ad37c84629",
+   "t": "Heaven bless you.",
+   "v": "monk"
+  },
+  "monk.select.3": {
+   "f": "monk/select_3.mp3",
+   "d": 1.03,
+   "h": "4224413619",
+   "t": "How can I help?",
+   "v": "monk"
+  },
+  "monk.special.1": {
+   "f": "monk/special_1.mp3",
+   "d": 1.31,
+   "h": "149dc47b8a",
+   "t": "The blessing works.",
+   "v": "monk"
+  },
+  "monk.special.2": {
+   "f": "monk/special_2.mp3",
+   "d": 1.31,
+   "h": "e573b43761",
+   "t": "You are whole again.",
+   "v": "monk"
+  },
+  "monk.special.3": {
+   "f": "monk/special_3.mp3",
+   "d": 1.84,
+   "h": "6d02aa0141",
+   "t": "It was only a scratch.",
+   "v": "monk"
+  },
+  "monk.wounded.1": {
+   "f": "monk/wounded_1.mp3",
+   "d": 1.95,
+   "h": "3090bf4c8f",
+   "t": "God help me!",
+   "v": "monk"
+  },
+  "monk.wounded.2": {
+   "f": "monk/wounded_2.mp3",
+   "d": 1.36,
+   "h": "cd0ce87918",
+   "t": "I cannot heal myself!",
+   "v": "monk"
+  },
+  "monk.wounded.3": {
+   "f": "monk/wounded_3.mp3",
+   "d": 1.81,
+   "h": "c1738f1c16",
+   "t": "Ouch, my habit is burning!",
+   "v": "monk"
+  },
+  "peasant.attack.1": {
+   "f": "peasant/attack_1.mp3",
+   "d": 1.17,
+   "h": "c1457e58fa",
+   "t": "I am no fighter!",
+   "v": "peasant"
+  },
+  "peasant.attack.2": {
+   "f": "peasant/attack_2.mp3",
+   "d": 0.94,
+   "h": "765464e921",
+   "t": "With a pitchfork?",
+   "v": "peasant"
+  },
+  "peasant.attack.3": {
+   "f": "peasant/attack_3.mp3",
+   "d": 1.78,
+   "h": "99070421a0",
+   "t": "Does that really have to be?",
+   "v": "peasant"
+  },
+  "peasant.done.1": {
+   "f": "peasant/done_1.mp3",
+   "d": 0.4,
+   "h": "78364ac7d7",
+   "t": "Done!",
+   "v": "peasant"
+  },
+  "peasant.done.2": {
+   "f": "peasant/done_2.mp3",
+   "d": 1.47,
+   "h": "7a59d5ab88",
+   "t": "There, that is finished.",
+   "v": "peasant"
+  },
+  "peasant.done.3": {
+   "f": "peasant/done_3.mp3",
+   "d": 1.55,
+   "h": "95d82bd3f9",
+   "t": "One piece of work less.",
+   "v": "peasant"
+  },
+  "peasant.hold.1": {
+   "f": "peasant/hold_1.mp3",
+   "d": 1.22,
+   "h": "f5c2788dd2",
+   "t": "I will stay here.",
+   "v": "peasant"
+  },
+  "peasant.hold.2": {
+   "f": "peasant/hold_2.mp3",
+   "d": 1.06,
+   "h": "c58490da05",
+   "t": "Then I will wait.",
+   "v": "peasant"
+  },
+  "peasant.hold.3": {
+   "f": "peasant/hold_3.mp3",
+   "d": 2.03,
+   "h": "2e8a213568",
+   "t": "It is safe enough here, is it not?",
+   "v": "peasant"
+  },
+  "peasant.move.1": {
+   "f": "peasant/move_1.mp3",
+   "d": 1.63,
+   "h": "c13e11f883",
+   "t": "Yes, I am going already.",
+   "v": "peasant"
+  },
+  "peasant.move.2": {
+   "f": "peasant/move_2.mp3",
+   "d": 0.98,
+   "h": "607b2a826b",
+   "t": "On my way.",
+   "v": "peasant"
+  },
+  "peasant.move.3": {
+   "f": "peasant/move_3.mp3",
+   "d": 1.17,
+   "h": "1baa171b08",
+   "t": "Over there, then.",
+   "v": "peasant"
+  },
+  "peasant.move.4": {
+   "f": "peasant/move_4.mp3",
+   "d": 1.2,
+   "h": "3a999dc71f",
+   "t": "I will be right there.",
+   "v": "peasant"
+  },
+  "peasant.select.1": {
+   "f": "peasant/select_1.mp3",
+   "d": 1.33,
+   "h": "f9fb6152df",
+   "t": "The fields are waiting.",
+   "v": "peasant"
+  },
+  "peasant.select.2": {
+   "f": "peasant/select_2.mp3",
+   "d": 1.61,
+   "h": "499469f7f3",
+   "t": "Yes, my lord, what is it?",
+   "v": "peasant"
+  },
+  "peasant.select.3": {
+   "f": "peasant/select_3.mp3",
+   "d": 1.03,
+   "h": "2ed6031df1",
+   "t": "Is there work?",
+   "v": "peasant"
+  },
+  "peasant.select.4": {
+   "f": "peasant/select_4.mp3",
+   "d": 0.98,
+   "h": "169933d85e",
+   "t": "How can I help?",
+   "v": "peasant"
+  },
+  "peasant.work.1": {
+   "f": "peasant/work_1.mp3",
+   "d": 1.57,
+   "h": "b517c2d335",
+   "t": "Work does not do itself.",
+   "v": "peasant"
+  },
+  "peasant.work.2": {
+   "f": "peasant/work_2.mp3",
+   "d": 1.33,
+   "h": "3f35921afd",
+   "t": "On and on and on.",
+   "v": "peasant"
+  },
+  "peasant.work.3": {
+   "f": "peasant/work_3.mp3",
+   "d": 1.08,
+   "h": "50b1f911fb",
+   "t": "One more handful.",
+   "v": "peasant"
+  },
+  "peasant.work.4": {
+   "f": "peasant/work_4.mp3",
+   "d": 1.58,
+   "h": "2f78f3b435",
+   "t": "The sun is already high.",
+   "v": "peasant"
+  },
+  "peasant.wounded.1": {
+   "f": "peasant/wounded_1.mp3",
+   "d": 1.42,
+   "h": "36b4995961",
+   "t": "Ouch, that hurts!",
+   "v": "peasant"
+  },
+  "peasant.wounded.2": {
+   "f": "peasant/wounded_2.mp3",
+   "d": 0.85,
+   "h": "f824e60583",
+   "t": "Someone help!",
+   "v": "peasant"
+  },
+  "peasant.wounded.3": {
+   "f": "peasant/wounded_3.mp3",
+   "d": 1.15,
+   "h": "77721937e4",
+   "t": "Save yourselves!",
+   "v": "peasant"
+  },
+  "siege.attack.1": {
+   "f": "siege/attack_1.mp3",
+   "d": 1.53,
+   "h": "197ed8b450",
+   "t": "Target locked, fire!",
+   "v": "siege"
+  },
+  "siege.attack.2": {
+   "f": "siege/attack_2.mp3",
+   "d": 0.96,
+   "h": "682abc5915",
+   "t": "Stone away!",
+   "v": "siege"
+  },
+  "siege.attack.3": {
+   "f": "siege/attack_3.mp3",
+   "d": 1.3,
+   "h": "fdf0386336",
+   "t": "Reload and let fly!",
+   "v": "siege"
+  },
+  "siege.attack.4": {
+   "f": "siege/attack_4.mp3",
+   "d": 1.8,
+   "h": "aef7c55667",
+   "t": "The walls are shaking, soon they fall!",
+   "v": "siege"
+  },
+  "siege.hold.1": {
+   "f": "siege/hold_1.mp3",
+   "d": 1.09,
+   "h": "c7b2bfca32",
+   "t": "We stay in position.",
+   "v": "siege"
+  },
+  "siege.hold.2": {
+   "f": "siege/hold_2.mp3",
+   "d": 1.31,
+   "h": "676d47ed5b",
+   "t": "The engine is secured.",
+   "v": "siege"
+  },
+  "siege.hold.3": {
+   "f": "siege/hold_3.mp3",
+   "d": 1.05,
+   "h": "7516d2776f",
+   "t": "We await your sign.",
+   "v": "siege"
+  },
+  "siege.move.1": {
+   "f": "siege/move_1.mp3",
+   "d": 0.86,
+   "h": "4bc6bbc72c",
+   "t": "Pull! Pull!",
+   "v": "siege"
+  },
+  "siege.move.2": {
+   "f": "siege/move_2.mp3",
+   "d": 1.75,
+   "h": "a95473dc1d",
+   "t": "Slow and steady, it is heavy.",
+   "v": "siege"
+  },
+  "siege.move.3": {
+   "f": "siege/move_3.mp3",
+   "d": 1.34,
+   "h": "868ef96c06",
+   "t": "All hands to the ropes!",
+   "v": "siege"
+  },
+  "siege.move.4": {
+   "f": "siege/move_4.mp3",
+   "d": 0.94,
+   "h": "ce5bcfb91b",
+   "t": "We will get it there.",
+   "v": "siege"
+  },
+  "siege.select.1": {
+   "f": "siege/select_1.mp3",
+   "d": 1.18,
+   "h": "9024b967a2",
+   "t": "The engine is ready.",
+   "v": "siege"
+  },
+  "siege.select.2": {
+   "f": "siege/select_2.mp3",
+   "d": 1.13,
+   "h": "5896e4c1b0",
+   "t": "The crew has assembled.",
+   "v": "siege"
+  },
+  "siege.select.3": {
+   "f": "siege/select_3.mp3",
+   "d": 1.16,
+   "h": "ffccbd7a6d",
+   "t": "Grease the axles!",
+   "v": "siege"
+  },
+  "siege.select.4": {
+   "f": "siege/select_4.mp3",
+   "d": 1.6,
+   "h": "79648d5c00",
+   "t": "We push it, my lord.",
+   "v": "siege"
+  },
+  "siege.special.1": {
+   "f": "siege/special_1.mp3",
+   "d": 1.05,
+   "h": "27688d536d",
+   "t": "The arm is drawn.",
+   "v": "siege"
+  },
+  "siege.special.2": {
+   "f": "siege/special_2.mp3",
+   "d": 1.83,
+   "h": "f4f0c3f605",
+   "t": "Careful, it will land any moment!",
+   "v": "siege"
+  },
+  "siege.special.3": {
+   "f": "siege/special_3.mp3",
+   "d": 0.81,
+   "h": "74393f952f",
+   "t": "Engine loaded.",
+   "v": "siege"
+  },
+  "siege.wounded.1": {
+   "f": "siege/wounded_1.mp3",
+   "d": 1.26,
+   "h": "cda4e893d4",
+   "t": "The engine is damaged!",
+   "v": "siege"
+  },
+  "siege.wounded.2": {
+   "f": "siege/wounded_2.mp3",
+   "d": 1.21,
+   "h": "76d19f7c61",
+   "t": "The crew is thinned out!",
+   "v": "siege"
+  },
+  "siege.wounded.3": {
+   "f": "siege/wounded_3.mp3",
+   "d": 1.32,
+   "h": "1e55bb1951",
+   "t": "We need an engineer!",
+   "v": "siege"
+  },
+  "smith.done.1": {
+   "f": "smith/done_1.mp3",
+   "d": 0.65,
+   "h": "f34c07756b",
+   "t": "Forged.",
+   "v": "smith"
+  },
+  "smith.done.2": {
+   "f": "smith/done_2.mp3",
+   "d": 1.34,
+   "h": "63d3995dbe",
+   "t": "That will hold, I promise.",
+   "v": "smith"
+  },
+  "smith.done.3": {
+   "f": "smith/done_3.mp3",
+   "d": 0.94,
+   "h": "abec1816f7",
+   "t": "A masterpiece.",
+   "v": "smith"
+  },
+  "smith.move.1": {
+   "f": "smith/move_1.mp3",
+   "d": 1.58,
+   "h": "ecd61cf4ff",
+   "t": "Let me quickly put out the fire.",
+   "v": "smith"
+  },
+  "smith.move.2": {
+   "f": "smith/move_2.mp3",
+   "d": 1.71,
+   "h": "21a085461d",
+   "t": "I come when the iron is cold.",
+   "v": "smith"
+  },
+  "smith.move.3": {
+   "f": "smith/move_3.mp3",
+   "d": 0.9,
+   "h": "acc6c525d4",
+   "t": "On my way.",
+   "v": "smith"
+  },
+  "smith.select.1": {
+   "f": "smith/select_1.mp3",
+   "d": 1.25,
+   "h": "3974459115",
+   "t": "The iron is hot.",
+   "v": "smith"
+  },
+  "smith.select.2": {
+   "f": "smith/select_2.mp3",
+   "d": 1.2,
+   "h": "44f87ea296",
+   "t": "What shall I forge?",
+   "v": "smith"
+  },
+  "smith.select.3": {
+   "f": "smith/select_3.mp3",
+   "d": 1.19,
+   "h": "26e5e32ee2",
+   "t": "The anvil is waiting.",
+   "v": "smith"
+  },
+  "smith.work.1": {
+   "f": "smith/work_1.mp3",
+   "d": 1.03,
+   "h": "1cd70480ff",
+   "t": "Blow after blow.",
+   "v": "smith"
+  },
+  "smith.work.2": {
+   "f": "smith/work_2.mp3",
+   "d": 1.8,
+   "h": "806d908be8",
+   "t": "The fire must get hotter.",
+   "v": "smith"
+  },
+  "smith.work.3": {
+   "f": "smith/work_3.mp3",
+   "d": 1.18,
+   "h": "dbb531c70a",
+   "t": "This will be a good blade.",
+   "v": "smith"
+  },
+  "smith.work.4": {
+   "f": "smith/work_4.mp3",
+   "d": 1.17,
+   "h": "b6498048f0",
+   "t": "The sparks fly.",
+   "v": "smith"
+  },
+  "spearman.attack.1": {
+   "f": "spearman/attack_1.mp3",
+   "d": 1.1,
+   "h": "bd951c3530",
+   "t": "Spears forward!",
+   "v": "spearman"
+  },
+  "spearman.attack.2": {
+   "f": "spearman/attack_2.mp3",
+   "d": 1.52,
+   "h": "eb6e41b70f",
+   "t": "Hold the line and thrust!",
+   "v": "spearman"
+  },
+  "spearman.attack.3": {
+   "f": "spearman/attack_3.mp3",
+   "d": 1.36,
+   "h": "673a36cdf7",
+   "t": "Attack, points forward!",
+   "v": "spearman"
+  },
+  "spearman.hold.1": {
+   "f": "spearman/hold_1.mp3",
+   "d": 1.87,
+   "h": "dcffe8d238",
+   "t": "Spears lowered, we hold.",
+   "v": "spearman"
+  },
+  "spearman.hold.2": {
+   "f": "spearman/hold_2.mp3",
+   "d": 1.69,
+   "h": "264bad47ba",
+   "t": "Riders will not pass here.",
+   "v": "spearman"
+  },
+  "spearman.hold.3": {
+   "f": "spearman/hold_3.mp3",
+   "d": 1.08,
+   "h": "8c0cfc7196",
+   "t": "The line stands.",
+   "v": "spearman"
+  },
+  "spearman.move.1": {
+   "f": "spearman/move_1.mp3",
+   "d": 0.81,
+   "h": "d76db1a077",
+   "t": "We set off.",
+   "v": "spearman"
+  },
+  "spearman.move.2": {
+   "f": "spearman/move_2.mp3",
+   "d": 1.52,
+   "h": "77db345981",
+   "t": "In line, follow me!",
+   "v": "spearman"
+  },
+  "spearman.move.3": {
+   "f": "spearman/move_3.mp3",
+   "d": 2.08,
+   "h": "143defbbc9",
+   "t": "Spears on shoulders, march!",
+   "v": "spearman"
+  },
+  "spearman.move.4": {
+   "f": "spearman/move_4.mp3",
+   "d": 1.72,
+   "h": "4f2e8818c4",
+   "t": "Understood, my lord.",
+   "v": "spearman"
+  },
+  "spearman.select.1": {
+   "f": "spearman/select_1.mp3",
+   "d": 1.27,
+   "h": "3eac5f4ff5",
+   "t": "Spear raised.",
+   "v": "spearman"
+  },
+  "spearman.select.2": {
+   "f": "spearman/select_2.mp3",
+   "d": 0.76,
+   "h": "738ed4dc27",
+   "t": "We are ready.",
+   "v": "spearman"
+  },
+  "spearman.select.3": {
+   "f": "spearman/select_3.mp3",
+   "d": 0.99,
+   "h": "31b2b130f3",
+   "t": "Give us the direction.",
+   "v": "spearman"
+  },
+  "spearman.select.4": {
+   "f": "spearman/select_4.mp3",
+   "d": 0.89,
+   "h": "3e48473aca",
+   "t": "Points forward.",
+   "v": "spearman"
+  },
+  "spearman.wounded.1": {
+   "f": "spearman/wounded_1.mp3",
+   "d": 0.72,
+   "h": "80e6c06146",
+   "t": "I am hit!",
+   "v": "spearman"
+  },
+  "spearman.wounded.2": {
+   "f": "spearman/wounded_2.mp3",
+   "d": 1.21,
+   "h": "7d6a86e2d3",
+   "t": "I can still stand.",
+   "v": "spearman"
+  },
+  "spearman.wounded.3": {
+   "f": "spearman/wounded_3.mp3",
+   "d": 2.16,
+   "h": "b978b00106",
+   "t": "Too badly hurt, my lord!",
+   "v": "spearman"
+  },
+  "swordsman.attack.1": {
+   "f": "swordsman/attack_1.mp3",
+   "d": 0.62,
+   "h": "9a0d62cd5b",
+   "t": "At them!",
+   "v": "swordsman"
+  },
+  "swordsman.attack.2": {
+   "f": "swordsman/attack_2.mp3",
+   "d": 0.96,
+   "h": "df7b5bc752",
+   "t": "For our castle!",
+   "v": "swordsman"
+  },
+  "swordsman.attack.3": {
+   "f": "swordsman/attack_3.mp3",
+   "d": 1.38,
+   "h": "f28bda0678",
+   "t": "Shields up, then strike!",
+   "v": "swordsman"
+  },
+  "swordsman.attack.4": {
+   "f": "swordsman/attack_4.mp3",
+   "d": 0.88,
+   "h": "34e4319026",
+   "t": "To the attack!",
+   "v": "swordsman"
+  },
+  "swordsman.hold.1": {
+   "f": "swordsman/hold_1.mp3",
+   "d": 1.13,
+   "h": "4998546da4",
+   "t": "We hold our ground.",
+   "v": "swordsman"
+  },
+  "swordsman.hold.2": {
+   "f": "swordsman/hold_2.mp3",
+   "d": 1.37,
+   "h": "0491a6cfae",
+   "t": "No one gets through here.",
+   "v": "swordsman"
+  },
+  "swordsman.hold.3": {
+   "f": "swordsman/hold_3.mp3",
+   "d": 1.03,
+   "h": "b36d3f3d57",
+   "t": "Shields together!",
+   "v": "swordsman"
+  },
+  "swordsman.hold.4": {
+   "f": "swordsman/hold_4.mp3",
+   "d": 1.31,
+   "h": "00545de57e",
+   "t": "We stand like a rock.",
+   "v": "swordsman"
+  },
+  "swordsman.move.1": {
+   "f": "swordsman/move_1.mp3",
+   "d": 0.85,
+   "h": "5c34c531d5",
+   "t": "We advance.",
+   "v": "swordsman"
+  },
+  "swordsman.move.2": {
+   "f": "swordsman/move_2.mp3",
+   "d": 1.25,
+   "h": "514c8fb935",
+   "t": "March, men!",
+   "v": "swordsman"
+  },
+  "swordsman.move.3": {
+   "f": "swordsman/move_3.mp3",
+   "d": 1.39,
+   "h": "ec0fc82869",
+   "t": "Understood, we march.",
+   "v": "swordsman"
+  },
+  "swordsman.move.4": {
+   "f": "swordsman/move_4.mp3",
+   "d": 0.78,
+   "h": "a1dbb64f89",
+   "t": "We are going.",
+   "v": "swordsman"
+  },
+  "swordsman.select.1": {
+   "f": "swordsman/select_1.mp3",
+   "d": 0.97,
+   "h": "1dc6881e8c",
+   "t": "Sword ready.",
+   "v": "swordsman"
+  },
+  "swordsman.select.2": {
+   "f": "swordsman/select_2.mp3",
+   "d": 1.65,
+   "h": "59e6910bb6",
+   "t": "We are listening, my lord.",
+   "v": "swordsman"
+  },
+  "swordsman.select.3": {
+   "f": "swordsman/select_3.mp3",
+   "d": 0.9,
+   "h": "69b7730d08",
+   "t": "At your service.",
+   "v": "swordsman"
+  },
+  "swordsman.select.4": {
+   "f": "swordsman/select_4.mp3",
+   "d": 1.06,
+   "h": "b49c1926bf",
+   "t": "The blades are sharp.",
+   "v": "swordsman"
+  },
+  "swordsman.wounded.1": {
+   "f": "swordsman/wounded_1.mp3",
+   "d": 1.17,
+   "h": "e4832c6c45",
+   "t": "That was a hard blow!",
+   "v": "swordsman"
+  },
+  "swordsman.wounded.2": {
+   "f": "swordsman/wounded_2.mp3",
+   "d": 1.64,
+   "h": "c3669d22e1",
+   "t": "I am bleeding, but I fight on.",
+   "v": "swordsman"
+  },
+  "swordsman.wounded.3": {
+   "f": "swordsman/wounded_3.mp3",
+   "d": 0.9,
+   "h": "95ed05d4d3",
+   "t": "I need help!",
+   "v": "swordsman"
+  },
+  "trader.done.1": {
+   "f": "trader/done_1.mp3",
+   "d": 0.81,
+   "h": "070b0c4d0d",
+   "t": "A good deal.",
+   "v": "trader"
+  },
+  "trader.done.2": {
+   "f": "trader/done_2.mp3",
+   "d": 1.39,
+   "h": "fb1bd45336",
+   "t": "The gold sounds lovely.",
+   "v": "trader"
+  },
+  "trader.done.3": {
+   "f": "trader/done_3.mp3",
+   "d": 0.51,
+   "h": "8506dad8b7",
+   "t": "Agreed.",
+   "v": "trader"
+  },
+  "trader.move.1": {
+   "f": "trader/move_1.mp3",
+   "d": 0.94,
+   "h": "8b33fcc54f",
+   "t": "I am packing up.",
+   "v": "trader"
+  },
+  "trader.move.2": {
+   "f": "trader/move_2.mp3",
+   "d": 1.2,
+   "h": "bd17d60bf3",
+   "t": "My wares travel with me.",
+   "v": "trader"
+  },
+  "trader.move.3": {
+   "f": "trader/move_3.mp3",
+   "d": 0.71,
+   "h": "89cf7f75b7",
+   "t": "On my way.",
+   "v": "trader"
+  },
+  "trader.select.1": {
+   "f": "trader/select_1.mp3",
+   "d": 1.55,
+   "h": "a120a5613d",
+   "t": "Fine goods, fair prices.",
+   "v": "trader"
+  },
+  "trader.select.2": {
+   "f": "trader/select_2.mp3",
+   "d": 0.9,
+   "h": "9a87b483e8",
+   "t": "What may it be?",
+   "v": "trader"
+  },
+  "trader.select.3": {
+   "f": "trader/select_3.mp3",
+   "d": 1.55,
+   "h": "80d34390fc",
+   "t": "Gold opens every door.",
+   "v": "trader"
+  },
+  "trader.work.1": {
+   "f": "trader/work_1.mp3",
+   "d": 1.41,
+   "h": "4c2e930e76",
+   "t": "Date wine, fresh and cool!",
+   "v": "trader"
+  },
+  "trader.work.2": {
+   "f": "trader/work_2.mp3",
+   "d": 1.59,
+   "h": "78abf54f41",
+   "t": "Fabrics from distant cities!",
+   "v": "trader"
+  },
+  "trader.work.3": {
+   "f": "trader/work_3.mp3",
+   "d": 1.51,
+   "h": "e23c3c4495",
+   "t": "The best prices in town!",
+   "v": "trader"
+  },
+  "trader.work.4": {
+   "f": "trader/work_4.mp3",
+   "d": 1.08,
+   "h": "80cdc1f1db",
+   "t": "Who buys, wins!",
+   "v": "trader"
+  },
+  "woodcutter.done.1": {
+   "f": "woodcutter/done_1.mp3",
+   "d": 1.12,
+   "h": "b2154d1bc8",
+   "t": "The wood is stacked.",
+   "v": "woodcutter"
+  },
+  "woodcutter.done.2": {
+   "f": "woodcutter/done_2.mp3",
+   "d": 1.1,
+   "h": "5cd108c3fa",
+   "t": "Another load done.",
+   "v": "woodcutter"
+  },
+  "woodcutter.done.3": {
+   "f": "woodcutter/done_3.mp3",
+   "d": 1.19,
+   "h": "3953d7855e",
+   "t": "The pile is growing.",
+   "v": "woodcutter"
+  },
+  "woodcutter.move.1": {
+   "f": "woodcutter/move_1.mp3",
+   "d": 1.49,
+   "h": "ed0c6ca3c5",
+   "t": "I will take the axe along.",
+   "v": "woodcutter"
+  },
+  "woodcutter.move.2": {
+   "f": "woodcutter/move_2.mp3",
+   "d": 1.22,
+   "h": "b9900bea7b",
+   "t": "To the next forest.",
+   "v": "woodcutter"
+  },
+  "woodcutter.move.3": {
+   "f": "woodcutter/move_3.mp3",
+   "d": 1.1,
+   "h": "ed2a5c738b",
+   "t": "Then I will go there.",
+   "v": "woodcutter"
+  },
+  "woodcutter.select.1": {
+   "f": "woodcutter/select_1.mp3",
+   "d": 1.03,
+   "h": "db2ffd5a31",
+   "t": "I will get to work.",
+   "v": "woodcutter"
+  },
+  "woodcutter.select.2": {
+   "f": "woodcutter/select_2.mp3",
+   "d": 1.07,
+   "h": "5f68f0a061",
+   "t": "The axe is sharp.",
+   "v": "woodcutter"
+  },
+  "woodcutter.select.3": {
+   "f": "woodcutter/select_3.mp3",
+   "d": 1.69,
+   "h": "982fd4832d",
+   "t": "Wood does not grow at the market.",
+   "v": "woodcutter"
+  },
+  "woodcutter.select.4": {
+   "f": "woodcutter/select_4.mp3",
+   "d": 0.85,
+   "h": "3cab87d8f0",
+   "t": "What do you need?",
+   "v": "woodcutter"
+  },
+  "woodcutter.work.1": {
+   "f": "woodcutter/work_1.mp3",
+   "d": 1.43,
+   "h": "fcbff9d27e",
+   "t": "Here falls the next tree.",
+   "v": "woodcutter"
+  },
+  "woodcutter.work.2": {
+   "f": "woodcutter/work_2.mp3",
+   "d": 0.58,
+   "h": "6419a489c6",
+   "t": "Timber!",
+   "v": "woodcutter"
+  },
+  "woodcutter.work.3": {
+   "f": "woodcutter/work_3.mp3",
+   "d": 1.39,
+   "h": "6afaa2078b",
+   "t": "It smells of fresh wood.",
+   "v": "woodcutter"
+  },
+  "woodcutter.work.4": {
+   "f": "woodcutter/work_4.mp3",
+   "d": 1.81,
+   "h": "a037811781",
+   "t": "One more blow, then it topples.",
+   "v": "woodcutter"
+  }
+ }
+}

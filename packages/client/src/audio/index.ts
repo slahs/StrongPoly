@@ -4,6 +4,11 @@
  * räumlich nach Kameraposition/Zoom, begrenzt Stimmen und steuert die generative Musik.
  */
 import { leadClass, voiceClassOf, CommandKind, VoiceClass } from './classes';
+import { VoiceEvent } from '@strongpoly/shared';
+import { VoiceSystem } from './voice';
+import { Ambience } from './ambience';
+import { AmbienceInput, SILENT_TARGETS } from './ambience_logic';
+import { eventOfCommand, groupOfBuilding, groupOfUnit, leadGroup } from './voice_groups';
 import { applyLevels, AudioSettings, Bus, Channel, createBus, DEFAULT_AUDIO } from './engine';
 import { Listener, LIMITER_CFG, spatialize, VoiceLimiter } from './mix';
 import { MusicPlayer, MusicStats } from './music';
@@ -17,6 +22,7 @@ export { DEFAULT_AUDIO } from './engine';
 export type { CommandKind, VoiceClass } from './classes';
 export type { GameMood, ThemeId } from './theory';
 export type { SfxId } from './sfx';
+export type { VoiceApi, SpeakRequest, VoicePriority } from './voice_api';
 
 const CHANNEL: Partial<Record<SfxId, Channel>> = {
   uiHover: 'ui',
@@ -78,6 +84,8 @@ interface DebugState {
   music: MusicStats | null;
   settings: AudioSettings;
   listener: Listener;
+  voice: ReturnType<VoiceSystem['debug']>;
+  ambience: { targets: Ambience['state']; played: Ambience['played'] } | null;
 }
 
 export class AudioEngine {
@@ -86,6 +94,7 @@ export class AudioEngine {
   private bus: Bus | null = null;
   private noise: AudioBuffer | null = null;
   private music: MusicPlayer | null = null;
+  private ambience: Ambience | null = null;
   private limiter = new VoiceLimiter(LIMITER_CFG);
   private listener: Listener = { x: 0, y: 0, yaw: Math.PI / 4, dist: 38 };
   private mood: GameMood = 'build';
@@ -93,10 +102,20 @@ export class AudioEngine {
   private played: Record<string, number> = {};
   private seed = (Math.random() * 0x7fffffff) | 0;
   private lastHover: Element | null = null;
+  /** Sprachsystem (Einheiten, Bewohner, Berater); Vertrag `VoiceApi` */
+  readonly voice: VoiceSystem;
+  private lastSel = { sig: '', at: 0 };
   private visTimer: ReturnType<typeof setTimeout> | null = null;
   private unlockBound = (e: Event): void => this.unlock(e);
 
   constructor() {
+    this.voice = new VoiceSystem({
+      isReady: () => this.ready,
+      settings: () => this.cfg,
+      ctx: () => this.ctx,
+      bus: () => this.bus,
+      listener: () => this.listener,
+    });
     if (typeof window === 'undefined') return;
     // Browser erlauben Audio erst nach einer Nutzergeste: erst dann Kontext erzeugen/fortsetzen
     for (const ev of ['pointerdown', 'keydown', 'touchend', 'mousedown']) window.addEventListener(ev, this.unlockBound, { capture: true, passive: true });
@@ -146,6 +165,8 @@ export class AudioEngine {
   private onRunning(): void {
     for (const ev of ['pointerdown', 'keydown', 'touchend', 'mousedown']) window.removeEventListener(ev, this.unlockBound, { capture: true });
     this.syncMusic();
+    this.voice.init();
+    this.syncAmbience();
   }
 
   /** true, wenn Klänge gerade hörbar abgespielt werden können. */
@@ -175,7 +196,11 @@ export class AudioEngine {
   configure(s: Partial<AudioSettings>): void {
     const wasMusic = this.cfg.musicOn;
     Object.assign(this.cfg, s);
-    for (const k of ['master', 'sfx', 'music', 'advisor'] as const) this.cfg[k] = Math.max(0, Math.min(1, Number(this.cfg[k]) || 0));
+    for (const k of ['master', 'sfx', 'music', 'advisor', 'voice', 'ambient'] as const) this.cfg[k] = Math.max(0, Math.min(1, Number(this.cfg[k]) || 0));
+    this.cfg.subtitles = !!this.cfg.subtitles;
+    this.cfg.ttsFallback = this.cfg.ttsFallback !== false;
+    if (!this.cfg.subtitles) this.voice.overlay.clear();
+    if (this.cfg.muted) this.voice.stop();
     if (this.ctx && this.bus) applyLevels(this.bus, this.cfg, this.ctx);
     if (wasMusic !== this.cfg.musicOn) this.syncMusic();
   }
@@ -204,6 +229,7 @@ export class AudioEngine {
     l.y = y;
     l.yaw = yaw;
     l.dist = dist;
+    this.voice.pump();
   }
 
   // ---------------------------------------------------------------------------------------
@@ -364,7 +390,8 @@ export class AudioEngine {
   // ---------------------------------------------------------------------------------------
   // Einheiten
 
-  private voice(cls: VoiceClass, mode: 'select' | 'command', kind: CommandKind = 'move'): void {
+  /** Letzter Ausweg ohne Sprachclips und ohne Browser-Sprachausgabe: kurze synthetische Rückmeldung je Klasse */
+  private legacyVoice(cls: VoiceClass, mode: 'select' | 'command', kind: CommandKind = 'move'): void {
     if (!this.ready || this.cfg.muted) return;
     const ctx = this.ctx!;
     if (!this.limiter.request('voice', performance.now(), 500)) return;
@@ -377,22 +404,54 @@ export class AudioEngine {
     setTimeout(() => g.disconnect(), (dur + 0.6) * 1000);
   }
 
-  /** Kurzer Ton bei Auswahl einer Einheit (Einheitentyp-ID aus shared/data/units). */
-  unitSelect(unitTypeId: number): void {
-    this.voice(voiceClassOf(unitTypeId), 'select');
+  /** Spielerrückmeldung (Auswahl/Befehl) an die Sprachausgabe; Rückfall auf die synthetische Kurzrückmeldung, wenn nichts sprechen kann. */
+  private feedback(group: string | null, event: VoiceEvent, cls: VoiceClass | null, mode: 'select' | 'command', kind: CommandKind, pos?: { x: number; y: number }): void {
+    if (!group || !this.ready || this.cfg.muted) return;
+    const ok = this.voice.speak(group, event, { pos, priority: 1 });
+    if (!ok && this.voice.lastDrop === 'unavailable' && cls) this.legacyVoice(cls, mode, kind);
   }
-  /** Kurzer Ton bei einem Befehl an Einheiten dieses Typs. */
-  unitCommand(unitTypeId: number, kind: CommandKind = 'move'): void {
-    this.voice(voiceClassOf(unitTypeId), 'command', kind);
+
+  /** Einheitentyp-ID (shared/data/units) → Rückmeldung bei Auswahl. `sig` kennzeichnet die Auswahl: dieselbe Auswahl in kurzer Folge bleibt stumm. */
+  unitSelect(unitTypeId: number, pos?: { x: number; y: number }, sig?: string): void {
+    this.selectionSelect([unitTypeId], pos, sig);
   }
-  /** Wie unitSelect, wählt die "sprechende" Klasse einer gemischten Auswahl. */
-  selectionSelect(types: Iterable<number>): void {
-    const c = leadClass(types);
-    if (c) this.voice(c, 'select');
+  /** Rückmeldung bei einem Befehl an Einheiten dieses Typs. */
+  unitCommand(unitTypeId: number, kind: CommandKind = 'move', pos?: { x: number; y: number }): void {
+    this.selectionCommand([unitTypeId], kind, pos);
   }
-  selectionCommand(types: Iterable<number>, kind: CommandKind = 'move'): void {
-    const c = leadClass(types);
-    if (c) this.voice(c, 'command', kind);
+  /** Eine „sprechende“ Klasse der (gemischten) Auswahl antwortet – nur bei neuer Auswahl. */
+  selectionSelect(types: Iterable<number>, pos?: { x: number; y: number }, sig?: string): void {
+    const arr = [...types];
+    const now = performance.now();
+    if (sig !== undefined) {
+      if (sig === this.lastSel.sig && now - this.lastSel.at < 4000) return;
+      this.lastSel = { sig, at: now };
+    }
+    const g = leadGroup(arr);
+    const c = leadClass(arr);
+    this.feedback(g, 'select', c, 'select', 'move', pos);
+  }
+  selectionCommand(types: Iterable<number>, kind: CommandKind = 'move', pos?: { x: number; y: number }): void {
+    const arr = [...types];
+    const ev = eventOfCommand(kind);
+    if (!ev) return;
+    this.feedback(leadGroup(arr), ev, leadClass(arr), 'command', kind, pos);
+  }
+  /** Gebäude angewählt: ein Bewohner/Arbeiter des Gebäudes meldet sich (Schmied, Bäcker, Händler …). */
+  buildingSelect(buildingType: number, pos?: { x: number; y: number }): void {
+    this.feedback(groupOfBuilding(buildingType), 'select', null, 'select', 'move', pos);
+  }
+  /** Ereignisbezogene Zeile (Arbeit, Abschluss, verwundet …) einer Einheitengruppe; Hintergrundrang, räumlich. */
+  speakEvent(group: string | null, event: VoiceEvent, pos?: { x: number; y: number }, priority: 0 | 1 = 0): boolean {
+    if (!group || !this.ready || this.cfg.muted) return false;
+    return this.voice.speak(group, event, { pos, priority });
+  }
+  /** Gruppe einer Einheit/eines Gebäudes (für Aufrufer ohne Kenntnis der Zuordnung) */
+  groupOfUnit(unitType: number): string | null {
+    return groupOfUnit(unitType);
+  }
+  groupOfBuilding(buildingType: number): string | null {
+    return groupOfBuilding(buildingType);
   }
 
   // ---------------------------------------------------------------------------------------
@@ -406,6 +465,10 @@ export class AudioEngine {
 
   /** Thema für Hauptmenü, Sieg, Niederlage; null = zurück zur Spielstimmung. */
   playTheme(t: ThemeId | null): void {
+    if (t === 'menu') {
+      this.ambience?.apply(SILENT_TARGETS, undefined, 0.6);
+      this.voice.stop('unit');
+    }
     if (this.theme === t) return;
     this.theme = t;
     this.music?.setTarget(t ?? this.mood, t ? THEME_PHRASES[t] : 0, !!t);
@@ -435,6 +498,32 @@ export class AudioEngine {
   }
 
   // ---------------------------------------------------------------------------------------
+  // Umgebungsgeräusche (4G)
+
+  private syncAmbience(): void {
+    if (!this.ready || this.ambience) return;
+    this.ambience = new Ambience(this.ctx!, this.bus!.input.ambient, this.noise!);
+  }
+
+  /**
+   * Beobachtungen der Umgebung (Soundscape, alle ~0,25 s) → Klangbetten und Einzelereignisse (Vögel, Knistern, ferne Waffenschläge).
+   * Einzelereignisse laufen über das Voice-Limit.
+   */
+  updateAmbience(input: AmbienceInput, dt: number): void {
+    if (!this.ready) return;
+    if (!this.ambience) this.syncAmbience();
+    const a = this.ambience;
+    if (!a) return;
+    const events = a.update(dt, input);
+    if (this.cfg.muted || this.bus!.level.ambient.gain.value < 0.0005) return;
+    for (const ev of events) {
+      const est = ev.kind === 'bird' ? 1100 : ev.kind === 'clash' ? 650 : 120;
+      if (!this.limiter.request(ev.kind, performance.now(), est)) continue;
+      a.fire(ev);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------------
   // Diagnose
 
   state(): DebugState {
@@ -450,6 +539,8 @@ export class AudioEngine {
       music: this.music ? this.music.stats() : null,
       settings: { ...this.cfg },
       listener: { ...this.listener },
+      voice: this.voice.debug(),
+      ambience: this.ambience ? { targets: { ...this.ambience.state }, played: { ...this.ambience.played } } : null,
     };
   }
 }
