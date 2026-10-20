@@ -220,6 +220,8 @@ export class AiController {
     const housingWant = Math.ceil((pr.econ.peasants - 8) / 8) + (foodOk ? Math.min(6, Math.floor(sim.tick / 9000)) : 0);
     const sequence: [number, number, boolean?][] = [];
     const add = (type: number, target: number, cond = true) => sequence.push([type, target, cond]);
+    // Gold hortet, weil Holz/Eisen für Waffen fehlt: zuerst den Markt (kauft Waffen und Holz gegen Gold)
+    if (this.marketHoard(sim)) add(BT.Market, 1);
 
     add(BT.Woodcutter, 1);
     add(BT.AppleOrchard, 1);
@@ -269,7 +271,8 @@ export class AiController {
     else if (pr.castle.cauldrons || pr.castle.killingPits) add(BT.PitchRig, 1, t > 4000);
     // Komfort
     // Profile ohne Markt bauen ihn trotzdem, wenn das Gold ausgeht (Überschuss verkaufen statt Stillstand)
-    if (pr.econ.market || (t > 12000 && pl.gold < 120)) add(BT.Market, 1, t > 3000);
+    // und auch bei hortbarem Gold (kein Eisen/Holz in Reichweite): der Markt setzt Gold in Waffen/Holz um
+    if (pr.econ.market || (t > 12000 && pl.gold < 120) || (t > 9000 && pl.gold > 800)) add(BT.Market, 1, t > 3000);
     if (pr.econ.ale) {
       add(BT.HopFarm, 1, peas > 20);
       add(BT.Brewery, 1, c(BT.HopFarm) > 0);
@@ -323,6 +326,7 @@ export class AiController {
       const inside = !def.placement || def.placement === 'flat';
       const res = this.tryBuild(sim, type, anchor, { inside: inside && type !== BT.Hovel ? undefined : undefined });
       if (res === 'built') return;
+      if (res === 'poor' && type === BT.Market && this.marketHoard(sim)) return; // Holz für den Markt sparen
       if (res === 'poor' && ++poor >= 3) return;
     }
   }
@@ -618,9 +622,15 @@ export class AiController {
     return steps;
   }
 
+  /** Viel Gold, kein Markt: die Burg darf das Holz für den Markt nicht wegbauen */
+  private marketHoard(sim: Sim): boolean {
+    return sim.tick > 9000 && sim.players[this.p].gold > 800 && this.cnt(BT.Market) === 0;
+  }
+
   private castleStep(sim: Sim): void {
     const c = this.profile.castle;
     const t = sim.tick;
+    if (this.marketHoard(sim) && sim.players[this.p].stock[R.Wood] < 60) return;
     if (this.castleDone && t < this.retryAt) return;
     // Burgbau beginnt, wenn die Wirtschaft steht
     const pl = sim.players[this.p];
@@ -1160,6 +1170,15 @@ export class AiController {
     if (sim.tick - this.woodCheckAt >= 600) {
       this.woodCheckAt = sim.tick;
       this.relocateWoodcutters(sim);
+    }
+    // Holzverbrauchende Werkstätten ruhen, bis der Markt steht (sonst verbrauchen sie jedes Stück Holz, das der Markt braucht)
+    {
+      const pause = this.marketHoard(sim) && pl.stock[R.Wood] < 40;
+      for (const b of sim.buildings.values()) {
+        if (b.owner !== this.p || !b.def.prod || b.off === pause) continue;
+        const rec = b.def.prod.recipes[b.recipe];
+        if (rec && rec.in.some(([r]) => r === R.Wood)) applyCommand(sim, this.p, { c: 'setWork', building: b.id, on: !pause });
+      }
     }
     // Überschuss verkaufen, wenn Gold knapp ist
     if (this.cnt(BT.Market) > 0 && pl.gold < 150) {
