@@ -9,7 +9,8 @@ export type HotkeyAction =
   | 'cat1' | 'cat2' | 'cat3' | 'cat4' | 'cat5' | 'cat6'
   | 'ability1' | 'ability2' | 'ability3' | 'ability4' | 'ability5'
   | 'toggleStock' | 'toggleMarket' | 'togglePopularity' | 'toggleAdmin'
-  | 'selectAllArmy' | 'toggleShadows' | 'centerKeep' | 'toggleMute';
+  | 'selectAllArmy' | 'toggleShadows' | 'centerKeep' | 'toggleMute'
+  | 'encyclopedia';
 
 export const HOTKEY_LABELS: Record<HotkeyAction, string> = {
   panUp: 'Kamera hoch', panDown: 'Kamera runter', panLeft: 'Kamera links', panRight: 'Kamera rechts',
@@ -23,6 +24,7 @@ export const HOTKEY_LABELS: Record<HotkeyAction, string> = {
   ability1: 'Fähigkeit 1', ability2: 'Fähigkeit 2', ability3: 'Fähigkeit 3', ability4: 'Fähigkeit 4', ability5: 'Fähigkeit 5',
   toggleStock: 'Lager', toggleMarket: 'Markt', togglePopularity: 'Beliebtheit', toggleAdmin: 'Verwaltung',
   selectAllArmy: 'Alle Truppen wählen', toggleShadows: 'Schatten umschalten', centerKeep: 'Zum Bergfried', toggleMute: 'Ton stumm/an',
+  encyclopedia: 'Enzyklopädie',
 };
 
 export const DEFAULT_HOTKEYS: Record<HotkeyAction, string> = {
@@ -33,10 +35,11 @@ export const DEFAULT_HOTKEYS: Record<HotkeyAction, string> = {
   attackMove: 'KeyF', patrol: 'KeyP', attackGround: 'KeyG',
   rotateBuilding: 'KeyR', cancel: 'Escape', pause: 'Space',
   demolish: 'Delete', repair: 'KeyU',
-  cat1: 'F1', cat2: 'F2', cat3: 'F3', cat4: 'F4', cat5: 'F5', cat6: 'F6',
+  cat1: 'F1', cat2: 'F3', cat3: 'F4', cat4: 'F5', cat5: 'F6', cat6: 'F7',
   ability1: 'KeyZ', ability2: 'KeyC', ability3: 'KeyN', ability4: 'KeyJ', ability5: 'KeyK',
   toggleStock: 'KeyI', toggleMarket: 'KeyO', togglePopularity: 'KeyL', toggleAdmin: 'KeyT',
   selectAllArmy: 'KeyY', toggleShadows: 'F9', centerKeep: 'Home', toggleMute: 'KeyM',
+  encyclopedia: 'F2',
 };
 
 const KEY = 'strongpoly.hotkeys';

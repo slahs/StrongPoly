@@ -1,5 +1,5 @@
 import './style.css';
-import { GameSetup } from '@strongpoly/shared';
+import { GameSetup, setLang } from '@strongpoly/shared';
 import { AudioEngine } from './audio';
 import { exposeAudioDebug } from './audio/debug';
 import { LocalConnection } from './game/connection';
@@ -8,6 +8,7 @@ import { Session } from './game/session';
 import { Settings } from './game/settings';
 import { GameScene } from './render/scene';
 import { Screens } from './ui/screens';
+import { openEncyclopedia } from './ui/encyclopedia';
 import { h } from './ui/dom';
 import { openEditor } from './editor/editor';
 import { MISSIONS } from '@strongpoly/shared';
@@ -16,6 +17,12 @@ import { SaveStore, makeSave } from './game/saves';
 // Icon-Galerie (?icons): rendern und den normalen Start überspringen
 if (new URLSearchParams(location.search).has('icons')) {
   (await import('./ui/icons/gallery')).showGallery();
+  await new Promise<never>(() => {});
+}
+
+// Tooltip-Testseite (?tooltips): alle Tooltips im Raster
+if (new URLSearchParams(location.search).has('tooltips')) {
+  (await import('./ui/tooltips/gallery')).showTooltipGallery();
   await new Promise<never>(() => {});
 }
 
@@ -178,6 +185,9 @@ try {
   /* ignorieren */
 }
 const params = new URLSearchParams(location.search);
+if (params.get('lang') === 'en') setLang('en');
+// Enzyklopädie direkt öffnen (?enc=building/quarry), z. B. für Tests und Verweise
+if (params.has('enc')) openEncyclopedia(params.get('enc') || undefined);
 if (params.get('quick') === '1') {
   // Schnellstart für Entwicklung/Tests
   const size = Number(params.get('size') ?? 128);

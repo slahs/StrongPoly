@@ -363,7 +363,6 @@ const RULES: Record<string, string> = {
   'rule.module': 'Weitere Module müssen an ein bestehendes {store} angrenzen.',
   'rule.enemy': 'Kein Bau, solange feindliche Soldaten näher als {radius} Felder sind.',
   'rule.line': 'Wird als Linie gezogen.',
-  'rule.needs.module': 'Braucht ein Lager für die Lieferung.',
   'placefail.enemy': 'Feinde in der Nähe: Solange feindliche Soldaten weniger als {radius} Felder vom Bauplatz entfernt sind, darf nicht gebaut werden. Das gilt auch für den Neubau von Toren mitten im Sturm.',
 };
 

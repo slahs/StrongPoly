@@ -32,6 +32,12 @@ export const SPECIAL_KEYS = [
 ] as const;
 
 let current: Lang = 'de';
+let usage: Set<string> | null = null;
+
+/** Testhilfe: sammelt alle über `t()`/`tf()` abgefragten Schlüssel (null = aus). */
+export function trackTextUsage(sink: Set<string> | null): void {
+  usage = sink;
+}
 
 export function setLang(l: Lang): void {
   if (LANGS.includes(l)) current = l;
@@ -48,6 +54,7 @@ export function hasText(key: string, lang: Lang = current): boolean {
 
 /** Rohtext (mit Platzhaltern). Fehlt der Schlüssel in der Sprache, gilt der deutsche Text; fehlt er überall, kommt der Schlüssel selbst zurück. */
 export function t(key: string, lang: Lang = current): string {
+  usage?.add(key);
   const own = TEXTS[lang];
   if (Object.prototype.hasOwnProperty.call(own, key)) return own[key];
   const de = TEXTS.de;

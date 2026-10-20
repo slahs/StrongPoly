@@ -20,6 +20,7 @@ import { NetClient } from '../game/netconn';
 import { HOTKEY_LABELS, DEFAULT_HOTKEYS, HotkeyAction, keyLabel, loadHotkeys, saveHotkeys } from '../game/hotkeys';
 import type { Settings } from '../game/settings';
 import { clear, h, hex } from './dom';
+import { openEncyclopedia } from './encyclopedia';
 
 export interface AppHooks {
   startSkirmish(setup: GameSetup): void;
@@ -112,6 +113,7 @@ export class Screens {
       add('Spiel laden', () => this.loadMenu());
       add('Optionen', () => this.options());
     }
+    add('Enzyklopädie', () => openEncyclopedia());
     this.show([
       h('h1', { text: 'STRONGPOLY' }),
       h('div', { class: 'sub', text: 'Burgenbau-Echtzeitstrategie im Low-Poly-Stil' }),

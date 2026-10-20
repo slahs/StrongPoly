@@ -4,6 +4,7 @@ import type { GhostPlacement } from '../render/ghost';
 import { loadHotkeys, HotkeyAction } from './hotkeys';
 import type { Session } from './session';
 import { groundYAt } from '../render/util';
+import { closeEncyclopedia, isEncyclopediaOpen, openEncyclopedia } from '../ui/encyclopedia';
 
 export type Mode =
   | { k: 'normal' }
@@ -483,6 +484,15 @@ export class InputController {
     else if (is('toggleAdmin')) s.hud.togglePopup('admin');
     else if (is('toggleShadows')) s.toggleShadows();
     else if (is('toggleMute')) s.toggleMute();
+    else if (is('encyclopedia')) {
+      // Enzyklopädie (F2): im Einzelspieler pausiert die Partie, solange sie offen ist
+      if (isEncyclopediaOpen()) closeEncyclopedia();
+      else {
+        const pausedByUs = s.conn.local && !s.paused;
+        if (pausedByUs) s.togglePause();
+        openEncyclopedia(undefined, { onClose: () => { if (pausedByUs && s.paused) s.togglePause(); } });
+      }
+    }
     else if (is('centerKeep')) s.centerOnKeep();
     else if (is('selectAllArmy')) s.selectAllArmy();
     else {

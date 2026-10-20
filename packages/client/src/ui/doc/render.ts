@@ -122,6 +122,10 @@ export function renderBlock(b: Block, o: RenderOpts): HTMLElement {
     case 'svg': {
       const box = h('div', { class: 'doc-svg' });
       box.innerHTML = b.svg;
+      box.addEventListener('click', (e) => {
+        const g = (e.target as Element).closest('[data-link]');
+        if (g) o.onLink?.(g.getAttribute('data-link') ?? '');
+      });
       if (b.caption) box.append(h('div', { class: 'cap', text: b.caption }));
       return box;
     }
