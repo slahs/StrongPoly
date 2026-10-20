@@ -37,13 +37,25 @@ Lange Läufe (Turnier) immer mit festem `OUT` starten (fortsetzbar).
 - [x] Gate + Browser-Check
 
 ## 4. Meilenstein D – Grafik
-- [ ] Beleuchtung/Schatten, Terrain, Wasser/Gräben
-- [ ] Gebäude: Baustufen, Arbeitsanimationen, Trümmer, Mauerverbindungen
-- [ ] Einheitenanimation, getragene Waren
-- [ ] Effekte, Auswahlkreise, Lebensbalken
-- [ ] Grafikstufen Niedrig/Mittel/Hoch
-- [ ] `?bench` mit 2000 Einheiten, FPS gemessen
-- [ ] Gate + Browser-Check
+- [x] Grafikstufen Niedrig/Mittel/Hoch: zentrale Tabelle `render/quality.ts` (Schatten + Shadow-Map-Größe, PCF-Weichheit, Partikelgrenzen, Gras, AO, Wasser-Shader, Pixel-Ratio-Deckel, Dekor-Sichtweite, Blob-Schatten), angewandt in `GameScene.applyGfx`; Test `client/test/render.test.ts`
+- [x] Beleuchtung/Schatten: warmes Hemisphären- + Sonnenlicht, PCF-soft-Schatten, Schattenkamera folgt dem Blickpunkt (Texel-Snapping), eingebackene AO (Vertexattribut, per Stufe skalierbar), Kontaktschatten unter großen Gebäuden, warmer Dunst
+- [x] Terrain: weiche Farbverläufe an Tile-Grenzen, facettierte Felsklippen mit Gesteinsbändern, Dünenmuster, wiegendes Instanced-Gras (Vertex-Shader-Wind), Steinbrocken-Haufen und Eisenadern
+- [x] Wasser und Gräben: Gewässerbett + animierte Wasserfläche (Wellen, Farbspiel, Uferschaum über Vertexattribut `aFoam`), Gräben sitzen tiefer mit eigenem Farbton, Pechgraben mit Rauch
+- [x] Gebäude: Baustufen (Fundament → Gerüst → wachsendes Gebäude → Staubwolke), Arbeitsanimationen (Mühlenflügel, Hammer/Axt/Hacke, Fahnen, Torflügel, Rauch/Dampf aus Schmiede, Bäcker, Pechgrube, Brauerei …), Einsturz + Trümmerhaufen + Staub, nahtlose Mauern (Pfosten + Arme je Nachbar, Zinnen, Mauerfugen, Treppen schauen zur Mauer)
+- [x] Einheiten: Vertex-Shader-Animation ohne Skelett (Gehen, Nahkampfhieb, Spannen/Schießen, Arbeiten, Sterben/Umkippen und liegen bleiben), Teile per `aPivot`; getragene Waren in 10 Formen; Lord, Ritter, Belagerungsgerät klar unterscheidbar; Räder drehen sich, Wurfarme schwingen beim Schuss
+- [x] Effekte: Pfeile/Bolzen/Feuerpfeile mit Bogenflug, drehende Steine mit Rauchspur und Staubwolke beim Einschlag, Feuer/Rauch/Funken instanziert, brennende Gebäude (Flammen + Rauchsäule), Ölkessel-Dampf, Pechgraben, Blut sparsam und abschaltbar (`Settings.blood`, `?blood=0`)
+- [x] Auswahl: Kreise in aufgehellter Spielerfarbe, Lebensbalken (verletzte/ausgewählte Einheiten, beschädigte Gebäude), Hover-Umriss (Kantenlinien + Rahmen) und Auswahlrahmen für Gebäude
+- [x] `?bench` (synthetische ClientWorld mit 2.000 kämpfenden Einheiten, 10-Hz-Ticks, Projektile, Partikel, Burgen) + `scripts/bench-fps.mjs` (alle Stufen, Markdown-Tabelle, `--hw`)
+- [x] Gate (typecheck, build, test) + Browser-Check (Konsole sauber, Screenshots gesichtet)
+
+Entscheidungen und offene Punkte (D):
+- **SSAO nicht umgesetzt:** EffectComposer verliert das Canvas-MSAA, die Normal-/Tiefenpasses passen nicht zur Vertex-Animation der Instanzen, das Bundle würde wachsen. Ersatz: eingebackene AO, Kontaktschatten, weiche Schatten. Das Feld `ssao` in `quality.ts` bleibt `false`.
+- **Baufortschritt:** Die Sim setzt Gebäude sofort. Minimal erweitert: `Building.born` (Tick der Platzierung, reine Ausgabe, wird mitgespeichert) → `BuildingRec.n` im Snapshot. Der Client leitet daraus die Baustufe ab (Dauer nur visuell, `buildTicks` in `render/entities.ts`); Pause und Spielgeschwindigkeit wirken mit, Reconnect zeigt den richtigen Stand.
+- **Blut-Schalter ohne Options-UI:** `Settings.blood` existiert und wird gespeichert; ein Kontrollkästchen müsste in `ui/screens.ts` (Hauptagent) ergänzt werden.
+- **Bench mit synthetischer Welt statt Sim-Worker:** isoliert den Renderer und ist deterministisch (eigener Zufallsgenerator, Test in `render.test.ts`). Die echte Sim ist für 2.000 Einheiten nicht nötig, um den Renderer zu belasten.
+- Die Bench-FPS stammen aus Software-GL (SwiftShader, 4 Kerne); 60 FPS auf echter GPU sind **nicht verifiziert**. Belegt sind Draw-Calls, Dreiecke und die JS-Zeit (`&nodraw=1`).
+- Dig-Planung (`digMask`) wird weiterhin nur über die Geister-Rechtecke angezeigt, nicht im Terrain.
+- Terrain empfing vorher keine Schatten: Chunk-Geometrie hatte keine `normal`-Attribute (Schattenversatz → keine Schatten). Behoben durch `computeVertexNormals` je Chunk.
 
 ## 5. Meilenstein E – Sound und Musik
 - [x] Effekte (räumlich, Voice-Limit)

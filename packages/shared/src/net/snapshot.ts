@@ -67,6 +67,8 @@ export interface BuildingRec {
   c: number;
   /** Ausgabepuffer */
   b: number;
+  /** Tick der Platzierung (0 = von Beginn an); die Darstellung leitet daraus die Baustufe ab */
+  n: number;
 }
 
 export interface Snapshot {
@@ -177,6 +179,7 @@ function bRec(b: NonNullable<ReturnType<Sim['buildings']['get']>>, sim: Sim): Bu
     s: b.staffed,
     c: b.recipe,
     b: b.out,
+    n: b.born || 0,
   };
 }
 

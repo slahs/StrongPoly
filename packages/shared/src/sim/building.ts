@@ -47,6 +47,8 @@ export class Building {
   repairer = 0;
   /** Fortschritt eines Spezialtimers (Stall-Pferde, Campfire-Spawn) */
   spawnTimer = 0;
+  /** Tick der Platzierung (0 = von Anfang an da). Reine Ausgabe für die Bau-Darstellung, beeinflusst die Sim nicht. */
+  born = 0;
 
   constructor(
     readonly id: number,

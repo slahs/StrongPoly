@@ -183,7 +183,7 @@ export class BenchWorld {
   private addBuilding(t: number, x: number, y: number, o: number, rot = 0, f = 0, staffed = 0): ClientBuilding {
     const w = this.w;
     const id = w.buildings.size + 1;
-    const rec: BuildingRec = { i: id, t, o, x, y, r: rot, hp: BUILDINGS[t].hp, f, u: 0, q: 0, s: staffed, c: 0, b: 0 };
+    const rec: BuildingRec = { i: id, t, o, x, y, r: rot, hp: BUILDINGS[t].hp, f, u: 0, q: 0, s: staffed, c: 0, b: 0, n: 0 };
     const cb = rec as ClientBuilding;
     w.placeBuilding(cb);
     w.buildings.set(id, cb);

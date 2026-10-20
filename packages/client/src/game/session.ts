@@ -485,5 +485,6 @@ export class Session {
     this.input.destroy();
     this.hud.destroy();
     this.gs.root.remove(this.entities.group, this.ghost.group);
+    this.entities.dispose();
   }
 }

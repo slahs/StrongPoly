@@ -56,11 +56,9 @@ export function wallParts(b: ModelBuilder, id: number, h: number, kind: 'arm' | 
   }
 }
 
-/** Gerades Mauerstück entlang x (Geisterbild und Symbole): Pfosten plus zwei Arme */
+/** Mauerstück für das Geisterbild: nur der Pfosten (die Arme zu den Nachbarn kennt erst die fertige Mauer) */
 function wallStraight(b: ModelBuilder, def: BuildingDef): void {
   wallParts(b, def.id, def.height, 'post');
-  wallParts(b, def.id, def.height, 'arm', 1);
-  wallParts(b, def.id, def.height, 'arm', -1);
 }
 
 /** Treppe: vier Stufen, Höhe 1.0, steigt entlang +z; im Renderer in y auf Mauerhöhe skaliert */
@@ -469,22 +467,22 @@ export function buildBuildingModel(def: BuildingDef): ModelGeos {
       flag(b, 0, 4.5, 0, 1.2);
       break;
     case BT.GateWood:
-      for (const sx of [-1, 1]) b.box(0.7, 2.6, H - 0.2, sx * (W / 2 - 0.35), 0, 0, PAL.woodDark);
-      b.box(W, 0.6, H - 0.2, 0, 1.9, 0, PAL.wood);
+      for (const sx of [-1, 1]) b.box(0.7, 2.2, H - 0.2, sx * (W / 2 - 0.35), 0, 0, PAL.woodDark);
+      b.box(W, 0.4, H - 0.2, 0, 1.8, 0, PAL.wood);
       b.part(PART.Door, 0, 0, 0).box(W - 1.4, 1.6, 0.1, 0, 0, 0, PAL.wood);
       b.part(0);
-      merlons(b, W, H - 0.2, 2.5, PAL.woodDark);
-      b.box(0.3, 0.1, 0.3, 0, 2.5, 0, PAL.roof, true);
+      merlons(b, W, H - 0.2, 2.2, PAL.woodDark);
+      b.box(0.3, 0.1, 0.3, 0, 2.2, 0, PAL.roof, true);
       break;
     case BT.GateStone:
       for (const sx of [-1, 1]) {
         tower(b, 0.9, 3.4, sx * (W / 2 - 0.9), 0, PAL.stone, PAL.roof);
       }
-      b.box(W - 1.6, 0.9, H - 0.4, 0, 2.5, 0, PAL.stone);
+      b.box(W - 1.6, 1.1, H - 0.4, 0, 2.5, 0, PAL.stone);
       b.part(PART.Door, 0, 0, 0).box(W - 2.2, 2.0, 0.2, 0, 0, 0, PAL.woodDark);
       for (let i = 0; i < 5; i++) b.box(0.05, 2.0, 0.24, -(W - 2.2) / 2 + 0.2 + i * ((W - 2.6) / 4), 0, 0, PAL.black);
       b.part(0);
-      merlons(b, W - 1.6, H - 0.4, 3.4, PAL.stone);
+      merlons(b, W - 1.6, H - 0.4, 3.6, PAL.stone);
       break;
     case BT.Drawbridge:
       b.box(W - 0.4, 0.15, H - 0.2, 0, 0.05, 0, PAL.wood);

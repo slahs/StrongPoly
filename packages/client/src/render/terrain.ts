@@ -256,26 +256,14 @@ export class TerrainRenderer {
       const j = m.idx(tx, ty);
       const tj = m.terrain[j];
       const wj = isWaterT(tj);
+      // Gewässer: Bett bzw. nasses Ufer; Land: eigene Tilefarbe
       let c0: number;
       let c1: number;
       let c2: number;
-      if (selfWater) {
-        if (wj) {
-          c0 = this.tileCol[j * 3];
-          c1 = this.tileCol[j * 3 + 1];
-          c2 = this.tileCol[j * 3 + 2];
-          c0 = BED[0];
-          c1 = BED[1];
-          c2 = BED[2];
-        } else {
-          c0 = WET[0];
-          c1 = WET[1];
-          c2 = WET[2];
-        }
-      } else if (wj) {
-        c0 = WET[0];
-        c1 = WET[1];
-        c2 = WET[2];
+      if (selfWater && wj) {
+        [c0, c1, c2] = BED;
+      } else if (selfWater || wj) {
+        [c0, c1, c2] = WET;
       } else {
         c0 = this.tileCol[j * 3];
         c1 = this.tileCol[j * 3 + 1];

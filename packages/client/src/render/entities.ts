@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { BUILDINGS, BT, ClientWorld, PAL, PLAYER_COLORS, PROJ, U, UNITS, UNIT_TYPES, BUILDING_TYPES, BF, SLOT_MASK } from '@strongpoly/shared';
+import { BUILDINGS, BT, BuildingDef, ClientWorld, PAL, PLAYER_COLORS, PROJ, U, UNITS, UNIT_TYPES, BUILDING_TYPES, BF, SLOT_MASK } from '@strongpoly/shared';
 import type { ClientBuilding } from '@strongpoly/shared';
 import { FxSystem, BillboardLayer } from './fx';
 import { TypeMesh, teamTable } from './instanced';
@@ -95,6 +95,12 @@ interface EmitSite {
   acc: number;
 }
 
+/** Dauer der Baustufen-Darstellung in Sim-Ticks (10 je Sekunde, rein visuell); 0 = keine (Mauern, Fallen, Lagerfeuer) */
+export function buildTicks(def: BuildingDef): number {
+  if (def.line || def.height < 0.7 || def.id === BT.Campfire) return 0;
+  return Math.round(Math.min(6, 1.2 + Math.sqrt(def.hp) * 0.075) * 10);
+}
+
 const ease = (t: number): number => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
 
 /** Zeichnet Einheiten, Gebäude, Projektile und Effekte aus dem ClientWorld-Zustand (nur lesend). */
@@ -140,8 +146,8 @@ export class EntityRenderer {
   private corpses: Corpse[] = [];
   private rubble: RubbleCell[] = [];
   private collapsing: Collapse[] = [];
-  private known = new Set<number>();
-  private construct = new Map<number, { t0: number; dur: number }>();
+  /** Gebäude, die gerade gebaut werden (Baustufe aus world.tick − Platzierungs-Tick `n` im Snapshot) */
+  private building = new Set<number>();
   private gateP = new Map<number, number>();
   private mapRef: unknown = null;
   private burnSites: BurnSite[] = [];
@@ -273,6 +279,17 @@ export class EntityRenderer {
     this.bldDirty = true;
   }
 
+  /** Gibt GPU-Puffer und Geometrien frei (beim Beenden der Partie) */
+  dispose(): void {
+    this.group.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (m.geometry) m.geometry.dispose();
+      if ((o as THREE.InstancedMesh).isInstancedMesh) (o as THREE.InstancedMesh).dispose();
+    });
+    for (const g of this.edgeCache.values()) g.dispose();
+    this.edgeCache.clear();
+  }
+
   /** Blut abschaltbar (Einstellung) */
   setBlood(on: boolean): void {
     this.fx.blood = on;
@@ -354,8 +371,7 @@ export class EntityRenderer {
           break;
         }
       }
-      this.known.delete(b.i);
-      this.construct.delete(b.i);
+      this.building.delete(b.i);
       if (!destroyed) continue;
       this.collapsing.push({ type: b.t, cx: b.x + b.w / 2, cz: b.y + b.h / 2, y: def.placement === 'water' ? -0.1 : tileY(w, b.x, b.y), rot: b.r ? Math.PI / 2 : 0, t0: now, owner: b.o });
       const life = this.q.particleScale < 0.5 ? 8 : 22;
@@ -420,13 +436,11 @@ export class EntityRenderer {
     if (this.mapRef !== w.map) {
       // neue Karte/Vollzustand: alles als fertig behandeln
       this.mapRef = w.map;
-      this.known.clear();
-      this.construct.clear();
+      this.building.clear();
       this.rubble.length = 0;
       this.collapsing.length = 0;
       this.corpses.length = 0;
       this.gateP.clear();
-      this.knownReady = false;
       this.bldDirty = true;
     }
     // Torflügel gleiten
@@ -443,17 +457,7 @@ export class EntityRenderer {
         this.gateAnim = true;
       } else if (p !== target) this.gateP.set(id, target);
     }
-    // Baufortschritt abgelaufen?
-    let building = this.construct.size > 0;
-    for (const [id, c] of this.construct) {
-      if (now - c.t0 >= c.dur) {
-        this.construct.delete(id);
-        const b = w.buildings.get(id);
-        if (b && this.visibleAt(b.x + b.w / 2, b.y + b.h / 2)) this.fx.effect('built', b.x + b.w / 2, b.y + b.h / 2, tileY(w, b.x, b.y) + 0.2);
-      }
-    }
-    building = building || this.construct.size > 0;
-    const redraw = w.buildingsDirty || this.bldDirty || building || this.gateAnim || this.collapsing.length > 0 || o.selectedBuilding !== this.lastSelB;
+    const redraw = w.buildingsDirty || this.bldDirty || this.building.size > 0 || this.gateAnim || this.collapsing.length > 0 || o.selectedBuilding !== this.lastSelB;
     this.lastSelB = o.selectedBuilding;
     const sizeBefore = w.buildings.size;
     void sizeBefore;
@@ -494,16 +498,17 @@ export class EntityRenderer {
       if ((b.t === BT.Pit || b.t === BT.KillingPit) && !mine) continue;
       const cx = b.x + b.w / 2;
       const cz = b.y + b.h / 2;
-      // Neu hinzugekommene Gebäude bekommen eine Bauphase (Fundament → Gerüst → fertig)
+      // Bauphase aus dem Platzierungs-Tick (Fundament → Gerüst → fertig); Pause und Spielgeschwindigkeit wirken mit
       let prog = 1;
-      if (!this.known.has(b.i)) {
-        this.known.add(b.i);
-        if (this.knownReady && !def.line && def.height >= 0.7 && b.t !== BT.Campfire) {
-          this.construct.set(b.i, { t0: now, dur: Math.min(6, 1.2 + Math.sqrt(def.hp) * 0.075) });
+      const dur = buildTicks(def);
+      if (b.n > 0 && dur > 0) {
+        const age = w.tick - b.n + Math.min(1, o.alpha);
+        if (age < dur) {
+          prog = Math.max(0, age / dur);
+          this.building.add(b.i);
         }
       }
-      const cs = this.construct.get(b.i);
-      if (cs) prog = Math.min(1, (now - cs.t0) / cs.dur);
+      if (prog >= 1 && this.building.delete(b.i) && this.visibleAt(cx, cz)) this.fx.effect('built', cx, cz, tileY(w, b.x, b.y) + 0.2);
       if (o.explored && !mine && !o.explored(cx, cz)) continue;
       count++;
       const y = def.placement === 'water' ? -0.1 : tileY(w, b.x, b.y);
@@ -603,7 +608,6 @@ export class EntityRenderer {
         }
       }
     }
-    this.knownReady = true;
     // Zusammenbrechende Gebäude: Modell sackt ab, während der Trümmerhaufen wächst
     for (let i = this.collapsing.length - 1; i >= 0; i--) {
       const c = this.collapsing[i];
@@ -628,7 +632,6 @@ export class EntityRenderer {
       this.fireList = fire;
     }
   }
-  private knownReady = false;
 
   /** Gerüst: Pfosten + Querlatten rund um die Grundfläche, Höhe h */
   private pushScaffold(b: ClientBuilding, y: number, h: number): void {
