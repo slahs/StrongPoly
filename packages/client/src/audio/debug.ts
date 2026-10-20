@@ -1,5 +1,6 @@
 import type { AudioEngine } from './index';
-import { renderAll, renderMusic, renderSfx, renderVoice } from './offline';
+import { renderAll, renderAmbience, renderAmbientEvent, renderMusic, renderSfx, renderVoice } from './offline';
+import { checkClips } from './clips_check';
 
 /**
  * Debug-Hook für Browser-Prüfungen (`window.__audio`):
@@ -14,5 +15,9 @@ export function exposeAudioDebug(audio: AudioEngine): void {
     renderSfx,
     renderVoice,
     renderMusic,
+    renderAmbience,
+    renderAmbientEvent,
+    /** Alle Sprachclips laden, dekodieren und prüfen (Länge, Pegel, NaN); optional nur Stimmen `voices` */
+    checkClips: (voices?: string[]) => checkClips(audio, voices),
   };
 }

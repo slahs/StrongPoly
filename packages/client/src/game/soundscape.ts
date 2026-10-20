@@ -1,7 +1,9 @@
 import { BF, BT, BUILDINGS, ClientWorld, PROJ, SimEvent, T, U, UNIT_CAP, WorkerPhase } from '@strongpoly/shared';
 import type { AudioEngine } from '../audio';
 import { MoodDirector } from '../audio/mood';
-import { viewRadius } from '../audio/mix';
+import { spatialize, viewRadius } from '../audio/mix';
+import { densityGain, MAX_SOURCES, nearestSources, phaseOffset, QUIET_INPUT, scanSurroundings } from '../audio/ambience_logic';
+import type { AmbienceInput } from '../audio/ambience_logic';
 import { groupOfBuilding } from '../audio/voice_groups';
 
 /** Blickpunkt/Teaminformation, die die Session pro Frame liefert. */
@@ -50,6 +52,8 @@ export class Soundscape {
   private candN = 0;
   private siegeOwn: { x: number; y: number }[] = [];
   private lastMood: string = 'build';
+  /** zuletzt abgeleitete Umgebungsbeobachtung (Diagnose) */
+  ambient: AmbienceInput = QUIET_INPUT;
   private seeded = false;
   private acc = 0;
   private combatAcc = 0;
@@ -60,6 +64,13 @@ export class Soundscape {
   private zw = 1;
   private clock = 0;
   private bldTimer = new Map<number, number>();
+  /** Werkstattgeräusche: Kandidaten dieses Durchlaufs (nächste je Typ gewinnen) */
+  private workCands: { id: number; x: number; y: number; sfx: 'smith' | 'mill' | 'pick'; period: number }[] = [];
+  /** eigene Arbeiter im Sichtbereich (Vorwert für die Dichte-Dämpfung der Arbeitsgeräusche) */
+  private nearWorkers = 0;
+  /** Kampfgeschehen für die Umgebung: nah/fern, geglättet */
+  private ambAcc = { near: 0, far: 0, farSide: 0 };
+  private ambRate = { near: 0, far: 0, pan: 0 };
   private view: SoundView | null = null;
 
   constructor(
@@ -75,6 +86,7 @@ export class Soundscape {
     if (e.e !== 'fx') return;
     const a = this.audio;
     const near = this.isRelevant(e.x, e.y, v);
+    this.accountCombat(e, v);
     switch (e.k) {
       case 'hit': {
         if (near) this.combatAcc += 1;
@@ -104,6 +116,21 @@ export class Soundscape {
         break;
       default:
         a.simFx(e.k, e.x, e.y);
+    }
+  }
+
+  /** Kampfereignisse für die Umgebung: im Bild (nah) oder außerhalb (fern, hörbar bis ~75 Tiles) */
+  private accountCombat(e: SimEvent & { e: 'fx' }, v: SoundView): void {
+    const wgt = e.k === 'hit' ? 1 : e.k === 'collapse' || e.k === 'collapseWood' || e.k === 'explosion' || e.k === 'rock' ? 2 : 0;
+    if (!wgt) return;
+    const dx = e.x - v.camX;
+    const dy = e.y - v.camY;
+    const d = Math.hypot(dx, dy);
+    const view = viewRadius(v.camDist);
+    if (d < view * 0.9) this.ambAcc.near += wgt;
+    else if (d < 75) {
+      this.ambAcc.far += wgt;
+      this.ambAcc.farSide += wgt * ((dx * Math.cos(v.camYaw) - dy * Math.sin(v.camYaw)) / Math.max(1, d));
     }
   }
 
@@ -184,11 +211,35 @@ export class Soundscape {
     // ----- Gebäude -----
     const fresh: BldRec[] = [];
     const seen = new Set<number>();
+    const viewR = viewRadius(v.camDist);
+    const settleR2 = viewR * 1.25 * (viewR * 1.25);
+    let built = 0;
+    let markets = 0;
+    let fireSum = 0;
+    let fireBest = 0;
+    let firePan = 0;
+    const listener = { x: v.camX, y: v.camY, yaw: v.camYaw, dist: v.camDist };
+    this.workCands.length = 0;
     for (const b of w.buildings.values()) {
       seen.add(b.i);
       const f = b.f;
       const cx = b.x + b.w / 2;
       const cy = b.y + b.h / 2;
+      const ddx = cx - v.camX;
+      const ddy = cy - v.camY;
+      const dd2 = ddx * ddx + ddy * ddy;
+      if (dd2 < settleR2 && (b.t < BT.WallWood || b.t > BT.TurretMangonel)) {
+        built++;
+        if (b.t === BT.Market) markets++;
+      }
+      if (f & BF.Burning && dd2 < cull2) {
+        const sp = spatialize(listener, cx, cy);
+        fireSum += sp.gain;
+        if (sp.gain > fireBest) {
+          fireBest = sp.gain;
+          firePan = sp.pan;
+        }
+      }
       const old = this.known.get(b.i);
       if (!old) {
         const rec: BldRec = { f, cx, cy, t: b.t, o: b.o };
@@ -205,6 +256,7 @@ export class Soundscape {
         if (dx * dx + dy * dy < cull2) this.buildingWork(b.t, b.i, cx, cy, dt);
       }
     }
+    if (!quiet) this.playWork(dt, v);
     const removed: BldRec[] = [];
     for (const [id, rec] of this.known) {
       if (!seen.has(id)) {
@@ -244,6 +296,9 @@ export class Soundscape {
     let nearSoldier: { type: number; x: number; y: number } | null = null;
     let nearAttacker: { type: number; x: number; y: number } | null = null;
     const ownSiege: { x: number; y: number }[] = [];
+    let folk = 0;
+    let workersNear = 0;
+    const workScale = Math.min(1, 3.5 / Math.max(1, this.nearWorkers));
     for (let s = 0; s < top; s++) {
       const id = w.ids[s];
       const wasId = this.prevIds[s];
@@ -288,7 +343,16 @@ export class Soundscape {
       if (period && (type === U.Peasant || type === U.Engineer)) {
         const dx = x - v.camX;
         const dy = y - v.camY;
-        if (dx * dx + dy * dy < cull2 && Math.random() < dt / period) this.workSound(sub, x, y);
+        if (dx * dx + dy * dy < cull2) {
+          workersNear++;
+          // viele Arbeiter ≠ Hammerwand: Gesamtrate der Arbeitsgeräusche bleibt begrenzt
+          if (Math.random() < (dt / period) * workScale) this.workSound(sub, x, y);
+        }
+      }
+      if (type === U.Peasant) {
+        const fx = x - v.camX;
+        const fy = y - v.camY;
+        if (fx * fx + fy * fy < settleR2) folk++;
       }
       // ----- Stimmen (4D): nur eigene Einheiten im Sichtbereich -----
       if (owner === v.me) {
@@ -343,6 +407,36 @@ export class Soundscape {
     this.stats.units = units;
     this.stats.combatRate = Math.round(this.director.combatRate * 100) / 100;
     a.setMood(this.director.mood);
+    this.nearWorkers = workersNear;
+
+    // ----- Umgebungsgeräusche (4G) -----
+    const k = Math.min(1, dt / 2);
+    const acc = this.ambAcc;
+    this.ambRate.near += (acc.near / dt - this.ambRate.near) * k;
+    this.ambRate.far += (acc.far / dt - this.ambRate.far) * k;
+    if (acc.far > 0) this.ambRate.pan += (acc.farSide / acc.far - this.ambRate.pan) * Math.min(1, k * 2);
+    acc.near = acc.far = acc.farSide = 0;
+    const map = w.map;
+    const sur = scanSurroundings(map, v.camX, v.camY, v.camYaw, Math.max(10, viewR * 1.1), (t) => t === T.Water || t === T.Moat, (t) => t === T.Rock);
+    const ambient: AmbienceInput = {
+      ...QUIET_INPUT,
+      dist: v.camDist,
+      mood: this.director.mood,
+      water: sur.water,
+      waterPan: sur.waterPan,
+      trees: sur.trees,
+      open: sur.open,
+      built,
+      folk,
+      markets,
+      fire: Math.min(1, fireSum * 0.8),
+      firePan,
+      farCombat: this.ambRate.far,
+      farCombatPan: this.ambRate.pan,
+      nearCombat: this.ambRate.near,
+    };
+    this.ambient = ambient;
+    if (!quiet) a.updateAmbience(ambient, dt);
     // Lage kippt: ein eigener Soldat in der Nähe ruft (Verteidigung beim ersten Feind, Angriff bei Schlachtbeginn)
     const mood = this.director.mood;
     if (mood !== this.lastMood && !quiet) {
@@ -426,11 +520,27 @@ export class Soundscape {
       default:
         return;
     }
-    const left = (this.bldTimer.get(id) ?? Math.random() * period) - dt;
-    if (left <= 0) {
-      this.audio.play(sfx, cx, cy, { vol: 0.8 });
-      this.bldTimer.set(id, period * (0.8 + Math.random() * 0.5));
-    } else this.bldTimer.set(id, left);
+    this.workCands.push({ id, x: cx, y: cy, sfx, period });
+  }
+
+  /**
+   * Werkstattgeräusche: je Typ höchstens `MAX_SOURCES` Quellen (die nächsten zum Blickpunkt), Lautstärke nach Dichte kompressiv,
+   * Phasenversatz je Gebäude, damit mehrere Schmieden nicht im Gleichtakt hämmern.
+   */
+  private playWork(dt: number, v: SoundView): void {
+    for (const sfx of ['smith', 'mill', 'pick'] as const) {
+      const list = this.workCands.filter((c) => c.sfx === sfx);
+      if (list.length === 0) continue;
+      const chosen = nearestSources(list, v.camX, v.camY, MAX_SOURCES[sfx]);
+      const gain = densityGain(chosen.length);
+      for (const c of chosen) {
+        const left = (this.bldTimer.get(c.id) ?? phaseOffset(c.id, c.period)) - dt;
+        if (left <= 0) {
+          this.audio.play(sfx, c.x, c.y, { vol: 0.8 * gain });
+          this.bldTimer.set(c.id, c.period * (0.8 + Math.random() * 0.5));
+        } else this.bldTimer.set(c.id, left);
+      }
+    }
   }
 
   /** Welche Arbeit steht an dieser Stelle an? Bäume → Hacken, Vorkommen → Pickel, sonst Ernte. */

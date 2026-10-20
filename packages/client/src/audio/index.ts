@@ -6,6 +6,8 @@
 import { leadClass, voiceClassOf, CommandKind, VoiceClass } from './classes';
 import { VoiceEvent } from '@strongpoly/shared';
 import { VoiceSystem } from './voice';
+import { Ambience } from './ambience';
+import { AmbienceInput, SILENT_TARGETS } from './ambience_logic';
 import { eventOfCommand, groupOfBuilding, groupOfUnit, leadGroup } from './voice_groups';
 import { applyLevels, AudioSettings, Bus, Channel, createBus, DEFAULT_AUDIO } from './engine';
 import { Listener, LIMITER_CFG, spatialize, VoiceLimiter } from './mix';
@@ -83,6 +85,7 @@ interface DebugState {
   settings: AudioSettings;
   listener: Listener;
   voice: ReturnType<VoiceSystem['debug']>;
+  ambience: { targets: Ambience['state']; played: Ambience['played'] } | null;
 }
 
 export class AudioEngine {
@@ -91,6 +94,7 @@ export class AudioEngine {
   private bus: Bus | null = null;
   private noise: AudioBuffer | null = null;
   private music: MusicPlayer | null = null;
+  private ambience: Ambience | null = null;
   private limiter = new VoiceLimiter(LIMITER_CFG);
   private listener: Listener = { x: 0, y: 0, yaw: Math.PI / 4, dist: 38 };
   private mood: GameMood = 'build';
@@ -162,6 +166,7 @@ export class AudioEngine {
     for (const ev of ['pointerdown', 'keydown', 'touchend', 'mousedown']) window.removeEventListener(ev, this.unlockBound, { capture: true });
     this.syncMusic();
     this.voice.init();
+    this.syncAmbience();
   }
 
   /** true, wenn Klänge gerade hörbar abgespielt werden können. */
@@ -460,6 +465,7 @@ export class AudioEngine {
 
   /** Thema für Hauptmenü, Sieg, Niederlage; null = zurück zur Spielstimmung. */
   playTheme(t: ThemeId | null): void {
+    if (t === 'menu') this.ambience?.apply(SILENT_TARGETS, undefined, 0.6);
     if (this.theme === t) return;
     this.theme = t;
     this.music?.setTarget(t ?? this.mood, t ? THEME_PHRASES[t] : 0, !!t);
@@ -489,6 +495,32 @@ export class AudioEngine {
   }
 
   // ---------------------------------------------------------------------------------------
+  // Umgebungsgeräusche (4G)
+
+  private syncAmbience(): void {
+    if (!this.ready || this.ambience) return;
+    this.ambience = new Ambience(this.ctx!, this.bus!.input.ambient, this.noise!);
+  }
+
+  /**
+   * Beobachtungen der Umgebung (Soundscape, alle ~0,25 s) → Klangbetten und Einzelereignisse (Vögel, Knistern, ferne Waffenschläge).
+   * Einzelereignisse laufen über das Voice-Limit.
+   */
+  updateAmbience(input: AmbienceInput, dt: number): void {
+    if (!this.ready) return;
+    if (!this.ambience) this.syncAmbience();
+    const a = this.ambience;
+    if (!a) return;
+    const events = a.update(dt, input);
+    if (this.cfg.muted || this.bus!.level.ambient.gain.value < 0.0005) return;
+    for (const ev of events) {
+      const est = ev.kind === 'bird' ? 1100 : ev.kind === 'clash' ? 650 : 120;
+      if (!this.limiter.request(ev.kind, performance.now(), est)) continue;
+      a.fire(ev);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------------
   // Diagnose
 
   state(): DebugState {
@@ -505,6 +537,7 @@ export class AudioEngine {
       settings: { ...this.cfg },
       listener: { ...this.listener },
       voice: this.voice.debug(),
+      ambience: this.ambience ? { targets: { ...this.ambience.state }, played: { ...this.ambience.played } } : null,
     };
   }
 }

@@ -104,6 +104,9 @@ export const LIMITER_CFG: LimiterCfg = {
     victory: { max: 1, gapMs: 1000, priority: 3 },
     defeat: { max: 1, gapMs: 1000, priority: 3 },
     voice: { max: 2, gapMs: 140, priority: 2 },
+    bird: { max: 2, gapMs: 1500 },
+    clash: { max: 3, gapMs: 180 },
+    crackle: { max: 3, gapMs: 40 },
   },
 };
 
