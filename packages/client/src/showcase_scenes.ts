@@ -163,8 +163,8 @@ export function findCliffs(map: GameMap): Spot {
  * Beste Stelle für eine Bebauung: Rechteck x±hw, y−up .. y+down mit möglichst viel Land (Wasser/Fels zählen nicht),
  * vollständig innerhalb der Karte; bei Gleichstand näher an der Kartenmitte.
  */
-export function findFlat(map: GameMap, hw: number, up: number, down: number): Spot {
-  const m = 16;
+export function findFlat(map: GameMap, hw: number, up: number, down: number, margin = 26): Spot {
+  const m = margin;
   return bestSpot(map, 0, 2, (x, y) => {
     if (x - hw < m || x + hw > map.w - m || y - up < m || y + down > map.h - m) return -1e9;
     let land = 0;
@@ -274,7 +274,7 @@ export function flatten(map: GameMap, x0: number, y0: number, x1: number, y1: nu
       if (!map.inBounds(x, y)) continue;
       const i = map.idx(x, y);
       const t = map.terrain[i];
-      if (t === T.Water || t === T.Rock || t === T.Swamp || t === T.Moat) map.terrain[i] = T.Steppe;
+      if (t === T.Water || t === T.Rock || t === T.Swamp || t === T.Moat || t === T.StoneDeposit || t === T.IronDeposit || t === T.PitchSpring) map.terrain[i] = T.Steppe;
       map.height[i] = height;
       map.trees[i] = 0;
     }
@@ -379,7 +379,7 @@ function block(p: Plan, types: number[], o: number, cx: number, cy: number, cols
 
 // ---------------------------------------------------------------- Szenen
 
-const SCENE_SEED = 7;
+const SCENE_SEED = 1;
 const MAP_SIZE = 128;
 
 function startOf(map: GameMap, i = 0): { x: number; y: number } {
@@ -469,7 +469,7 @@ export function sceneSpec(name: ShowName, seedOverride?: number): ShowSpec {
     }
     case 'siege': {
       desc = 'Belagerung: Burg mit Verteidigern, mehrere hundert Angreifer mit Rammböcken, Belagerungstürmen, Katapulten';
-      const { x, y } = findFlat(map, 34, 26, 58);
+      const { x, y } = findFlat(map, 34, 26, 58, 12);
       flatten(map, x - 34, y - 26, x + 34, y + 58);
       castle(p, x, y, 0, { moat: false });
       // Verteidiger hinter der Südmauer, einige verwundet
