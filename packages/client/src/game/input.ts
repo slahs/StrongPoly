@@ -586,6 +586,7 @@ export class InputController {
     else if (is('toggleAdmin')) s.hud.togglePopup('admin');
     else if (is('toggleShadows')) s.toggleShadows();
     else if (is('toggleMute')) s.toggleMute();
+    else if (is('advisorReplay')) s.advisorReplay();
     else if (is('centerKeep')) s.centerOnKeep();
     else if (is('selectAllArmy')) s.selectAllArmy();
     else {

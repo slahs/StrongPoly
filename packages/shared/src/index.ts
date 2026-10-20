@@ -31,3 +31,4 @@ export * from './sim/popularity_explain';
 export { popularityFactors, popularityTarget, spawnIntervalTicks } from './sim/popularity';
 export type { PopInputs } from './sim/popularity';
 export * from './data/popularity_text';
+export * from './data/advisor_lines';

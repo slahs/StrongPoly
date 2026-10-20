@@ -13,7 +13,8 @@ import { EntityRenderer } from '../render/entities';
 import { GhostRenderer } from '../render/ghost';
 import { GameScene } from '../render/scene';
 import { Hud, HudActions, ModeName } from '../ui/hud';
-import { AdvisorLogic, AdvisorPanel } from '../ui/advisor';
+import { AdvisorLogic, AdvisorMsg, AdvisorPanel } from '../ui/advisor';
+import type { VoiceApi } from '../audio/voice_api';
 import { showEndScreen } from '../ui/endscreen';
 import { closeEncyclopedia, isEncyclopediaOpen, openEncyclopedia } from '../ui/encyclopedia';
 import type { GameConnection } from './connection';
@@ -129,12 +130,22 @@ export class Session {
       },
     });
     this.hud.setMe(this.me);
-    this.advisor = new AdvisorLogic(this.world, () => this.me, () => this.teamOf);
-    this.advisorPanel = new AdvisorPanel(this.hud.topRight, this.advisor, (x, y) => this.gs.cam.lookAt(x, y), () => this.world.tick);
-    this.advisor.onMessage = (m) => {
-      this.advisorPanel?.notify();
-      this.audio?.advisor(m.kind === 'info' ? 'info' : 'alert');
-    };
+    this.advisor = new AdvisorLogic(this.world, () => this.me, () => this.teamOf, { mission: !!opts.mission });
+    this.advisorPanel = new AdvisorPanel(
+      this.hud.topRight,
+      this.advisor,
+      {
+        onJump: (x, y, building) => {
+          this.gs.cam.lookAt(x, y);
+          if (building) this.setSelection([], building);
+        },
+        onReplay: () => this.advisorReplay(),
+        speechOn: () => this.opts.settings.advisorSpeech,
+        toggleSpeech: () => this.toggleAdvisorSpeech(),
+      },
+      () => this.world.tick,
+    );
+    this.advisor.onMessage = (m) => this.onAdvisorMessage(m);
     this.hud.formationHandler = (f) => {
       this.input.formation = f;
       this.hud.toast('Formation geändert');
@@ -189,6 +200,45 @@ export class Session {
       if (s >= 0) types.push(w.type[s]);
     }
     if (types.length) this.audio.selectionCommand(types, kind);
+  }
+
+  /** Sprachausgabe des Sprachsystems (null, solange es fehlt: der Berater zeigt dann nur Text) */
+  private voice(): VoiceApi | null {
+    return (this.audio as unknown as { voice?: VoiceApi } | null)?.voice ?? null;
+  }
+
+  /** Neue Beratermeldung: Ton, Sprachausgabe (falls vorhanden und eingeschaltet), Panel */
+  private onAdvisorMessage(m: AdvisorMsg): void {
+    this.advisorPanel?.notify();
+    const voice = this.voice();
+    const speak = !!(m.key && voice && this.opts.settings.advisorSpeech);
+    // Gesprochene Hinweise brauchen keinen Klingelton, nur Kritisches behält den Gong
+    if (!speak || m.prio === 2) this.audio?.advisor(m.kind === 'info' ? 'info' : 'alert');
+    if (speak && m.key && voice) voice.say({ voice: 'advisor', key: m.key, text: m.text, lang: m.lang ?? 'de', priority: m.prio });
+  }
+
+  /** Alt+H / Knopf im Beraterpanel: letzten Hinweis erneut sprechen, sonst als Text einblenden */
+  advisorReplay(): void {
+    const last = this.advisor.lastSpoken();
+    const voice = this.voice();
+    if (!last) {
+      this.hud.toast('Noch kein Hinweis des Beraters');
+      return;
+    }
+    last.read = true;
+    this.advisorPanel?.render();
+    if (voice && this.opts.settings.advisorSpeech && voice.replayLast('advisor')) return;
+    this.hud.toast(voice?.lastText('advisor') ?? last.text);
+  }
+
+  /** Schalter im Beraterpanel: Sprache an/aus (Text bleibt) */
+  private toggleAdvisorSpeech(): void {
+    const st = this.opts.settings;
+    st.advisorSpeech = !st.advisorSpeech;
+    st.save();
+    if (!st.advisorSpeech) this.voice()?.stop('advisor');
+    this.hud.toast(st.advisorSpeech ? 'Der Berater spricht wieder' : 'Der Berater schweigt (Text bleibt lesbar)');
+    this.advisorPanel?.syncSpeech();
   }
 
   /** Taste M: Ton stumm/an, mit sichtbarer Meldung. */
@@ -582,6 +632,7 @@ export class Session {
     this.conn.close();
     this.input.destroy();
     this.advisorPanel?.destroy();
+    this.voice()?.stop('advisor');
     this.hud.destroy();
     this.gs.root.remove(this.entities.group, this.ghost.group);
     this.entities.dispose();

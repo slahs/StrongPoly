@@ -26,6 +26,8 @@ export class Settings {
   volAdvisor = DEFAULT_AUDIO.advisor;
   /** Musik an/aus */
   music = DEFAULT_AUDIO.musicOn;
+  /** Der Berater spricht seine Hinweise (Text bleibt in jedem Fall lesbar) */
+  advisorSpeech = true;
   /** Stummschaltung (Taste M) */
   muted = false;
   edgeScroll = true;
@@ -66,6 +68,7 @@ export class Settings {
           volMusic: this.volMusic,
           volAdvisor: this.volAdvisor,
           music: this.music,
+          advisorSpeech: this.advisorSpeech,
           muted: this.muted,
           edgeScroll: this.edgeScroll,
           aa: this.aa,

@@ -12,7 +12,7 @@ export type HotkeyAction =
   | 'selectKeep' | 'selectGranary' | 'selectBarracks' | 'selectMarket' | 'selectStock' | 'selectArmory'
   | 'jumpAlert' | 'centerSelection'
   | 'help' | 'encyclopedia'
-  | 'selectAllArmy' | 'toggleShadows' | 'centerKeep' | 'toggleMute';
+  | 'selectAllArmy' | 'toggleShadows' | 'centerKeep' | 'toggleMute' | 'advisorReplay';
 
 export const HOTKEY_LABELS: Record<HotkeyAction, string> = {
   panUp: 'Kamera hoch', panDown: 'Kamera runter', panLeft: 'Kamera links', panRight: 'Kamera rechts',
@@ -29,7 +29,7 @@ export const HOTKEY_LABELS: Record<HotkeyAction, string> = {
   selectMarket: 'Markt anwählen', selectStock: 'Lager anwählen', selectArmory: 'Waffenkammer anwählen',
   jumpAlert: 'Kamera zur letzten Meldung', centerSelection: 'Kamera auf Auswahl',
   help: 'Hotkey-Übersicht', encyclopedia: 'Enzyklopädie',
-  selectAllArmy: 'Alle Truppen wählen', toggleShadows: 'Schatten umschalten', centerKeep: 'Zum Bergfried', toggleMute: 'Ton stumm/an',
+  selectAllArmy: 'Alle Truppen wählen', toggleShadows: 'Schatten umschalten', centerKeep: 'Zum Bergfried', toggleMute: 'Ton stumm/an', advisorReplay: 'Letzten Berater-Hinweis erneut abspielen',
 };
 
 /** Reihenfolge und Gruppen für Optionsmenü und F1-Übersicht */
@@ -40,7 +40,7 @@ export const HOTKEY_GROUPS: { name: string; actions: HotkeyAction[] }[] = [
   { name: 'Einheiten', actions: ['selectAllArmy', 'hold', 'defensive', 'aggressive', 'attackMove', 'patrol', 'attackGround', 'tunnel', 'stop'] },
   { name: 'Fenster', actions: ['toggleStock', 'toggleMarket', 'togglePopularity', 'toggleAdmin', 'help', 'encyclopedia'] },
   { name: 'Extreme', actions: ['ability1', 'ability2', 'ability3', 'ability4', 'ability5'] },
-  { name: 'Spiel', actions: ['pause', 'toggleShadows', 'toggleMute'] },
+  { name: 'Spiel', actions: ['pause', 'toggleShadows', 'toggleMute', 'advisorReplay'] },
 ];
 
 export const DEFAULT_HOTKEYS: Record<HotkeyAction, string> = {
@@ -57,7 +57,7 @@ export const DEFAULT_HOTKEYS: Record<HotkeyAction, string> = {
   selectKeep: 'Alt+KeyK', selectGranary: 'Alt+KeyG', selectBarracks: 'Alt+KeyB', selectMarket: 'Alt+KeyM', selectStock: 'Alt+KeyS', selectArmory: 'Alt+KeyW',
   jumpAlert: 'Space', centerSelection: 'Enter',
   help: 'F1', encyclopedia: 'F2',
-  selectAllArmy: 'KeyY', toggleShadows: 'F9', centerKeep: 'Home', toggleMute: 'KeyM',
+  selectAllArmy: 'KeyY', toggleShadows: 'F9', centerKeep: 'Home', toggleMute: 'KeyM', advisorReplay: 'Alt+KeyH',
 };
 
 const KEY = 'strongpoly.hotkeys';

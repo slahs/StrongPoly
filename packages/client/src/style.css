@@ -163,7 +163,16 @@ input[type=checkbox] { accent-color: #a8741a; width: 16px; height: 16px; }
 .adv-msg.read { opacity: 0.6; }
 .adv-msg.go { cursor: pointer; }
 .adv-msg.go:hover { background: #ffe9a8aa; }
-.adv-time { color: var(--ink2); min-width: 24px; font-size: 11px; }
+.adv-time { color: var(--ink2); min-width: 24px; font-size: 11px; flex: none; }
+.adv-head .adv-name { font-size: 12px; line-height: 1.15; }
+.adv-head .spacer { flex: 1; }
+.adv-btn { padding: 2px 5px; display: flex; align-items: center; justify-content: center; height: 26px; min-width: 28px; box-sizing: border-box; }
+.adv-btn.off { opacity: 0.6; }
+.adv-list { max-height: 244px; overflow-y: auto; }
+.adv-msg .adv-text { line-height: 1.25; }
+.adv-msg.p0 { border-color: #7d9a4a; }
+.adv-msg.p1 { border-color: #d28a1a; }
+.adv-msg.p2 { border-color: #b8322a; }
 .toasts { position: absolute; left: 50%; transform: translateX(-50%); top: 48px; width: 380px; display: flex; flex-direction: column; gap: 4px; pointer-events: none; z-index: 7; align-items: center; }
 .toast { padding: 5px 12px; border-radius: 4px; background: var(--panel); border-left: 4px solid var(--gold); font-size: 13px; animation: fade 0.2s; }
 .toast.bad { border-color: var(--bad); }

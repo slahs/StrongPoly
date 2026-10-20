@@ -31,16 +31,20 @@ function addUnit(w: ClientWorld, owner: number, type: number, x: number, y: numb
 }
 
 describe('Berater', () => {
-  it('meldet Hunger genau einmal pro Abklingzeit', () => {
+  it('meldet Hunger genau einmal, nicht alle paar Sekunden; erneut erst nach Entwarnung und Abklingzeit', () => {
     const w = mkWorld();
     const a = new AdvisorLogic(w, () => 0, () => [0, 1]);
     const got: string[] = [];
     a.onMessage = (m) => got.push(m.text);
     a.update(mkView({ foodShort: true }), 100);
-    a.update(mkView({ foodShort: true }), 200);
+    for (let t = 110; t <= 900; t += 10) a.update(mkView({ foodShort: true }), t);
     expect(got.length).toBe(1);
-    expect(got[0]).toMatch(/Hunger/);
-    a.update(mkView({ foodShort: true }), 900);
+    expect(got[0]).toMatch(/Hunger|Kornspeicher/);
+    // Entwarnung (Vorrat da), danach wieder Hunger: innerhalb der Abklingzeit still, danach eine neue Meldung
+    a.update(mkView({ foodShort: false }), 1000);
+    a.update(mkView({ foodShort: true }), 1100);
+    expect(got.length).toBe(1);
+    a.update(mkView({ foodShort: true }), 1500);
     expect(got.length).toBe(2);
   });
 
