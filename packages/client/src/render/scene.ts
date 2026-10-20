@@ -85,6 +85,15 @@ export class GameScene {
     this.applyGfx({});
   }
 
+  /** Nebelweite für Übersichtsansichten (Prüfszenen) skalieren; 1 = normal */
+  setOverview(scale: number): void {
+    const f = this.scene.fog as THREE.Fog | null;
+    if (f) {
+      f.near = 105 * scale;
+      f.far = 235 * scale;
+    }
+  }
+
   resize(): void {
     const w = this.canvas.clientWidth || window.innerWidth;
     const h = this.canvas.clientHeight || window.innerHeight;

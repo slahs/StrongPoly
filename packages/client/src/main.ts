@@ -33,6 +33,12 @@ if (new URLSearchParams(location.search).has('bench')) {
   await new Promise<never>(() => {});
 }
 
+// Vergleichsszenen/Screenshot-Werkzeug (?shots=early|town|castle|siege|figures|map|…): feste Kameras, fester Spielzustand
+if (new URLSearchParams(location.search).has('shots')) {
+  (await import('./showcase')).startShowcase();
+  await new Promise<never>(() => {});
+}
+
 const canvas = document.getElementById('view') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLElement;
 const gs = new GameScene(canvas);

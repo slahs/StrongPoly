@@ -132,7 +132,8 @@ export class DecorRenderer {
     this.dirty = true;
   }
 
-  setOccupancy(a: Int32Array | null): void {
+  setOccupancy(a: Int32Array | null, buildings?: ReadonlyMap<number, { t: number; x: number; y: number; w: number; h: number }>): void {
+    void buildings;
     this.occupied = a;
     this.dirty = true;
   }
