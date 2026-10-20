@@ -13,6 +13,7 @@ import {
 } from '@strongpoly/shared';
 import * as THREE from 'three';
 import { EntityRenderer } from './render/entities';
+import { JOB_NAMES } from './render/unit_jobs';
 import { GameScene } from './render/scene';
 
 /**
@@ -65,6 +66,10 @@ declare global {
       setCamera: (x: number, y: number, dist?: number) => void;
       /** Gebäude zerstören (Einsturz, Staub, Trümmer) – Prüfhilfe */
       destroy: (id: number) => void;
+      /** feste Zeit (s) für Bildserien der Animation; null = Echtzeit */
+      setTime: (t: number | null) => void;
+      /** Zähler gezeichneter Bilder (zum Warten auf ein neues Bild) */
+      frameNo: () => number;
       /** Auswahl/Hover für Prüfaufnahmen */
       selected: Set<number>;
       ui: { selectedBuilding: number; hoverBuilding: number };
@@ -133,6 +138,8 @@ export interface ShowcaseEntry {
   carry?: number;
   /** Arbeits-Teilzustand (Sim `P.*`) */
   sub?: number;
+  /** Beruf erzwingen (Prüfhilfe: `EntityRenderer.debugJobs`) */
+  job?: number;
 }
 
 export class BenchWorld {
@@ -154,6 +161,8 @@ export class BenchWorld {
   /** Beschriftungen für Prüfszenen (Weltkoordinaten) */
   readonly labels: { x: number; y: number; text: string }[] = [];
   showcaseGrid = { cols: 1, spacing: 2.3, rowSpacing: 2.7 };
+  /** erzwungene Berufe der Prüfszene (Einheiten-ID → Beruf) */
+  readonly showJobs = new Map<number, number>();
 
   constructor(
     private total: number,
@@ -499,7 +508,7 @@ export class BenchWorld {
         const p = this.gridPos(col, row);
         const s = this.spawn(e.type, row % 2 === 0 ? 0 : 1, p.x, p.y);
         if (s < 0) continue;
-        w.face[s] = Math.PI * 1.25;
+        w.face[s] = Math.PI * 0.4;
         if (row === 1) w.flags[s] |= 4;
         if (row === 2) w.aux[s] |= 1;
         if (row === 3) {
@@ -507,6 +516,7 @@ export class BenchWorld {
           w.carry[s] = e.carry ?? 1 + (e.type % 12);
         } else if (e.carry && e.type === U.Peasant) w.carry[s] = e.carry;
         if (e.sub !== undefined) w.aux[s] = (w.aux[s] & 15) | (e.sub << 4);
+        if (e.job !== undefined) this.showJobs.set(w.ids[s], e.job);
         w.hp[s] = row === 2 ? 140 : 255;
       }
       const p = this.gridPos(col, 3.6);
@@ -594,7 +604,7 @@ export class BenchWorld {
 
 /** Zusätzliche Prüfspalten: Bauern in den verschiedenen Berufen (Beruf folgt aus Ware/Teilzustand) */
 function professionEntries(): ShowcaseEntry[] {
-  return [];
+  return JOB_NAMES.map((label, job) => ({ type: U.Peasant, label, job }));
 }
 
 /** Einstieg: ersetzt das normale Spiel durch die Benchmark-Szene */
@@ -629,6 +639,7 @@ export function startBench(): void {
   gs.setMap(world.map);
   gs.decor?.setOccupancy(world.bldAt);
   entities.onBuildingsChanged = () => gs.decor?.markDirty();
+  for (const [id, j] of bw.showJobs) entities.debugJobs.set(id, j);
   gs.onGfx = (qc, sh) => entities.applyQuality(qc, sh);
   gs.applyGfx({ quality, shadows: q.get('shadows') !== '0' });
   entities.applyQuality(gs.qcfg, gs.gfx.shadows && gs.qcfg.shadows);
@@ -726,7 +737,9 @@ export function startBench(): void {
     world.buildingsDirty = true;
     world.events.push({ e: 'fx', k: def.wood ? 'collapseWood' : 'collapse', x: b.x + b.w / 2, y: b.y + b.h / 2, z: def.height });
   };
-  window.__bench = { ready: true, done: false, result, scene: gs, entities, world, setCamera, destroy, selected, ui: ctl };
+  let fixedT: number | null = null;
+  let frameCount = 0;
+  window.__bench = { ready: true, done: false, result, scene: gs, entities, world, setCamera, destroy, selected, ui: ctl, setTime: (t) => (fixedT = t), frameNo: () => frameCount };
 
   const loop = (nowMs: number): void => {
     const dtReal = (nowMs - last) / 1000;
@@ -748,7 +761,8 @@ export function startBench(): void {
     }
     if (showcase) world.lastSnapMs = performance.now();
     if (tickAcc > 1.2) tickAcc = 0;
-    const nowS = nowMs / 1000;
+    const nowS = fixedT ?? nowMs / 1000;
+    frameCount++;
     // Kamera: leichter Schwenk, damit Schatten- und Dekor-Updates mitlaufen
     const t = (nowMs - begin) / 1000;
     if (still) gs.cam.lookAt(camX, camY);
