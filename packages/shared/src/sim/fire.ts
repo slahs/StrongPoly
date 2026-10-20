@@ -1,4 +1,4 @@
-import { DT, FIRE_DPS, FIRE_SPREAD_CHANCE, POT_RADIUS, WELL_RADIUS } from '../data/balance';
+import { CAULDRON, DT, FIRE_DPS, FIRE_SPREAD_CHANCE, POT_RADIUS, TURRETS, WELL_RADIUS } from '../data/balance';
 import { BT } from '../data/buildings';
 import { R } from '../data/resources';
 import { D, PROJ, U } from '../data/units';
@@ -168,10 +168,10 @@ function updateDefenses(sim: Sim): void {
       }
       if ((sim.tick + b.id) % 5 !== 0) continue;
       const pl = sim.players[b.owner];
-      if (pl.stock[R.Pitch] < 1) continue;
+      if (pl.stock[R.Pitch] < CAULDRON.pitchPerUse) continue;
       let best = -1;
-      let bd = 6.5 * 6.5;
-      sim.spatial.query(b.cx, b.cy, 6.5, (s) => {
+      let bd = CAULDRON.range * CAULDRON.range;
+      sim.spatial.query(b.cx, b.cy, CAULDRON.range, (s) => {
         if (!u.alive[s] || !sim.isEnemy(b.owner, u.owner[s]) || u.layer[s] === 1) return;
         const d = (u.x[s] - b.cx) ** 2 + (u.y[s] - b.cy) ** 2;
         if (d < bd) {
@@ -180,14 +180,14 @@ function updateDefenses(sim: Sim): void {
         }
       });
       if (best >= 0) {
-        sim.takeStock(b.owner, R.Pitch, 1);
+        sim.takeStock(b.owner, R.Pitch, CAULDRON.pitchPerUse);
         const tx = u.x[best];
         const ty = u.y[best];
         sim.emit({ e: 'fx', k: 'oil', x: tx, y: ty, z: 0.5 });
-        sim.spatial.query(tx, ty, 2.4, (s) => {
-          if (u.alive[s] && sim.isEnemy(b.owner, u.owner[s]) && Math.hypot(u.x[s] - tx, u.y[s] - ty) <= 2) damageUnit(sim, s, 85, D.Fire, b.owner, true);
+        sim.spatial.query(tx, ty, CAULDRON.queryRadius, (s) => {
+          if (u.alive[s] && sim.isEnemy(b.owner, u.owner[s]) && Math.hypot(u.x[s] - tx, u.y[s] - ty) <= CAULDRON.radius) damageUnit(sim, s, CAULDRON.dmg, D.Fire, b.owner, true);
         });
-        b.cd = 90;
+        b.cd = CAULDRON.cooldown;
       }
       continue;
     }
@@ -198,8 +198,9 @@ function updateDefenses(sim: Sim): void {
       }
       if ((sim.tick + b.id) % 3 !== 0) continue;
       const ballista = b.turret === 1;
-      const range = ballista ? 18 : 16;
-      const minR = ballista ? 2 : 5;
+      const tur = ballista ? TURRETS.ballista : TURRETS.mangonel;
+      const range = tur.range;
+      const minR = tur.minRange;
       let best = -1;
       let bd = range * range;
       sim.spatial.query(b.cx, b.cy, range, (s) => {
@@ -222,12 +223,12 @@ function updateDefenses(sim: Sim): void {
           sz: groundZ(sim, b.cx, b.cy) + 1,
           tx: u.x[best],
           ty: u.y[best],
-          dmg: (ballista ? 60 : 55) * fm,
+          dmg: tur.dmg * fm,
           dtype: ballista ? D.Pierce : D.Siege,
-          splash: ballista ? 0 : 1.5,
+          splash: tur.splash,
           target: u.id(best),
         });
-        b.turretCd = ballista ? 30 : 60;
+        b.turretCd = tur.cooldown;
       }
     }
   }

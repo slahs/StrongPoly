@@ -55,3 +55,16 @@ export const MARKET_PRICE_STEP = 0.015;
 
 /** Kein Bauen, solange feindliche Soldaten so nah (Tiles, ab Gebäuderand) sind – wie im Original verhindert das Tor-Neubau mitten im Sturm */
 export const ENEMY_BUILD_RADIUS = 8;
+
+/**
+ * Mauergeschütze auf Großen Türmen (Ballista = turret 1, Mangonel = turret 2).
+ * range/minRange in Tiles, cooldown in Ticks, dmg = Grundschaden (vor Angstfaktor), splash = Flächenradius in Tiles.
+ * Die Reichweiten sind bewusst kürzer als bei Belagerungsgerät (Katapult/Trebuchet).
+ */
+export const TURRETS = {
+  ballista: { range: 18, minRange: 2, dmg: 60, cooldown: 30, splash: 0 },
+  mangonel: { range: 16, minRange: 5, dmg: 55, cooldown: 60, splash: 1.5 },
+} as const;
+
+/** Ölkessel: Reichweite und Wirkradius in Tiles, Schaden (Feuer), Abklingzeit in Ticks; verbraucht 1 Pech pro Guss. */
+export const CAULDRON = { range: 6.5, queryRadius: 2.4, radius: 2, dmg: 85, cooldown: 90, pitchPerUse: 1 } as const;
