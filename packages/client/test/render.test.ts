@@ -3,7 +3,7 @@ import { BT, BUILDINGS, PROJ, R, RES_COUNT, U, UNITS, UNIT_TYPES } from '@strong
 import { BenchWorld } from '../src/bench';
 import { ModelBuilder } from '../src/render/builder';
 import { PART } from '../src/render/materials';
-import { buildBuildingModel, WALL_JOIN, WALL_TYPES, wallParts } from '../src/render/models_buildings';
+import { buildBuildingModel, TRIS_BUDGET, WALL_JOIN, WALL_TYPES, wallParts } from '../src/render/models_buildings';
 import { arrowGeo, flameGeo, foundationGeo, rubbleGeo, scaffoldGeo, stoneGeo } from '../src/render/models_misc';
 import { buildCargoModel, buildUnitModel, CARGO_KINDS, CARGO_OF_RES, UNIT_CORPSE, UNIT_CYCLE, UNIT_SCALE, UNIT_TOP, UNIT_WALK_W } from '../src/render/models_units';
 import { QUALITY, qualityOf } from '../src/render/quality';
@@ -105,7 +105,7 @@ describe('Gebäudemodelle', () => {
     for (const def of BUILDINGS) {
       const m = buildBuildingModel(def);
       expect(m.tris, def.key).toBeGreaterThan(0);
-      expect(m.tris, def.key).toBeLessThan(2500);
+      expect(m.tris, def.key).toBeLessThan(def.id === BT.Keep ? TRIS_BUDGET.keep : TRIS_BUDGET.large);
       expect(finite(m.merged), def.key).toBe(true);
       const meta = m.merged.getAttribute('aMeta');
       // eingebackene Ambient Occlusion: unten dunkler als oben

@@ -136,6 +136,9 @@ export function buildTicksOf(def: Pick<BuildingDef, 'id'>): number {
   return Math.round(buildSeconds(def.id) * TICK_RATE);
 }
 
+/** Typen ohne Gerüst (offene Höfe, Felsen, flache Anlagen): sie wachsen nur aus Fundament und Baumaterial */
+export const NO_SCAFFOLD: Set<number> = new Set([BT.Market, BT.Stockpile, BT.Quarry, BT.IronMine, BT.PitchRig, BT.OxTether, BT.Maypole, BT.Drawbridge, BT.Garden, BT.Well, BT.WaterPot, BT.Stocks, BT.Gallows]);
+
 /** Staffelung innerhalb einer gezogenen Mauerlinie: Verzögerung je Stück (s) und Obergrenze der Gesamtlaufzeit */
 export const WALL_SWEEP = { perPiece: 0.07, maxSweep: 2.4 };
 

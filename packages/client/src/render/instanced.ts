@@ -20,6 +20,10 @@ export interface TypeMeshOpts {
   shadow: boolean;
   /** Anfangskapazität */
   cap: number;
+  /** eigenes Material (z. B. Gebäudematerial); sonst Standard nach `anim` */
+  material?: THREE.Material;
+  /** eigenes Schattenmaterial (nur mit `anim`); sonst die gemeinsame Animationstiefe */
+  depthMaterial?: THREE.Material;
 }
 
 /**
@@ -52,7 +56,7 @@ export class TypeMesh {
   }
 
   private make(): THREE.InstancedMesh {
-    const m = new THREE.InstancedMesh(this.geo, this.opts.anim ? animMaterial() : staticMaterial(), this.cap);
+    const m = new THREE.InstancedMesh(this.geo, this.opts.material ?? (this.opts.anim ? animMaterial() : staticMaterial()), this.cap);
     m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     m.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(this.cap * 3), 3);
     m.instanceColor.setUsage(THREE.DynamicDrawUsage);
@@ -60,7 +64,7 @@ export class TypeMesh {
       this.an = new THREE.InstancedBufferAttribute(new Float32Array(this.cap * 4), 4);
       this.an.setUsage(THREE.DynamicDrawUsage);
       this.geo.setAttribute('iAnim', this.an);
-      m.customDepthMaterial = animDepthMaterial();
+      m.customDepthMaterial = this.opts.depthMaterial ?? animDepthMaterial();
     }
     m.frustumCulled = false;
     m.castShadow = this.shadow;
@@ -82,6 +86,13 @@ export class TypeMesh {
     this.mat = this.mesh.instanceMatrix.array as Float32Array;
     this.col = (this.mesh.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
     this.ani = this.an ? (this.an.array as Float32Array) : null;
+  }
+
+  /** Mesh entfernen und GPU-Puffer samt Geometrie freigeben */
+  dispose(): void {
+    this.parent.remove(this.mesh);
+    this.mesh.dispose();
+    this.geo.dispose();
   }
 
   setShadows(on: boolean): void {

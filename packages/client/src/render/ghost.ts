@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { BuildingDef, ClientWorld } from '@strongpoly/shared';
-import { buildBuildingModel } from './models_buildings';
+import { BT, BuildingDef, ClientWorld } from '@strongpoly/shared';
+import { buildBuildingModel, TURRET_BASE_Y } from './models_buildings';
 import { tileY } from './util';
 import type { ModelGeos } from './builder';
 
@@ -57,7 +57,7 @@ export class GhostRenderer {
     }
     let geos = this.geoCache.get(def.id);
     if (!geos) {
-      geos = buildBuildingModel(def);
+      geos = buildBuildingModel(def, 1);
       this.geoCache.set(def.id, geos);
     }
     this.body = new THREE.InstancedMesh(geos.body, this.matBody, this.cap);
@@ -80,6 +80,8 @@ export class GhostRenderer {
     const w = rot ? def.h : def.w;
     const h = rot ? def.w : def.h;
     const n = Math.min(list.length, this.cap);
+    // Geschütze sitzen auf der Turmkrone
+    const lift = def.id === BT.TurretBallista || def.id === BT.TurretMangonel ? TURRET_BASE_Y : 0;
     let nt = 0;
     const tArr = this.tiles.instanceMatrix.array as Float32Array;
     const tCol = (this.tiles.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
@@ -88,7 +90,7 @@ export class GhostRenderer {
     for (let i = 0; i < n; i++) {
       const p = list[i];
       const col = p.valid ? OK : BAD;
-      m4.compose(new THREE.Vector3(p.x + w / 2, tileY(world, p.x, p.y), p.y + h / 2), q, new THREE.Vector3(1, 1, 1));
+      m4.compose(new THREE.Vector3(p.x + w / 2, tileY(world, p.x, p.y) + lift, p.y + h / 2), q, new THREE.Vector3(1, 1, 1));
       this.body!.setMatrixAt(i, m4);
       this.accent?.setMatrixAt(i, m4);
       bCol[i * 3] = col.r; bCol[i * 3 + 1] = col.g; bCol[i * 3 + 2] = col.b;

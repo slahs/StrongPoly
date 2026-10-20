@@ -1,553 +1,165 @@
-import { BT, BuildingDef, PAL } from '@strongpoly/shared';
+import { BT, BuildingDef } from '@strongpoly/shared';
 import { ModelBuilder, ModelGeos } from './builder';
-import { PART } from './materials';
+import {
+  armorer,
+  appleOrchard,
+  bakery,
+  blacksmith,
+  brewery,
+  dairyFarm,
+  fletcher,
+  granary,
+  hopFarm,
+  hunterPost,
+  inn,
+  ironMine,
+  market,
+  mill,
+  armory,
+  oxTether,
+  pitchRig,
+  poleturner,
+  quarry,
+  stockpile,
+  tanner,
+  wheatFarm,
+  woodcutter,
+} from './models_economy';
+import {
+  barracks,
+  cauldron,
+  drawbridge,
+  dungeon,
+  engineerGuild,
+  gateStone,
+  gateWood,
+  keep,
+  killingPit,
+  mercPost,
+  pit,
+  pitchDitch,
+  stable,
+  stairs,
+  towerGuard,
+  towerLookout,
+  towerRound,
+  turretModel,
+  wallParts,
+  wallStraight,
+} from './models_castle';
+import { campfire, cathedral, chapel, church, garden, gallows, hovel, maypole, statue, stocks, well, waterPot } from './models_town';
 
-/** Dicke der Mauerstücke je Typ und Höhe der Mauerkrone (= Laufhöhe der Einheiten, siehe def.height) */
-const WALL_T: Record<number, number> = { [BT.WallWood]: 0.52, [BT.WallLow]: 0.6, [BT.WallHigh]: 0.72 };
+export { wallParts, WALL_T } from './models_castle';
+
 export const WALL_TYPES: number[] = [BT.WallWood, BT.WallLow, BT.WallHigh];
 /** Bauwerke, an die Mauerarme anschließen (Mauern, Türme, Tore, Bergfried, Ölkessel) */
 export const WALL_JOIN: Set<number> = new Set([BT.WallWood, BT.WallLow, BT.WallHigh, BT.TowerLookout, BT.TowerGuard, BT.TowerRound, BT.GateWood, BT.GateStone, BT.Keep, BT.Cauldron]);
 
+/** Höhe, auf der das Geschütz auf dem Großen Turm sitzt (Kronenhöhe) */
+export const TURRET_BASE_Y = 4.6;
+
+/** Detailstufen der Gebäudemodelle: 0 = Grundform, 1 = mittlere Details (Fenster, Balken), 2 = Feindetail */
+export type ModelDetail = 0 | 1 | 2;
+
+/** Builder-Optionen der Gebäude: Zusatzattribute (Bauanimation, Oberflächen), Farbvariation, Fuß-Verdunklung */
+function newBuilder(ao = 0.32, aoH = 0.55): ModelBuilder {
+  return new ModelBuilder({ ao, aoH, extras: true, jitter: 0.05, grad: 0.16 });
+}
+
+const MODELS: Record<number, (b: ModelBuilder, W: number, H: number) => void> = {
+  [BT.Keep]: keep,
+  [BT.Campfire]: (b) => campfire(b),
+  [BT.Hovel]: hovel,
+  [BT.Stockpile]: stockpile,
+  [BT.Granary]: granary,
+  [BT.Armory]: armory,
+  [BT.Woodcutter]: woodcutter,
+  [BT.Quarry]: quarry,
+  [BT.OxTether]: oxTether,
+  [BT.IronMine]: ironMine,
+  [BT.PitchRig]: pitchRig,
+  [BT.AppleOrchard]: appleOrchard,
+  [BT.DairyFarm]: dairyFarm,
+  [BT.HunterPost]: hunterPost,
+  [BT.WheatFarm]: wheatFarm,
+  [BT.HopFarm]: hopFarm,
+  [BT.Mill]: mill,
+  [BT.Bakery]: bakery,
+  [BT.Brewery]: brewery,
+  [BT.Inn]: inn,
+  [BT.Fletcher]: (b) => fletcher(b),
+  [BT.Poleturner]: (b) => poleturner(b),
+  [BT.Blacksmith]: (b) => blacksmith(b),
+  [BT.Tanner]: (b) => tanner(b),
+  [BT.Armorer]: (b) => armorer(b),
+  [BT.Market]: market,
+  [BT.Chapel]: chapel,
+  [BT.Church]: church,
+  [BT.Cathedral]: cathedral,
+  [BT.Well]: (b) => well(b),
+  [BT.WaterPot]: (b) => waterPot(b),
+  [BT.Garden]: garden,
+  [BT.Statue]: (b) => statue(b),
+  [BT.Maypole]: (b) => maypole(b),
+  [BT.Gallows]: (b) => gallows(b),
+  [BT.Stocks]: (b) => stocks(b),
+  [BT.Dungeon]: dungeon,
+  [BT.WallWood]: (b, _w, _h) => wallStraight(b, BT.WallWood, 1.5),
+  [BT.WallLow]: (b) => wallStraight(b, BT.WallLow, 1.5),
+  [BT.WallHigh]: (b) => wallStraight(b, BT.WallHigh, 2.4),
+  [BT.TowerLookout]: (b) => towerLookout(b),
+  [BT.TowerGuard]: (b) => towerGuard(b),
+  [BT.TowerRound]: (b) => towerRound(b),
+  [BT.GateWood]: gateWood,
+  [BT.GateStone]: gateStone,
+  [BT.Drawbridge]: drawbridge,
+  [BT.Stairs]: (b) => stairs(b),
+  [BT.Pit]: (b) => pit(b),
+  [BT.KillingPit]: (b) => killingPit(b),
+  [BT.PitchDitch]: (b) => pitchDitch(b),
+  [BT.Cauldron]: (b) => cauldron(b),
+  [BT.TurretBallista]: (b) => turretModel(b, 'ballista'),
+  [BT.TurretMangonel]: (b) => turretModel(b, 'mangonel'),
+  [BT.Barracks]: barracks,
+  [BT.MercPost]: mercPost,
+  [BT.Stable]: stable,
+  [BT.EngineerGuild]: engineerGuild,
+};
+
+/** Alle Typen mit einem eigenen Modell (Testabdeckung) */
+export const MODELLED_TYPES: number[] = Object.keys(MODELS).map(Number);
+
+const builders = new Map<number, ModelBuilder>();
+
 /**
- * Mauerteile. `arm`: halbes Tile von der Mitte (x=0) zur Kante (x=±0.5), `post`: Pfosten in der Tilemitte,
- * `stub`: Einzelpfosten ohne Nachbarn (mit Spitze/Kappe). Mauerfugen entstehen aus dunklem Kern und
- * leicht versetzten Steinlagen (die eingebackene AO verdunkelt die Lagenkanten zusätzlich).
+ * Gebäudemodell. `detail` filtert Teile nach Detailstufe (Niedrig nutzt 1, Mittel/Hoch 2). Jeder Aufruf liefert
+ * eigene Geometrien (ein TypeMesh hängt Instanzattribute daran); der Aufbau der Teile selbst wird je Typ nur einmal gemacht.
  */
-export function wallParts(b: ModelBuilder, id: number, h: number, kind: 'arm' | 'post' | 'stub', sx = 1): void {
-  const T = WALL_T[id] ?? 0.6;
-  if (id === BT.WallWood) {
-    const top = h - 0.04;
-    if (kind === 'arm') {
-      b.box(0.5, top, T - 0.12, sx * 0.25, 0, 0, PAL.woodDark);
-      for (const x of [0.13, 0.37])
-        for (const z of [-0.17, 0.17]) b.cyl(0.1, 0.11, top, 5, sx * x, 0, z, (x > 0.2) !== (z > 0) ? PAL.wood : PAL.woodDark);
-      b.box(0.5, 0.04, T, sx * 0.25, top, 0, PAL.wood);
-      for (const x of [0.13, 0.37])
-        for (const z of [-0.2, 0.2]) b.cone(0.09, 0.3, 5, sx * x, h, z, PAL.woodDark);
-    } else {
-      const P = T + 0.1;
-      b.box(P - 0.1, top, P - 0.1, 0, 0, 0, PAL.woodDark);
-      for (const [x, z] of [[-0.17, -0.17], [0.17, -0.17], [-0.17, 0.17], [0.17, 0.17]]) {
-        b.cyl(0.12, 0.13, top, 5, x, 0, z, PAL.wood);
-        b.cone(0.11, kind === 'stub' ? 0.5 : 0.34, 5, x, h, z, PAL.woodDark);
-      }
-      b.box(P, 0.04, P, 0, top, 0, PAL.wood);
-    }
-    return;
+export function buildBuildingModel(def: BuildingDef, detail: ModelDetail = 2): ModelGeos {
+  let b = builders.get(def.id);
+  if (!b) {
+    b = newBuilder();
+    const fn = MODELS[def.id];
+    if (fn) fn(b, def.w, def.h);
+    else b.box(def.w - 0.2, Math.max(0.3, def.height * 0.6), def.h - 0.2, 0, 0, 0, 0xb2aa9b);
+    builders.set(def.id, b);
   }
-  const body = h - 0.04;
-  const n = Math.max(3, Math.round(body / 0.32));
-  const ch = (body - 0.02 * (n + 1)) / n;
-  if (kind === 'arm') {
-    b.box(0.5, body, T - 0.04, sx * 0.25, 0, 0, PAL.stoneDark);
-    for (let k = 0; k < n; k++) b.box(0.5, ch, T + (k % 2) * 0.025, sx * 0.25, 0.02 + k * (ch + 0.02), 0, PAL.stone);
-    b.box(0.5, 0.04, T + 0.03, sx * 0.25, body, 0, PAL.stoneDark);
-    // Zinnen an beiden Seiten des Wehrgangs
-    for (const x of [0.12, 0.38])
-      for (const z of [-1, 1]) b.box(0.17, 0.3, 0.12, sx * x, h, z * (T / 2 - 0.04), PAL.stone);
-  } else {
-    const P = T + 0.1;
-    b.box(P - 0.04, body, P - 0.04, 0, 0, 0, PAL.stoneDark);
-    for (let k = 0; k < n; k++) b.box(P, ch, P + (k % 2) * 0.025, 0, 0.02 + k * (ch + 0.02), 0, PAL.stone);
-    b.box(P + 0.03, 0.04, P + 0.03, 0, body, 0, PAL.stoneDark);
-    const o = P / 2 - 0.1;
-    for (const [x, z] of [[-o, -o], [o, -o], [-o, o], [o, o]]) b.box(0.2, 0.3, 0.2, x, h, z, PAL.stone);
-    if (kind === 'stub') b.pyramid(P * 0.62, 0.5, 0, h + 0.05, 0, PAL.stoneDark);
-  }
+  return b.build(detail);
 }
 
-/** Mauerstück für das Geisterbild: nur der Pfosten (die Arme zu den Nachbarn kennt erst die fertige Mauer) */
-function wallStraight(b: ModelBuilder, def: BuildingDef): void {
-  wallParts(b, def.id, def.height, 'post');
+/** Mauerstück (Pfosten, Arm oder Einzelpfosten) als Instanzmodell; Arme liegen auf x ∈ [0, 0.5] */
+export function buildWallModel(id: number, height: number, kind: 'arm' | 'post' | 'stub', detail: ModelDetail = 2): ModelGeos {
+  const b = new ModelBuilder({ ao: 0.34, aoH: 0.8, extras: true, jitter: 0.04, grad: 0.12 });
+  wallParts(b, id, height, kind, 1);
+  return b.build(detail);
 }
 
-/** Treppe: vier Stufen, Höhe 1.0, steigt entlang +z; im Renderer in y auf Mauerhöhe skaliert */
-function stairs(b: ModelBuilder): void {
-  for (let i = 0; i < 4; i++) {
-    b.box(0.9, 0.25 * (i + 1), 0.26, 0, 0, -0.375 + i * 0.25, i % 2 ? PAL.stone : PAL.stoneDark);
-    b.box(0.1, 0.25 * (i + 1) + 0.08, 0.26, -0.45, 0, -0.375 + i * 0.25, PAL.stone);
-    b.box(0.1, 0.25 * (i + 1) + 0.08, 0.26, 0.45, 0, -0.375 + i * 0.25, PAL.stone);
-  }
+/** Geschütz, das auf einem Großen Turm sitzt (Ursprung auf der Turmkrone) */
+export function buildTurretModel(kind: 'ballista' | 'mangonel', detail: ModelDetail = 2): ModelGeos {
+  const b = newBuilder(0.2, 0.4);
+  turretModel(b, kind);
+  return b.build(detail);
 }
 
-/** Zinnen auf einer rechteckigen Krone */
-function merlons(b: ModelBuilder, w: number, d: number, y: number, color: number, step = 0.5): void {
-  const nx = Math.max(2, Math.round(w / step));
-  const nz = Math.max(2, Math.round(d / step));
-  for (let i = 0; i < nx; i += 2) {
-    const x = -w / 2 + (i + 0.5) * (w / nx);
-    b.box(w / nx * 0.8, 0.18, 0.1, x, y, -d / 2 + 0.05, color);
-    b.box(w / nx * 0.8, 0.18, 0.1, x, y, d / 2 - 0.05, color);
-  }
-  for (let j = 1; j < nz - 1; j += 2) {
-    const z = -d / 2 + (j + 0.5) * (d / nz);
-    b.box(0.1, 0.18, d / nz * 0.8, -w / 2 + 0.05, y, z, color);
-    b.box(0.1, 0.18, d / nz * 0.8, w / 2 - 0.05, y, z, color);
-  }
-}
-
-function hut(b: ModelBuilder, w: number, d: number, h: number, wall: number, roof: number, roofTeam = false, door = true): void {
-  b.box(w, h, d, 0, 0, 0, wall);
-  b.roof(w + 0.15, Math.min(0.9, w * 0.45), d + 0.15, 0, h, 0, roof, roofTeam);
-  if (door) b.box(Math.min(0.4, w * 0.3), Math.min(0.55, h * 0.7), 0.04, 0, 0, d / 2 + 0.01, PAL.black);
-}
-
-function flag(b: ModelBuilder, x: number, y: number, z: number, h = 0.8): void {
-  b.box(0.04, h, 0.04, x, y, z, PAL.woodDark);
-  b.part(PART.Cloth, x, y + h - 0.1, z).box(0.03, 0.22, 0.34, x, y + h - 0.24, z + 0.19, PAL.roof, true);
-  b.part(0);
-}
-
-function tower(b: ModelBuilder, r: number, h: number, x: number, z: number, wallC: number, roofC: number | null): void {
-  b.cyl(r, r * 1.08, h, 8, x, 0, z, wallC);
-  b.cyl(r * 1.2, r * 1.2, 0.18, 8, x, h, z, wallC);
-  if (roofC !== null) b.cone(r * 1.2, r * 1.2, 8, x, h + 0.18, z, roofC, true);
-  else {
-    for (let i = 0; i < 4; i++) {
-      const a = (i / 4) * Math.PI * 2;
-      b.box(r * 0.5, 0.2, r * 0.5, Math.cos(a) * r * 0.9 + x, h + 0.18, Math.sin(a) * r * 0.9 + z, wallC);
-    }
-  }
-}
-
-function barrel(b: ModelBuilder, x: number, z: number, c: number = PAL.woodDark): void {
-  b.cyl(0.14, 0.14, 0.3, 6, x, 0, z, c);
-  b.cyl(0.15, 0.15, 0.04, 6, x, 0.1, z, PAL.black);
-}
-
-function crate(b: ModelBuilder, x: number, z: number, s = 0.3, c: number = PAL.wood): void {
-  b.box(s, s, s, x, 0, z, c);
-}
-
-function tree(b: ModelBuilder, x: number, z: number, leaf = PAL.treeLight, fruit?: number): void {
-  b.cyl(0.05, 0.07, 0.3, 4, x, 0, z, PAL.trunk);
-  b.cone(0.3, 0.45, 5, x, 0.25, z, leaf);
-  if (fruit) {
-    b.box(0.07, 0.07, 0.07, x + 0.18, 0.4, z, fruit);
-    b.box(0.07, 0.07, 0.07, x - 0.12, 0.34, z + 0.12, fruit);
-  }
-}
-
-function workshop(b: ModelBuilder, W: number, H: number, wall: number, roof: number, kind: string): void {
-  hut(b, W - 0.5, H - 0.6, 0.9, wall, roof, false);
-  b.box(0.3, 0.9, 0.3, W * 0.25, 0.9, -H * 0.15, PAL.stoneDark); // Schornstein
-  flag(b, -W / 2 + 0.3, 0.2, H / 2 - 0.3, 1.2);
-  switch (kind) {
-    case 'bow':
-      b.box(0.05, 0.7, 0.05, W / 2 - 0.2, 0, H / 2 - 0.2, PAL.wood);
-      b.box(0.05, 0.7, 0.05, W / 2 - 0.4, 0, H / 2 - 0.2, PAL.wood);
-      break;
-    case 'smith': {
-      const ax = W / 2 - 0.3;
-      const az = H / 2 - 0.05;
-      b.box(0.3, 0.2, 0.3, ax, 0, az, PAL.black);
-      b.box(0.22, 0.1, 0.16, ax, 0.2, az, PAL.stoneDark);
-      b.box(0.3, 0.06, 0.1, ax, 0.24, az + 0.02, PAL.stoneDark);
-      b.box(0.3, 0.2, 0.3, ax - 0.55, 0, az - 0.05, PAL.roof);
-      b.part(PART.ArmR, ax, 0.42, az - 0.4)
-        .box(0.04, 0.04, 0.34, ax, 0.4, az - 0.23, PAL.woodDark)
-        .box(0.1, 0.12, 0.1, ax, 0.36, az - 0.06, PAL.stoneDark);
-      b.part(0);
-      break;
-    }
-    case 'armor': {
-      const ax = W / 2 - 0.3;
-      const az = H / 2 - 0.05;
-      b.box(0.3, 0.3, 0.3, ax, 0, az, PAL.stone);
-      b.box(0.18, 0.1, 0.18, ax, 0.3, az, PAL.stoneDark);
-      b.part(PART.ArmR, ax - 0.3, 0.46, az - 0.4)
-        .box(0.04, 0.04, 0.3, ax - 0.3, 0.44, az - 0.25, PAL.woodDark)
-        .box(0.12, 0.1, 0.1, ax - 0.3, 0.41, az - 0.1, PAL.stone);
-      b.part(0);
-      b.box(0.2, 0.4, 0.2, ax - 0.7, 0, az - 0.1, PAL.stoneDark);
-      break;
-    }
-    case 'tan':
-      b.box(0.5, 0.05, 0.4, W / 2 - 0.3, 0.5, H / 2 - 0.1, PAL.woodDark);
-      b.box(0.06, 0.5, 0.06, W / 2 - 0.1, 0, H / 2 - 0.1, PAL.woodDark);
-      b.box(0.06, 0.5, 0.06, W / 2 - 0.5, 0, H / 2 - 0.1, PAL.woodDark);
-      break;
-    default:
-      b.cyl(0.08, 0.08, 0.7, 5, W / 2 - 0.2, 0, H / 2 - 0.2, PAL.wood);
-  }
-}
-
-export function buildBuildingModel(def: BuildingDef): ModelGeos {
-  const b = new ModelBuilder();
-  const W = def.w;
-  const H = def.h;
-  switch (def.id) {
-    case BT.Keep: {
-      b.box(W - 0.4, 2.4, H - 0.4, 0, 0, 0, PAL.stone);
-      b.box(W - 1.4, 1.6, H - 1.4, 0, 2.4, 0, PAL.stoneDark);
-      merlons(b, W - 0.4, H - 0.4, 2.4, PAL.stone);
-      b.roof(W - 1.4, 0.9, H - 1.4, 0, 4.0, 0, PAL.roof, true);
-      for (const sx of [-1, 1])
-        for (const sz of [-1, 1]) tower(b, 0.55, 3.0, sx * (W / 2 - 0.45), sz * (H / 2 - 0.45), PAL.stone, PAL.roof);
-      b.box(1.0, 1.4, 0.1, 0, 0, H / 2 - 0.2, PAL.black);
-      flag(b, 0, 4.9, 0, 1.2);
-      break;
-    }
-    case BT.Campfire:
-      b.cyl(0.32, 0.36, 0.1, 7, 0, 0, 0, PAL.stoneDark);
-      b.box(0.5, 0.08, 0.1, 0, 0.1, 0, PAL.trunk, false, 0.6);
-      b.box(0.5, 0.08, 0.1, 0, 0.1, 0, PAL.trunk, false, -0.6);
-      b.cone(0.14, 0.4, 5, 0, 0.12, 0, PAL.gold);
-      b.cone(0.09, 0.3, 4, 0, 0.12, 0, PAL.roof);
-      break;
-    case BT.Hovel:
-      hut(b, W - 0.3, H - 0.3, 0.7, PAL.sandDark, PAL.roof, true);
-      b.box(0.2, 0.5, 0.2, 0.3, 0.9, 0, PAL.stoneDark);
-      break;
-    case BT.Stockpile:
-      b.box(W - 0.1, 0.08, H - 0.1, 0, 0, 0, PAL.sandDark);
-      for (let i = 0; i < 3; i++) b.box(0.9, 0.22, 0.28, -0.5, 0.08 + i * 0.22, -0.9 + (i % 2) * 0.05, PAL.wood);
-      crate(b, 0.7, -0.8, 0.5);
-      crate(b, 0.7, -0.2, 0.4, PAL.woodDark);
-      b.box(0.5, 0.5, 0.5, -0.7, 0.08, 0.7, PAL.stone);
-      b.box(0.4, 0.4, 0.4, 0.5, 0.08, 0.8, PAL.stoneDark);
-      flag(b, W / 2 - 0.15, 0, H / 2 - 0.15, 1.0);
-      break;
-    case BT.Granary:
-      b.box(W - 0.3, 1.0, H - 0.3, 0, 0, 0, PAL.sand);
-      b.roof(W, 0.9, H, 0, 1.0, 0, PAL.thatch);
-      b.box(0.6, 0.8, 0.06, 0, 0, H / 2 - 0.14, PAL.woodDark);
-      b.cyl(0.35, 0.35, 0.5, 6, W / 2 - 0.3, 1.0, 0.1, PAL.thatch, true);
-      break;
-    case BT.Armory:
-      b.box(W - 0.2, 1.1, H - 0.2, 0, 0, 0, PAL.stone);
-      merlons(b, W - 0.2, H - 0.2, 1.1, PAL.stone);
-      b.box(0.7, 0.8, 0.06, 0, 0, H / 2 - 0.1, PAL.woodDark);
-      b.box(0.4, 0.5, 0.06, -0.8, 0.4, H / 2 - 0.1, PAL.roof, true);
-      b.box(0.04, 0.6, 0.04, 0.8, 0.4, H / 2 - 0.1, PAL.stoneDark);
-      b.box(0.3, 0.04, 0.04, 0.8, 0.8, H / 2 - 0.1, PAL.stoneDark);
-      break;
-    case BT.Woodcutter:
-      hut(b, 1.1, 1.0, 0.6, PAL.wood, PAL.woodDark);
-      b.box(0.8, 0.2, 0.25, 0.5, 0, 0.7, PAL.trunk);
-      b.box(0.8, 0.2, 0.25, 0.5, 0.2, 0.7, PAL.trunk);
-      b.box(0.3, 0.3, 0.3, -0.7, 0, 0.45, PAL.trunk);
-      b.part(PART.ArmR, -0.7, 0.62, 0.0)
-        .box(0.04, 0.04, 0.36, -0.7, 0.6, 0.16, PAL.woodDark)
-        .box(0.04, 0.14, 0.1, -0.7, 0.55, 0.36, PAL.stoneDark);
-      b.part(0);
-      break;
-    case BT.Quarry:
-      b.box(W - 0.3, 0.06, H - 0.3, 0, 0, 0, PAL.rockDark);
-      b.box(1.2, 0.3, 1.2, -0.5, 0.06, -0.5, PAL.stoneDark);
-      b.box(0.8, 0.5, 0.8, -0.4, 0.06, -0.4, PAL.stone);
-      b.box(0.1, 1.3, 0.1, 0.9, 0, -0.9, PAL.wood);
-      b.box(1.0, 0.1, 0.1, 0.5, 1.3, -0.9, PAL.wood);
-      b.box(0.1, 0.5, 0.1, 0.1, 0.8, -0.9, PAL.woodDark);
-      b.box(0.5, 0.3, 0.5, 0.8, 0.06, 0.6, PAL.wood);
-      b.part(PART.ArmR, 0.1, 0.8, 0.3)
-        .box(0.04, 0.04, 0.4, 0.1, 0.78, 0.5, PAL.woodDark)
-        .box(0.26, 0.05, 0.05, 0.1, 0.76, 0.72, PAL.stoneDark);
-      b.part(0);
-      flag(b, -W / 2 + 0.2, 0, H / 2 - 0.2, 1.0);
-      break;
-    case BT.OxTether:
-      b.box(W - 0.2, 0.06, H - 0.2, 0, 0, 0, PAL.sandDark);
-      b.box(0.1, 0.8, 0.1, 0, 0, 0, PAL.woodDark);
-      b.box(0.9, 0.08, 0.08, 0, 0.1, 0.2, PAL.wood);
-      b.box(0.5, 0.35, 0.4, 0.5, 0.06, -0.4, PAL.wood);
-      b.roof(0.7, 0.3, 0.6, 0.5, 0.41, -0.4, PAL.thatch);
-      break;
-    case BT.IronMine:
-      b.cone(1.6, 1.3, 6, 0, 0, -0.3, PAL.rockDark);
-      b.box(0.8, 0.7, 0.3, 0, 0, H / 2 - 0.9, PAL.black);
-      b.box(0.1, 0.8, 0.1, -0.5, 0, H / 2 - 0.8, PAL.woodDark);
-      b.box(0.1, 0.8, 0.1, 0.5, 0, H / 2 - 0.8, PAL.woodDark);
-      b.box(1.2, 0.1, 0.1, 0, 0.8, H / 2 - 0.8, PAL.woodDark);
-      b.box(0.5, 0.3, 0.4, 1.0, 0, 0.9, PAL.stoneDark);
-      break;
-    case BT.PitchRig:
-      b.cyl(0.6, 0.7, 0.08, 6, 0, 0, 0, PAL.pitch);
-      for (const [x, z] of [[-0.4, -0.3], [0.4, -0.3], [0, 0.45]]) b.box(0.07, 1.2, 0.07, x * 0.6, 0, z * 0.6, PAL.woodDark);
-      b.box(0.2, 0.2, 0.2, 0, 1.15, 0, PAL.black);
-      b.cyl(0.18, 0.18, 0.4, 6, 0.6, 0, 0.5, PAL.black);
-      break;
-    case BT.AppleOrchard:
-      b.box(W - 0.2, 0.04, H - 0.2, 0, 0, 0, PAL.oasisDark);
-      for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j += 1) if ((i + j) % 2 === 0) tree(b, -W / 2 + 0.6 + i * 0.9, -H / 2 + 0.6 + j * 0.9, PAL.treeLight, PAL.roof);
-      break;
-    case BT.DairyFarm:
-      b.box(W - 0.2, 0.04, H - 0.2, 0, 0, 0, PAL.oasis);
-      hut(b, 1.4, 1.2, 0.8, PAL.roof, PAL.woodDark, false);
-      for (const [x, z] of [[1.0, 0.6], [0.4, 1.1], [1.2, -0.4]]) {
-        b.box(0.3, 0.25, 0.5, x, 0.05, z, PAL.white);
-        b.box(0.16, 0.14, 0.16, x, 0.18, z + 0.3, PAL.black);
-      }
-      b.box(W - 0.2, 0.2, 0.05, 0, 0, H / 2 - 0.1, PAL.wood);
-      break;
-    case BT.HunterPost:
-      hut(b, 1.2, 1.0, 0.7, PAL.woodDark, PAL.sandDark);
-      b.box(0.04, 0.3, 0.04, 0.2, 1.1, 0.6, PAL.stone);
-      b.box(0.5, 0.04, 0.04, 0.2, 1.3, 0.6, PAL.stone);
-      b.box(0.04, 0.6, 0.04, -0.7, 0, 0.9, PAL.woodDark);
-      break;
-    case BT.WheatFarm:
-      b.box(W - 0.2, 0.04, H - 0.2, 0, 0, 0, PAL.thatch);
-      for (let i = 0; i < 5; i++) b.box(0.3, 0.3, H - 1.4, -W / 2 + 0.7 + i * 0.85, 0.04, 0.5, i % 2 ? PAL.thatch : PAL.sandDark);
-      hut(b, 1.0, 0.8, 0.6, PAL.wood, PAL.thatch);
-      break;
-    case BT.HopFarm:
-      b.box(W - 0.2, 0.04, H - 0.2, 0, 0, 0, PAL.oasisDark);
-      for (let i = 0; i < 4; i++) {
-        b.box(0.05, 1.1, 0.05, -W / 2 + 0.6 + i * 0.8, 0.04, -0.4, PAL.woodDark);
-        b.box(0.35, 0.9, 0.35, -W / 2 + 0.6 + i * 0.8, 0.04, 0.5, PAL.treeLight);
-      }
-      break;
-    case BT.Mill: {
-      b.cyl(0.7, 1.0, 2.0, 8, 0, 0, 0, PAL.sand);
-      b.cone(1.0, 0.9, 8, 0, 2.0, 0, PAL.roof, true);
-      b.box(0.5, 0.7, 0.06, 0, 0, 0.98, PAL.woodDark);
-      b.box(0.14, 0.14, 0.34, 0, 1.43, 0.9, PAL.woodDark);
-      // Flügel: Kreuz aus zwei Balken mit Stoffbahnen, dreht sich um die Welle (z)
-      b.part(PART.Sail, 0, 1.5, 1.08);
-      b.box(0.1, 2.3, 0.05, 0, 0.35, 1.08, PAL.wood);
-      b.box(2.3, 0.1, 0.05, 0, 1.45, 1.08, PAL.wood);
-      for (const [x, y, w, h] of [[0.0, 2.45, 0.5, 0.6], [0.0, 0.55, 0.5, 0.6], [0.7, 1.5, 0.6, 0.5], [-0.7, 1.5, 0.6, 0.5]] as [number, number, number, number][])
-        b.box(w, h, 0.03, x, y - h / 2, 1.1, PAL.white);
-      b.box(0.2, 0.2, 0.08, 0, 1.4, 1.1, PAL.woodDark);
-      b.part(0);
-      break;
-    }
-    case BT.Bakery:
-      hut(b, W - 0.4, H - 0.4, 0.9, PAL.sand, PAL.roof, false);
-      b.box(0.4, 1.0, 0.4, 0.7, 0.9, -0.3, PAL.stoneDark);
-      b.cyl(0.35, 0.4, 0.4, 6, -1.0, 0, 0.9, PAL.stoneDark);
-      flag(b, -W / 2 + 0.2, 0, H / 2 - 0.2, 1.1);
-      break;
-    case BT.Brewery:
-      hut(b, W - 0.5, H - 0.6, 1.0, PAL.woodDark, PAL.wood, false);
-      barrel(b, 1.0, 1.0);
-      barrel(b, 0.6, 1.2);
-      b.cyl(0.35, 0.35, 0.9, 7, -1.0, 0, 1.0, PAL.wood);
-      flag(b, -W / 2 + 0.2, 0, -H / 2 + 0.2, 1.4);
-      break;
-    case BT.Inn:
-      b.box(W - 0.3, 1.0, H - 0.3, 0, 0, 0, PAL.sand);
-      b.box(W - 0.7, 0.8, H - 0.7, 0, 1.0, 0, PAL.sandDark);
-      b.roof(W, 0.9, H - 0.2, 0, 1.8, 0, PAL.roof, true);
-      b.box(0.5, 0.7, 0.05, 0, 0, H / 2 - 0.14, PAL.woodDark);
-      b.box(0.04, 0.5, 0.04, W / 2 - 0.1, 0.6, H / 2 - 0.1, PAL.woodDark);
-      b.box(0.3, 0.3, 0.04, W / 2 - 0.25, 0.6, H / 2 - 0.1, PAL.gold, true);
-      barrel(b, -0.9, H / 2 - 0.1);
-      break;
-    case BT.Fletcher:
-      workshop(b, W, H, PAL.wood, PAL.treeDark, 'bow');
-      break;
-    case BT.Poleturner:
-      workshop(b, W, H, PAL.sand, PAL.woodDark, 'pole');
-      break;
-    case BT.Blacksmith:
-      workshop(b, W, H, PAL.stone, PAL.black, 'smith');
-      break;
-    case BT.Tanner:
-      workshop(b, W, H, PAL.woodDark, PAL.thatch, 'tan');
-      break;
-    case BT.Armorer:
-      workshop(b, W, H, PAL.stoneDark, PAL.stone, 'armor');
-      break;
-    case BT.Market:
-      b.box(W - 0.2, 0.05, H - 0.2, 0, 0, 0, PAL.sandDark);
-      for (let i = 0; i < 3; i++) {
-        const x = -W / 2 + 0.6 + i * 0.9;
-        b.box(0.05, 0.9, 0.05, x - 0.3, 0.05, -0.2, PAL.woodDark);
-        b.box(0.05, 0.9, 0.05, x + 0.3, 0.05, -0.2, PAL.woodDark);
-        b.roof(0.8, 0.3, 1.0, x, 0.95, -0.2, i % 2 ? PAL.white : PAL.roof, i % 2 === 0);
-        b.box(0.6, 0.25, 0.3, x, 0.05, -0.2, PAL.wood);
-      }
-      crate(b, -0.8, 1.0, 0.3);
-      barrel(b, 0.8, 1.0, PAL.wood);
-      break;
-    case BT.Chapel:
-      b.box(W - 0.3, 1.3, H - 0.4, 0, 0, 0, PAL.stone);
-      b.roof(W, 0.8, H - 0.3, 0, 1.3, 0, PAL.roof, true);
-      b.box(0.5, 0.9, 0.06, 0, 0, H / 2 - 0.18, PAL.woodDark);
-      b.box(0.08, 0.5, 0.08, 0, 2.1, -0.5, PAL.gold);
-      b.box(0.3, 0.08, 0.08, 0, 2.3, -0.5, PAL.gold);
-      break;
-    case BT.Church:
-      b.box(W - 0.4, 1.8, H - 0.6, 0, 0, 0.2, PAL.stone);
-      b.roof(W - 0.2, 1.0, H - 0.5, 0, 1.8, 0.2, PAL.roof, true);
-      b.box(1.0, 3.0, 1.0, 0, 0, -H / 2 + 0.7, PAL.stoneDark);
-      b.pyramid(0.8, 1.4, 0, 3.0, -H / 2 + 0.7, PAL.roof, true);
-      b.box(0.08, 0.5, 0.08, 0, 4.4, -H / 2 + 0.7, PAL.gold);
-      b.box(0.3, 0.08, 0.08, 0, 4.65, -H / 2 + 0.7, PAL.gold);
-      b.box(0.7, 1.1, 0.06, 0, 0, H / 2 - 0.35, PAL.woodDark);
-      break;
-    case BT.Cathedral:
-      b.box(W - 0.4, 2.4, H - 0.8, 0, 0, 0.3, PAL.stone);
-      b.roof(W - 0.2, 1.3, H - 0.7, 0, 2.4, 0.3, PAL.roof, true);
-      for (const sx of [-1, 1]) {
-        b.box(0.9, 3.6, 0.9, sx * (W / 2 - 0.6), 0, -H / 2 + 0.7, PAL.stoneDark);
-        b.pyramid(0.75, 1.6, sx * (W / 2 - 0.6), 3.6, -H / 2 + 0.7, PAL.roof, true);
-      }
-      b.box(0.9, 1.6, 0.08, 0, 0, H / 2 - 0.45, PAL.woodDark);
-      b.box(0.1, 0.8, 0.1, 0, 3.8, 0.3, PAL.gold);
-      b.box(0.5, 0.1, 0.1, 0, 4.2, 0.3, PAL.gold);
-      break;
-    case BT.Well:
-      b.cyl(0.35, 0.38, 0.4, 7, 0, 0, 0, PAL.stoneDark);
-      b.cyl(0.25, 0.25, 0.02, 7, 0, 0.4, 0, PAL.water);
-      b.box(0.05, 0.6, 0.05, -0.3, 0.4, 0, PAL.woodDark);
-      b.box(0.05, 0.6, 0.05, 0.3, 0.4, 0, PAL.woodDark);
-      b.roof(0.9, 0.3, 0.7, 0, 1.0, 0, PAL.roof, true, Math.PI / 2);
-      break;
-    case BT.WaterPot:
-      b.cyl(0.2, 0.28, 0.35, 6, 0, 0, 0, PAL.sandDark);
-      b.cyl(0.18, 0.18, 0.02, 6, 0, 0.35, 0, PAL.water);
-      break;
-    case BT.Garden:
-      b.box(W - 0.2, 0.1, H - 0.2, 0, 0, 0, PAL.oasisDark);
-      for (const [x, z, c] of [[-0.4, -0.4, PAL.roof], [0.4, -0.4, PAL.gold], [-0.4, 0.4, PAL.white], [0.4, 0.4, PAL.roof]] as [number, number, number][]) {
-        b.cone(0.18, 0.3, 5, x, 0.1, z, PAL.treeLight);
-        b.box(0.1, 0.1, 0.1, x, 0.38, z, c, c === PAL.roof && x < 0);
-      }
-      break;
-    case BT.Statue:
-      b.box(1.4, 0.2, 1.4, 0, 0, 0, PAL.stoneDark);
-      b.box(0.7, 0.6, 0.7, 0, 0.2, 0, PAL.stone);
-      b.box(0.3, 0.8, 0.2, 0, 0.8, 0, PAL.stone);
-      b.box(0.2, 0.2, 0.2, 0, 1.6, 0, PAL.stone);
-      b.box(0.5, 0.06, 0.06, 0, 1.3, 0, PAL.gold, true);
-      break;
-    case BT.Maypole:
-      b.cyl(0.3, 0.35, 0.1, 6, 0, 0, 0, PAL.oasis);
-      b.cyl(0.06, 0.08, 2.0, 5, 0, 0.1, 0, PAL.woodDark);
-      b.box(0.04, 1.0, 0.04, 0.3, 1.0, 0.0, PAL.roof, true);
-      b.box(0.04, 1.0, 0.04, -0.3, 1.0, 0.0, PAL.gold);
-      b.box(0.5, 0.15, 0.04, 0, 2.0, 0, PAL.treeLight);
-      break;
-    case BT.Gallows:
-      b.box(1.6, 0.12, 1.6, 0, 0, 0, PAL.woodDark);
-      b.box(0.1, 1.8, 0.1, -0.5, 0.12, 0, PAL.wood);
-      b.box(1.0, 0.1, 0.1, -0.05, 1.8, 0, PAL.wood);
-      b.box(0.03, 0.5, 0.03, 0.3, 1.3, 0, PAL.thatch);
-      b.box(0.14, 0.14, 0.14, 0.3, 1.15, 0, PAL.sandDark);
-      break;
-    case BT.Stocks:
-      b.box(0.9, 0.06, 1.6, 0, 0, 0, PAL.woodDark);
-      b.box(0.1, 0.8, 0.1, 0, 0.06, -0.6, PAL.wood);
-      b.box(0.1, 0.8, 0.1, 0, 0.06, 0.6, PAL.wood);
-      b.box(0.15, 0.1, 1.4, 0, 0.5, 0, PAL.wood);
-      break;
-    case BT.Dungeon:
-      b.box(W - 0.3, 1.0, H - 0.3, 0, 0, 0, PAL.stoneDark);
-      merlons(b, W - 0.3, H - 0.3, 1.0, PAL.stoneDark);
-      b.box(0.8, 0.7, 0.06, 0, 0, H / 2 - 0.16, PAL.black);
-      b.box(0.5, 0.3, 0.06, -0.8, 0.5, H / 2 - 0.16, PAL.black);
-      break;
-    case BT.WallWood:
-    case BT.WallLow:
-    case BT.WallHigh:
-      wallStraight(b, def);
-      break;
-    case BT.TowerLookout:
-      tower(b, 0.8, 2.8, 0, 0, PAL.stone, PAL.roof);
-      b.box(0.3, 0.5, 0.06, 0, 0, 0.8, PAL.black);
-      break;
-    case BT.TowerGuard:
-      b.box(W - 0.3, 3.4, H - 0.3, 0, 0, 0, PAL.stone);
-      b.box(W, 0.2, H, 0, 3.4, 0, PAL.stoneDark);
-      merlons(b, W, H, 3.6, PAL.stone, 0.5);
-      b.box(0.5, 0.4, 0.06, 0, 2.4, H / 2 - 0.14, PAL.black);
-      flag(b, 0, 3.6, 0, 1.0);
-      break;
-    case BT.TowerRound:
-      b.cyl(1.7, 1.9, 4.2, 10, 0, 0, 0, PAL.stone);
-      b.cyl(2.0, 2.0, 0.3, 10, 0, 4.2, 0, PAL.stoneDark);
-      for (let i = 0; i < 8; i++) {
-        const a = (i / 8) * Math.PI * 2;
-        b.box(0.5, 0.3, 0.5, Math.cos(a) * 1.8, 4.5, Math.sin(a) * 1.8, PAL.stone);
-      }
-      b.box(0.6, 0.6, 0.06, 0, 2.4, 1.8, PAL.black);
-      flag(b, 0, 4.5, 0, 1.2);
-      break;
-    case BT.GateWood:
-      for (const sx of [-1, 1]) b.box(0.7, 2.2, H - 0.2, sx * (W / 2 - 0.35), 0, 0, PAL.woodDark);
-      b.box(W, 0.4, H - 0.2, 0, 1.8, 0, PAL.wood);
-      b.part(PART.Door, 0, 0, 0).box(W - 1.4, 1.6, 0.1, 0, 0, 0, PAL.wood);
-      b.part(0);
-      merlons(b, W, H - 0.2, 2.2, PAL.woodDark);
-      b.box(0.3, 0.1, 0.3, 0, 2.2, 0, PAL.roof, true);
-      break;
-    case BT.GateStone:
-      for (const sx of [-1, 1]) {
-        tower(b, 0.9, 3.4, sx * (W / 2 - 0.9), 0, PAL.stone, PAL.roof);
-      }
-      b.box(W - 1.6, 1.1, H - 0.4, 0, 2.5, 0, PAL.stone);
-      b.part(PART.Door, 0, 0, 0).box(W - 2.2, 2.0, 0.2, 0, 0, 0, PAL.woodDark);
-      for (let i = 0; i < 5; i++) b.box(0.05, 2.0, 0.24, -(W - 2.2) / 2 + 0.2 + i * ((W - 2.6) / 4), 0, 0, PAL.black);
-      b.part(0);
-      merlons(b, W - 1.6, H - 0.4, 3.6, PAL.stone);
-      break;
-    case BT.Drawbridge:
-      b.box(W - 0.4, 0.15, H - 0.2, 0, 0.05, 0, PAL.wood);
-      for (let i = 0; i < 5; i++) b.box(W - 0.4, 0.04, 0.04, 0, 0.2, -H / 2 + 0.3 + i * (H - 0.6) / 4, PAL.woodDark);
-      b.box(0.06, 0.8, 0.06, -W / 2 + 0.3, 0.1, -H / 2 + 0.2, PAL.black);
-      b.box(0.06, 0.8, 0.06, W / 2 - 0.3, 0.1, -H / 2 + 0.2, PAL.black);
-      break;
-    case BT.Stairs:
-      stairs(b);
-      break;
-    case BT.Pit:
-      b.box(0.9, 0.04, 0.9, 0, 0, 0, PAL.black);
-      for (const [x, z] of [[-0.25, -0.25], [0.25, -0.25], [0, 0.2]]) b.pyramid(0.07, 0.25, x, 0.04, z, PAL.stone);
-      break;
-    case BT.KillingPit:
-      b.box(0.95, 0.04, 0.95, 0, 0, 0, PAL.black);
-      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) b.pyramid(0.07, 0.3, -0.3 + i * 0.3, 0.04, -0.3 + j * 0.3, PAL.stone);
-      b.box(0.95, 0.06, 0.05, 0, 0.05, 0, PAL.roof);
-      break;
-    case BT.PitchDitch:
-      b.box(0.95, 0.05, 0.95, 0, 0, 0, PAL.pitch);
-      b.box(0.5, 0.06, 0.5, 0.05, 0, -0.05, PAL.black);
-      break;
-    case BT.Cauldron:
-      wallParts(b, BT.WallLow, 1.5, 'post');
-      b.cyl(0.34, 0.26, 0.34, 7, 0, 1.5, 0, PAL.black);
-      b.cyl(0.36, 0.36, 0.05, 7, 0, 1.82, 0, PAL.stoneDark);
-      b.cyl(0.28, 0.28, 0.02, 7, 0, 1.83, 0, PAL.gold);
-      b.box(0.5, 0.08, 0.08, 0, 1.4, 0.0, PAL.black);
-      break;
-    case BT.Barracks:
-      b.box(W - 0.4, 1.5, H - 0.4, 0, 0, 0, PAL.stone);
-      b.box(W - 1.6, 0.9, H - 1.6, 0, 1.5, 0, PAL.stoneDark);
-      merlons(b, W - 0.4, H - 0.4, 1.5, PAL.stone);
-      b.roof(W - 1.6, 0.7, H - 1.6, 0, 2.4, 0, PAL.roof, true);
-      b.box(1.0, 1.1, 0.06, 0, 0, H / 2 - 0.18, PAL.woodDark);
-      b.box(0.1, 1.4, 0.1, -W / 2 + 0.3, 0, H / 2 - 0.3, PAL.woodDark);
-      b.box(0.1, 1.4, 0.1, W / 2 - 0.3, 0, H / 2 - 0.3, PAL.woodDark);
-      b.box(0.04, 0.4, 0.5, -W / 2 + 0.3, 1.0, H / 2 - 0.3, PAL.roof, true);
-      break;
-    case BT.MercPost:
-      b.pyramid(1.7, 1.6, 0, 0, 0, PAL.sandDark);
-      b.pyramid(1.2, 0.9, 0, 1.4, 0, PAL.roof, true);
-      b.box(0.5, 0.9, 0.06, 0, 0, 1.15, PAL.black);
-      b.box(0.04, 1.2, 0.04, 1.3, 0, 1.2, PAL.woodDark);
-      b.box(0.04, 0.3, 0.4, 1.3, 0.9, 1.4, PAL.gold);
-      break;
-    case BT.Stable:
-      hut(b, W - 0.6, H - 1.0, 0.8, PAL.wood, PAL.thatch, false);
-      for (let i = 0; i < 4; i++) b.box(0.06, 0.5, 0.06, -W / 2 + 0.3 + i * 1.1, 0, H / 2 - 0.2, PAL.woodDark);
-      b.box(W - 0.4, 0.06, 0.06, 0, 0.4, H / 2 - 0.2, PAL.woodDark);
-      b.box(0.3, 0.3, 0.6, 1.0, 0.0, H / 2 - 0.6, PAL.woodDark);
-      b.box(0.1, 0.1, 0.1, 1.0, 0.3, H / 2 - 0.3, PAL.woodDark);
-      break;
-    case BT.EngineerGuild:
-      b.box(W - 0.6, 1.4, H - 0.6, 0, 0, 0, PAL.wood);
-      b.roof(W - 0.4, 0.8, H - 0.5, 0, 1.4, 0, PAL.stoneDark, false);
-      b.box(0.1, 2.2, 0.1, W / 2 - 0.3, 0, H / 2 - 0.3, PAL.woodDark);
-      b.box(1.2, 0.1, 0.1, W / 2 - 0.9, 2.2, H / 2 - 0.3, PAL.woodDark);
-      b.cyl(0.3, 0.3, 0.1, 8, -W / 2 + 0.5, 1.4, -H / 2 + 0.6, PAL.stoneDark);
-      b.box(0.7, 0.9, 0.06, 0, 0, H / 2 - 0.3, PAL.black);
-      flag(b, -W / 2 + 0.3, 1.4, H / 2 - 0.3, 0.9);
-      break;
-    default:
-      b.box(W - 0.2, def.height * 0.6, H - 0.2, 0, 0, 0, PAL.stone);
-  }
-  return b.build();
-}
+/** Gebäude, deren Dreiecksbudget (Bergfried bis ~8k, normale Gebäude ~1,5k) im Test geprüft wird */
+export const TRIS_BUDGET = { keep: 8000, large: 4500, normal: 2600, wall: 900 };
