@@ -6,7 +6,7 @@ export function migrateSettings(o: Record<string, unknown>): Record<string, unkn
   const r = { ...o };
   if (typeof r.volume === 'number' && typeof r.volMaster !== 'number') r.volMaster = r.volume;
   delete r.volume;
-  for (const k of ['volMaster', 'volSfx', 'volMusic', 'volAdvisor']) {
+  for (const k of ['volMaster', 'volSfx', 'volMusic', 'volAdvisor', 'volVoice', 'volAmbient']) {
     if (k in r) {
       const v = Number(r[k]);
       r[k] = Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : undefined;
@@ -24,6 +24,14 @@ export class Settings {
   volSfx = DEFAULT_AUDIO.sfx;
   volMusic = DEFAULT_AUDIO.music;
   volAdvisor = DEFAULT_AUDIO.advisor;
+  /** Einheiten- und Bewohnerstimmen */
+  volVoice = DEFAULT_AUDIO.voice;
+  /** Umgebungsgeräusche */
+  volAmbient = DEFAULT_AUDIO.ambient;
+  /** Untertitel zu gesprochenen Zeilen */
+  subtitles = DEFAULT_AUDIO.subtitles;
+  /** Browser-Sprachausgabe als Ersatz, wenn ein Clip fehlt */
+  ttsFallback = DEFAULT_AUDIO.ttsFallback;
   /** Musik an/aus */
   music = DEFAULT_AUDIO.musicOn;
   /** Stummschaltung (Taste M) */
@@ -51,7 +59,18 @@ export class Settings {
 
   /** Audio-Teil im Format der AudioEngine */
   audio(): AudioSettings {
-    return { master: this.volMaster, sfx: this.volSfx, music: this.volMusic, advisor: this.volAdvisor, musicOn: this.music, muted: this.muted };
+    return {
+      master: this.volMaster,
+      sfx: this.volSfx,
+      music: this.volMusic,
+      advisor: this.volAdvisor,
+      voice: this.volVoice,
+      ambient: this.volAmbient,
+      musicOn: this.music,
+      muted: this.muted,
+      subtitles: this.subtitles,
+      ttsFallback: this.ttsFallback,
+    };
   }
 
   save(): void {
@@ -65,6 +84,10 @@ export class Settings {
           volSfx: this.volSfx,
           volMusic: this.volMusic,
           volAdvisor: this.volAdvisor,
+          volVoice: this.volVoice,
+          volAmbient: this.volAmbient,
+          subtitles: this.subtitles,
+          ttsFallback: this.ttsFallback,
           music: this.music,
           muted: this.muted,
           edgeScroll: this.edgeScroll,

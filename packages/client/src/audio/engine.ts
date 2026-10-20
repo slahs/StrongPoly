@@ -8,14 +8,34 @@ export interface AudioSettings {
   master: number;
   sfx: number;
   music: number;
+  /** Berater-Stimme und Meldungstöne */
   advisor: number;
+  /** Einheiten- und Bewohnerstimmen */
+  voice: number;
+  /** Umgebungsgeräusche (Wind, Wasser, Vögel, Siedlung, Werkstätten …) */
+  ambient: number;
   musicOn: boolean;
   muted: boolean;
+  /** Untertitel zu gesprochenen Zeilen */
+  subtitles: boolean;
+  /** Browser-Sprachausgabe, wenn zu einer Zeile kein Clip vorliegt */
+  ttsFallback: boolean;
 }
 
-export const DEFAULT_AUDIO: AudioSettings = { master: 0.8, sfx: 0.8, music: 0.5, advisor: 0.8, musicOn: true, muted: false };
+export const DEFAULT_AUDIO: AudioSettings = {
+  master: 0.8,
+  sfx: 0.8,
+  music: 0.5,
+  advisor: 0.8,
+  voice: 0.8,
+  ambient: 0.6,
+  musicOn: true,
+  muted: false,
+  subtitles: false,
+  ttsFallback: true,
+};
 
-export type Channel = 'effects' | 'music' | 'advisor' | 'ui';
+export type Channel = 'effects' | 'music' | 'advisor' | 'ui' | 'voice' | 'ambient';
 
 export interface Bus {
   /** Eingänge der Kanäle (Quellen verbinden sich hiermit) */
@@ -51,6 +71,8 @@ export function createBus(ctx: BaseAudioContext, dest: AudioNode = ctx.destinati
     music: [-20, 3],
     advisor: [-18, 4],
     ui: [-18, 4],
+    voice: [-18, 4],
+    ambient: [-22, 3],
   };
   for (const ch of Object.keys(cfg) as Channel[]) {
     const inp = ctx.createGain();
@@ -74,5 +96,7 @@ export function applyLevels(bus: Bus, s: AudioSettings, ctx: BaseAudioContext, i
   set(bus.level.effects.gain, volumeCurve(s.sfx));
   set(bus.level.ui.gain, volumeCurve(s.sfx));
   set(bus.level.advisor.gain, volumeCurve(s.advisor));
+  set(bus.level.voice.gain, volumeCurve(s.voice));
+  set(bus.level.ambient.gain, volumeCurve(s.ambient));
   set(bus.level.music.gain, s.musicOn ? volumeCurve(s.music) : 0);
 }

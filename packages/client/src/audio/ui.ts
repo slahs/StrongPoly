@@ -4,7 +4,7 @@ import type { AudioEngine } from './index';
 
 /**
  * Optionszeilen für den Ton (Label/Regler-Paare für das zweispaltige `.form`-Raster):
- * Master, Effekte, Musik, Berater, Musik-Schalter, Stumm. Änderungen wirken sofort und werden gespeichert.
+ * Master, Effekte, Musik, Berater, Einheitenstimmen, Umgebung, Musik-Schalter, Untertitel, Sprachersatz, Stumm. Änderungen wirken sofort und werden gespeichert.
  * `onChange` ersetzt das Standardverhalten (Einstellungen speichern + an die Engine geben).
  */
 export function audioOptionRows(audio: AudioEngine, st: Settings, onChange?: () => void): HTMLElement[] {
@@ -15,7 +15,7 @@ export function audioOptionRows(audio: AudioEngine, st: Settings, onChange?: () 
       audio.configure(st.audio());
     }
   };
-  const slider = (label: string, key: 'volMaster' | 'volSfx' | 'volMusic' | 'volAdvisor', preview: () => void): HTMLElement[] => {
+  const slider = (label: string, key: 'volMaster' | 'volSfx' | 'volMusic' | 'volAdvisor' | 'volVoice' | 'volAmbient', preview: () => void): HTMLElement[] => {
     const out = h('span', { class: 'crumb', text: `${Math.round(st[key] * 100)} %`, style: 'min-width:42px;text-align:right' });
     const input = h('input', {
       type: 'range',
@@ -49,7 +49,11 @@ export function audioOptionRows(audio: AudioEngine, st: Settings, onChange?: () 
     ...slider('Effekte', 'volSfx', () => audio.play('chop')),
     ...slider('Musik', 'volMusic', () => undefined),
     ...slider('Berater', 'volAdvisor', () => audio.play('gong')),
+    ...slider('Einheitenstimmen', 'volVoice', () => audio.speakEvent('swordsman', 'select', undefined, 1)),
+    ...slider('Umgebung', 'volAmbient', () => undefined),
     ...check('Musik spielen', () => st.music, (v) => (st.music = v)),
+    ...check('Untertitel bei Sprache', () => st.subtitles, (v) => (st.subtitles = v)),
+    ...check('Browser-Stimme als Ersatz', () => st.ttsFallback, (v) => (st.ttsFallback = v)),
     ...check('Stumm (Taste M)', () => st.muted, (v) => (st.muted = v)),
   ];
 }

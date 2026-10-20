@@ -2,6 +2,7 @@ import { BF, BT, BUILDINGS, ClientWorld, PROJ, SimEvent, T, U, UNIT_CAP, WorkerP
 import type { AudioEngine } from '../audio';
 import { MoodDirector } from '../audio/mood';
 import { viewRadius } from '../audio/mix';
+import { groupOfBuilding } from '../audio/voice_groups';
 
 /** Blickpunkt/Teaminformation, die die Session pro Frame liefert. */
 export interface SoundView {
@@ -41,6 +42,14 @@ export class Soundscape {
   stats = { enemyNear: 0, attackers: 0, combatRate: 0, scans: 0, units: 0 };
   private known = new Map<number, BldRec>();
   private prevIds = new Int32Array(UNIT_CAP);
+  private prevHp = new Uint8Array(UNIT_CAP);
+  private prevSub = new Uint8Array(UNIT_CAP);
+  /** Hintergrundgerede (Arbeit/Abschluss): höchstens eine Zeile je Zeitfenster, Kandidaten per Zufallsauswahl aus der Sichtweite */
+  private chatterIn = 14;
+  private cand: { group: string; ev: 'work' | 'done'; x: number; y: number } | null = null;
+  private candN = 0;
+  private siegeOwn: { x: number; y: number }[] = [];
+  private lastMood: string = 'build';
   private seeded = false;
   private acc = 0;
   private combatAcc = 0;
@@ -227,6 +236,14 @@ export class Soundscape {
     let recruitY = 0;
     let units = 0;
     const top = w.top;
+    const voiceR = viewRadius(v.camDist) * 0.85;
+    const voiceR2 = voiceR * voiceR;
+    let woundedBudget = 1;
+    let nearIdleD2 = Infinity;
+    let nearAtkD2 = Infinity;
+    let nearSoldier: { type: number; x: number; y: number } | null = null;
+    let nearAttacker: { type: number; x: number; y: number } | null = null;
+    const ownSiege: { x: number; y: number }[] = [];
     for (let s = 0; s < top; s++) {
       const id = w.ids[s];
       const wasId = this.prevIds[s];
@@ -237,6 +254,10 @@ export class Soundscape {
       units++;
       const isNew = wasId !== id;
       this.prevIds[s] = id;
+      if (isNew) {
+        this.prevHp[s] = w.hp[s];
+        this.prevSub[s] = 0;
+      }
       const type = w.type[s];
       const owner = w.owner[s];
       const x = w.curX[s];
@@ -257,17 +278,61 @@ export class Soundscape {
         if ((owner === v.me || this.inZone(x, y)) && soldier) attackers++;
         else if (Math.hypot(x - v.camX, y - v.camY) < 30 && soldier) attackers += 0.5;
       }
-      if (quiet) continue;
       const sub = aux >> 4;
+      if (quiet) {
+        this.prevHp[s] = w.hp[s];
+        this.prevSub[s] = sub;
+        continue;
+      }
       const period = WORK_PERIOD[sub];
       if (period && (type === U.Peasant || type === U.Engineer)) {
         const dx = x - v.camX;
         const dy = y - v.camY;
         if (dx * dx + dy * dy < cull2 && Math.random() < dt / period) this.workSound(sub, x, y);
       }
+      // ----- Stimmen (4D): nur eigene Einheiten im Sichtbereich -----
+      if (owner === v.me) {
+        const dx = x - v.camX;
+        const dy = y - v.camY;
+        const d2 = dx * dx + dy * dy;
+        const hp = w.hp[s];
+        if (d2 < voiceR2) {
+          if (soldier && hp < 90 && this.prevHp[s] >= 90 && woundedBudget > 0) {
+            woundedBudget--;
+            a.speakEvent(a.groupOfUnit(type), 'wounded', { x, y });
+          }
+          const working = WORK_PERIOD[sub] !== undefined && (type === U.Peasant || type === U.Engineer);
+          const wasWorking = WORK_PERIOD[this.prevSub[s]] !== undefined;
+          if (working) this.offer(this.taskGroup(sub, x, y), 'work', x, y);
+          else if (wasWorking && !working && type === U.Peasant) this.offer(this.taskGroup(this.prevSub[s], x, y), 'done', x, y);
+          if (soldier && type !== U.Lord) {
+            if (d2 < nearIdleD2) {
+              nearIdleD2 = d2;
+              nearSoldier = { type, x, y };
+            }
+            if (aux & 1 && d2 < nearAtkD2) {
+              nearAtkD2 = d2;
+              nearAttacker = { type, x, y };
+            }
+          }
+          if (type >= U.Catapult && type <= U.FireBallista && type !== U.Ox) ownSiege.push({ x, y });
+        }
+        this.prevHp[s] = hp;
+        this.prevSub[s] = sub;
+      }
     }
     if (recruits > 0) a.play('recruit', recruitX, recruitY);
     this.seeded = true;
+    this.siegeOwn = ownSiege;
+
+    // ----- Stimmen: Hintergrundgerede (selten, ein Kandidat pro Fenster) -----
+    this.chatterIn -= dt;
+    if (this.chatterIn <= 0 && this.cand) {
+      if (a.speakEvent(this.cand.group, this.cand.ev, { x: this.cand.x, y: this.cand.y })) this.chatterIn = 16 + Math.random() * 20;
+      else this.chatterIn = 3;
+    }
+    this.cand = null;
+    this.candN = 0;
 
     // ----- Stimmung -----
     const combat = this.combatAcc + attackers * 0.15 * dt;
@@ -278,6 +343,42 @@ export class Soundscape {
     this.stats.units = units;
     this.stats.combatRate = Math.round(this.director.combatRate * 100) / 100;
     a.setMood(this.director.mood);
+    // Lage kippt: ein eigener Soldat in der Nähe ruft (Verteidigung beim ersten Feind, Angriff bei Schlachtbeginn)
+    const mood = this.director.mood;
+    if (mood !== this.lastMood && !quiet) {
+      if (mood === 'tension' && nearSoldier) a.speakEvent(a.groupOfUnit(nearSoldier.type), 'hold', { x: nearSoldier.x, y: nearSoldier.y }, 1);
+      else if (mood === 'battle') {
+        const c = nearAttacker ?? nearSoldier;
+        if (c) a.speakEvent(a.groupOfUnit(c.type), 'attack', { x: c.x, y: c.y }, 1);
+      }
+    }
+    this.lastMood = mood;
+  }
+
+  /** Kandidat für Hintergrundgerede: gleichverteilte Zufallsauswahl (Reservoir) */
+  private offer(group: string | null, ev: 'work' | 'done', x: number, y: number): void {
+    if (!group) return;
+    this.candN++;
+    if (Math.random() * this.candN < 1) this.cand = { group, ev, x, y };
+  }
+
+  /** Welche Gruppe arbeitet hier? Bäume → Holzfäller, Vorkommen → Steinmetz, Ernte → Landwirt, sonst Bauer. */
+  private taskGroup(sub: number, x: number, y: number): string {
+    const w = this.world;
+    if (sub === WorkerPhase.Repair || sub === WorkerPhase.Dig) return 'peasant';
+    const tx = Math.floor(x);
+    const ty = Math.floor(y);
+    let tree = false;
+    let ore = false;
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++) {
+        if (!w.map.inBounds(tx + dx, ty + dy)) continue;
+        const i = w.map.idx(tx + dx, ty + dy);
+        if (w.map.trees[i] > 0) tree = true;
+        const tr = w.map.terrain[i];
+        if (tr === T.StoneDeposit || tr === T.IronDeposit) ore = true;
+      }
+    return tree ? 'woodcutter' : ore ? 'mason' : 'farmer';
   }
 
   private barracksAt(x: number, y: number): { cx: number; cy: number } | null {
@@ -296,6 +397,14 @@ export class Soundscape {
   }
 
   private buildingWork(t: number, id: number, cx: number, cy: number, dt: number): void {
+    const bg = groupOfBuilding(t);
+    if (bg && bg !== 'lord' && t !== BT.Barracks && t !== BT.MercPost && t !== BT.Stable && t !== BT.EngineerGuild) {
+      const dxv = cx - (this.view?.camX ?? cx);
+      const dyv = cy - (this.view?.camY ?? cy);
+      const vr = viewRadius(this.view?.camDist ?? 30) * 0.85;
+      // Werkstatt-Bewohner sprechen seltener als Feldarbeiter (Kandidat nur mit kleiner Wahrscheinlichkeit)
+      if (dxv * dxv + dyv * dyv < vr * vr && Math.random() < 0.25) this.offer(bg, 'work', cx, cy);
+    }
     let period = 0;
     let sfx: 'smith' | 'mill' | 'pick' | null = null;
     switch (t) {
@@ -406,7 +515,11 @@ export class Soundscape {
       let ok = false;
       if (k === PROJ.Arrow || k === PROJ.FireArrow) ok = a.play('arrowShot', x, y);
       else if (k === PROJ.Bolt) ok = a.play('arrowShot', x, y, { v: 1.3 });
-      else if (k === PROJ.Stone || k === PROJ.Boulder) ok = a.play('catapult', x, y, { v: k === PROJ.Boulder ? 1.2 : 1 });
+      else if (k === PROJ.Stone || k === PROJ.Boulder) {
+        ok = a.play('catapult', x, y, { v: k === PROJ.Boulder ? 1.2 : 1 });
+        // Mannschaft des eigenen Geräts kommentiert den Schuss (selten, Hintergrundrang)
+        if (this.siegeOwn.some((u) => (u.x - x) * (u.x - x) + (u.y - y) * (u.y - y) < 16) && Math.random() < 0.35) a.speakEvent('siege', 'special', { x, y });
+      }
       tries += ok ? 1 : 0.25;
     }
     // Pfeile, die nicht mehr fliegen, ohne dass ein Trefferereignis kam: Einschlag in Boden/Mauer

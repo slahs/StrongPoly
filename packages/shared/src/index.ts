@@ -27,3 +27,4 @@ export * from './sim/serialize';
 export * from './data/matchups';
 export { ARMOR_KEYS, DTYPE_KEYS, SPECIAL_KEYS, LANGS, TEXTS, fill, fmtNum, getLang, hasText, placeholders, setLang, t, tf, trackTextUsage } from './data/descriptions';
 export type { Lang, Params } from './data/descriptions';
+export * from './data/voices';
