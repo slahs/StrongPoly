@@ -35,7 +35,7 @@ pnpm build        # Client (Vite) + Server (esbuild-Bundle)
 pnpm start        # gebauten Server starten (liefert den Client statisch aus)
 ```
 
-Entwicklungs-URL-Parameter: `?bench` (Benchmark-Szene, siehe „Grafik“), `?quality=low|medium|high`, `?blood=0`, `?quick=1` (sofort ein Gefecht), `&dev=1` (Dev-Befehle, z. B. Einheiten spawnen über `session().conn.dev(...)`), `&fog=1`, `&extreme=1`, `&size=`, `&seed=`.
+Entwicklungs-URL-Parameter: `?bench` (Benchmark-Szene, siehe „Grafik“), `?quality=low|medium|high`, `?blood=0`, `?icons` (Icon-Galerie), `?tooltips` (alle Tooltips im Raster), `?enc=building/quarry` (Enzyklopädie-Seite direkt öffnen), `?lang=en`, `?quick=1` (sofort ein Gefecht), `&dev=1` (Dev-Befehle, z. B. Einheiten spawnen über `session().conn.dev(...)`), `&fog=1`, `&extreme=1`, `&size=`, `&seed=`.
 
 ## Architektur
 
@@ -145,13 +145,15 @@ Alles entsteht zur Laufzeit per WebAudio-Synthese; es gibt keine Audiodateien un
 
 Lautstärkeregler (Master, Effekte, Musik, Berater), Musik-Schalter und Stumm stehen in den Optionen (`audio/ui.ts`, `Settings.vol*`), **M** schaltet den Ton stumm. Prüfung ohne Lautsprecher: `window.__audio.state()` (Kontextstatus, Stimmung, Stimmen, Zähler gespielter Effekte) und `window.__audio.renderAll()` (rendert jede Synthese offline und meldet Spitzenpegel, RMS und NaN).
 
-## Steuerung (Standard, im Optionsmenü frei belegbar)
+## Bedienung (Stronghold-Stil)
 
-Linksklick wählen / Rahmen ziehen · Doppelklick: alle gleichen Einheiten · Rechtsklick: Bewegen/Angreifen (Umschalt: Wegpunkt) · `F` Angriffsmarsch · `P` Patrouille · `G` Bodenangriff · `X` Stopp · `H`/`V`/`B` Halten/Defensiv/Aggressiv · Strg+`1..9` Kontrollgruppe setzen, `1..9` wählen · `WASD` scrollen · `Q`/`E` Kamera drehen · Mausrad Zoom · `R` Gebäude drehen · `Leertaste` Pause (Singleplayer) · `I`/`O`/`L`/`T` Lager/Markt/Beliebtheit/Verwaltung · `Z C N J K` Extreme-Fähigkeiten · `M` Ton stumm/an.
+Unten sitzt das Hauptpanel: links Baumenü (Reiter Burg/Industrie/Landwirtschaft/Stadt/Waffen/Nahrung, bei „Burg“ Unterkategorien Mauern/Türme/Tore/Truppen/Belagerung, Icon-Raster mit Kosten, ausgegraut wenn nicht bezahlbar, Werkzeuge Abreißen/Reparieren/Rückgängig/Abbrechen), in der Mitte das Kontextpanel (Bergfried mit Beliebtheits-Aufschlüsselung und Prognose, Kornspeicher/Lager/Waffenkammer mit Beständen und Rationen, Kaserne und Söldner mit Rekrutierung, Markt mit Preisen, Werkstätten mit Rezeptwahl und Fortschritt, Schenke/Kirche mit Abdeckung, Arbeiter an/aus, Truppenpanel mit Typ-Icons, Haltung, Formation, Patrouille, Bodenangriff, Graben, Öl), rechts die Minikarte. Platzierungs-Geist grün/rot mit Grund und Kosten am Cursor, Linien-Vorschau bei Mauern, Berater mit Meldungsliste und Kamerasprung (`Leertaste`), Endbildschirm mit Podium und Statistik. Tooltips (Hover) und Enzyklopädie (`F2`, auch im Menü) erklären alle Gebäude, Einheiten, Waren, Wirtschaftsketten und Regeln; Deutsch und Englisch (`?lang=en`).
+
+Standard-Tasten (alle im Optionsmenü frei belegbar, `F1` zeigt die Übersicht): Linksklick wählen / Rahmen ziehen · Doppelklick: alle gleichen Einheiten · Rechtsklick: Bewegen/Angreifen/Bau abbrechen (Umschalt: Wegpunkt) · `F` Angriffsmarsch · `P` Patrouille · `G` Bodenangriff · `X` Stopp · `H`/`V`/`B` Halten/Defensiv/Aggressiv · Strg+`1..9` Kontrollgruppe setzen, `1..9` wählen · `WASD` scrollen · `Q`/`E` Kamera drehen · Mausrad/`+`/`-` Zoom · `R` Gebäude drehen · `Entf` abreißen · `U` reparieren · Strg+`Z` Platzierung zurücknehmen · `F3..F8` Baukategorien · Alt+`K/G/B/M/S/W` Bergfried/Kornspeicher/Kaserne/Markt/Lager/Waffenkammer wählen · `Pos1` Bergfried · `Y` gesamte Armee · `Leertaste` letzte Meldung · `Pause` Pause (Singleplayer) · `I`/`O`/`L`/`T` Lager/Markt/Beliebtheit/Verwaltung · `Z C N J K` Extreme-Fähigkeiten · `M` Ton stumm/an · `F9` Schatten.
 
 ## Tests
 
-`pnpm test` führt Vitest in `shared`, `client` (reine Audio-Logik: Skalen/Phrasen, Voice-Limiter, Raummischung, Stimmungs-Hysterese) und `server` aus: Kartengenerator (inkl. Erreichbarkeit der Ressourcen), Wirtschaftsketten, Markt, Beliebtheit, Kampf/Rüstung/Tore/Treppen/Fallen/Feuer, Belagerung (Ramme, Katapult, Belagerungsturm, Leitern, Assassinen, Tunnel), alle 9 KI-Profile, Extreme-Modus, Missionen, Snapshot-Roundtrip, Speichern/Laden sowie ein Netzwerktest mit zwei Clients, KI-Slot, Befehlen und Reconnect.
+`pnpm test` führt Vitest in `shared`, `client` (Audio-Logik, Icons, Tooltips, Enzyklopädie, Wirtschaftsketten-Diagramme, HUD-Logik, Render-Tabellen) und `server` aus: Kartengenerator (inkl. Erreichbarkeit der Ressourcen), Wirtschaftsketten, Markt, Beliebtheit, Kampf/Rüstung/Tore/Treppen/Fallen/Feuer, Belagerung (Ramme, Katapult, Belagerungsturm, Leitern, Assassinen, Tunnel), alle 9 KI-Profile, Extreme-Modus, Missionen (per Skript bis zum Sieg gespielt: `missions_play.test.ts`), Determinismus (zwei identische Läufe → gleicher Hash, Save/Load-Fortsetzung), Regressionstests zu den KI-/Wirtschaftsfehlern, Rückgängig/Arbeiter an-aus, Snapshot-Roundtrip, Speichern/Laden sowie ein Netzwerktest mit zwei Clients, KI-Slot, Befehlen und Reconnect.
 
 ## Bench- und Prüfwerkzeuge (`packages/shared/bench`)
 
@@ -160,6 +162,8 @@ Linksklick wählen / Rahmen ziehen · Doppelklick: alle gleichen Einheiten · Re
 | `duel.ts <A> <B> [seed] [min]` | KI gegen KI, headless, läuft bis zum Keep-Fall |
 | `tournament.ts [seeds] [min] [parallel]` | alle KI-Profile paarweise (Ziel: ≥ 80 % der Partien enden innerhalb von 90 Min); `RERUN=<json>` wiederholt nur Timeouts; ein abgebrochenes Turnier setzt beim nächsten Start mit gleichem `OUT` dort an (`<OUT>.partial.jsonl`) |
 | `aistate.ts`, `diag.ts`, `econ.ts`, `gates.ts`, `iron.ts` | Zustands- und Wirtschaftsdiagnose einzelner KI-Lords |
+| `missions.ts` | Bot spielt die Tutorial-Missionen 1–5 bis zum Sieg (Grundlage von `missions_play.test.ts`) |
+| `pop.ts`, `wood.ts`, `trees.ts`, `recruitwhy.ts`, `deaths.ts`, `exit.ts` | Diagnose: Bevölkerung, Holzversorgung, Rekrutierungsstau, Verluste, Spielende |
 | `smoke.ts [seed] [min]` | feuert jeden Befehlstyp (auch Unsinnsparameter) gegen eine laufende Sim und prüft Invarianten (keine NaN, Bestände ≥ 0, keine Bodeneinheit in festen Gebäuden, HP ≤ Max); läuft auch als Test |
 | `units.bench.ts` | Leistung bei 2.000 Einheiten |
 
