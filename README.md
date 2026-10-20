@@ -98,11 +98,23 @@ Alles prozedural: Low-Poly mit flacher Schattierung, kleine Palette (`shared/src
 | `terrain.ts` | Chunk-Terrain: Eckenfarben aus den vier angrenzenden Tiles (weiche Übergänge), Dünenmuster, Felsklippen mit facettierten Flächen und Gesteinsbändern, Gewässerbett plus Wasserfläche mit Uferschaum, Kriegsnebel |
 | `decor.ts` | Bäume, Felsen, Steinbrocken-Haufen, Eisenadern, Pechquellen und wiegende Grasbüschel als Instanzen, nur im Sichtbereich |
 | `materials.ts` | gemeinsame Materialien: Vertex-Animation (Beine, Arme, Bogen, Räder, Hebel, Mühlenflügel, Fahnen, Tore), Teamfarbe und Ambient Occlusion aus Vertex-Attributen, Gras-Wind, Wasser-Wellen |
-| `builder.ts`, `models_units.ts`, `models_buildings.ts`, `models_misc.ts` | prozedurale Modelle; jedes Teil trägt Animationskennung und Drehpunkt (`aPivot`), Bodenverdunklung (`aMeta.y`) ist eingebacken |
+| `builder.ts`, `models_buildings.ts`, `models_misc.ts` | prozedurale Gebäude- und Hilfsmodelle; jedes Teil trägt Animationskennung und Drehpunkt (`aPivot`), Bodenverdunklung (`aMeta.y`) ist eingebacken |
+| `models_units.ts`, `unit_builder.ts`, `unit_humans.ts`, `unit_types.ts`, `unit_jobs_models.ts`, `unit_beasts.ts`, `unit_siege.ts`, `unit_items.ts` | Figuren, Berufe, Reittiere, Belagerungsgerät, Waffen/Werkzeuge/Kopfbedeckungen (siehe „Figuren“) |
+| `unit_shader.ts`, `units_style.ts`, `unit_jobs.ts` | Figuren-Material mit Vertex-Animation, Farb-/Variationstabellen, Berufserkennung |
 | `entities.ts`, `instanced.ts` | Einheiten, Gebäude, Mauern (Pfosten + Arme je Nachbar), Baustufen (Fundament → Gerüst → fertig, abgeleitet aus `BuildingRec.n`, dem Platzierungs-Tick im Snapshot; rein visuell), Trümmer, Leichen, Projektile, Auswahlkreise, Lebensbalken, Hover-Umriss |
 | `fx.ts`, `work_fx.ts` | Partikel (Rauch, Staub, Feuer, Trümmer, Blut) und Dauereffekte an Gebäuden (Schornsteine, Dampf, Brände) |
 
 Die Einheiten-Animation kostet keine CPU-Zeit pro Knochen: pro Instanz werden nur Phase, Zustandsflags (Gehen/Nahkampf/Schießen/Arbeiten/Tod), Schrittfrequenz und Zyklusdauer geschrieben; der Vertex-Shader dreht daraus Beine, Waffenarm, Bogen, Räder oder Wurfarm. Gefallene Einheiten bleiben kurz als Leiche liegen (Umkippen im Shader). Blut ist abschaltbar (`Settings.blood`, URL `?blood=0`).
+
+### Figuren (`models_units.ts` und `unit_*.ts`)
+
+Alle 26 Einheitentypen sind neu modelliert (≈ 5,5 Kopfhöhen, Hals, Rumpf, Arme mit Händen, Beine mit Knie und Stiefeln, Nase, Haare, Bärte, Kopfbedeckungen) und bleiben EIN Mesh je Typ (ein Draw-Call). Alles in einer Geometrie wird per Instanzattribut ein- und ausgeblendet; Unsichtbares klappt der Vertex-Shader zu Punkten zusammen:
+
+- **Nah/Fern (LOD)**: nahes Modell (Infanterie ≤ 400 Dreiecke, Reiter ≤ 800, Belagerung ≤ 1500) und vereinfachtes fernes Modell (≈ 100–230) im selben Mesh; Umschalten nach Kameraabstand mit Hysterese (`LOD_NEAR_DIST`: Mittel 32, Hoch 46 Tiles, Niedrig immer fern). Grafikstufe Niedrig baut die nahen Teile gar nicht erst, Mittel lässt die Hoch-Details (Augen, Ohren, Schnallen) weg.
+- **Variation je Einheit** (`unitVariant`, deterministisch aus der Einheiten-ID, keine Zufallszahlen): 8 Hauttöne, 8 Haarfarben, 32 gedeckte Stofffarben (je Typ nur passende Listen, Soldaten behalten ihre Typfarben), 3 Haarformen, Bart, 3 Hüte, Größe ±5 %, Helligkeit ±7 %. Farbklassen im Eckpunkt (`aStyle.x`) + Tonetabelle (`UNIT_TINTS`) im Shader; Instanzattribut `iVar` (Palette, Helligkeit, Sichtbarkeits-Bits, Berufs-Bit).
+- **Berufe der Bauern**: die Sim kennt nur „Bauer“; der Beruf ergibt sich nur für die Darstellung aus Arbeitsplatz-Gebäude neben dem Arbeiter, Arbeitsphase (`aux >> 4`) und getragener Ware (`unit_jobs.ts`, 23 Berufe von Holzfäller über Steinmetz, Schmied, Müller, Bäcker, Brauer bis Händler und Geistlicher). Der Renderer merkt sich den zuletzt sicher erkannten Beruf je Einheit; Hüte, Schürzen und Werkzeuge hängen an Berufs-Bits, der Armstil (Hacken, Klopfen, Rühren, Graben …) folgt im Shader dem Beruf.
+- **Animation (Vertex-Shader, kein Skelett)**: Arm- und Beinschwung in Gegenphase, Knie (Oberschenkel + Schienbein), Oberkörper neigt/dreht sich um die Hüfte, Wippen, Kopf (Umsehen im Stand, Blick nach unten bei der Arbeit), Umhang, Mähne/Schweif/Flammen flattern, Arbeits-/Hieb-/Stoß-/Schussstile, Räder drehen sich radiusrichtig, Wurfarm/Ramme. Tragelasten (alle 10 Formen in einem Mesh) hängen am Oberkörper des Trägers. Gefallene bleiben liegen (Umkippen unverändert).
+- Prüfszenen: `?bench&showcase=units` (alle Typen in vier Zuständen; `&prof=1` zusätzlich alle Berufe, `&labels=1` Beschriftung, `&still=1` feste Kamera, `&face=0.75` Seitenansicht), `?bench&showcase=single&type=8&state=attack|walk|work|stand|dead&job=1&carry=1` (eine Einheit, Bildserien mit `__bench.setTime(t)`).
 
 Grafikstufen (Auszug aus `quality.ts`):
 

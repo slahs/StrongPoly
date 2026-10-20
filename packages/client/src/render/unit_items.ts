@@ -274,10 +274,10 @@ export function hood(b: UnitBuilder, col: Col | number, o: { y?: number; point?:
 export function hairVariants(b: UnitBuilder, o: { styles: number; beard: boolean; hatCover?: boolean }): void {
   if (o.styles > 0) {
     st(b, { part: 14, px: 0, py: HEAD_Y - 0.075, pz: 0, show: VIS.Near | VIS.Hair0, upper: HIP });
-    b.ball(0.074, 0.05, 0.078, 0, HY + 0.028, -0.008, hairC(), 1);
+    b.ball(0.074, 0.046, 0.078, 0, HY + 0.036, -0.008, hairC(), 1);
     b.box(0.15, 0.06, 0.03, 0, HY - 0.035, -0.07, hairC());
     st(b, { part: 14, px: 0, py: HEAD_Y - 0.075, pz: 0, show: VIS.Near | VIS.Hair1, upper: HIP });
-    b.ball(0.077, 0.056, 0.082, 0, HY + 0.022, -0.004, hairC(0.95), 1);
+    b.ball(0.077, 0.05, 0.082, 0, HY + 0.03, -0.004, hairC(0.95), 1);
     b.box(0.165, 0.13, 0.04, 0, HY - 0.105, -0.07, hairC(0.9), { taper: [0.8, 1] });
     b.box(0.03, 0.06, 0.05, -0.07, HY - 0.05, 0.01, hairC(0.9));
     b.box(0.03, 0.06, 0.05, 0.07, HY - 0.05, 0.01, hairC(0.9));

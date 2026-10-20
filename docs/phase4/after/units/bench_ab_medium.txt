@@ -1,0 +1,8 @@
+base {"calls":70,"tris":377914,"cpu":4.21,"upd":1.18,"ren":3.03,"units":0.77}
+new {"calls":70,"tris":889082,"cpu":5.4,"upd":2.01,"ren":3.4,"units":1.32}
+base {"calls":70,"tris":377425,"cpu":5.54,"upd":1.44,"ren":4.1,"units":0.91}
+new {"calls":70,"tris":890546,"cpu":7.55,"upd":2.6,"ren":4.94,"units":1.93}
+base {"calls":70,"tris":376913,"cpu":5.58,"upd":1.38,"ren":4.2,"units":0.84}
+new {"calls":70,"tris":889454,"cpu":5.88,"upd":2.05,"ren":3.83,"units":1.61}
+MEDIAN base cpu 5.54 upd 1.38 ren 4.1 units 0.84 calls 70 tris 377914
+MEDIAN new cpu 5.88 upd 2.05 ren 3.83 units 1.61 calls 70 tris 889082

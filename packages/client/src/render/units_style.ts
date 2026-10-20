@@ -299,6 +299,6 @@ export function unitVariant(type: number, id: number, job: number = JOB.None): U
 export type UnitDetail = 0 | 1 | 2;
 
 /** Entfernung (Tiles) bis zu der das nahe Modell gezeichnet wird, je Detailstufe */
-export const LOD_NEAR_DIST: Record<UnitDetail, number> = { 0: 0, 1: 27, 2: 40 };
+export const LOD_NEAR_DIST: Record<UnitDetail, number> = { 0: 0, 1: 32, 2: 46 };
 /** Hysterese (Tiles) gegen Umspringen an der Grenze */
 export const LOD_HYST = 2.5;

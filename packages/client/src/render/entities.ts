@@ -920,11 +920,11 @@ export class EntityRenderer {
       const tm = this.unitMesh(type);
       const phase = (s * 0.61803) % 1;
       tm.push(x, ny, y, face, sc, sc, owner, phase, af, UNIT_WALK_W[type], af & AF.Work ? 1.1 : UNIT_CYCLE[type]);
+      if (useBlob) blob.push(x, ny + 0.025, y, Math.max(0.5, def.radius * 2.3) * sc, 0, 0, 0, SIEGE[type] ? 0.32 : 0.3);
       // Figur: Beruf (Bauern), Nah/Fern-Modell, Variation (Haut, Haar, Stoffe, Größe) – ein Mesh je Typ, keine Extra-Draw-Calls
       const job = type === U.Peasant ? this.jobFor(s, id, x, y, owner, ax >> 4, carryA[s], w) : 0;
       const vr = this.variantFor(s, id, type, job);
       tm.styleLast(vr.pack, vr.jitter, this.visMask(s, x, ny, y, camP) | vr.bits, vr.jobBit, vr.kx, vr.ky);
-      if (useBlob) blob.push(x, ny + 0.025, y, Math.max(0.5, def.radius * 2.3) * sc, 0, 0, 0, SIEGE[type] ? 0.32 : 0.3);
       const sel = o.selected.has(id);
       if (sel && rings < 2048) {
         const r = Math.max(1, def.radius * 2.3) * (1 + 0.035 * Math.sin(ptr * 5 + s));

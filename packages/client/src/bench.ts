@@ -161,6 +161,8 @@ export class BenchWorld {
   /** Beschriftungen für Prüfszenen (Weltkoordinaten) */
   readonly labels: { x: number; y: number; text: string }[] = [];
   showcaseGrid = { cols: 1, spacing: 2.3, rowSpacing: 2.7 };
+  /** Blickrichtung der Prüfszene (Bruchteile von π; 0,4 = Dreiviertelansicht, 0,75 = Seitenansicht nach rechts) */
+  showFace = 0.4;
   /** erzwungene Berufe der Prüfszene (Einheiten-ID → Beruf) */
   readonly showJobs = new Map<number, number>();
 
@@ -502,13 +504,13 @@ export class BenchWorld {
     const w = this.w;
     const list: ShowcaseEntry[] = UNITS.map((d) => ({ type: d.id, label: d.name }));
     list.push(...extra);
-    this.showcaseGrid = { cols: list.length, spacing: 2.3, rowSpacing: 2.7 };
+    this.showcaseGrid = { cols: list.length, spacing: list.length > 30 ? 1.7 : 2.3, rowSpacing: 2.7 };
     list.forEach((e, col) => {
       for (let row = 0; row < 4; row++) {
         const p = this.gridPos(col, row);
         const s = this.spawn(e.type, row % 2 === 0 ? 0 : 1, p.x, p.y);
         if (s < 0) continue;
-        w.face[s] = Math.PI * 0.4;
+        w.face[s] = Math.PI * this.showFace;
         if (row === 1) w.flags[s] |= 4;
         if (row === 2) w.aux[s] |= 1;
         if (row === 3) {
@@ -524,6 +526,21 @@ export class BenchWorld {
     });
     void cx;
     void cy;
+    this.commitTick(0);
+  }
+
+  /** Prüfszene mit einer einzigen Einheit in der Kartenmitte (Bildserien der Animation): state = stand|walk|attack|work */
+  showcaseSingle(type: number, state: string, job: number, side: number, carry = 0): void {
+    const w = this.w;
+    const s = this.spawn(type, side, this.cx, this.cy);
+    if (s < 0) return;
+    w.face[s] = Math.PI * this.showFace;
+    if (state === 'walk') w.flags[s] |= 4;
+    if (state === 'attack') w.aux[s] |= 1;
+    if (state === 'work') w.aux[s] |= 2;
+    if (carry) w.carry[s] = carry;
+    if (job > 0) this.showJobs.set(w.ids[s], job);
+    if (state === 'dead') w.ids[s] = 0; // nur die Leiche (per Sterbe-Ereignis aus dem Skript) bleibt
     this.commitTick(0);
   }
 
@@ -631,8 +648,10 @@ export function startBench(): void {
   }
   const showcase = q.get('showcase');
   const bw = new BenchWorld(showcase ? 0 : total, seed, !!showcase);
+  if (q.get('face')) bw.showFace = Number(q.get('face'));
   if (showcase === 'units') bw.showcaseUnits(q.get('prof') === '1' ? professionEntries() : []);
   else if (showcase === 'buildings') bw.showcaseBuildings();
+  else if (showcase === 'single') bw.showcaseSingle(Number(q.get('type') ?? 8), q.get('state') ?? 'stand', Number(q.get('job') ?? 0), Number(q.get('team') ?? 0), Number(q.get('carry') ?? 0));
   const world = bw.w;
   const entities = new EntityRenderer(world);
   gs.root.add(entities.group);

@@ -113,7 +113,7 @@ export function body(b: UnitBuilder, r: Rig = {}): number {
   st(b, { part: UPART.Head, px: 0, py: dy + SHO + 0.03, pz: 0, upper: up, show: VIS.Near | VIS.Detail });
   for (const s of [-1, 1]) {
     b.box(0.012, 0.032, 0.024, s * 0.068 * hs, dy + HY - 0.004, 0.0, skinC(0.94));
-    b.box(0.018, 0.012, 0.006, s * 0.026 * hs, dy + HY + 0.014, 0.066 * hs, C.black);
+    b.box(0.013, 0.009, 0.006, s * 0.027 * hs, dy + HY + 0.006, 0.066 * hs, C.black);
   }
   st(b, { part: UPART.Head, px: 0, py: dy + SHO + 0.03, pz: 0, upper: up, show: VIS.Far });
   b.ball(0.067 * hs, 0.075 * hs, 0.07 * hs, 0, dy + HY, 0.006, skinC(), 1);
