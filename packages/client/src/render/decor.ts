@@ -484,6 +484,33 @@ const FAR: Record<Species, { kind: DecorKind; col: C3 }> = {
   palm: { kind: 'farBroad', col: K.palmLeaf },
 };
 
+/**
+ * Schreibt eine 4x4-Instanzmatrix (spaltenweise) aus Position, Drehung um Y (rot), Neigung um X (lean) und
+ * Skalierung (breit w, hoch h): entspricht `Matrix4.compose` mit Euler-Reihenfolge YXZ (z = 0), ohne Zwischenobjekte.
+ */
+export function writeInstanceMatrix(arr: Float32Array, m: number, x: number, y: number, z: number, rot: number, lean: number, w: number, h: number): void {
+  const cy = Math.cos(rot);
+  const sy = Math.sin(rot);
+  const cx = Math.cos(lean);
+  const sx = Math.sin(lean);
+  arr[m] = cy * w;
+  arr[m + 1] = 0;
+  arr[m + 2] = -sy * w;
+  arr[m + 3] = 0;
+  arr[m + 4] = sy * sx * h;
+  arr[m + 5] = cx * h;
+  arr[m + 6] = cy * sx * h;
+  arr[m + 7] = 0;
+  arr[m + 8] = sy * cx * w;
+  arr[m + 9] = -sx * w;
+  arr[m + 10] = cy * cx * w;
+  arr[m + 11] = 0;
+  arr[m + 12] = x;
+  arr[m + 13] = y;
+  arr[m + 14] = z;
+  arr[m + 15] = 1;
+}
+
 /** Statische Dekoration (Bäume, Felsen, Vorkommen, Gras, Blumen) als InstancedMeshes, nur im Sichtbereich. */
 export class DecorRenderer {
   readonly group = new THREE.Group();
@@ -786,11 +813,6 @@ export class DecorRenderer {
       }
     }
     this.stats.small = smallCount + grassCount;
-    const m4 = new THREE.Matrix4();
-    const qt = new THREE.Quaternion();
-    const eu = new THREE.Euler();
-    const pv = new THREE.Vector3();
-    const sv = new THREE.Vector3();
     let total = 0;
     for (const k of DECOR_KINDS) {
       const l = L(k);
@@ -801,18 +823,14 @@ export class DecorRenderer {
       const ca = (mesh.instanceColor as THREE.InstancedBufferAttribute).array as Float32Array;
       for (let n = 0; n < count; n++) {
         const o = n * STRIDE;
-        eu.set(l[o + 6], l[o + 3], 0, 'YXZ');
-        qt.setFromEuler(eu);
-        pv.set(l[o], l[o + 1], l[o + 2]);
-        const s = l[o + 4];
-        sv.set(s, l[o + 5], s);
-        m4.compose(pv, qt, sv);
-        m4.toArray(arr, n * 16);
+        writeInstanceMatrix(arr, n * 16, l[o], l[o + 1], l[o + 2], l[o + 3], l[o + 6], l[o + 4], l[o + 5]);
         ca[n * 3] = l[o + 7];
         ca[n * 3 + 1] = l[o + 8];
         ca[n * 3 + 2] = l[o + 9];
       }
       mesh.count = count;
+      // leere Gruppen gar nicht erst durch die Renderliste schicken (spart Programmwechsel und Objektaufwand)
+      mesh.visible = count > 0;
       mesh.instanceMatrix.needsUpdate = true;
       (mesh.instanceColor as THREE.InstancedBufferAttribute).needsUpdate = true;
       total += count;

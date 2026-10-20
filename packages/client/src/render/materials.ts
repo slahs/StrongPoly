@@ -588,14 +588,15 @@ float spHk = 0.0;
   // Bodenkarte: getretene Erde um Gebäude, Pfade, Felder, Kontaktschatten
   float wear = smoothstep(0.10, 0.72, spG.r + (spA.g - 0.5) * 0.36) * (1.0 - spCliff);
   vec3 dirt = vec3(0.40, 0.29, 0.18) * (0.9 + 0.22 * spB.g);
-  spC = mix(spC, dirt, wear * 0.5);
+  // Spuren folgen dem Kriegsnebel (vFog 1 sichtbar, 0,55 erkundet, 0,08 unerkundet): sonst verrieten sie Gebäude im Nebel
+  spC = mix(spC, dirt * vFog, wear * 0.5);
   float path = smoothstep(0.30, 0.60, spG.a + (spB.r - 0.5) * 0.45) * (1.0 - spCliff);
   vec3 pdirt = vec3(0.40, 0.29, 0.17) * (0.9 + 0.2 * spF.r);
   pdirt = mix(pdirt, vec3(0.62, 0.55, 0.45), smoothstep(0.84, 0.95, spF.a) * 0.6);
-  spC = mix(spC, pdirt, path * 0.9);
+  spC = mix(spC, pdirt * vFog, path * 0.9);
   float field = smoothstep(0.32, 0.65, spG.g + (spB.r - 0.5) * 0.25) * (1.0 - spCliff);
   float fur = 0.5 + 0.5 * sin(vSpW.x * 9.5 + spB.g * 2.2);
-  spC = mix(spC, mix(vec3(0.11, 0.07, 0.04), vec3(0.20, 0.13, 0.07), fur), field * 0.85);
+  spC = mix(spC, mix(vec3(0.11, 0.07, 0.04), vec3(0.20, 0.13, 0.07), fur) * vFog, field * 0.85);
   spH += (fur - 0.5) * 0.12 * field;
   spC *= 1.0 - spG.b * 0.30;
   float sub = step(1.5, vSurf.w);
@@ -620,11 +621,11 @@ export function terrainMaterial(): THREE.MeshLambertMaterial {
     s.uniforms.uGround = GFX.uGround;
     s.uniforms.uMapInv = GFX.uMapInv;
     s.vertexShader = s.vertexShader
-      .replace('void main() {', 'attribute vec4 aSurf;\nvarying vec4 vSurf;\nvarying float vNy;\nvoid main() {')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\n vSurf = aSurf;\n vNy = normal.y;');
+      .replace('void main() {', 'attribute vec4 aSurf;\nattribute float aFog;\nvarying vec4 vSurf;\nvarying float vNy;\nvarying float vFog;\nvoid main() {')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\n vSurf = aSurf;\n vNy = normal.y;\n vFog = aFog;');
     patchLit(s);
     s.fragmentShader = s.fragmentShader
-      .replace('void main() {', 'uniform float uDetail;\nuniform sampler2D uGround;\nuniform vec2 uMapInv;\nvarying vec4 vSurf;\nvarying float vNy;\n' + BUMP_FN + 'void main() {')
+      .replace('void main() {', 'uniform float uDetail;\nuniform sampler2D uGround;\nuniform vec2 uMapInv;\nvarying vec4 vSurf;\nvarying float vNy;\nvarying float vFog;\n' + BUMP_FN + 'void main() {')
       .replace('#include <color_fragment>', TERRAIN_FRAG)
       .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n if (spHk > 0.0) normal = spBump(normal, -vViewPosition, spH, spHk);');
   };
@@ -684,11 +685,12 @@ void main() {
   float moat = vKind;
   // zwei gegenläufige Wellenlagen (Gradienten aus der Wassertextur)
   vec2 wd = uWindDir;
-  vec4 n1 = texture2D(uNoiseN, vW.xz * 0.050 + wd * (uTime * 0.021));
-  vec4 n2 = texture2D(uNoiseN, vW.xz * 0.115 + vec2(wd.y, -wd.x) * (uTime * 0.029) + 0.37);
-  vec2 g = (n1.rg + n2.rg - 1.0) * (1.0 - 0.45 * moat);
+  // feine Wellen (Zellen von etwa einem Feld): große Wellenzellen ergäben großflächige Sonnenreflexe wie Wolken
+  vec4 n1 = texture2D(uNoiseN, vW.xz * 0.13 + wd * (uTime * 0.035));
+  vec4 n2 = texture2D(uNoiseN, vW.xz * 0.29 + vec2(wd.y, -wd.x) * (uTime * 0.05) + 0.37);
+  vec2 g = (n1.rg + n2.rg - 1.0) * (1.0 - 0.2 * moat);
   if (uWaterLv > 1.5) {
-    vec4 n3 = texture2D(uNoiseN, vW.xz * 0.31 - wd * (uTime * 0.045) + 0.71);
+    vec4 n3 = texture2D(uNoiseN, vW.xz * 0.67 - wd * (uTime * 0.08) + 0.71);
     g += (n3.rg - 0.5) * 0.6;
   }
   vec3 N = normalize(vec3(-g.x * 0.26, 1.0, -g.y * 0.26));
@@ -701,7 +703,7 @@ void main() {
   // Fresnel: flach gesehenes Wasser spiegelt den Himmel (stilisiert)
   float fr = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 4.0);
   fr = 0.03 + 0.97 * fr;
-  col = mix(col, uSkyCol * (0.78 + 0.12 * n2.b), clamp(fr * 0.8, 0.0, 0.42));
+  col = mix(col, uSkyCol * (0.78 + 0.12 * n2.b), clamp(fr * (0.8 + 1.2 * moat), 0.0, 0.42 + 0.16 * moat));
   // Sonnenglanz und Glitzern
   vec3 R = reflect(-V, N);
   float spec = pow(clamp(dot(R, uSunDir), 0.0, 1.0), 220.0);
@@ -713,8 +715,8 @@ void main() {
   }
   // Uferschaum: unregelmäßiger Saum und auslaufende Schaumlinien
   float edge = vFoam + (n1.a - 0.5) * 0.34 + 0.08 * sin(vW.x * 5.0 + uTime * 1.6) * sin(vW.z * 4.3 - uTime * 1.1);
-  float foam = smoothstep(0.80, 1.02, edge);
-  float lines = smoothstep(0.80, 1.0, sin(vFoam * 7.0 - uTime * 0.9 + n2.a * 7.0)) * smoothstep(0.45, 0.95, vFoam) * 0.4;
+  float foam = smoothstep(0.60, 0.92, edge);
+  float lines = smoothstep(0.80, 1.0, sin(vFoam * 9.0 - uTime * 0.9 + n2.a * 7.0)) * smoothstep(0.2, 0.7, vFoam) * 0.4;
   float pulse = 0.80 + 0.20 * sin(uTime * 1.9 + vW.x * 1.7 + vW.z * 1.3);
   float fa = clamp(foam * pulse + lines * (1.0 - foam), 0.0, 1.0);
   col = mix(col, vec3(0.88, 0.92, 0.88) * mix(0.55, 0.8, nl), fa * 0.6 * (1.0 - 0.7 * moat));

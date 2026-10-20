@@ -48,13 +48,12 @@ const CLIFF = col(PAL.rockDark);
 const CLIFF_LIGHT = mix(col(PAL.rock), SAND_DARK, 0.22);
 const CLIFF_WARM = mix(col(0x9a8466), CLIFF, 0.25);
 const FOGC = col(FOG_COLOR);
-const WHITE: RGB = [1, 1, 1];
 // Wasser: flach türkis, tief blau; Graben: trüb olivgrün bis fast schwarz
 const W_SHALLOW = col(0x62b5b2);
 const W_MID = col(0x3f8ebb);
 const W_DEEP = col(0x215f93);
-const MOAT_SHALLOW = col(0x7a8a5c);
-const MOAT_DEEP = col(0x2f3b33);
+const MOAT_SHALLOW = col(0x6f9068);
+const MOAT_DEEP = col(0x34493f);
 
 function isWaterT(t: number): boolean {
   return t === T.Water || t === T.Moat;
@@ -128,6 +127,8 @@ interface ChunkRec {
   waterStarts: Int32Array;
   waterCounts: Int32Array;
   landAttr: THREE.BufferAttribute;
+  /** Nebelhelligkeit je Land-Vertex (Spuren im Boden folgen dem Kriegsnebel) */
+  fogAttr: THREE.BufferAttribute;
   waterAttr: THREE.BufferAttribute | null;
 }
 
@@ -517,6 +518,7 @@ export class TerrainRenderer {
         geo.setAttribute('aKind', new THREE.Float32BufferAttribute(acc.kind, 1));
       } else {
         geo.setAttribute('aSurf', new THREE.Float32BufferAttribute(acc.surf, 4));
+        geo.setAttribute('aFog', new THREE.Float32BufferAttribute(new Float32Array(acc.count).fill(1), 1));
       }
       // Normalen werden für den Schattenversatz (normalBias) und die Klippenerkennung im Shader gebraucht
       geo.computeVertexNormals();
@@ -547,6 +549,7 @@ export class TerrainRenderer {
       waterStarts: wStart,
       waterCounts: wCount,
       landAttr: L.attr,
+      fogAttr: L.mesh.geometry.getAttribute('aFog') as THREE.BufferAttribute,
       waterAttr: W ? W.attr : null,
     };
     this.chunks.set(key, rec);
@@ -572,8 +575,6 @@ export class TerrainRenderer {
     const nbWater = m.inBounds(x + dx, y + dy) && isWaterT(m.terrain[m.idx(x + dx, y + dy)]);
     const wetBank = isWaterT(t) ? false : yBot < -0.5 || nbWater;
     const waterSelf = isWaterT(t);
-    const tc = (c00[0] + c10[0] + c01[0] + c11[0]) / 4;
-    void tc;
     const topTile: RGB = [(c00[0] + c10[0] + c01[0] + c11[0]) / 4, (c00[1] + c10[1] + c01[1] + c11[1]) / 4, (c00[2] + c10[2] + c01[2] + c11[2]) / 4];
     // Schichtfarben (oben nach unten)
     const layer = (k: number, hh: number): RGB => {
@@ -652,8 +653,12 @@ export class TerrainRenderer {
         } else land = true;
       }
       const d = land ? 0 : n ? sum / n : 4;
+      // Kartenrand: Wasser wird undurchsichtig (das ausgeblendete Bett soll nicht durchscheinen)
+      const e = Math.min(px, py, m.w - px, m.h - py);
+      const ef = e < 10 ? (1 - e / 10) * (1 - e / 10) : 0;
       // Gräben sind trüb und tief wirkend (dunkler Ton auch am Rand)
-      return { foam: land ? 1 : 0, depth: moat ? Math.max(0.62, clamp01((d - 0.5) / 4.5)) : clamp01((d - 0.5) / 4.5) };
+      const base = moat ? Math.max(0.62, clamp01((d - 0.5) / 4.5)) : clamp01((d - 0.5) / 4.5);
+      return { foam: land ? 1 : 0, depth: Math.max(base, ef) };
     };
     const fogC = (c: RGB, px: number, py: number): RGB => {
       const e = Math.min(px, py, m.w - px, m.h - py);
@@ -665,7 +670,8 @@ export class TerrainRenderer {
     const corners: [number, number][] = [[x, y], [x, y + 1], [x + 1, y + 1], [x + 1, y]];
     const info = corners.map(([px, py]) => cornerInfo(px, py));
     const dc = info.reduce((s, v) => s + v.depth, 0) / 4;
-    const fc = info.reduce((s, v) => s + v.foam, 0) / 4;
+    // Schaum entlang des Ufers: die Tile-Mitte bekommt nur einen Teil (glatter Saum, schmale Rinnen füllen sich nicht ganz mit Schaum)
+    const fc = (info.reduce((s, v) => s + v.foam, 0) / 4) * 0.45;
     const tintOf = (d: number, px: number, py: number): RGB => {
       const c = waterTint(d, moat);
       return fogC([c[0] * (1 + jitter), c[1] * (1 + jitter), c[2] * (1 + jitter)], px, py);
@@ -683,7 +689,6 @@ export class TerrainRenderer {
       acc.vert(mid[0], yw, mid[2], cmid, [0, 0, 0, 0], fc, dc, kind);
       acc.vert(a[0], yw, a[1], cols[k], [0, 0, 0, 0], info[k].foam, info[k].depth, kind);
     }
-    void WHITE;
   }
 
   /** Kriegsnebel in die Vertexfarben einarbeiten (nur geänderte Tiles). */
@@ -710,6 +715,7 @@ export class TerrainRenderer {
     if (!d || !vis || !exp || !st) return;
     const m = this.map;
     const arr = d.landAttr.array as Float32Array;
+    const fogArr = d.fogAttr.array as Float32Array;
     const warr = d.waterAttr ? (d.waterAttr.array as Float32Array) : null;
     let changed = false;
     let wchanged = false;
@@ -726,6 +732,7 @@ export class TerrainRenderer {
         const start = d.landStarts[local];
         if (start >= 0) {
           for (let v = start * 3; v < (start + d.landCounts[local]) * 3; v++) arr[v] = d.landBase[v] * f;
+          fogArr.fill(f, start, start + d.landCounts[local]);
           changed = true;
         }
         const ws = d.waterStarts[local];
@@ -734,7 +741,10 @@ export class TerrainRenderer {
           wchanged = true;
         }
       }
-    if (changed) d.landAttr.needsUpdate = true;
+    if (changed) {
+      d.landAttr.needsUpdate = true;
+      d.fogAttr.needsUpdate = true;
+    }
     if (wchanged && d.waterAttr) d.waterAttr.needsUpdate = true;
   }
 

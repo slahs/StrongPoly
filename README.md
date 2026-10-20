@@ -35,7 +35,7 @@ pnpm build        # Client (Vite) + Server (esbuild-Bundle)
 pnpm start        # gebauten Server starten (liefert den Client statisch aus)
 ```
 
-Entwicklungs-URL-Parameter: `?bench` (Benchmark-Szene, siehe „Grafik“), `?quality=low|medium|high`, `?blood=0`, `?icons` (Icon-Galerie), `?tooltips` (alle Tooltips im Raster), `?enc=building/quarry` (Enzyklopädie-Seite direkt öffnen), `?lang=en`, `?quick=1` (sofort ein Gefecht), `&dev=1` (Dev-Befehle, z. B. Einheiten spawnen über `session().conn.dev(...)`), `&fog=1`, `&extreme=1`, `&size=`, `&seed=`.
+Entwicklungs-URL-Parameter: `?bench` (Benchmark-Szene, siehe „Grafik“), `?quality=low|medium|high`, `?blood=0`, `?icons` (Icon-Galerie), `?tooltips` (alle Tooltips im Raster), `?enc=building/quarry` (Enzyklopädie-Seite direkt öffnen), `?lang=en`, `?quick=1` (sofort ein Gefecht), `&dev=1` (Dev-Befehle, z. B. Einheiten spawnen über `session().conn.dev(...)`), `&fog=1`, `&extreme=1`, `&size=`, `&seed=`, `?shots=<szene>` (feste Vergleichsszenen für Grafikprüfungen, siehe „Vergleichsszenen“).
 
 ## Architektur
 
@@ -68,7 +68,7 @@ packages/
 
 **Balancing** liegt vollständig in Datentabellen unter `packages/shared/src/data/`: `buildings.ts` (Kosten, HP, Produktionszeiten, Rezepte), `units.ts` (HP, Schaden, Reichweiten, Geschwindigkeiten, Schadenstabelle), `balance.ts` (Beliebtheit, Steuern, Feuer, Markt …), `ai.ts`, `extreme.ts`, `missions.ts`, `resources.ts`, `terrain.ts`.
 
-**Rendering (`client/src/render`)**: Terrain als Chunks aus flach schattierten Terrassen-Quads mit weich verlaufenden Vertexfarben, getrennte animierte Wasserfläche, alle Einheiten-/Gebäudetypen als `InstancedMesh` mit Vertex-Shader-Animation (siehe Abschnitt „Grafik“), instanziertes Partikelsystem, ein Directional Light mit weichen, der Kamera folgenden Schatten und warmem Wüstendunst.
+**Rendering (`client/src/render`)**: Terrain als Chunks aus Terrassen-Quads mit weich verlaufenden Vertexfarben und einer Detailschicht im Shader (Fleckung, Gras, Sand, Fels, Klippenschichten, Pfade, Felder), getrennte Wasserfläche mit eigenem Shader, alle Einheiten-/Gebäudetypen und die gesamte Vegetation als `InstancedMesh` (Animation und Baumschwanken im Vertex-Shader, siehe Abschnitt „Grafik“), instanziertes Partikelsystem, ein Directional Light mit weichen, der Kamera folgenden Schatten, Tonemapping/Grading und kameraabhängiger Dunst.
 
 **Netzwerk (`server/src`)**: serverautoritativ; Clients senden nur Befehle. Frames: `0` Kontrollnachricht, `1` Snapshot, `2` Spieleransicht (Ressourcen, Beliebtheit …, nur an den Besitzer). Jeder Client bekommt ein Token (localStorage); bei Verbindungsabbruch bleibt der Slot erhalten, und beim Wiederverbinden wird der Voll-Zustand erneut gesendet. Hinweis: Der Kriegsnebel ist ein reines Darstellungsmerkmal im Client (der Server sendet allen Spielern den Gesamtzustand).
 
@@ -89,15 +89,17 @@ Railway: Repository verbinden – `railway.json` verweist auf das Dockerfile und
 
 ## Grafik (`client/src/render`)
 
-Alles prozedural: Low-Poly mit flacher Schattierung, kleine Palette (`shared/src/data/palette.ts`), keine Texturen oder externen Modelle. Der Renderer liest nur den `ClientWorld`-Spiegel.
+Alles prozedural: Low-Poly mit flacher Schattierung, kleine Palette (`shared/src/data/palette.ts`), keine Bilddateien und keine externen Modelle (die wenigen kleinen Rauschtexturen für Gelände und Wasser werden beim Start berechnet). Der Renderer liest nur den `ClientWorld`-Spiegel.
 
 | Datei | Aufgabe |
 | --- | --- |
-| `quality.ts` | zentrale Tabelle der Grafikstufen Niedrig/Mittel/Hoch (Schatten und Shadow-Map-Größe, Schattenfilter, Partikelgrenzen, Gras, AO-Stärke, Wasser-Shader, Pixel-Ratio, Dekor-Sichtweite, Blob-Schatten …); angewandt über `GameScene.applyGfx` |
-| `scene.ts` | Renderer, Hemisphären- und Sonnenlicht, Schattenkamera folgt dem Blickpunkt (mit Texel-Snapping gegen Flimmern), Dunst |
-| `terrain.ts` | Chunk-Terrain: Eckenfarben aus den vier angrenzenden Tiles (weiche Übergänge), Dünenmuster, Felsklippen mit facettierten Flächen und Gesteinsbändern, Gewässerbett plus Wasserfläche mit Uferschaum, Kriegsnebel |
-| `decor.ts` | Bäume, Felsen, Steinbrocken-Haufen, Eisenadern, Pechquellen und wiegende Grasbüschel als Instanzen, nur im Sichtbereich |
-| `materials.ts` | gemeinsame Materialien: Vertex-Animation (Beine, Arme, Bogen, Räder, Hebel, Mühlenflügel, Fahnen, Tore), Teamfarbe und Ambient Occlusion aus Vertex-Attributen, Gras-Wind, Wasser-Wellen |
+| `quality.ts` | zentrale Tabelle der Grafikstufen Niedrig/Mittel/Hoch (Schatten und Shadow-Map-Größe, Schattenfilter, Partikelgrenzen, Gras, AO-Stärke, Wasserdetail, Oberflächendetail, Wolkenschatten, Randlicht, Baumschwanken, Baum-LOD, Unterholz, Blumen, Umgebungsleben, Pixel-Ratio, Dekor-Sichtweite, Blob-Schatten …); angewandt über `GameScene.applyGfx` |
+| `scene.ts` | Renderer (Tonemapping Neutral), Lichtstimmung (warme Sonne, leicht kühler Himmel), Schattenkamera folgt dem Blickpunkt (mit Texel-Snapping gegen Flimmern), Dunst folgt dem Kameraabstand, Bodenkarte, Umgebungsleben |
+| `terrain.ts` | Chunk-Terrain: Eckenfarben und Oberflächengewichte (Gras/Sand/Fels/nass) aus den vier angrenzenden Tiles (weiche Übergänge), Biom und großflächige Feuchte, Höhenlage, Felsklippen in drei Gesteinsschichten ohne Nahtstellen, Gewässerbett nach Tiefe plus Wasserfläche (Tiefe, Schaum, Graben-Kennung), Kriegsnebel |
+| `decor.ts` | Vegetation und Felsen als Instanzen, nur im Sichtbereich: sieben Baumarten (Fichte x2, Eiche, Birke, Akazie, Zypresse, Palme) mit Größe/Neigung/Farbe je Instanz, Fernformen (LOD nach Kameraabstand), Büsche, Gras, Blumen, Kiesel, Felsen mit Moos und Schichten, Stein-/Eisen-/Pechvorkommen |
+| `biome.ts`, `noise.ts`, `groundmap.ts` | rein berechnete Grundlagen: Biom je Karte, Baumart/-gestalt, Oberflächengewichte; kachelbare Rauschtexturen (prozedural, keine Bilddateien); Bodenkarte (getretene Erde, Pfade, Felder, Kontaktschatten) aus den Gebäuden |
+| `ambient.ts` | Umgebungsleben im Vertex-Shader: Vogelschwärme (Mittel), Schmetterlinge und treibende Blätter/Staub (Hoch), drei Draw-Calls, keine CPU-Arbeit pro Frame |
+| `materials.ts` | gemeinsame Materialien: Vertex-Animation (Beine, Arme, Bogen, Räder, Hebel, Mühlenflügel, Fahnen, Tore), Teamfarbe und Ambient Occlusion aus Vertex-Attributen, Instanzvariation, Wolkenschatten und Randlicht, Gelände-Shader (Detailschicht, Bump, Pfade/Felder), Laub mit Wind-Schwanken, Gras, Wasser-Shader (Normalen, Fresnel, Schaum, Glitzern), Farbkorrektur |
 | `builder.ts`, `models_units.ts`, `models_buildings.ts`, `models_misc.ts` | prozedurale Modelle; jedes Teil trägt Animationskennung und Drehpunkt (`aPivot`), Bodenverdunklung (`aMeta.y`) ist eingebacken |
 | `entities.ts`, `instanced.ts` | Einheiten, Gebäude, Mauern (Pfosten + Arme je Nachbar), Baustufen (Fundament → Gerüst → fertig, abgeleitet aus `BuildingRec.n`, dem Platzierungs-Tick im Snapshot; rein visuell), Trümmer, Leichen, Projektile, Auswahlkreise, Lebensbalken, Hover-Umriss |
 | `fx.ts`, `work_fx.ts` | Partikel (Rauch, Staub, Feuer, Trümmer, Blut) und Dauereffekte an Gebäuden (Schornsteine, Dampf, Brände) |
@@ -111,11 +113,41 @@ Grafikstufen (Auszug aus `quality.ts`):
 | Schatten | 1024², hart, nur Gebäude; Blob-Schatten unter Einheiten | 2048², weich (PCF soft), alles | 4096², weich, alles |
 | Partikel (max.) | 500 | 1.800 | 4.000 |
 | Gras je Oasen-Tile | aus | 3 | 7 |
-| Wasser | flach | animiert mit Schaum | animiert mit Schaum |
+| Wasser | flach | animierte Normalen, Fresnel-Himmelsreflex, Uferschaum | + zweite Wellenlage, Glitzern |
+| Geländedetail (Shader) | nur Bodenkarte und Grobfleckung | + Farbvariation, Gras-/Sand-/Felsstruktur, Bump | + Gesteinsschichten, Kies |
+| Wolkenschatten / Randlicht | aus | 0,6 / 0,6 | 0,9 / 0,9 |
+| Bäume | Fernformen ab 26 Feldern, kein Schwanken | volle Form bis 46, Schwanken, Unterholz | volle Form bis 72, mehr Unterholz und Blumen |
+| Umgebungsleben | aus | Vogelschwärme (≈20) | + Schmetterlinge, Blätter/Staub (≈220 Instanzen) |
 | Pixel-Ratio-Deckel | 1 | 1,5 | 2 |
 | Dekor-Sichtweite | 48 | 72 | 110 |
 
 Nicht umgesetzt: SSAO. Der Nachbearbeitungspfad (EffectComposer) würde das MSAA des Canvas verlieren, die Normalen-/Tiefenpasses der animierten Instanzen wären nicht deckungsgleich mit der Vertex-Animation, und das Bundle würde größer; stattdessen sorgen eingebackene Bodenverdunklung, Kontaktschatten unter großen Gebäuden und weiche Schatten für die Tiefenwirkung.
+
+### Vergleichsszenen und Screenshot-Werkzeug (`?shots=`)
+
+Zum Prüfen und Vergleichen der Grafik gibt es feste Szenen mit festen Kameras und festem Spielzustand (Karten-Seed, Gebäude, Einheiten): `/?shots=<szene>&quality=medium`. Die Szenen entstehen rein aus Daten (`client/src/showcase_scenes.ts`) und werden über dieselben Modell- und Entity-Pfade gezeichnet wie das Spiel (`EntityRenderer`), es wird nichts dupliziert; spätere Gebäude-/Figurenmodelle erscheinen daher automatisch. Die Zeit läuft synthetisch (feste Schrittweite je Frame) und `Math.random` ist gesetzt, dieselbe URL liefert Frame für Frame dasselbe Bild (Test `render_world.test.ts`).
+
+| Szene | Inhalt |
+| --- | --- |
+| `early` | früher Wirtschaftsaufbau: Bergfried, Lager, Holzfäller, Hütten, wenige Bauern |
+| `town` | dicht bebaute Siedlung (Markt, Kirche, Werkstätten, Felder, Mühle) mit ~100 Figuren |
+| `castle` | große Steinburg: Außen- und Ringmauer, Ecktürme, Torhaus, Graben, Hofgebäude |
+| `siege` | Belagerung mit mehreren hundert Soldaten, Rammböcken, Belagerungstürmen, Katapulten, Pfeilen im Flug |
+| `figures`, `engines` | Detailansicht der Figuren (Ruhe, Gehen, Kampf, Arbeit) bzw. des Belagerungsgeräts |
+| `map` | vollständige Spielkarte (160x160, 4 Spieler) aus großer Höhe |
+| `ground`, `forest`, `water`, `coast`, `deposits` | Nahansichten: Boden mit Pfaden und Feld, dichter Wald, Gewässer, Küste und Klippen, Rohstoffvorkommen |
+
+Weitere Parameter: `&seed=N` (andere Karte), `&frames=N` (Einschwingphase), `&cam=x,y,dist,yawGrad,neigung`, `&shadows=0`, `&hud=1`, `&live=1` (weiterlaufen statt Standbild). Das Skript `scripts/shots.mjs` rendert alle Szenen für eine Stufe in ein Verzeichnis:
+
+```bash
+pnpm build
+node scripts/shots.mjs --out=docs/phase4/after/world --quality=medium            # alle Szenen
+node scripts/shots.mjs --out=/tmp/shots --scenes=castle,siege --format=jpg --info # Auswahl, JPEG, Kennzahlen (info.json)
+node scripts/shots.mjs --out=/tmp/shots --quality=high --check                    # Konsole prüfen (Shader-Warnungen/-Fehler => Exit-Code 2)
+node scripts/shots.mjs --dist=<anderer Build> --out=docs/phase4/before/world      # Vorher-Stand aus einem älteren Build
+```
+
+Voraussetzungen wie bei `bench-fps.mjs` (`playwright-core`, Chromium, gebauter Client; ohne `--hw` Software-GL). Die Bilder des Umbaus (Vorher/Nachher, gleiche Kameras) liegen unter `docs/phase4/before/world/` und `docs/phase4/after/world/`.
 
 ### Benchmark-Szene `?bench`
 

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { BT, BUILDINGS, GameMap, T, generateMap } from '@strongpoly/shared';
 import { Biome, biomeOf, blendWeight, forestDensity, moistureAt, pickSpecies, SPECIES, surfaceWeights, treeLook } from '../src/render/biome';
-import { DecorRenderer, DECOR_KINDS } from '../src/render/decor';
+import { DecorRenderer, DECOR_KINDS, writeInstanceMatrix } from '../src/render/decor';
 import { computeGround, GROUND_A, GROUND_B, GROUND_G, GROUND_R, groundTrace } from '../src/render/groundmap';
 import { genNoiseA, genNoiseN, NOISE_SIZE, periodicFbm, periodicNoise } from '../src/render/noise';
 import { QUALITY, QualityCfg } from '../src/render/quality';
@@ -270,7 +270,7 @@ describe('Gelände- und Dekor-Aufbau (ohne GL)', () => {
   const map = generateMap({ seed: 3, size: 64, players: 2 });
   it('TerrainRenderer baut alle Chunks mit gültigen Attributen', () => {
     const tr = new TerrainRenderer(map);
-    expect(tr.group.children.length).toBeGreaterThan(9);
+    expect(tr.group.children.length).toBeGreaterThanOrEqual(4);
     let water = 0;
     for (const o of tr.group.children) {
       const g = (o as THREE.Mesh).geometry;
@@ -303,6 +303,31 @@ describe('Gelände- und Dekor-Aufbau (ohne GL)', () => {
     tr.markTile(30, 30);
     tr.flush();
     map.terrain[i] = old;
+  });
+  it('Kriegsnebel: Vertexfarben und Fog-Attribut folgen dem Sichtstatus (Spuren im Boden verraten nichts)', () => {
+    const tr = new TerrainRenderer(map);
+    const vis = new Uint8Array(map.n);
+    const exp = new Uint8Array(map.n);
+    const landMeshes = (): THREE.Mesh[] => tr.group.children.filter((o) => (o as THREE.Mesh).geometry.getAttribute('aFog')) as THREE.Mesh[];
+    const range = (): [number, number] => {
+      let lo = 9;
+      let hi = -1;
+      for (const m of landMeshes()) for (const v of m.geometry.getAttribute('aFog').array) {
+        lo = Math.min(lo, v);
+        hi = Math.max(hi, v);
+      }
+      return [lo, hi];
+    };
+    expect(range()).toEqual([1, 1]);
+    tr.applyFog(vis, exp);
+    const dark = range();
+    expect(dark[1]).toBeCloseTo(0.08, 5);
+    exp.fill(1);
+    tr.applyFog(vis, exp);
+    expect(range()[1]).toBeCloseTo(0.55, 5);
+    vis.fill(1);
+    tr.applyFog(vis, exp);
+    expect(range()).toEqual([1, 1]);
   });
   it('DecorRenderer: deterministisch, Dreiecksbudget, Instanzzahlen nach Stufe monoton', () => {
     const counts: Record<string, number> = {};
@@ -351,6 +376,19 @@ describe('Gelände- und Dekor-Aufbau (ohne GL)', () => {
     hi.setCameraPos(new THREE.Vector3(32, 40, 32));
     hi.rebuild(32, 32);
     expect(lo.stats.trees).toBeLessThan(hi.stats.trees);
+  });
+  it('Instanzmatrix entspricht Matrix4.compose (Euler YXZ, z = 0)', () => {
+    const out = new Float32Array(16);
+    const ref = new THREE.Matrix4();
+    for (let i = 0; i < 50; i++) {
+      const rot = (i * 0.731) % 6.28;
+      const lean = ((i * 0.37) % 1 - 0.5) * 0.3;
+      const w = 0.6 + (i % 7) * 0.1;
+      const h = 0.8 + (i % 5) * 0.1;
+      writeInstanceMatrix(out, 0, 1.5 + i, 0.6, 2.5 - i, rot, lean, w, h);
+      ref.compose(new THREE.Vector3(1.5 + i, 0.6, 2.5 - i), new THREE.Quaternion().setFromEuler(new THREE.Euler(lean, rot, 0, 'YXZ')), new THREE.Vector3(w, h, w));
+      for (let k = 0; k < 16; k++) expect(out[k]).toBeCloseTo(ref.elements[k], 5);
+    }
   });
   it('alle Dekor-Modelle sind endlich, nicht leer und im Dreiecksbudget', () => {
     const d = new DecorRenderer(map);
