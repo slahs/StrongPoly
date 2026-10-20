@@ -31,6 +31,8 @@ const ARMY_MIN = U.Archer;
 /** Eine KI: baut Burg aus Template, betreibt Wirtschaft, rekrutiert und greift in Wellen an. */
 /** Ab diesem Tick (40 Min) greift jede KI mit voller Aggression an, damit Partien nicht im Patt enden */
 const LATE_GAME = 40 * 600;
+/** Obergrenze Belagerungsgerät pro Welle */
+const MAX_SIEGE_PER_WAVE = 6;
 
 export class AiController {
   readonly kx: number;
@@ -720,7 +722,7 @@ export class AiController {
     if (pr.army.assassins) special.push([U.Assassin, pr.army.assassins]);
     if (pr.army.firethrowers) special.push([U.Firethrower, pr.army.firethrowers]);
     const doc = this.doctrine();
-    const siegeWanted = Math.round((doc.siegePer10 * waveTarget) / 10);
+    const siegeWanted = this.siegeWanted(doc.siegePer10, waveTarget);
     const siegeCount = Object.entries(counts).filter(([t]) => Number(t) >= U.Catapult).reduce((a, [, n]) => a + n, 0);
     const nearWave = sim.tick >= this.wave.nextAt - 2400;
     if (nearWave) {
@@ -846,6 +848,14 @@ export class AiController {
     return this.profile.army.wave + this.profile.army.waveGrow * Math.min(this.wave.index, 5);
   }
 
+  /**
+   * Belagerungsgerät je Welle, gedeckelt: ohne Deckel verlangte die Eskalation bis zu ~20 Geräte
+   * (4 je 10 Soldaten), das gesparte Gold fehlte der Infanterie und die Welle startete nie.
+   */
+  private siegeWanted(per10: number, waveTarget: number): number {
+    return Math.min(MAX_SIEGE_PER_WAVE, Math.round((per10 * waveTarget) / 10));
+  }
+
   /** Streitkräfte (ohne Lord/Arbeiter) aller Gegner */
   private enemyArmy(sim: Sim): number {
     const u = sim.units;
@@ -875,7 +885,7 @@ export class AiController {
       if (strength < waveTarget * frac && !superior) return;
       // Belagerungsgerät abwarten (max. 3 Minuten Verzögerung)
       const doc = this.doctrine(sim.tick);
-      const siegeWant = Math.round((doc.siegePer10 * waveTarget) / 10);
+      const siegeWant = this.siegeWanted(doc.siegePer10, waveTarget);
       const siegeHave = free.filter((s) => u.type[s] >= U.Catapult).length;
       if (siegeWant > 0 && siegeHave < Math.ceil(siegeWant * 0.6) && sim.tick < w.nextAt + 1800 && doc.siege.length) return;
       const enemy = this.pickEnemy(sim);
