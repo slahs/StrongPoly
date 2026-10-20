@@ -1,0 +1,44 @@
+{
+ "report": {
+  "frames": 1200,
+  "moveFrames": 3280,
+  "ratioP50": 0.9252299666404724,
+  "ratioP95": 1.291893482208252,
+  "ratioP99": 1.4037530422210693,
+  "ratioMax": 1.6699440479278564,
+  "jumpPct": 0,
+  "haltPct": 0.39634146341463417,
+  "backPct": 0.03048780487804878,
+  "reversalsPerMin": 0.8212001018288114,
+  "turnP95": 354.5553283691406,
+  "turnMax": 401.0705871582031,
+  "degPerTile": 19.52471335824286,
+  "idleDriftMean": 7.307089066504078e-8,
+  "idleDriftP95": 0,
+  "marchInPlacePct": 0.12195121951219512,
+  "slidePct": 0.1524390243902439,
+  "strideCV": 0.1658922336838804
+ },
+ "fps": 37.21380259938346,
+ "frameMs": {
+  "p50": 16.69999999999891,
+  "p95": 83.29999999999927,
+  "max": 566.6000000000004
+ },
+ "tick": 376,
+ "units": 62,
+ "speed": 1,
+ "clock": {
+  "delay": 2.6389480000000063,
+  "jitter": 1.3379435171393605,
+  "resyncs": 3
+ },
+ "cuts": 0,
+ "runnerDone": false,
+ "outliers": [],
+ "scene": "stairs",
+ "mode": "new",
+ "viewport": "640x360",
+ "noDraw": true,
+ "errors": []
+}

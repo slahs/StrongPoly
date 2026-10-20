@@ -1,0 +1,75 @@
+{
+ "mode": "legacy",
+ "before": {
+  "tick": 63,
+  "moving": 6
+ },
+ "pause": {
+  "paused": true,
+  "tickAdvance": 0,
+  "maxMove": 0,
+  "maxGaitDelta": 0,
+  "movingDuringPause": 6
+ },
+ "resume": {
+  "paused": false,
+  "tickAdvance": 25,
+  "maxMove": 4.0343780517578125,
+  "maxGaitDelta": 0
+ },
+ "speed3": {
+  "speed": 3,
+  "report": {
+   "frames": 495,
+   "moveFrames": 204,
+   "ratioP50": 1.0399214029312134,
+   "ratioP95": 2.3205630779266357,
+   "ratioP99": 4.064859390258789,
+   "ratioMax": 11.8119535446167,
+   "jumpPct": 9.313725490196079,
+   "haltPct": 15.196078431372548,
+   "backPct": 0.9803921568627451,
+   "reversalsPerMin": 27.907625758738558,
+   "turnP95": 291.09039306640625,
+   "turnMax": 1262.3367919921875,
+   "degPerTile": 13.59140028935924,
+   "idleDriftMean": 0.47916944688777857,
+   "idleDriftP95": 2.078598976135254,
+   "marchInPlacePct": 11.764705882352942,
+   "slidePct": 0.49019607843137253,
+   "strideCV": 0
+  },
+  "clock": {
+   "delay": 2.7533500000000024,
+   "resyncs": 0
+  }
+ },
+ "speedHalf": {
+  "speed": 0.5,
+  "report": {
+   "frames": 586,
+   "moveFrames": 1725,
+   "ratioP50": 1.0398142337799072,
+   "ratioP95": 1.3255083560943604,
+   "ratioP99": 4.100612163543701,
+   "ratioMax": 13.923377990722656,
+   "jumpPct": 2.4347826086956523,
+   "haltPct": 3.4782608695652173,
+   "backPct": 0.9855072463768116,
+   "reversalsPerMin": 52.2261391826609,
+   "turnP95": 127.24395751953125,
+   "turnMax": 809.9999389648438,
+   "degPerTile": 24.79271665321211,
+   "idleDriftMean": 0.22756673503546576,
+   "idleDriftP95": 0.583282470703125,
+   "marchInPlacePct": 3.130434782608696,
+   "slidePct": 0,
+   "strideCV": 0
+  },
+  "clock": {
+   "delay": 3.0183299999999997,
+   "resyncs": 0
+  }
+ },
+ "errors": []
+}

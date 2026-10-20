@@ -1,0 +1,44 @@
+{
+ "report": {
+  "frames": 16,
+  "moveFrames": 3218,
+  "ratioP50": 0.8630041480064392,
+  "ratioP95": 1.2554113864898682,
+  "ratioP99": 1.4051496982574463,
+  "ratioMax": 1.7853504419326782,
+  "jumpPct": 0,
+  "haltPct": 0.6525792417650714,
+  "backPct": 0.18645121193287756,
+  "reversalsPerMin": 0.09729737092773968,
+  "turnP95": 102.34181213378906,
+  "turnMax": 381.6145324707031,
+  "degPerTile": 19.162481054666173,
+  "idleDriftMean": 7.660302433735993e-7,
+  "idleDriftP95": 0,
+  "marchInPlacePct": 0,
+  "slidePct": 0,
+  "strideCV": 0.0353614992030336
+ },
+ "fps": 2.5557472365985285,
+ "frameMs": {
+  "p50": 333.39999999999964,
+  "p95": 833.3000000000011,
+  "max": 833.3000000000011
+ },
+ "tick": 130,
+ "units": 307,
+ "speed": 1,
+ "clock": {
+  "delay": 2.9905979999999994,
+  "jitter": 1.9094411185006357,
+  "resyncs": 7
+ },
+ "cuts": 71,
+ "runnerDone": false,
+ "outliers": [],
+ "scene": "crowd",
+ "mode": "new",
+ "viewport": "640x360",
+ "noDraw": false,
+ "errors": []
+}
