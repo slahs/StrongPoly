@@ -208,8 +208,19 @@ export class EnvMap {
     this.dirTexture.needsUpdate = true;
   }
 
+  /** Signatur der letzten Eingaben: unveränderte Wege/Bäume/Wasser → keine Neuberechnung (Bauen/Baufortschritt markiert oft) */
+  private sig = '';
+
   update(roads: RoadSeg[], trees: ArrayLike<number> | null, wet?: (i: number) => boolean): void {
-    const d = computeEnvMap(this.w, this.h, this.res, [...roads, ...this.extraRoads], trees, wet, this.dirData);
+    const all = [...roads, ...this.extraRoads];
+    let hs = 0;
+    if (trees) for (let i = 0; i < trees.length; i++) if (trees[i]) hs = (Math.imul(hs, 31) + i * 7 + trees[i]) | 0;
+    let hw = 0;
+    if (wet) for (let i = 0, n = this.w * this.h; i < n; i++) if (wet(i)) hw = (Math.imul(hw, 17) + i) | 0;
+    const sig = `${hs}|${hw}|${all.map((r) => `${r.x0},${r.y0},${r.x1},${r.y1},${r.hw},${r.ruts}`).join(';')}`;
+    if (sig === this.sig) return;
+    this.sig = sig;
+    const d = computeEnvMap(this.w, this.h, this.res, all, trees, wet, this.dirData);
     this.data.set(d);
     this.texture.needsUpdate = true;
     this.dirTexture.needsUpdate = true;

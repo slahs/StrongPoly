@@ -5,7 +5,7 @@
  *
  *   node scripts/bench-fps.mjs [--units=2000] [--secs=15] [--warm=4] [--quality=low,medium,high]
  *                              [--viewport=1280x720] [--dist=36] [--pr=1] [--hw] [--no-js] [--json] [--out=datei.md]
- *                              [--url=http://host:port]
+ *                              [--url=http://host:port] [--style=medieval]
  *
  * Voraussetzungen:
  *  - `playwright-core` (normal installiert, per NODE_PATH oder PLAYWRIGHT_CORE=<Verzeichnis>)
@@ -48,6 +48,7 @@ const qualities = String(args.quality ?? 'low,medium,high').split(',');
 const [vw, vh] = String(args.viewport ?? '1280x720').split('x').map(Number);
 const dist = Number(args.dist ?? 36);
 const pr = Number(args.pr ?? 1);
+const style = args.style ? `&style=${encodeURIComponent(String(args.style))}` : ''; // --style=medieval (Phase 5A), ohne = Standardstil
 const hw = !!args.hw;
 const withJs = !args['no-js'];
 
@@ -156,7 +157,7 @@ async function main() {
   for (const quality of qualities) {
     const page = await browser.newPage({ viewport: { width: vw, height: vh } });
     page.on('pageerror', (e) => console.error('[Seitenfehler]', e.message));
-    const q = `bench&quality=${quality}&units=${units}&secs=${secs}&warm=${warm}&dist=${dist}&pr=${pr}`;
+    const q = `bench&quality=${quality}&units=${units}&secs=${secs}&warm=${warm}&dist=${dist}&pr=${pr}${style}`;
     console.error(`Messe ${quality} (${units} Einheiten, ${warm}+${secs} s) …`);
     await page.goto(`${base}/?${q}`);
     await page.waitForFunction(() => window.__bench && window.__bench.done, null, { timeout: (warm + secs) * 1000 * 8 + 120000, polling: 500 });

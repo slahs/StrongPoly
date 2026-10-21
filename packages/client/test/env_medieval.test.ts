@@ -5,7 +5,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { describe, expect, it } from 'vitest';
 import { T, generateMap } from '@strongpoly/shared';
 import { MEDIEVAL_LOOK, buildSky, fogDensityFor, hemiOf, skyRadiance, sunColorOf, sunDirOf, toneMapJs } from '../src/render/env/atmosphere';
-import { CROSS_MAX, computeEnvMap, envRes, polylineSegs, roadAt } from '../src/render/env/envmap';
+import { CROSS_MAX, EnvMap, computeEnvMap, envRes, polylineSegs, roadAt } from '../src/render/env/envmap';
 import { VEG_LOD, catalogOf, catalogReady, placeVegetation, speciesOf, vegLod, vegQualityOf } from '../src/render/env/veg_place';
 import type { VegCatalog, VegPlaceInput } from '../src/render/env/veg_place';
 import { snapTrails } from '../src/render/env/veg_layer';
@@ -125,6 +125,23 @@ describe('Umgebungskarte (Wege, Kronendach)', () => {
     expect(envRes(96)).toBe(4);
     expect(envRes(400)).toBeLessThanOrEqual(3);
     expect(envRes(400) * 400).toBeLessThanOrEqual(1400);
+  });
+  it('EnvMap.update: unveränderte Eingaben → keine Neuberechnung, geänderte Bäume/Wege → neu', () => {
+    const w = 16;
+    const h = 16;
+    const env = new EnvMap(w, h);
+    const trees = new Uint8Array(w * h);
+    const roads = polylineSegs([[0, 8], [16, 8]], 1, 0);
+    env.update(roads, trees);
+    const v0 = env.texture.version;
+    env.update(polylineSegs([[0, 8], [16, 8]], 1, 0), trees);
+    expect(env.texture.version).toBe(v0);
+    trees[3] = 9;
+    env.update(roads, trees);
+    expect(env.texture.version).toBeGreaterThan(v0);
+    const v1 = env.texture.version;
+    env.update(polylineSegs([[0, 4], [16, 4]], 1, 0), trees);
+    expect(env.texture.version).toBeGreaterThan(v1);
   });
   it('Trampelpfade enden am nächsten Weg statt quer zum Lager', () => {
     const trails: [number, number, number, number][] = [[10, 10, 30, 30]];

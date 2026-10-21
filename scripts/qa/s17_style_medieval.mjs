@@ -73,6 +73,10 @@ ok('Platzierungsgeist zeigt das GLB-Modell', ghost.visible && ghost.count >= 1 &
 await q.shot('1_geist');
 
 // 2) Bauen (Befehlsweg), Bauanimation: Beobachter im Seitenkontext nach jedem Bild (die Bauzeit des Brunnens ist kurz)
+// Software-GL: Gelände + Vegetation des Stils medieval kosten in Nahsicht ≈ 2,5 s je Bild (SwiftShader) – länger als der
+// ganze Bau des Brunnens. Für die Beobachtung daher kleineres Fenster (¼ der Pixel), danach wieder 1280×720.
+await page.setViewportSize({ width: 640, height: 360 });
+await sleep(1500);
 await q.speed(0.25);
 await S(([t, x, y]) => {
   const s = window.session();
@@ -98,6 +102,7 @@ await S(([t, x, y]) => {
 }, [WELL, spot.x, spot.y]);
 await page.keyboard.press('Escape');
 await page.waitForFunction(() => window.__bau.length && window.__bau[window.__bau.length - 1].fin > 0 && window.__bau[window.__bau.length - 1].prog >= 1, null, { timeout: 60000 });
+await page.setViewportSize({ width: 1280, height: 720 });
 const samples = await S(() => window.__bau);
 const bid = await S(([x, y]) => [...window.session().world.buildings.values()].find((b) => b.x === x && b.y === y).i, [spot.x, spot.y]);
 q.note('bau', samples);
