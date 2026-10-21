@@ -1,0 +1,151 @@
+{
+  "id": "keep",
+  "desc": "Bergfried/Wohnturm: Bruchstein mit Eckquadern, Hocheingang mit Holztreppe, Konsolfries, Zinnen, Scharwachttuerme, Turmaufsatz mit Zeltdach, Banner in Spielerfarbe",
+  "file": "models/keep.glb",
+  "target": {
+    "building": "Keep"
+  },
+  "class": "keep",
+  "footprint": [
+    5,
+    5
+  ],
+  "height": 9.41,
+  "bbox": {
+    "min": [
+      -2.461,
+      -0.028,
+      -2.424
+    ],
+    "max": [
+      2.46,
+      9.41,
+      2.519
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 24356,
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Iron_Wrought",
+        "M_Roof_Shingle",
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 6766,
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Iron_Wrought",
+        "M_Roof_Shingle",
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 998,
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Roof_Shingle",
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble",
+        "M_Timber_Oak"
+      ]
+    }
+  ],
+  "tris": [
+    24356,
+    6766,
+    998
+  ],
+  "budget": [
+    25000,
+    8750,
+    2500
+  ],
+  "materials": [
+    "M_Cloth_Linen",
+    "M_Iron_Wrought",
+    "M_Roof_Shingle",
+    "M_Stone_Ashlar",
+    "M_Stone_Rubble",
+    "M_Timber_Oak",
+    "M_Wood_Planks"
+  ],
+  "anchors": [
+    {
+      "name": "ANCHOR_flag_0",
+      "kind": "flag",
+      "pos": [
+        0.0,
+        9.41,
+        -0.0
+      ],
+      "extras": {
+        "kind": "flag",
+        "note": "Mastspitze"
+      }
+    },
+    {
+      "name": "ANCHOR_banner_0",
+      "kind": "banner",
+      "pos": [
+        1.32,
+        2.99,
+        2.1
+      ],
+      "extras": {
+        "kind": "banner",
+        "note": "Fassadenbanner"
+      }
+    },
+    {
+      "name": "ANCHOR_door_0",
+      "kind": "door",
+      "pos": [
+        -0.42,
+        0.0,
+        2.57
+      ],
+      "extras": {
+        "kind": "door",
+        "note": "Fuss der Aussentreppe vor dem Hocheingang"
+      }
+    },
+    {
+      "name": "ANCHOR_smoke_0",
+      "kind": "smoke",
+      "pos": [
+        -0.5,
+        8.17,
+        -0.48
+      ],
+      "extras": {
+        "kind": "smoke",
+        "rate": 0.7,
+        "staffed": false,
+        "note": "Rauch aus dem Kamin des Wohngeschosses"
+      }
+    }
+  ],
+  "attributes": [
+    "COLOR_0",
+    "_BUILD",
+    "_BUILDH",
+    "_PART",
+    "_PIVOT"
+  ],
+  "bytes": 4064468,
+  "source": "assets/blender/models/keep.py",
+  "blend": "assets/src/keep.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

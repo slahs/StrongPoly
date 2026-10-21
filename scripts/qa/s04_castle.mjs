@@ -11,12 +11,45 @@ const fast = !!args.fast;
 const legacy = !!args.legacy;
 
 const BT = { Hovel: 2, Stockpile: 3, WallHigh: 39, TowerGuard: 41, TowerRound: 42, GateStone: 44, Stairs: 46, Barracks: 53, TurretBallista: 51 };
-const q = await startQA(`s04_castle${fast ? '_fast' : ''}${legacy ? '_legacy' : ''}`, {
-  query: `quick=1&dev=1&size=128&seed=${args.seed ?? 6}${fast ? "&motiondebug" : ""}${legacy ? '&motionlegacy=1' : ''}`,
+// --style=medieval: gleicher Ablauf mit den GLB-Assets (Phase 5A: Bergfried, Hohe Steinmauer, Steintor)
+const style = args.style && args.style !== true ? String(args.style) : null;
+const q = await startQA(`s04_castle${fast ? '_fast' : ''}${legacy ? '_legacy' : ''}${style ? `_${style}` : ''}`, {
+  query: `quick=1&dev=1&size=128&seed=${args.seed ?? 6}${fast ? "&motiondebug" : ""}${legacy ? '&motionlegacy=1' : ''}${style ? `&style=${style}` : ''}`,
   viewport: fast ? { width: 640, height: 360 } : { width: 1280, height: 720 },
   settings: fast ? { quality: 'low', shadows: false } : { quality: 'medium', shadows: true },
 });
 const { page, S, ok } = q;
+if (style === 'medieval') {
+  await page.waitForFunction(() => window.__assets && window.__assets.manifestState === 'ready', null, { timeout: 60000 });
+  const pre = await S(() => window.__assets.preload());
+  ok('Assets geladen (medieval)', pre.ok >= 1 && pre.failed === 0, JSON.stringify(pre));
+  const ov = await S(() => ({
+    keep: window.__assets.forBuilding(0)?.id,
+    gate: window.__assets.forBuilding(44)?.id,
+    arm: window.__assets.forWall(39, 'arm')?.id,
+    post: window.__assets.forWall(39, 'post')?.id,
+    stub: window.__assets.forWall(39, 'stub')?.id,
+  }));
+  ok('Overrides Bergfried/Steintor/Mauerstücke aktiv', ov.keep === 'keep' && ov.gate === 'gate_stone' && ov.arm === 'wall_high_arm' && ov.post === 'wall_high_post' && ov.stub === 'wall_high_stub', JSON.stringify(ov));
+  // Bergfried im Bild (eigener Spieler)
+  await S(() => {
+    const s = window.session();
+    const k = s.world.players[0];
+    s.gs.cam.lookAt(k.keepX + 0.5, k.keepY + 0.5);
+    s.gs.cam.dist = 18;
+    s.gs.cam.distTarget = 18;
+  });
+  await sleep(2500);
+  const kc = await S(() => {
+    let n = 0;
+    window.session().entities.group.traverse((o) => {
+      if (o.name.startsWith('asset:keep:') && o.count) n += o.count;
+    });
+    return n;
+  });
+  ok('Bergfried als GLB-Instanz gezeichnet', kc >= 1, kc);
+  await q.shot('0_bergfried');
+}
 await q.dev('gold', { owner: 0, n: 9000 });
 for (const r of [0, 1, 2, 3, 4, 5]) await q.dev('res', { owner: 0, res: r, n: 3000 });
 await q.waitTick(30);
