@@ -34,7 +34,7 @@ def _frame_axes(p0, p1, up):
 
 
 def timber(name, p0, p1, w, h=None, ch=0.012, up=(0, 0, 1), segs=1, bend=0.0, wob=0.0, rnd=None, tile=2.0, taper=0.0,
-           caps=True):
+           caps=True, outer_only=False):
     """Gefastes Holz von p0 nach p1, Querschnitt w (quer, lokale Y) x h (lokale Z), Fase ch auf den vier Laengskanten
     (Achteck-Querschnitt). segs > 1: Zwischenringe fuer Durchhang `bend` (Mitte sinkt entlang -Z) und Verzug `wob`
     (zufaellig quer). UVs: U entlang der Maserung (Laenge / tile), V um den Umfang; Stirnflaechen planar (Hirnholz)."""
@@ -42,9 +42,13 @@ def timber(name, p0, p1, w, h=None, ch=0.012, up=(0, 0, 1), segs=1, bend=0.0, wo
     h = h if h is not None else w
     a, L, x, y, z = _frame_axes(p0, p1, up)
     c = min(ch, w * 0.3, h * 0.3)
-    prof = [(w / 2, -h / 2 + c), (w / 2, h / 2 - c), (w / 2 - c, h / 2), (-w / 2 + c, h / 2),
-            (-w / 2, h / 2 - c), (-w / 2, -h / 2 + c), (-w / 2 + c, -h / 2), (w / 2 - c, -h / 2)] if c > 1e-4 else \
-        [(w / 2, -h / 2), (w / 2, h / 2), (-w / 2, h / 2), (-w / 2, -h / 2)]
+    if c <= 1e-4:
+        prof = [(w / 2, -h / 2), (w / 2, h / 2), (-w / 2, h / 2), (-w / 2, -h / 2)]
+    elif outer_only:  # nur die beiden Kanten der Aussenseite (+Y) gefast: Wandhoelzer, Innenseite verdeckt
+        prof = [(w / 2, -h / 2 + c), (w / 2, h / 2 - c), (w / 2 - c, h / 2), (-w / 2, h / 2), (-w / 2, -h / 2), (w / 2 - c, -h / 2)]
+    else:
+        prof = [(w / 2, -h / 2 + c), (w / 2, h / 2 - c), (w / 2 - c, h / 2), (-w / 2 + c, h / 2),
+                (-w / 2, h / 2 - c), (-w / 2, -h / 2 + c), (-w / 2 + c, -h / 2), (w / 2 - c, -h / 2)]
     n = len(prof)
     bm = bmesh.new()
     uvl = bm.loops.layers.uv.new(UV)
@@ -169,7 +173,7 @@ def frame(wall, members, rnd, depth=0.09, prefix='fw'):
             segs = 2
             bend = rnd.uniform(0.004, 0.012) if role == 'plate' else 0.0
         o = timber(f'{prefix}_{i}', p0, p1, d, w, ch=0.011 if role != 'rail' else 0.008, up=upv, segs=segs, bend=0.0,
-                   wob=0.004 if L > 0.6 else 0.0, rnd=rnd)
+                   wob=0.004 if L > 0.6 else 0.0, rnd=rnd, outer_only=True)
         if bend:
             mesh.sag(o, bend, 'X' if abs(wall.dir.x) > 0.5 else 'Y')
         out.append(o)
@@ -507,7 +511,7 @@ def uv_roof(obj, R, tile=3.0, seed=0):
 
 
 def course_rows(name, R, side, rows, row_thick=0.03, lap=1.45, xmargin=0.0, depth0=0.02, seed=0, tooth=0.0, nseg=1,
-                jitter=0.012, x_split=None):
+                jitter=0.012, x_split=None, lean=False, split=False):
     """Schindel-/Ziegel-Lagen einer Dachseite (side -1 vorn, +1 hinten): ueberlappende Bretter von der Traufe zum First,
     jede Lage leicht verdreht/versetzt, Unterkante mit Zahnung (tooth > 0: Laengsunterteilung nseg mit Hoehenversatz).
     x_split: Liste von x-Grenzen, um die Lagen in Abschnitte zu teilen (unregelmaessige Stoesse)."""
@@ -525,34 +529,55 @@ def course_rows(name, R, side, rows, row_thick=0.03, lap=1.45, xmargin=0.0, dept
         for ci in range(len(x_cuts) - 1):
             xa = x_cuts[ci] + rnd.uniform(-0.01, 0.01) + xmargin
             xb = x_cuts[ci + 1] + rnd.uniform(-0.01, 0.01) - xmargin
-            dz = depth0 + row_thick * 0.6 + rnd.uniform(-jitter, jitter) * 0.4
-            za = R.z_main(0, y0) + dz
-            zb = R.z_main(0, y1) + dz + row_thick * 0.3
+            # Fuss der Lage liegt auf der darunterliegenden Lage (um row_thick angehoben), Kopf auf der Lattung:
+            # so liegt jede Lage sicher ueber der vorigen und zeigt eine Stirnkante
+            za = R.z_main(0, y0) + depth0 + row_thick + rnd.uniform(0.0, jitter) * 0.5
+            zb = R.z_main(0, y1) + depth0
             bm = bmesh.new()
             nsg = max(1, nseg)
-            verts_top, verts_bot = [], []
+            verts_top, verts_bot, mids = [], [], []
+            faces_dir = []
             for i in range(nsg + 1):
                 x = xa + (xb - xa) * i / nsg
                 sag = R.z_main(x, y0) - R.z_main(0, y0)
                 tz = (rnd.uniform(-1, 1) * tooth) if 0 < i < nsg else 0.0
-                tw = rnd.uniform(-jitter, jitter)
+                tw = rnd.uniform(0.0, jitter)
                 # vier Punkte je Station: Unterkante oben/unten, Oberkante oben/unten
                 pa = Vector((x, y0 + side * tz * 0.5, za + sag + tw))
-                pb = Vector((x, y1, zb + sag + tw * 0.3))
+                pb = Vector((x, y1, zb + sag))
                 verts_top.append((bm.verts.new(pa), bm.verts.new(pb)))
                 verts_bot.append((bm.verts.new(pa - Vector((0, 0, row_thick))), bm.verts.new(pb - Vector((0, 0, row_thick * 0.6)))))
+                if split:  # Zwischenkante an der Grenze des sichtbaren Teils (gleichmaessige AO auf dem sichtbaren Teil)
+                    mids.append(bm.verts.new(pa + (pb - pa) * min(0.95, 1.08 / lap)))
             for i in range(nsg):
                 a0, b0 = verts_top[i]
                 a1, b1 = verts_top[i + 1]
                 c0, d0 = verts_bot[i]
                 c1, d1 = verts_bot[i + 1]
-                bm.faces.new((a0, a1, b1, b0))       # Oberseite
-                bm.faces.new((c0, a0, b0, d0)) if i == 0 else None
-                bm.faces.new((a1, c1, d1, b1)) if i == nsg - 1 else None
-                bm.faces.new((c1, c0, d0, d1))       # Unterseite
-                bm.faces.new((a0, c0, c1, a1))       # Stirn (Unterkante sichtbar)
-                bm.faces.new((b0, b1, d1, d0))       # obere Kante (verdeckt)
-            bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+                up = Vector((0, 0, 1))
+                down_slope = Vector((0, side, 0))
+                xdir = Vector((1, 0, 0))
+                want = []
+                if split:
+                    m0, m1 = mids[i], mids[i + 1]
+                    want.append((bm.faces.new((a0, a1, m1, m0)), up))
+                    want.append((bm.faces.new((m0, m1, b1, b0)), up))
+                else:
+                    want.append((bm.faces.new((a0, a1, b1, b0)), up))   # Oberseite
+                if i == 0:
+                    want.append((bm.faces.new((c0, a0, b0, d0)), -xdir))
+                if i == nsg - 1:
+                    want.append((bm.faces.new((a1, c1, d1, b1)), xdir))
+                if not lean or r == 0:
+                    want.append((bm.faces.new((c1, c0, d0, d1)), -up))  # Unterseite (lean: nur unterste Lage)
+                want.append((bm.faces.new((a0, c0, c1, a1)), down_slope))  # Stirn (Unterkante sichtbar)
+                if not lean or r == rows - 1:
+                    want.append((bm.faces.new((b0, b1, d1, d0)), -down_slope))  # obere Kante (lean: nur oberste Lage)
+                faces_dir.extend(want)
+            bm.normal_update()
+            for f, wdir in faces_dir:  # Normalen nach der gewollten Richtung (offene Lagen: recalc ist unzuverlaessig)
+                if f.normal.dot(wdir) < 0:
+                    f.normal_flip()
             out.append(mesh.obj_from_bm(f'{name}_{r}_{ci}', bm))
     return out
 
@@ -651,24 +676,185 @@ def barrel(name, x, y, r=0.13, h=0.34, segs=10, z=0.0, rnd=None):
 
 
 def sack(name, x, y, rnd, s=1.0, rot=0.0, lie=False):
-    """Mehl-/Kornsack: verformter Koerper mit eingeschnuertem Hals"""
+    """Mehl-/Kornsack: bauchiger Koerper, eingeschnuerter Hals mit Zipfel (stehend) bzw. liegend"""
     bm = bmesh.new()
-    bmesh.ops.create_uvsphere(bm, u_segments=8, v_segments=5, radius=0.5)
+    segs = 7
+    prof = [(0.0, 0.1), (0.08, 0.122), (0.16, 0.108), (0.205, 0.072), (0.24, 0.06)]
+    rings = []
+    for (z, r) in prof:
+        ring = []
+        for k in range(segs):
+            a = 2 * math.pi * k / segs
+            rr = r * s * (1 + rnd.uniform(-0.07, 0.07))
+            ring.append(bm.verts.new((math.cos(a) * rr * 1.12, math.sin(a) * rr * 0.92, z * s)))
+        rings.append(ring)
+    for i in range(len(rings) - 1):
+        for k in range(segs):
+            j = (k + 1) % segs
+            bm.faces.new((rings[i][k], rings[i][j], rings[i + 1][j], rings[i + 1][k]))
+    bm.faces.new(list(reversed(rings[0])))
+    bm.faces.new(rings[-1])
+    # Zipfel kippt etwas zur Seite, Sack sackt einseitig zusammen
+    for v in rings[-1] + rings[-2]:
+        v.co.x += 0.025 * s
+    tilt_a = rnd.uniform(-0.18, 0.18)
+    bmesh.ops.rotate(bm, cent=(0, 0, 0), matrix=Matrix.Rotation(tilt_a, 3, 'X'), verts=bm.verts)
     for v in bm.verts:
-        p = v.co
-        zt = p.z + 0.5
-        w = 0.32 if zt > 0.85 else (0.5 - 0.12 * max(0.0, zt - 0.6) / 0.25)
-        p.x *= (w / 0.5) * 0.24 * s * 2
-        p.y *= (w / 0.5) * 0.2 * s * 2
-        p.z = zt * 0.4 * s
-        if zt < 0.25:
-            p.z = max(p.z, 0.01)
-        n = noise.noise(Vector((p.x * 9, p.y * 9, p.z * 9 + rnd.random() * 9)))
-        p.x += n * 0.012
-        p.y += n * 0.012
+        v.co.z = max(0.0, v.co.z)
     if lie:
-        bmesh.ops.rotate(bm, cent=(0, 0, 0.1 * s), matrix=Matrix.Rotation(math.pi / 2 - 0.15, 3, 'X'), verts=bm.verts)
-        bmesh.ops.translate(bm, vec=Vector((0, 0, -0.04 * s)), verts=bm.verts)
+        bmesh.ops.rotate(bm, cent=(0, 0, 0), matrix=Matrix.Rotation(math.pi / 2 - 0.1, 3, 'Y'), verts=bm.verts)
+        bmesh.ops.translate(bm, vec=Vector((-0.14 * s, 0, 0.08 * s)), verts=bm.verts)
+        for v in bm.verts:  # liegender Sack flacht ab
+            v.co.z = max(0.0, v.co.z * 0.8)
     bmesh.ops.rotate(bm, cent=(0, 0, 0), matrix=Matrix.Rotation(rot, 3, 'Z'), verts=bm.verts)
     bmesh.ops.translate(bm, vec=Vector((x, y, 0)), verts=bm.verts)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     return mesh.obj_from_bm(name, bm)
+
+
+def trough(name, cx, cy, z, L=0.48, W=0.22, H=0.13, flare=1.25, rim=0.022):
+    """Trog (Teig-/Wassertrog): nach oben weiter werdender Kasten mit eingesenkter Innenflaeche"""
+    bm = bmesh.new()
+
+    def rect(w, l, zz):
+        return [bm.verts.new((cx + sx * l / 2, cy + sy * w / 2, zz)) for (sx, sy) in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+    b0 = rect(W, L, z)
+    t0 = rect(W * flare, L * 1.08, z + H)
+    t1 = rect(W * flare - 2 * rim, L * 1.08 - 2 * rim, z + H)
+    i0 = rect(W * 0.8 - rim, L * 0.95 - rim, z + H * 0.45)
+    bm.faces.new(list(reversed(b0)))
+    for ring_a, ring_b in ((b0, t0), (t0, t1), (t1, i0)):
+        for k in range(4):
+            j = (k + 1) % 4
+            bm.faces.new((ring_a[k], ring_a[j], ring_b[j], ring_b[k]))
+    bm.faces.new(i0)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    return mesh.obj_from_bm(name, bm)
+
+
+def plaster_gable(wall, name, u_l, u_r, z0, u_apex, z_apex, rnd, inset=0.022, thick=0.07, cell=0.16, bulge=0.005):
+    """Putzflaeche eines Giebeldreiecks (Trapez-Zeilen bis knapp unter die Spitze) hinter dem Giebelfachwerk"""
+    nz = max(1, int(round((z_apex - z0) / cell)))
+    nu = max(1, int(round((u_r - u_l) / cell)))
+    bm = bmesh.new()
+    off = Vector((rnd.uniform(0, 50), rnd.uniform(0, 50), 0.0))
+    rows = []
+    for j in range(nz + 1):
+        t = min(j / nz, 0.94)
+        z = z0 + (z_apex - z0) * t
+        a = u_l + (u_apex - u_l) * t
+        b = u_r + (u_apex - u_r) * t
+        row = []
+        for i in range(nu + 1):
+            u = a + (b - a) * i / nu
+            edge = i in (0, nu) or j in (0, nz)
+            bl = 0.0 if edge else bulge * (0.5 + noise.noise(Vector((u * 3.0, z * 3.0, 0)) + off))
+            row.append(bm.verts.new(wall.p(u, z, inset - bl)))
+        rows.append(row)
+    for j in range(nz):
+        for i in range(nu):
+            bm.faces.new((rows[j][i], rows[j][i + 1], rows[j + 1][i + 1], rows[j + 1][i]))
+    # Rueckseite als einfache Flaeche (verdeckt)
+    ring = rows[0] + [rows[j][nu] for j in range(1, nz + 1)] + list(reversed(rows[nz]))[1:] + [rows[j][0] for j in range(nz - 1, 0, -1)]
+    back = [bm.verts.new(v.co - wall.out * thick) for v in ring]
+    m = len(ring)
+    for k in range(m):
+        k2 = (k + 1) % m
+        bm.faces.new((ring[k2], ring[k], back[k], back[k2]))
+    bmesh.ops.contextual_create(bm, geom=back)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    return mesh.obj_from_bm(name, bm)
+
+
+def place(obj, rot_z=0.0, offset=(0, 0, 0)):
+    """Objekt um die Hochachse drehen und verschieben (in die Geometrie uebernommen)"""
+    m = Matrix.Translation(Vector(offset)) @ Matrix.Rotation(rot_z, 4, 'Z')
+    obj.data.transform(m)
+    obj.data.update()
+    return obj
+
+
+def loaf(name, x, y, z, rnd, l=0.11, w=0.07, h=0.045, rot=0.0):
+    """Brotlaib: abgeflachtes Ellipsoid mit Einschnitt-Andeutung"""
+    bm = bmesh.new()
+    bmesh.ops.create_uvsphere(bm, u_segments=6, v_segments=3, radius=0.5)
+    for v in bm.verts:
+        p = v.co
+        if p.z < 0:
+            p.z *= 0.25
+        p.x *= l * (1 + rnd.uniform(-0.08, 0.08))
+        p.y *= w
+        p.z *= h * 2
+    bmesh.ops.rotate(bm, cent=(0, 0, 0), matrix=Matrix.Rotation(rot, 3, 'Z'), verts=bm.verts)
+    bmesh.ops.translate(bm, vec=Vector((x, y, z + h * 0.25)), verts=bm.verts)
+    return mesh.obj_from_bm(name, bm)
+
+
+def dome(name, cx, cy, z0, rx, ry, h, segs=12, rings=4, cut_y=None, rnd=None, wob=0.012):
+    """Gewoelbe/Kuppel (Backofen) als halbes Ellipsoid ueber (cx, cy) ab Hoehe z0; cut_y: vorn bei y = cut_y abgeschnitten"""
+    rnd = rnd or random.Random(3)
+    bm = bmesh.new()
+    rows = []
+    for j in range(rings + 1):
+        phi = (math.pi / 2) * j / (rings + 1)
+        row = []
+        for i in range(segs):
+            a = 2 * math.pi * i / segs
+            r = math.cos(phi)
+            x = cx + math.cos(a) * rx * r
+            y = cy + math.sin(a) * ry * r
+            z = z0 + math.sin(phi) * h
+            if cut_y is not None and y < cut_y:
+                y = cut_y
+            n = noise.noise(Vector((x * 5.0, y * 5.0, z * 5.0)))
+            row.append(bm.verts.new((x + n * wob, y + n * wob * (0 if cut_y is not None and y <= cut_y + 1e-6 else 1), z + n * wob * 0.5)))
+        rows.append(row)
+    top = bm.verts.new((cx, cy if cut_y is None else max(cy, cut_y), z0 + h))
+    for j in range(rings):
+        for i in range(segs):
+            i2 = (i + 1) % segs
+            bm.faces.new((rows[j][i], rows[j][i2], rows[j + 1][i2], rows[j + 1][i]))
+    for i in range(segs):
+        bm.faces.new((rows[rings][i], rows[rings][(i + 1) % segs], top))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    return mesh.obj_from_bm(name, bm)
+
+
+def frame_lods(wall, members, rnd, prefix, z_lo, z_hi, key_posts=False, pegs=True, depth=0.09, post_pegs=True):
+    """Fachwerk einer Wand in drei Stufen: LOD0 gefaste Hoelzer + Holznaegel, LOD1 einfache Kanthoelzer (Glieder > 0,25),
+    LOD2 nur Schwelle, Rahm, Eck- (und mit key_posts alle) Staender. z_lo/z_hi: Bereich, in dem Naegel sitzen duerfen.
+    Rueckgabe: (lod0, lod1, lod2) Listen von Objekten."""
+    l0 = frame(wall, members, rnd, depth=depth, prefix=prefix)
+    l1, l2 = [], []
+    for i, (u0, z0, u1, z1, ww, role) in enumerate(members):
+        p0, p1 = wall.p(u0, z0, depth / 2), wall.p(u1, z1, depth / 2)
+        upv = (p1 - p0).normalized().cross(wall.out).normalized()
+        if math.hypot(u1 - u0, z1 - z0) > 0.25:
+            l1.append(timber(f'{prefix}_L1_{i}', p0, p1, depth, ww, ch=0.0, up=upv, rnd=rnd))
+        key = role in ('sill', 'plate', 'rafter') or (role == 'post' and (key_posts or min(u0, u1) < 0.1 or max(u0, u1) > wall.L - 0.1))
+        if key:
+            l2.append(timber(f'{prefix}_L2_{i}', p0, p1, depth, ww, ch=0.0, up=upv, rnd=rnd))
+        if not pegs:
+            continue
+        if role in ('rail', 'brace'):
+            d = Vector((u1 - u0, z1 - z0)).normalized()
+            for (u, z, sgn) in ((u0, z0, 1), (u1, z1, -1)):
+                if 0.02 < u < wall.L - 0.02 and z_lo + 0.03 < z < z_hi - 0.02:
+                    l0.append(peg(f'{prefix}_peg{i}_{sgn}', wall.p(u + sgn * 0.04 * d.x, z + sgn * 0.04 * d.y, 0.0), wall.out,
+                                  rot=rnd.uniform(-0.3, 0.3)))
+        elif role == 'post' and post_pegs:
+            for z in (z0 + 0.04, z1 - 0.04):
+                l0.append(peg(f'{prefix}_pegp{i}_{z:.2f}', wall.p((u0 + u1) / 2 + rnd.uniform(-0.01, 0.01), z, 0.0), wall.out,
+                              rot=rnd.uniform(-0.3, 0.3)))
+    return l0, l1, l2
+
+
+def subdivided_box(name, size, loc, cuts=2):
+    """Quader mit Gitterteilung (Datenfarbe/AO brauchen Vertices auf grossen Flaechen)"""
+    o = mesh.box(name, size, loc=loc)
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bmesh.ops.subdivide_edges(bm, edges=bm.edges, cuts=cuts, use_grid_fill=True)
+    bm.to_mesh(o.data)
+    bm.free()
+    return o

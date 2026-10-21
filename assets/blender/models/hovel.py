@@ -19,7 +19,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'lib'))
 
-from sp import anchors, asset, mesh, scene, town, uv  # noqa: E402
+from sp import anchors, asset, materials, mesh, scene, town, uv  # noqa: E402
 from mathutils import Vector  # noqa: E402
 
 VARIANT = 'b' if '--variant=b' in sys.argv else 'a'
@@ -450,7 +450,9 @@ A.add(mesh.join(bench, 'bench'), mat='M_Wood_Planks', uv_mode=None, build=(0.88,
 
 bx, by = (0.66 * MIRROR, Y0 - 0.25)
 body, hoops = town.barrel('barrel', bx, by, r=0.12, h=0.32, segs=9)
-A.add(body, mat='M_Wood_Planks', uv_mode='cyl', pivot=(bx, by, 0), build=(0.9, 0.97), smooth=40, dirt=1.2, lod2='drop')
+materials.assign(body, 'M_Wood_Planks')
+uv.cylindrical(body, center=(bx, by, 0.0))
+A.add(body, mat=None, uv_mode=None, build=(0.9, 0.97), smooth=40, dirt=1.2, lod2='drop')
 A.add(mesh.join(hoops, 'barrel_hoops'), mat='M_Iron_Wrought', uv_mode='box', build=(0.92, 0.97), smooth=40, dirt=0.6, lod1='drop', lod2='drop')
 
 wx0 = X1 + 0.035 if MIRROR > 0 else X0 - 0.035 - 0.25
@@ -467,7 +469,9 @@ A.add(mesh.join(cover, 'pile_cover'), mat='M_Wood_Planks', uv_mode=None, build=(
 hx, hy = (X1 + 0.2) * MIRROR, -0.72
 block = mesh.cylinder('chop_block', 0.1, 0.2, segs=8, loc=(hx, hy, 0.0))
 mesh.displace(block, 0.008, 9.0, seed=2)
-A.add(block, mat='M_Timber_Oak', uv_mode='cyl', pivot=(hx, hy, 0), build=(0.9, 0.97), smooth=40, dirt=1.3, lod2='drop')
+materials.assign(block, 'M_Timber_Oak')
+uv.cylindrical(block, center=(hx, hy, 0.0))
+A.add(block, mat=None, uv_mode=None, build=(0.9, 0.97), smooth=40, dirt=1.3, lod2='drop')
 axe_h = town.timber('axe_handle', (hx - 0.02, hy + 0.01, 0.2), (hx - 0.2 * MIRROR, hy - 0.1, 0.42), 0.022, 0.026, ch=0.005, rnd=rnd)
 A.add(axe_h, mat='M_Wood_Planks', uv_mode=None, build=(0.95, 0.98), smooth=0, lod1='drop', lod2='drop')
 axe_b = mesh.box('axe_blade', (0.11, 0.015, 0.06), loc=(hx + 0.02, hy + 0.01, 0.185), rot=(0, 0.25, 0.3))

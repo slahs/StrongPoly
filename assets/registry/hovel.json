@@ -10,23 +10,23 @@
     2,
     2
   ],
-  "height": 3.091,
+  "height": 3.092,
   "bbox": {
     "min": [
       -1.142,
-      -0.047,
+      -0.049,
       -0.906
     ],
     "max": [
       1.239,
-      3.091,
+      3.092,
       1.028
     ]
   },
   "lods": [
     {
       "node": "LOD0",
-      "tris": 7693,
+      "tris": 7277,
       "materials": [
         "M_Ground_Grass",
         "M_Iron_Wrought",
@@ -63,7 +63,7 @@
     }
   ],
   "tris": [
-    7693,
+    7277,
     1680,
     626
   ],
@@ -114,7 +114,7 @@
     "_BUILD",
     "_BUILDH"
   ],
-  "bytes": 1055480,
+  "bytes": 1017624,
   "source": "assets/blender/models/hovel.py",
   "blend": "assets/src/hovel.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"

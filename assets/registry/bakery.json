@@ -1,0 +1,146 @@
+{
+  "id": "bakery",
+  "desc": "Baeckerei: Bruchstein-Erdgeschoss, Fachwerk-Obergeschoss mit Auskragung, Ziegeldach, Backofen mit Lehmkuppel und Rauchabzug, Verkaufsladen mit Broten, Vordach, Mehlsaecke, Reisig, Zunftschild",
+  "file": "models/bakery.glb",
+  "target": {
+    "building": "Bakery"
+  },
+  "class": "production",
+  "footprint": [
+    3,
+    3
+  ],
+  "height": 3.529,
+  "bbox": {
+    "min": [
+      -1.625,
+      -0.02,
+      -1.46
+    ],
+    "max": [
+      1.632,
+      3.529,
+      1.425
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 7983,
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Iron_Wrought",
+        "M_Plaster_Lime",
+        "M_Roof_ClayTile",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 2674,
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Plaster_Lime",
+        "M_Roof_ClayTile",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 593,
+      "materials": [
+        "M_Plaster_Lime",
+        "M_Roof_ClayTile",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    }
+  ],
+  "tris": [
+    7983,
+    2674,
+    593
+  ],
+  "budget": [
+    8000,
+    2800,
+    800
+  ],
+  "materials": [
+    "M_Cloth_Linen",
+    "M_Iron_Wrought",
+    "M_Plaster_Lime",
+    "M_Roof_ClayTile",
+    "M_Stone_Rubble",
+    "M_Timber_Oak",
+    "M_Wood_Planks"
+  ],
+  "anchors": [
+    {
+      "name": "ANCHOR_smoke_0",
+      "kind": "smoke",
+      "pos": [
+        0.91,
+        2.82,
+        0.15
+      ],
+      "extras": {
+        "kind": "smoke",
+        "rate": 2.2,
+        "staffed": true
+      }
+    },
+    {
+      "name": "ANCHOR_work_0",
+      "kind": "work",
+      "pos": [
+        0.91,
+        0.0,
+        0.7
+      ],
+      "extras": {
+        "kind": "work",
+        "note": "Ofenloch"
+      }
+    },
+    {
+      "name": "ANCHOR_work_1",
+      "kind": "work",
+      "pos": [
+        -0.11,
+        0.0,
+        1.35
+      ],
+      "extras": {
+        "kind": "work",
+        "note": "Verkaufsladen"
+      }
+    },
+    {
+      "name": "ANCHOR_door_0",
+      "kind": "door",
+      "pos": [
+        -0.85,
+        0.0,
+        1.15
+      ],
+      "extras": {
+        "kind": "door"
+      }
+    }
+  ],
+  "attributes": [
+    "COLOR_0",
+    "_BUILD",
+    "_BUILDH"
+  ],
+  "bytes": 1286464,
+  "source": "assets/blender/models/bakery.py",
+  "blend": "assets/src/bakery.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}
