@@ -2,14 +2,36 @@
 
 Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/strongpoly-phase5a-medieval-realism`, Ausgang `e64750f`.
 
+## Status: EINGEFRORENER REVIEW-KANDIDAT (Freigabe durch den Projektinhaber auf dem Mac ausstehend; keine Phase 5B ohne Freigabe)
+
 ## Teilschritte
 - [x] 1 Architekturprüfung + Asset-Strategie (`docs/phase5a/ARCHITECTURE.md`)
-- [ ] 2 Import- und Materialpipeline (Blender-Skripte, Materialbibliothek, GLB-Export, Loader, Fallback) – Pipeline-Teil erledigt (Blender-Bibliothek `assets/blender/lib/sp`, GLB-Export, Laufzeit `render/assets`, Rückfall, Beispiel-Asset Brunnen; siehe „Pipeline“); offen: Materialbibliothek-Texturen (Material-Agent)
-- [ ] 3 Erstes hochwertiges Referenzgebäude (Bergfried)
-- [ ] 4 Weitere Referenzobjekte (Fachwerkhaus, Bäckerei/Schmiede, Mauer + Tor) und Figuren (Bauer, Soldat)
-- [x] 5 Referenzumgebung (Terrain mit Weg/Gras/Steinen/Bäumen, Licht, Atmosphäre) – Stil medieval, siehe „Umgebung (Terrain, Vegetation, Licht)“
-- [ ] 6 Vergleich (`?lookdev=medieval`, alt/neu, 3 Kameras) + Performance – Werkzeug erledigt (`?lookdev`, `scripts/lookdev.mjs`, Statistik; siehe „Pipeline“); offen: Vergleich mit den fertigen Referenz-Assets
-- [ ] 7 Dokumentation + Mac-Testanleitung
+- [x] 2 Import- und Materialpipeline: Blender-Bibliothek `assets/blender/lib/sp`, GLB-Export mit LOD0/1/2 und gebackener Datenfarbe, Laufzeit `render/assets` mit Rückfall auf die prozeduralen Modelle, Materialbibliothek (19 + 3 ergänzte PBR-Materialien, WebP)
+- [x] 3 Erstes Referenzgebäude: Bergfried
+- [x] 4 Fachwerkhaus (2 Varianten), Bäckerei, Schmiede, hohe Mauer (arm/post/stub), Steintor, Figuren Bauer + Speerkämpfer
+- [x] 5 Referenzumgebung (Terrain, Wege, 24 Vegetations-/Stein-/Requisiten-Assets, Licht/Atmosphäre im Stil medieval)
+- [~] 6 Vergleich + Performance: LookDev `?lookdev=medieval` (alt/neu, feste Kameras) und Bilder je Teilbereich vorhanden (`docs/phase5a/assets/{castle,town,figures,environment}/`); ein gemeinsamer Gesamt-Vergleichslauf aller fertigen Assets wurde auf Wunsch des Auftraggebers abgebrochen (Kosten-Stopp) – **offen**
+- [~] 7 Dokumentation: PIPELINE.md, ARCHITECTURE.md, ENVIRONMENT.md, LICENSES.md, diese Datei; Mac-Testanleitung unten. README nicht ergänzt – **offen**
+
+## Mac-Test (Safari, MacBook Air M3)
+```
+corepack pnpm i
+corepack pnpm --filter @strongpoly/client dev
+```
+- LookDev neu: `http://localhost:5173/?lookdev=medieval` – Kameras über `&cam=1-rts|2-mid|2b-town|3a-building|3b-figures|3c-material|3d-keep|3e-gate|3f-wall|3g-corner|3h-landscape|4a-house|4b-bakery|4c-smithy`, Stufe `&quality=low|medium|high`; Vergleich alt: `?lookdev=classic` (gleiche Kameras).
+- Im Spiel: `http://localhost:5173/?quick=1&style=medieval` (Standard ohne Parameter bleibt `classic`; Grafikstil auch in den Optionen umschaltbar).
+- Leistung: `http://localhost:5173/?bench&style=medieval&quality=medium&units=2000&secs=20` (Overlay bzw. `window.__bench.result()`); Statistik-Overlay der LookDev zeigt Draw-Calls, Dreiecke, Programme, Texturspeicher.
+- Beim ersten Aufruf werden ca. 15–25 MB Texturen/Modelle geladen (Stufe Mittel); bitte Ladezeit, FPS, Hänger und Bildeindruck zurückmelden.
+
+## Bekannte Einschränkungen / offen
+- Alle Messwerte stammen aus Software-GL (SwiftShader) – **keine GPU-/Safari-Messung**; 60 FPS nicht belegt.
+- `?bench` 2.000 Einheiten im Stil medieval: JS-Zeit ohne Raster 7,6/8,5/9,4 ms (Niedrig/Mittel/Hoch) – Ziel ≤ 8 ms auf Mittel knapp verfehlt; classic unverändert.
+- Draw-Calls im RTS-Bild classic ~53 → medieval ~100 (6–7 Materialien je Asset-Typ × LOD, plus Schattenpass); Texturspeicher geschätzt 56/224/368 MB je Stufe (ohne KTX2) – für 5B: KTX2/Basis, Material-Atlas/weniger Materialien je Asset.
+- GLB unkomprimiert (Bergfried 4 MB, Hütte ~1 MB; kein Meshopt, da der PyPI-Blender es nicht exportiert und gltfpack Attribute verwirft).
+- Ladezeit der Umgebung unter Software-GL hoch; Gelände-Shader ist der teuerste Teil.
+- Qualitätsschwächen: Bruchstein an Mauer/Tor wirkt gleichförmig; Materialien Timber_Oak, Leather, Rock, Ground_Path schwach; Laubkronen nah „kartig“; Figuren ohne Ellbogen, Gesichter nur angedeutet; Strohdach etwas glatt; Mauer bleibt Kachelsystem; Torflügel nur fest geöffnet; Schmiede-Effekte nur in der LookDev belegt.
+- Assets können nach Spielstart nachgeladen werden (sichtbarer Wechsel prozedural → GLB); Vorladen fehlt.
+- Wasser im Stil medieval nur farblich angepasst.
 
 ## Befunde
 
