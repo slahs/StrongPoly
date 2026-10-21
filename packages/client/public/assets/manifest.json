@@ -159,6 +159,156 @@
     }
   },
   "assets": {
+    "gate_stone": {
+      "id": "gate_stone",
+      "desc": "Steintor: Torhaus mit zwei Flankentuermen, Rundbogendurchfahrt, Fallgitter (hebt sich), offene Bohlenfluegel, Pechnase auf Kragsteinen, Zinnen, Banner in Spielerfarbe",
+      "file": "models/gate_stone.glb",
+      "target": {
+        "building": "GateStone"
+      },
+      "class": "gate",
+      "footprint": [
+        4,
+        3
+      ],
+      "height": 5.39,
+      "bbox": {
+        "min": [
+          -2.035,
+          -0.005,
+          -1.28
+        ],
+        "max": [
+          2.035,
+          5.39,
+          1.538
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 5994,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Iron_Wrought",
+            "M_Roof_Shingle",
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 2044,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Iron_Wrought",
+            "M_Roof_Shingle",
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 592,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        }
+      ],
+      "tris": [
+        5994,
+        2044,
+        592
+      ],
+      "budget": [
+        6000,
+        2100,
+        600
+      ],
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Iron_Wrought",
+        "M_Roof_Shingle",
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ],
+      "anchors": [
+        {
+          "name": "ANCHOR_door_0",
+          "kind": "door",
+          "pos": [
+            0,
+            0,
+            1.75
+          ],
+          "extras": {
+            "kind": "door",
+            "note": "vor der Durchfahrt (aussen)"
+          }
+        },
+        {
+          "name": "ANCHOR_flag_0",
+          "kind": "flag",
+          "pos": [
+            -1.79,
+            5.15,
+            -1.02
+          ],
+          "extras": {
+            "kind": "flag",
+            "note": "Wimpelmast"
+          }
+        },
+        {
+          "name": "ANCHOR_banner_0",
+          "kind": "banner",
+          "pos": [
+            -1.38,
+            2.1,
+            1.52
+          ],
+          "extras": {
+            "kind": "banner",
+            "note": "Turmbanner"
+          }
+        },
+        {
+          "name": "ANCHOR_banner_1",
+          "kind": "banner",
+          "pos": [
+            1.38,
+            2.1,
+            1.52
+          ],
+          "extras": {
+            "kind": "banner",
+            "note": "Turmbanner"
+          }
+        }
+      ],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH",
+        "_PART",
+        "_PIVOT"
+      ],
+      "bytes": 1168188,
+      "hash": "c4515c5451",
+      "source": "assets/blender/models/gate_stone.py",
+      "blend": "assets/src/gate_stone.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
     "keep": {
       "id": "keep",
       "desc": "Bergfried/Wohnturm: Bruchstein mit Eckquadern, Hocheingang mit Holztreppe, Konsolfries, Zinnen, Scharwachttuerme, Turmaufsatz mit Zeltdach, Banner in Spielerfarbe",
