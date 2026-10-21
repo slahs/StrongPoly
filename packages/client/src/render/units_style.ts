@@ -181,7 +181,9 @@ export const VAR_SPEC: VarSpec[] = (() => {
   s[U.Lord] = soldier([CLOTH.saffron], [CLOTH.black], { size: 0.02, jitter: 0.03, hairStyles: 0, beard: 0.7 });
   s[U.Archer] = soldier([CLOTH.moss, CLOTH.forest, CLOTH.olive], [CLOTH.leather, CLOTH.brown], { hats: 3 });
   s[U.Crossbowman] = soldier([CLOTH.slate, CLOTH.blueGrey, CLOTH.stone], [CLOTH.leather, CLOTH.coal], { hats: 2 });
-  s[U.Spearman] = soldier([CLOTH.wool, CLOTH.brown, CLOTH.ochre], [CLOTH.leather, CLOTH.leatherDark], { hats: 0 });
+  // hats 3 / hairStyles 2: Haubenvarianten und zwei Haarformen der GLB-Figur (Stil medieval); das prozedurale Modell hat keine
+  // Teile mit diesen Bits und bleibt unverändert
+  s[U.Spearman] = soldier([CLOTH.wool, CLOTH.brown, CLOTH.ochre], [CLOTH.leather, CLOTH.leatherDark], { hats: 3, hairStyles: 2 });
   s[U.Pikeman] = soldier([CLOTH.stone, CLOTH.lightGrey, CLOTH.steel], [CLOTH.darkSteel, CLOTH.coal], { hairStyles: 0, beard: 0.5 });
   s[U.Maceman] = soldier([CLOTH.brown, CLOTH.wool, CLOTH.rust], [CLOTH.leatherDark, CLOTH.leather], { hairStyles: 0 });
   s[U.Swordsman] = soldier([CLOTH.steel, CLOTH.lightGrey, CLOTH.darkSteel], [CLOTH.coal, CLOTH.darkSteel], { hairStyles: 0 });

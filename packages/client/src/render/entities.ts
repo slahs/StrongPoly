@@ -127,6 +127,9 @@ export function buildTicks(def: BuildingDef): number {
 const ease = (t: number): number => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
 
 /** Zeichnet Einheiten, Gebäude, Projektile und Effekte aus dem ClientWorld-Zustand (nur lesend). */
+/** Größenverhältnis GLB-Figur (Phase 5A, Schulterhöhe 0,745) zu prozeduraler Figur (0,625) für getragene Waren */
+const GLB_CARGO_SCALE = 1.18;
+
 export class EntityRenderer {
   readonly group = new THREE.Group();
   readonly fx = new FxSystem();
@@ -1092,7 +1095,9 @@ export class EntityRenderer {
         const kind = CARGO_OF_RES[carry - 1];
         if (kind) {
           const cm = this.cargo;
-          cm.push(x, ny, y, face, sc, sc, 0, phase, af, UNIT_WALK_W[type], 1.1);
+          // GLB-Figuren sind größer als die prozeduralen (Schulter 0,745 statt 0,625): Ware mitskalieren, sitzt so am Rücken
+          const csc = ua ? sc * GLB_CARGO_SCALE : sc;
+          cm.push(x, ny, y, face, csc, csc, 0, phase, af, UNIT_WALK_W[type], 1.1);
           cm.styleLast(0, 1, 0, 1 << CARGO_KINDS.indexOf(kind), vr.kx, vr.ky);
           const c = RES_COLORS[carry - 1] ?? 0xffffff;
           cm.tintLast(srgb(((c >> 16) & 255) / 255), srgb(((c >> 8) & 255) / 255), srgb((c & 255) / 255));

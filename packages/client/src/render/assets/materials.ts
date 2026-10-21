@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { ANIM_PARS, FRAG_PARS, FRAG_TAIL, GFX, WORLD_POS, ensureNoiseTextures, shareUniforms } from '../materials';
 import { FRAG_CLIP } from '../building_materials';
 import { UNIT_ANIM_PARS, uTintUniform } from '../unit_shader';
+import { TINT_COUNT } from '../units_style';
 import type { MapEntry, MapKind, MaterialDef } from './manifest';
 
 /**
@@ -16,6 +17,11 @@ import type { MapEntry, MapKind, MaterialDef } from './manifest';
  *    Kantenabnutzung (heller, glatter), Teamfarbe (Instanzfarbe)
  *  - Instanzvariation (Helligkeit/Farbton aus der Instanzphase, uVar), Wolkenschatten, Randlicht, Grading (global)
  *  - Variante 'clip': Höhenmaske der Bauanimation (aBuild, iAnim.z) wie building_materials.ts
+ *  - Variante 'unit' (GLB-Figuren): Farbklassen aus aStyle.x wie die prozeduralen Figuren (1 Haut, 2 Haar, 3/4 Stoffe je
+ *    Instanz) und zusätzlich feste Töne (Klasse ≥ 16 → Eintrag Klasse − 16 der Tonetabelle: Holz, Stroh, Leder, Eisen ohne
+ *    eigenes Material). Getönte und spielerfarbene Teile werden auf die mittlere Albedo ihres Materials normiert (kleinste
+ *    Mipmap der Albedo-Textur bzw. Grundfarbe): die Textur liefert nur noch die Struktur, der Ton bestimmt die Farbe – sonst
+ *    würde z. B. eine braune Wolltextur jede Spielerfarbe abdunkeln und verfälschen.
  */
 
 export type AssetVariant = 'final' | 'clip' | 'unit';
@@ -38,6 +44,7 @@ varying vec4 vBuild;
 varying float vProg;
 varying vec4 vData;
 varying vec3 vSpW;
+varying float vSpTint;
 `;
 
 const VERT_BEGIN = /* glsl */ `
@@ -51,12 +58,15 @@ transformed = spAnimate(transformed);
 /** Teamfarbe (aData.a) und Instanzvariation; Figuren zusätzlich Farbklassen (Haut/Haar/Stoffe) und Helligkeit (iVar) */
 const COLOR_VERTEX = /* glsl */ `
 vColor = vec3(1.0);
+vSpTint = 0.0;
 #ifdef SP_UNIT
 {
   int tcl = int(aStyle.x + 0.5);
   if (tcl > 0) {
     int pk = int(iVar.x + 0.5);
-    if (tcl == 1) vColor = uTint[pk & 7];
+    vSpTint = 1.0;
+    if (tcl >= 16) vColor = uTint[min(tcl - 16, ${TINT_COUNT - 1})];
+    else if (tcl == 1) vColor = uTint[pk & 7];
     else if (tcl == 2) vColor = uTint[8 + ((pk >> 3) & 7)];
     else if (tcl == 3) vColor = uTint[16 + ((pk >> 6) & 31)];
     else vColor = uTint[16 + ((pk >> 11) & 31)];
@@ -66,6 +76,9 @@ vColor = vec3(1.0);
 #endif
 #ifdef USE_INSTANCING_COLOR
   vColor = mix(vColor, instanceColor.rgb, aData.a);
+  #ifdef SP_UNIT
+  vSpTint = max(vSpTint, step(0.5, aData.a));
+  #endif
 #endif
 #ifndef SP_UNIT
 {
@@ -84,12 +97,27 @@ varying vec3 vLocal;
 varying vec4 vBuild;
 varying float vProg;
 varying vec4 vData;
+varying float vSpTint;
 uniform vec3 uDirt;
 uniform float uAo;
 `;
 
 const FRAG_SURFACE = /* glsl */ `
 #include <color_fragment>
+#ifdef SP_UNIT
+{
+  // getönte Figurenteile: auf die mittlere Albedo des Materials normieren (1×1-Mipmap = Mittelwert der Textur)
+  #ifdef USE_MAP
+    vec3 spAvg = textureLod(map, vMapUv, 16.0).rgb * diffuse;
+  #else
+    vec3 spAvg = diffuse;
+  #endif
+  // Struktur relativ zur mittleren Albedo, auf Figurenmaßstab gedämpft (Webmuster sonst wie ein Gitter)
+  vec3 spRel = diffuseColor.rgb / max(spAvg * vColor, vec3(0.002));
+  vec3 spTinted = vColor * mix(vec3(1.0), spRel, 0.6);
+  diffuseColor.rgb = mix(diffuseColor.rgb, spTinted, vSpTint);
+}
+#endif
 {
   // Schmutz (Vertexfarbe G) zieht Richtung Schmutzfarbe, Kantenabnutzung (B) hellt leicht auf; frische Baukante heller
   float spD = clamp(vData.g, 0.0, 1.0);
@@ -136,6 +164,7 @@ function patch(s: THREE.WebGLProgramParametersWithUniforms, variant: AssetVarian
     .replace('#include <aomap_fragment>', FRAG_AO)
     .replace('#include <opaque_fragment>', FRAG_TAIL + '\n#include <opaque_fragment>');
   if (variant === 'clip') s.fragmentShader = '#define BUILD_CLIP\n' + s.fragmentShader;
+  if (unit) s.fragmentShader = '#define SP_UNIT\n' + s.fragmentShader;
 }
 
 function srgbHex(hex: string): THREE.Color {
@@ -348,6 +377,8 @@ export class AssetMaterials {
       alphaTest: d.alphaTest ?? 0,
     });
     if (nrm && d.normalScale) m.normalScale.set(d.normalScale, d.normalScale);
+    // Figuren: Normalen der Bibliothek halb so stark (Stoffbindung/Ledernarbung ist im Figurenmaßstab bewusst vergrößert)
+    if (nrm && variant === 'unit') m.normalScale.multiplyScalar(0.5);
     if (orm) m.aoMapIntensity = 1;
     const dRef = dirt;
     m.onBeforeCompile = (s) => patch(s, variant, dRef);

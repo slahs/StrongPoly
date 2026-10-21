@@ -682,6 +682,8 @@ export function startBench(): void {
   // &style=medieval: GLB-Assets der Phase 5A (wo registriert) statt prozeduraler Modelle; Messung startet nach dem Laden
   const style = parseStyle(q.get('style')) ?? 'classic';
   assetRegistry.setStyle(style);
+  // für Messskripte (z. B. weitere Einheitentypen per register() auf eine GLB-Figur abbilden)
+  (window as unknown as Record<string, unknown>).__assets = assetRegistry;
   // &nodraw=1: Draw-Calls werden zu No-ops. So misst man die reine JS-Zeit (Szenengraph, Instanzdaten, Uploads),
   // unabhängig davon, wie langsam der Rasterizer (z. B. SwiftShader) den Befehlspuffer abarbeitet.
   const nodraw = q.get('nodraw') === '1';

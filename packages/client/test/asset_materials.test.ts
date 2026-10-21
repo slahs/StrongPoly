@@ -41,9 +41,12 @@ describe('Materialbibliothek (assets/materials.json + public/assets/textures)', 
     materials: Record<string, { maps: Partial<Record<(typeof MAPS)[number], MapEntry>> }>;
   };
 
-  it('Bibliothek = Namensliste aus PIPELINE.md (19 Materialien)', () => {
+  it('Bibliothek enthält die Namensliste aus PIPELINE.md (19 Materialien); Zusatzmaterialien sind in PIPELINE.md dokumentiert', () => {
     expect(names).toHaveLength(19);
-    expect(Object.keys(lib).sort()).toEqual([...names].sort());
+    expect(Object.keys(lib).filter((k) => names.includes(k)).sort()).toEqual([...names].sort());
+    // Zusatzmaterialien einzelner Asset-Gruppen (z. B. M_Figure der GLB-Figuren, ohne Textur) müssen dort beschrieben sein
+    const md = readFileSync(join(ROOT, 'assets/PIPELINE.md'), 'utf8');
+    for (const extra of Object.keys(lib).filter((k) => !names.includes(k))) expect(md, extra).toContain(`\`${extra}\``);
   });
 
   for (const name of names) {

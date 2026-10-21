@@ -129,6 +129,14 @@
         }
       }
     },
+    "M_Figure": {
+      "base": "#d8d0c4",
+      "rough": 0.72,
+      "metal": 0,
+      "tile": 1,
+      "dirt": "#5a4a38",
+      "maps": {}
+    },
     "M_Foliage": {
       "base": "#405128",
       "rough": 0.54,
@@ -1117,6 +1125,170 @@
       "hash": "b81253c6ac",
       "source": "assets/blender/models/keep.py",
       "blend": "assets/src/keep.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "peasant": {
+      "id": "peasant",
+      "desc": "Bauer/Arbeiter: Leinentunika, Wollbeinlinge, Bundschuhe, Schaerpe+Halstuch in Spielerfarbe, Strohhut/Gugel, Werkzeug je Beruf",
+      "file": "models/peasant.glb",
+      "target": {
+        "unit": "Peasant"
+      },
+      "class": "figure",
+      "footprint": null,
+      "height": 0.965,
+      "bbox": {
+        "min": [
+          -0.158,
+          0.003,
+          -0.138
+        ],
+        "max": [
+          0.167,
+          0.965,
+          0.394
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 2484,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Figure",
+            "M_Iron_Wrought",
+            "M_Leather"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 778,
+          "materials": [
+            "M_Figure"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 246,
+          "materials": [
+            "M_Figure"
+          ]
+        }
+      ],
+      "tris": [
+        2484,
+        778,
+        246
+      ],
+      "budget": [
+        2500,
+        800,
+        250
+      ],
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Figure",
+        "M_Iron_Wrought",
+        "M_Leather"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0",
+        "_PART",
+        "_PIVOT",
+        "_STYLE",
+        "_SLOT",
+        "_ARM"
+      ],
+      "bytes": 490480,
+      "lodDist": [
+        0.45
+      ],
+      "hash": "4e67f7f80e",
+      "source": "assets/blender/models/peasant.py",
+      "blend": "assets/src/peasant.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "spearman": {
+      "id": "spearman",
+      "desc": "Speerkaempfer: Gambeson mit Steppnaehten, Waffenrock+Schild in Spielerfarbe, Eisenhut, Kettenhaube/Steppkappe, Speer",
+      "file": "models/spearman.glb",
+      "target": {
+        "unit": "Spearman"
+      },
+      "class": "figure",
+      "footprint": null,
+      "height": 1.194,
+      "bbox": {
+        "min": [
+          -0.261,
+          0.003,
+          -0.149
+        ],
+        "max": [
+          0.158,
+          1.194,
+          0.562
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 2492,
+          "materials": [
+            "M_Cloth_Wool",
+            "M_Figure",
+            "M_Iron_Wrought",
+            "M_Leather"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 735,
+          "materials": [
+            "M_Figure"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 240,
+          "materials": [
+            "M_Figure"
+          ]
+        }
+      ],
+      "tris": [
+        2492,
+        735,
+        240
+      ],
+      "budget": [
+        2500,
+        800,
+        250
+      ],
+      "materials": [
+        "M_Cloth_Wool",
+        "M_Figure",
+        "M_Iron_Wrought",
+        "M_Leather"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0",
+        "_PART",
+        "_PIVOT",
+        "_STYLE",
+        "_SLOT",
+        "_ARM"
+      ],
+      "bytes": 464836,
+      "lodDist": [
+        0.45
+      ],
+      "hash": "af05fe2a59",
+      "source": "assets/blender/models/spearman.py",
+      "blend": "assets/src/spearman.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "wall_high_arm": {
