@@ -83,8 +83,8 @@ Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/
   `{'unit': 'Spearman'}`):
   | Figur | LOD0 / LOD1 / LOD2 Dreiecke (alle Varianten) | sichtbar je Instanz | Materialien | GLB |
   | --- | --- | --- | --- | --- |
-  | Bauer | 2.484 / 778 / 230 | 1.564–1.892 / 464–568 / 162–205 | LOD0: M_Cloth_Linen, M_Leather, M_Iron_Wrought, M_Figure; LOD1/2: M_Figure | 446 KB |
-  | Speerkämpfer | 2.492 / 735 / 240 | 2.090–2.285 / 632–677 / 232–240 | LOD0: M_Cloth_Wool, M_Leather, M_Iron_Wrought, M_Figure; LOD1/2: M_Figure | 436 KB |
+  | Bauer | 2.484 / 778 / 246 | 1.564–1.892 / 464–568 / 178–221 | LOD0: M_Cloth_Linen, M_Leather, M_Iron_Wrought, M_Figure; LOD1/2: M_Figure | 479 KB |
+  | Speerkämpfer | 2.492 / 735 / 240 | 2.090–2.285 / 632–677 / 232–240 | LOD0: M_Cloth_Wool, M_Leather, M_Iron_Wrought, M_Figure; LOD1/2: M_Figure | 454 KB |
 - **Gestaltung:** realistische Proportionen (~0,93 Einheiten ≈ 1,72 m, ≈ 7,3 Kopfhöhen), Kopf mit Nase, Augenhöhlen, Kinn,
   Ohren, Augen/Brauen, Bartvariante, drei Haarformen; modellierte Fäuste mit Daumen. Bauer: Leinentunika mit Bausch über dem
   Gürtel und geschlitzten, gefältelten Schößen, hochgekrempelte Ärmel, Wollbeinlinge mit Wickelbändern, Bundschuhe,
@@ -118,14 +118,20 @@ Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/
   JS-Schwankung ±2 ms durch parallel laufende Agenten.
 - **Bilder** `docs/phase5a/assets/figures/`: `01_cycles_bauer.jpg`, `02_cycles_speerkaempfer.jpg`, `03_cycles_nah.jpg` (Cycles,
   Varianten + LOD0/1/2), `04_lookdev_3b_classic_medieval.jpg`, `05_lookdev_2mid_…`, `06_lookdev_1rts_…`, `07_nah_medieval_oben_classic_unten.jpg`,
-  `08_anim_gehen.jpg`, `09_anim_berufe_ware_stoss.jpg`, `10_anim_umkippen.jpg`, `11_spiel_s18.jpg`.
+  `08_anim_gehen.jpg`, `09_anim_berufe_ware_stoss.jpg`, `10_anim_umkippen.jpg`, `11_spiel_s18.jpg`,
+  `12_nah_mit_bibliothekstexturen.jpg` (Echtzeit-Aufnahmen nach dem Merge der Materialbibliothek, mit deren Texturen).
+- **Nach Merge der Materialbibliothek:** mit den neuen `tile`-Werten neu exportiert; auf Figuren ist die Stoffbindung feiner
+  gekachelt (Leinen 0,16, Wolle 0,2 statt 0,25/0,3 – sonst wirkte das Leinen wie ein grobes Gitter), in der Variante `unit`
+  sind die Normalen halb so stark und der Strukturkontrast getönter Teile auf 60 % gedämpft; Spielerfarbe/Stofftöne bleiben
+  durch die Normierung unverändert (Leinen-, Wollalbedo ist heller Naturton, wird nicht multiplikativ verfälscht). LOD2 des
+  Bauern: breitere Schärpe, Halstuch und Werkzeugstiel (Lesbarkeit aus RTS-Höhe).
 - **Tests:** `packages/client/test/assets_figures.test.ts` (Manifest/Budget/Materialien, Attribute je Vertex, Gelenkkette passt
   zum Shader, Maße, Spielerfarbe je LOD, Varianten, sichtbare Dreiecke je Instanz, Werkzeug je Beruf, Shader-Patch).
 - **Kritische Einschätzung:** deutlicher Sprung gegenüber den prozeduralen Klötzchenfiguren (Proportionen, Kleidung, Silhouette,
   Spielerfarbe aus RTS-Höhe klar, Bauer/Soldat sofort unterscheidbar). Noch nicht auf Manor-Lords-Niveau: Flächen sind glatt
   (Struktur kommt erst mit den Stoff-/Leder-/Eisentexturen der Materialbibliothek), Gesichter nur angedeutet, Arme ohne
   Ellbogengelenk (starre Arme wie bisher), Speer bleibt beim Stoß schräg nach oben (Armstil Stoß verschiebt nur).
-- **Offen:** Bibliothekstexturen einbinden, sobald gemergt (Normierung vorbereitet); eigener kleiner Figurenatlas (Gesicht,
+- **Offen:** eigener kleiner Figurenatlas (Gesicht,
   Haar) wäre der nächste Qualitätsschritt; Ellbogen/Speer-Senken als neue Armstile (Shader) in 5B; LOD1 bei sehr naher
   Kamera teurer als das alte Nahmodell.
 
