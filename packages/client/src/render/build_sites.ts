@@ -202,15 +202,16 @@ export class BuildSites {
     const cp = constructionParams(prog);
     const cx = b.x + b.w / 2;
     const cz = b.y + b.h / 2;
-    const am = assetRegistry.forBuilding(b.t);
+    const am = assetRegistry.forBuilding(b.t, b.i);
     const top = (am ? am.height : (this.tops[b.t] ?? def.height)) * sy;
     if (cp.ground > 0.01) {
       const sink = (1 - cp.ground) * 0.09;
       for (let yy = 0; yy < b.h; yy++) for (let xx = 0; xx < b.w; xx++) this.ground.push(b.x + xx + 0.5, y + 0.004 - sink, b.y + yy + 0.5, 0, 1, 1, b.o);
     }
-    if (am) this.assetMesh(`b:${b.t}`, am).push(b.i, cx, y, cz, rot, 1, sy, b.o, phase, AF.Static, cp.raise, 0);
+    if (am) this.assetMesh(`b:${b.t}:${am.id}`, am).push(b.i, cx, y, cz, rot, 1, sy, b.o, phase, AF.Static, cp.raise, 0);
     else this.conMesh(b.t).push(cx, y, cz, rot, 1, sy, b.o, phase, AF.Static, cp.raise, 0);
-    if (cp.scaffold > 0.02 && top >= 1.5 && def.cat !== 'farm' && !NO_SCAFFOLD.has(b.t)) this.pushScaffold(b, y, (top + 0.35) * cp.scaffold);
+    const scafTop = am?.def.scaffold ? am.def.scaffold * sy : top;
+    if (cp.scaffold > 0.02 && top >= 1.5 && def.cat !== 'farm' && !NO_SCAFFOLD.has(b.t)) this.pushScaffold(b, y, (scafTop + 0.35) * cp.scaffold);
     if (cp.materials > 0.02 && b.w * b.h >= 4 && def.cat !== 'farm') this.pushPiles(b, def, y, cp.materials);
     if (visible) constructionFx(this.fx, this.rect(b, def, y, top), cp, dt, this.scale);
   }

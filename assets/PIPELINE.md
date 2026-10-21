@@ -238,3 +238,21 @@ die 2048er Fassung lohnt nur für Nahaufnahmen/LookDev.
   nur bis 0,14. LOD-Grenzen der Figuren × 0,45 (`lod_dist`), Budget `figure` 2.500/800/250 gilt für alle Varianten zusammen.
 - Tests: `packages/client/test/assets_figures.test.ts`; QA im Spiel: `scripts/qa/s18_figures_medieval.mjs`.
 
+### Ergänzt (Stadt-Assets): Modellvarianten, Verschmutzung je Vertex, Baukasten `sp.town`
+- **Modellvarianten** (rückwärtskompatibel): Ziel `{'building': 'Hovel', 'variant': 1}` → Schlüssel `b:<BT>#1`. Gibt es zu
+  einem Gebäudetyp die Varianten 1..n (lückenlos), wählt `AssetRegistry.forBuilding(bt, id)` je Gebäude-ID stabil eine
+  von n+1 Formen (`variantOf`, Hash der ID); fehlt/lädt eine Variante noch, gilt das Grundmodell. Baustelle, fertiges
+  Gebäude, Hover-Kontur und Emitter benutzen dieselbe ID; der Platzierungsgeist zeigt das Grundmodell. Instanzmeshes
+  je Asset-ID (`b:<BT>:<Asset-ID>`). Variante als eigenes Skript bzw. Skriptschalter (`hovel.py --variant=b` → `hovel_b`).
+- **Mindest-Schmutz** (`sp.attrs`): Objekt-Eigenschaft `sp_grime` (0..1) bzw. Float-Attribut `sp_grime` (POINT) je Vertex
+  (`sp.town.grime_attr(obj, fn)`) hebt den Schmutzkanal G mindestens auf diesen Wert: Lehmflecken, Russ an Esse/Ofen,
+  Verwitterung/Moos auf der Wetterseite von Dächern. Wird nicht exportiert (nur in COLOR_0.G eingerechnet).
+- **Baukasten `sp.town`**: Fachwerkwand (`Wall`, `frame_lods` mit LOD1/LOD2-Kanthölzern und Holznägeln), Putzfelder mit
+  Laibungen (`plaster`, `plaster_gable`), Bruchsteinsockel, Strohdach als Höhenfeld mit Lagen/Krüppelwalm (`GableRoof`,
+  `ThatchSurf`, `thatch_roof`), Schindel-/Ziegellagen (`course_rows`, `lean`/`split` für wenig Dreiecke und saubere AO),
+  Schlot, Kuppel, Kleinteile (Fass, Holzstapel, Sack, Trog, Laib). Wandhölzer sind nur an der Außenseite gefast.
+- **UVs im Weltmaß** (`sp.town`): Hölzer, Bretter, Dachlagen erzeugen UVs in Spiel-Einheiten (`mark_world`);
+  `town.add(A, obj, …)` (statt `A.add`) teilt sie nach der Materialzuweisung durch `tile` des Materials und dreht sie für
+  Materialien mit Maserung entlang V (`GRAIN_V`, z. B. `M_Wood_Planks`). Ändert die Bibliothek `tile`, genügt ein Neuexport.
+- **Gerüsthöhe** (optional): `A.scaffold = <Traufhöhe>` → Registerfeld `scaffold`; die Baustelle stellt das Gerüst nur bis
+  dahin (sonst Modellhöhe inkl. Kamin), das Dach wächst darüber.

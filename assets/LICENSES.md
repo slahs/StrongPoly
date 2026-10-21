@@ -14,6 +14,18 @@ mit Nachweis (derzeit keine).
 | `assets/blender/models/wall_high_{arm,post,stub}.py` → `wall_high_*.blend/.glb/.json`, `assets/previews/wall_high_*.jpg` | Eigenerstellung | Projektlizenz StrongPoly |
 | Materialien (`M_Stone_Rubble`, `M_Stone_Ashlar`, `M_Timber_Oak`, `M_Wood_Planks`, `M_Roof_Shingle`, `M_Iron_Wrought`, `M_Cloth_Linen`) | nur Namen im GLB; Texturen aus der gemeinsamen Materialbibliothek (siehe dort) | – |
 
+## Gebäude (Stadt)
+
+| Asset | Ziel | Quelle (Skript) | Bearbeitbare Quelle | Ausgabe | Lizenz |
+| --- | --- | --- | --- | --- | --- |
+| `hovel` | `BT.Hovel` (Grundmodell) | `assets/blender/models/hovel.py` | `assets/src/hovel.blend` | `public/assets/models/hovel.glb`, `assets/previews/hovel_*.jpg` | Eigenerstellung |
+| `hovel_b` | `BT.Hovel`, Variante 1 | `assets/blender/models/hovel.py --variant=b` | `assets/src/hovel_b.blend` | `public/assets/models/hovel_b.glb`, `assets/previews/hovel_b_*.jpg` | Eigenerstellung |
+| `bakery` | `BT.Bakery` | `assets/blender/models/bakery.py` | `assets/src/bakery.blend` | `public/assets/models/bakery.glb`, `assets/previews/bakery_*.jpg` | Eigenerstellung |
+| `blacksmith` | `BT.Blacksmith` | `assets/blender/models/blacksmith.py` | `assets/src/blacksmith.blend` | `public/assets/models/blacksmith.glb`, `assets/previews/blacksmith_*.jpg` | Eigenerstellung |
+
+Gemeinsamer Baukasten: `assets/blender/lib/sp/town.py` (Eigenerstellung). Die Materialien sind nur als Namen der
+Bibliothek (`assets/materials.json`) referenziert; Texturen stammen aus der Materialbibliothek.
+
 ## Materialbibliothek (`packages/client/public/assets/textures/M_*/`)
 
 | Dateien | Herkunft | Lizenz |

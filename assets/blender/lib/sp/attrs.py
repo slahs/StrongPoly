@@ -8,6 +8,9 @@ Objekt-Eigenschaften (Custom Properties), die der Asset-Autor setzt (alle option
   sp_team   : 1 = Spielerfarbe (Fahnen, Banner, Wappen)
   sp_dirt   : Faktor fuer den Schmutz (Standard 1; 0 = sauber, z. B. Metall)
   sp_wear   : Faktor fuer die Kantenabnutzung (Standard 1)
+  sp_grime  : Mindest-Schmutz 0..1 (Standard 0), z. B. Lehmflecken/abgeplatzter Putz, Russ am Ofenloch.
+              Je Vertex: Float-Attribut 'sp_grime' (Domaene POINT) am Mesh (Verwitterung/Moos auf Daechern, Russfahnen);
+              es wird mit der Objekt-Eigenschaft per max() verknuepft und nicht exportiert.
   sp_style  : (Farbklasse, Sichtbarkeitsmaske, Hueft-/Oberkoerperhoehe, Slot) nur Figuren -> _STYLE (vec3) + _SLOT
   sp_arm    : Armstil (unit_shader.ts ARM) nur Figuren -> _ARM
 """
@@ -89,8 +92,20 @@ def init_data(obj, src):
     team = 1.0 if src.get('sp_team') else 0.0
     c.data.foreach_set('color', [1.0, 0.0, 0.0, team] * len(c.data))
     me.color_attributes.active_color = c
+    n = len(me.vertices)
+    g0 = float(src.get('sp_grime', 0.0))
+    gv = me.attributes.get('sp_grime')
+    grime = [g0] * n
+    if gv is not None and gv.domain == 'POINT' and gv.data_type == 'FLOAT' and len(gv.data) == n:
+        vals = [0.0] * n
+        gv.data.foreach_get('value', vals)
+        grime = [max(g0, v) for v in vals]
     f = _attr(me, '_spfac', 'FLOAT_VECTOR')
-    f.data.foreach_set('vector', [float(src.get('sp_dirt', 1.0)), float(src.get('sp_wear', 1.0)), 0.0] * len(me.vertices))
+    vec = []
+    dd, ww = float(src.get('sp_dirt', 1.0)), float(src.get('sp_wear', 1.0))
+    for g in grime:
+        vec += (dd, ww, g)
+    f.data.foreach_set('vector', vec)
     return c
 
 
@@ -129,11 +144,12 @@ def fill_dirt_wear(obj, ground_h=0.55, seed=0, mirror_y=False):
         ao = cols[li * 4]
         n1 = noise.noise(co * 3.0 + off) * 0.5 + 0.5
         n2 = noise.noise(co * 11.0 + off * 2.0) * 0.5 + 0.5
-        fd, fw = (fac.data[vi].vector[0], fac.data[vi].vector[1]) if fac else (1.0, 1.0)
+        fd, fw, fg = (fac.data[vi].vector[0], fac.data[vi].vector[1], fac.data[vi].vector[2]) if fac else (1.0, 1.0, 0.0)
         ground = (1.0 - _smooth(0.0, ground_h, co.z)) * (0.55 + 0.45 * n1)
         cavity = _smooth(0.92, 0.45, ao) * 0.7
         streak = _smooth(0.55, 0.85, n1) * 0.18
         dirt = min(1.0, (ground * 0.8 + cavity + streak) * (0.75 + 0.5 * n2)) * fd
+        dirt = max(dirt, fg * (0.8 + 0.2 * n1))
         wear = min(1.0, convex[vi] * (0.35 + 0.65 * _smooth(0.35, 0.75, n2))) * fw
         cols[li * 4 + 1] = dirt
         cols[li * 4 + 2] = wear
@@ -142,6 +158,7 @@ def fill_dirt_wear(obj, ground_h=0.55, seed=0, mirror_y=False):
 
 
 def strip_helpers(obj):
-    a = obj.data.attributes.get('_spfac')
-    if a is not None:
-        obj.data.attributes.remove(a)
+    for name in ('_spfac', 'sp_grime'):
+        a = obj.data.attributes.get(name)
+        if a is not None:
+            obj.data.attributes.remove(a)

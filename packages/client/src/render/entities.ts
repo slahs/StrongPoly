@@ -138,7 +138,7 @@ export class EntityRenderer {
   private unitMeshes: (TypeMesh | null)[] = new Array(UNIT_TYPES).fill(null);
   private bldMeshes: (TypeMesh | null)[] = new Array(BUILDING_TYPES).fill(null);
   private wallMeshes = new Map<string, TypeMesh>();
-  /** GLB-Assets (Stil „medieval“, render/assets): Schlüssel `b:<BT>`, `w:<BT>:<Stück>`, `u:<U>` → Instanzmesh je LOD × Material */
+  /** GLB-Assets (Stil „medieval“, render/assets): Schlüssel `b:<BT>:<Asset-ID>` (Modellvarianten), `w:<BT>:<Stück>`, `u:<U>` → Instanzmesh je LOD × Material */
   private assetMeshes = new Map<string, AssetTypeMesh>();
   private assetVer = -1;
   /** alle getragenen Waren in EINEM Mesh (Form je Instanz über Sichtbarkeits-Bits) */
@@ -421,8 +421,8 @@ export class EntityRenderer {
 
   /** Gebäude zeichnen: GLB-Asset, falls registriert und geladen, sonst das prozedurale Modell (Rückfall) */
   private pushBuilding(t: number, key: number, x: number, y: number, z: number, rot: number, sx: number, sy: number, team: number, a0: number, a1: number, a2: number, a3: number): void {
-    const am = assetRegistry.forBuilding(t);
-    if (am) this.assetMesh(`b:${t}`, am).push(key, x, y, z, rot, sx, sy, team, a0, a1, a2, a3);
+    const am = assetRegistry.forBuilding(t, key);
+    if (am) this.assetMesh(`b:${t}:${am.id}`, am).push(key, x, y, z, rot, sx, sy, team, a0, a1, a2, a3);
     else this.bldMesh(t).push(x, y, z, rot, sx, sy, team, a0, a1, a2, a3);
   }
 
@@ -433,8 +433,8 @@ export class EntityRenderer {
   }
 
   /** Emitter eines Gebäudes: aus den Ankerpunkten des Assets, sonst die Tabelle work_fx.ts */
-  private emittersOf(t: number): { x: number; y: number; z: number; kind: string; rate: number; staffed: boolean }[] | undefined {
-    const am = assetRegistry.forBuilding(t);
+  private emittersOf(t: number, id?: number): { x: number; y: number; z: number; kind: string; rate: number; staffed: boolean }[] | undefined {
+    const am = assetRegistry.forBuilding(t, id);
     return am && am.emitters.length ? am.emitters : EMITTERS[t];
   }
 
@@ -797,7 +797,7 @@ export class EntityRenderer {
             });
           }
         }
-        const em = this.emittersOf(b.t);
+        const em = this.emittersOf(b.t, b.i);
         if (em && this.q.workSmoke) {
           const c = Math.cos(rot);
           const s = Math.sin(rot);
@@ -944,7 +944,7 @@ export class EntityRenderer {
     // Kantenlinien des überfahrenen Gebäudes
     // (während der Bauphase keine Kontur des fertigen Gebäudes anzeigen)
     if (hov && !WALL_TYPES.includes(hov.t) && BUILDINGS[hov.t].height >= 0.7 && !this.building.has(hov.i)) {
-      const am = assetRegistry.forBuilding(hov.t);
+      const am = assetRegistry.forBuilding(hov.t, hov.i);
       let eg = am ? am.cache.edges : this.edgeCache.get(hov.t);
       if (!eg) {
         // GLB-Asset: Kanten der LOD1-Stufe (ruhiger als LOD0), sonst Grundform des prozeduralen Modells

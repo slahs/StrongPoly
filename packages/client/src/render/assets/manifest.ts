@@ -48,6 +48,8 @@ export interface AssetTarget {
   piece?: WallPiece;
   unit?: string;
   prop?: string;
+  /** nur Gebäude: Modellvariante 1, 2, … neben dem Grundmodell (ohne Angabe); Auswahl je Gebäude-ID (`variantOf`) */
+  variant?: number;
 }
 
 export interface AnchorDef {
@@ -84,6 +86,8 @@ export interface AssetDef {
   hash?: string;
   /** Faktoren auf die LOD-Entfernungen (d01, d12), sonst aus der Größe abgeleitet */
   lodDist?: number[];
+  /** Höhe des Baugerüsts (z. B. Traufhöhe), sonst die Modellhöhe */
+  scaffold?: number;
   source?: string | null;
   blend?: string;
   license?: string;
@@ -121,7 +125,9 @@ export function unitTypeOf(name: string | undefined): number {
 export function targetKey(t: AssetTarget): string | null {
   if (t.building !== undefined) {
     const b = buildingTypeOf(t.building);
-    return b >= 0 ? `b:${b}` : null;
+    if (b < 0) return null;
+    if (t.variant === undefined || t.variant === 0) return `b:${b}`;
+    return Number.isInteger(t.variant) && t.variant > 0 ? variantKey(b, t.variant) : null;
   }
   if (t.wall !== undefined) {
     const b = buildingTypeOf(t.wall);
@@ -135,6 +141,18 @@ export function targetKey(t: AssetTarget): string | null {
 }
 
 export const buildingKey = (bt: number): string => `b:${bt}`;
+/** Schlüssel einer Modellvariante (1, 2, …) eines Gebäudetyps */
+export const variantKey = (bt: number, v: number): string => `b:${bt}#${v}`;
+
+/** Variante 0..n-1 zu einer Gebäude-ID (stabil, gut gestreut auch für fortlaufende IDs) */
+export function variantOf(id: number, n: number): number {
+  if (n <= 1) return 0;
+  let h = Math.imul(id | 0, 0x9e3779b1) >>> 0;
+  h ^= h >>> 15;
+  h = Math.imul(h, 0x85ebca6b) >>> 0;
+  h ^= h >>> 13;
+  return (h >>> 0) % n;
+}
 export const wallKey = (bt: number, piece: WallPiece): string => `w:${bt}:${piece}`;
 export const unitKey = (ut: number): string => `u:${ut}`;
 

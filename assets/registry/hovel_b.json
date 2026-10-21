@@ -1,0 +1,119 @@
+{
+  "id": "hovel_b",
+  "desc": "Fachwerkhaus (Variante B): Schindeldach, Kamin links, Tuer rechts, Holzlager-Anbau",
+  "file": "models/hovel_b.glb",
+  "target": {
+    "building": "Hovel",
+    "variant": 1
+  },
+  "class": "house",
+  "footprint": [
+    2,
+    2
+  ],
+  "height": 2.852,
+  "bbox": {
+    "min": [
+      -1.218,
+      -0.051,
+      -0.906
+    ],
+    "max": [
+      1.143,
+      2.852,
+      1.028
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 7369,
+      "materials": [
+        "M_Iron_Wrought",
+        "M_Plaster_Lime",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 1534,
+      "materials": [
+        "M_Plaster_Lime",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 498,
+      "materials": [
+        "M_Plaster_Lime",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    }
+  ],
+  "tris": [
+    7369,
+    1534,
+    498
+  ],
+  "budget": [
+    8000,
+    2800,
+    800
+  ],
+  "materials": [
+    "M_Iron_Wrought",
+    "M_Plaster_Lime",
+    "M_Roof_Shingle",
+    "M_Stone_Rubble",
+    "M_Timber_Oak",
+    "M_Wood_Planks"
+  ],
+  "anchors": [
+    {
+      "name": "ANCHOR_smoke_0",
+      "kind": "smoke",
+      "pos": [
+        -0.47,
+        2.9204,
+        -0.18
+      ],
+      "extras": {
+        "kind": "smoke",
+        "rate": 0.4,
+        "staffed": false
+      }
+    },
+    {
+      "name": "ANCHOR_door_0",
+      "kind": "door",
+      "pos": [
+        0.15,
+        0.0,
+        0.96
+      ],
+      "extras": {
+        "kind": "door"
+      }
+    }
+  ],
+  "attributes": [
+    "COLOR_0",
+    "_BUILD",
+    "_BUILDH"
+  ],
+  "bytes": 1046460,
+  "source": "assets/blender/models/hovel.py",
+  "blend": "assets/src/hovel_b.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",
+  "scaffold": 1.5
+}

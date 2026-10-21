@@ -825,6 +825,304 @@
     }
   },
   "assets": {
+    "bakery": {
+      "id": "bakery",
+      "desc": "Baeckerei: Bruchstein-Erdgeschoss, Fachwerk-Obergeschoss mit Auskragung, Ziegeldach, Backofen mit Lehmkuppel und Rauchabzug, Verkaufsladen mit Broten, Vordach, Mehlsaecke, Reisig, Zunftschild",
+      "file": "models/bakery.glb",
+      "target": {
+        "building": "Bakery"
+      },
+      "class": "production",
+      "footprint": [
+        3,
+        3
+      ],
+      "height": 3.529,
+      "bbox": {
+        "min": [
+          -1.625,
+          -0.02,
+          -1.46
+        ],
+        "max": [
+          1.649,
+          3.529,
+          1.416
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 7943,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Iron_Wrought",
+            "M_Plaster_Lime",
+            "M_Roof_ClayTile",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 2682,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Plaster_Lime",
+            "M_Roof_ClayTile",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 589,
+          "materials": [
+            "M_Plaster_Lime",
+            "M_Roof_ClayTile",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        }
+      ],
+      "tris": [
+        7943,
+        2682,
+        589
+      ],
+      "budget": [
+        8000,
+        2800,
+        800
+      ],
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Iron_Wrought",
+        "M_Plaster_Lime",
+        "M_Roof_ClayTile",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ],
+      "anchors": [
+        {
+          "name": "ANCHOR_smoke_0",
+          "kind": "smoke",
+          "pos": [
+            0.91,
+            2.82,
+            0.15
+          ],
+          "extras": {
+            "kind": "smoke",
+            "rate": 2.2,
+            "staffed": true
+          }
+        },
+        {
+          "name": "ANCHOR_work_0",
+          "kind": "work",
+          "pos": [
+            0.91,
+            0,
+            0.7
+          ],
+          "extras": {
+            "kind": "work",
+            "note": "Ofenloch"
+          }
+        },
+        {
+          "name": "ANCHOR_work_1",
+          "kind": "work",
+          "pos": [
+            -0.11,
+            0,
+            1.35
+          ],
+          "extras": {
+            "kind": "work",
+            "note": "Verkaufsladen"
+          }
+        },
+        {
+          "name": "ANCHOR_door_0",
+          "kind": "door",
+          "pos": [
+            -0.85,
+            0,
+            1.15
+          ],
+          "extras": {
+            "kind": "door"
+          }
+        }
+      ],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 1283716,
+      "scaffold": 2.35,
+      "hash": "2364f52f40",
+      "source": "assets/blender/models/bakery.py",
+      "blend": "assets/src/bakery.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "blacksmith": {
+      "id": "blacksmith",
+      "desc": "Schmiede: Fachwerk-Werkstatt, offener Arbeitsplatz unter Pultdach, gemauerte Esse mit Schlot, Blasebalg, Amboss, Loeschtrog, Werkzeugwand, Kohlehaufen, Schleifstein",
+      "file": "models/blacksmith.glb",
+      "target": {
+        "building": "Blacksmith"
+      },
+      "class": "production",
+      "footprint": [
+        3,
+        3
+      ],
+      "height": 2.684,
+      "bbox": {
+        "min": [
+          -1.51,
+          -0.055,
+          -1.538
+        ],
+        "max": [
+          1.25,
+          2.684,
+          1.031
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 7156,
+          "materials": [
+            "M_Iron_Wrought",
+            "M_Leather",
+            "M_Plaster_Lime",
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 1867,
+          "materials": [
+            "M_Iron_Wrought",
+            "M_Leather",
+            "M_Plaster_Lime",
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 668,
+          "materials": [
+            "M_Plaster_Lime",
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        }
+      ],
+      "tris": [
+        7156,
+        1867,
+        668
+      ],
+      "budget": [
+        8000,
+        2800,
+        800
+      ],
+      "materials": [
+        "M_Iron_Wrought",
+        "M_Leather",
+        "M_Plaster_Lime",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ],
+      "anchors": [
+        {
+          "name": "ANCHOR_smokeDark_0",
+          "kind": "smokeDark",
+          "pos": [
+            0.52,
+            2.75,
+            0.1
+          ],
+          "extras": {
+            "kind": "smokeDark",
+            "rate": 2.4,
+            "staffed": true
+          }
+        },
+        {
+          "name": "ANCHOR_anvil_0",
+          "kind": "anvil",
+          "pos": [
+            0.42,
+            0.56,
+            0.78
+          ],
+          "extras": {
+            "kind": "anvil",
+            "rate": 2.2,
+            "staffed": true
+          }
+        },
+        {
+          "name": "ANCHOR_work_0",
+          "kind": "work",
+          "pos": [
+            0.37,
+            0,
+            1.13
+          ],
+          "extras": {
+            "kind": "work",
+            "note": "Amboss"
+          }
+        },
+        {
+          "name": "ANCHOR_door_0",
+          "kind": "door",
+          "pos": [
+            -0.175,
+            0,
+            0.28
+          ],
+          "extras": {
+            "kind": "door"
+          }
+        }
+      ],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 1111788,
+      "scaffold": 1.56,
+      "hash": "3d2b4504a2",
+      "source": "assets/blender/models/blacksmith.py",
+      "blend": "assets/src/blacksmith.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
     "gate_stone": {
       "id": "gate_stone",
       "desc": "Steintor: Torhaus mit zwei Flankentuermen, Rundbogendurchfahrt, Fallgitter (hebt sich), offene Bohlenfluegel, Pechnase auf Kragsteinen, Zinnen, Banner in Spielerfarbe",
@@ -973,6 +1271,249 @@
       "hash": "d18964091a",
       "source": "assets/blender/models/gate_stone.py",
       "blend": "assets/src/gate_stone.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "hovel": {
+      "id": "hovel",
+      "desc": "Fachwerkhaus: Bruchsteinsockel, Eichenfachwerk, Kalkputz, Strohdach mit Krueppelwalm, Kamin, Bohlentuer, Fensterladen (Spielerfarbe), Brennholz, Fass, Bank",
+      "file": "models/hovel.glb",
+      "target": {
+        "building": "Hovel"
+      },
+      "class": "house",
+      "footprint": [
+        2,
+        2
+      ],
+      "height": 3.091,
+      "bbox": {
+        "min": [
+          -1.142,
+          -0.049,
+          -0.906
+        ],
+        "max": [
+          1.239,
+          3.091,
+          1.028
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 7277,
+          "materials": [
+            "M_Ground_Grass",
+            "M_Iron_Wrought",
+            "M_Plaster_Lime",
+            "M_Roof_Thatch",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 1680,
+          "materials": [
+            "M_Ground_Grass",
+            "M_Plaster_Lime",
+            "M_Roof_Thatch",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 626,
+          "materials": [
+            "M_Ground_Grass",
+            "M_Plaster_Lime",
+            "M_Roof_Thatch",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        }
+      ],
+      "tris": [
+        7277,
+        1680,
+        626
+      ],
+      "budget": [
+        8000,
+        2800,
+        800
+      ],
+      "materials": [
+        "M_Ground_Grass",
+        "M_Iron_Wrought",
+        "M_Plaster_Lime",
+        "M_Roof_Thatch",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ],
+      "anchors": [
+        {
+          "name": "ANCHOR_smoke_0",
+          "kind": "smoke",
+          "pos": [
+            0.47,
+            3.1604,
+            -0.18
+          ],
+          "extras": {
+            "kind": "smoke",
+            "rate": 0.4,
+            "staffed": false
+          }
+        },
+        {
+          "name": "ANCHOR_door_0",
+          "kind": "door",
+          "pos": [
+            -0.15,
+            0,
+            0.96
+          ],
+          "extras": {
+            "kind": "door"
+          }
+        }
+      ],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 1048540,
+      "scaffold": 1.5,
+      "hash": "ea372b569e",
+      "source": "assets/blender/models/hovel.py",
+      "blend": "assets/src/hovel.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "hovel_b": {
+      "id": "hovel_b",
+      "desc": "Fachwerkhaus (Variante B): Schindeldach, Kamin links, Tuer rechts, Holzlager-Anbau",
+      "file": "models/hovel_b.glb",
+      "target": {
+        "building": "Hovel",
+        "variant": 1
+      },
+      "class": "house",
+      "footprint": [
+        2,
+        2
+      ],
+      "height": 2.852,
+      "bbox": {
+        "min": [
+          -1.218,
+          -0.051,
+          -0.906
+        ],
+        "max": [
+          1.143,
+          2.852,
+          1.028
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 7369,
+          "materials": [
+            "M_Iron_Wrought",
+            "M_Plaster_Lime",
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 1534,
+          "materials": [
+            "M_Plaster_Lime",
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 498,
+          "materials": [
+            "M_Plaster_Lime",
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        }
+      ],
+      "tris": [
+        7369,
+        1534,
+        498
+      ],
+      "budget": [
+        8000,
+        2800,
+        800
+      ],
+      "materials": [
+        "M_Iron_Wrought",
+        "M_Plaster_Lime",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ],
+      "anchors": [
+        {
+          "name": "ANCHOR_smoke_0",
+          "kind": "smoke",
+          "pos": [
+            -0.47,
+            2.9204,
+            -0.18
+          ],
+          "extras": {
+            "kind": "smoke",
+            "rate": 0.4,
+            "staffed": false
+          }
+        },
+        {
+          "name": "ANCHOR_door_0",
+          "kind": "door",
+          "pos": [
+            0.15,
+            0,
+            0.96
+          ],
+          "extras": {
+            "kind": "door"
+          }
+        }
+      ],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 1046460,
+      "scaffold": 1.5,
+      "hash": "0d3c9e41b0",
+      "source": "assets/blender/models/hovel.py",
+      "blend": "assets/src/hovel_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "keep": {
