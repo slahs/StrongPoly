@@ -231,6 +231,8 @@ Begründungen, Messwerte und Bilder: `docs/phase5a/ENVIRONMENT.md`.
 - Budgets (`sp.veg.BUDGETS`, Export bricht ab): Baum 6000/1500/300 (Karten zählen), Busch 2400/700/160, Flora 420/140/40,
   Fels 1500/500/150, Requisit 1500/600/150.
 
+- Ergänzte Bibliotheksmaterialien (Umgebung, nicht vom Material-Agenten): `M_Foliage_Conifer`, `M_Flora` (Quellen `assets/blender/tools/veg_textures.py`).
+
 ### Datenfarbe der Vegetation (COLOR_0 → `aData`)
 | Kanal | Bedeutung |
 | --- | --- |

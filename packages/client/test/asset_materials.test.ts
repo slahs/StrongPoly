@@ -41,9 +41,12 @@ describe('Materialbibliothek (assets/materials.json + public/assets/textures)', 
     materials: Record<string, { maps: Partial<Record<(typeof MAPS)[number], MapEntry>> }>;
   };
 
-  it('Bibliothek = Namensliste aus PIPELINE.md (19 Materialien)', () => {
+  it('Bibliothek = Namensliste aus PIPELINE.md (19 Materialien) + dort ausdrücklich ergänzte (Umgebung)', () => {
     expect(names).toHaveLength(19);
-    expect(Object.keys(lib).sort()).toEqual([...names].sort());
+    const md = readFileSync(join(ROOT, 'assets/PIPELINE.md'), 'utf8');
+    const ext = md.split('\n').find((l) => l.includes('Ergänzte Bibliotheksmaterialien'));
+    const extra = ext ? [...ext.matchAll(/`(M_[A-Za-z_]+)`/g)].map((m) => m[1]) : [];
+    expect(Object.keys(lib).sort()).toEqual([...names, ...extra].sort());
   });
 
   for (const name of names) {
