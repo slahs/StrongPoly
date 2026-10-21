@@ -99,9 +99,10 @@ def _smooth(e0, e1, x):
     return t * t * (3 - 2 * t)
 
 
-def fill_dirt_wear(obj, ground_h=0.55, seed=0):
+def fill_dirt_wear(obj, ground_h=0.55, seed=0, mirror_y=False):
     """Schmutz (G) und Kantenabnutzung (B) aus Geometrie: Spritzzone am Boden, Hohlraeume (aus dem AO-Kanal), Rauschen;
-    Abnutzung an konvexen Kanten. Benoetigt die bereits gebackene AO im Kanal R."""
+    Abnutzung an konvexen Kanten. Benoetigt die bereits gebackene AO im Kanal R.
+    mirror_y: Rauschen mit |y| statt y auswerten (Mauerstuecke, die gedreht aneinanderstossen: gleiche Werte an den Stoessen)."""
     me = obj.data
     c = me.color_attributes[config.DATA_COLOR]
     fac = me.attributes.get('_spfac')
@@ -123,6 +124,8 @@ def fill_dirt_wear(obj, ground_h=0.55, seed=0):
     for li, loop in enumerate(me.loops):
         vi = loop.vertex_index
         co = me.vertices[vi].co
+        if mirror_y:
+            co = Vector((co.x, abs(co.y), co.z))
         ao = cols[li * 4]
         n1 = noise.noise(co * 3.0 + off) * 0.5 + 0.5
         n2 = noise.noise(co * 11.0 + off * 2.0) * 0.5 + 0.5

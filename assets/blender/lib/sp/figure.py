@@ -46,6 +46,9 @@ HAIR_BITS = (VIS['Hair0'], VIS['Hair1'], VIS['Hair2'])
 HAT_BITS = (VIS['Hat0'], VIS['Hat1'], VIS['Hat2'])
 
 FRONT = Vector((0.0, -1.0, 0.0))
+
+# Texturwiederholung (Einheiten) fuer Figuren; None = Bibliothekswert aus assets/materials.json
+FIG_TILE = {'M_Cloth_Linen': 0.16, 'M_Cloth_Wool': 0.2}
 UP = Vector((0.0, 0.0, 1.0))
 SIDE = Vector((1.0, 0.0, 0.0))
 
@@ -313,7 +316,9 @@ class Fig:
         obj['sp_style'] = (float(cls), float(mask), float(up), float(slot))
         if arm is not None:
             obj['sp_arm'] = float(arm)
-        self.A.add(obj, mat=mat, uv_mode=uv, part=part, pivot=pivot, team=team, only=self.L, smooth=smooth,
+        # Stoffbindung auf Figuren feiner als in der Bibliothek (Gebaeude-Massstab): sonst wirkt sie wie ein grobes Gitter
+        tile = FIG_TILE.get(mat)
+        self.A.add(obj, mat=mat, uv_mode=uv, part=part, pivot=pivot, team=team, only=self.L, smooth=smooth, tile=tile,
                    dirt=0.45 if dirt is None else dirt, wear=0.6 if wear is None else wear,
                    uv_space='object')
         return obj

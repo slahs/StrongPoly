@@ -112,7 +112,10 @@ const FRAG_SURFACE = /* glsl */ `
   #else
     vec3 spAvg = diffuse;
   #endif
-  diffuseColor.rgb *= mix(vec3(1.0), 1.0 / max(spAvg, vec3(0.03)), vSpTint);
+  // Struktur relativ zur mittleren Albedo, auf Figurenmaßstab gedämpft (Webmuster sonst wie ein Gitter)
+  vec3 spRel = diffuseColor.rgb / max(spAvg * vColor, vec3(0.002));
+  vec3 spTinted = vColor * mix(vec3(1.0), spRel, 0.6);
+  diffuseColor.rgb = mix(diffuseColor.rgb, spTinted, vSpTint);
 }
 #endif
 {
@@ -374,6 +377,8 @@ export class AssetMaterials {
       alphaTest: d.alphaTest ?? 0,
     });
     if (nrm && d.normalScale) m.normalScale.set(d.normalScale, d.normalScale);
+    // Figuren: Normalen der Bibliothek halb so stark (Stoffbindung/Ledernarbung ist im Figurenmaßstab bewusst vergrößert)
+    if (nrm && variant === 'unit') m.normalScale.multiplyScalar(0.5);
     if (orm) m.aoMapIntensity = 1;
     const dRef = dirt;
     m.onBeforeCompile = (s) => patch(s, variant, dRef);

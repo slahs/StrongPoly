@@ -97,7 +97,7 @@
     "_BUILD",
     "_BUILDH"
   ],
-  "bytes": 434880,
+  "bytes": 439116,
   "source": "assets/blender/models/well.py",
   "blend": "assets/src/well.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"

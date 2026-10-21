@@ -222,6 +222,7 @@ describe('Figuren-Material (Variante unit): feste Töne und Normierung der Tönu
     expect(shader.vertexShader).toContain('vSpTint');
     expect(shader.fragmentShader).toContain('#define SP_UNIT');
     expect(shader.fragmentShader).toContain('textureLod(map, vMapUv, 16.0)');
+    expect(shader.fragmentShader).toContain('spTinted');
     expect(mat.customProgramCacheKey()).toBe('spAsset:unit');
   });
 });

@@ -1,0 +1,80 @@
+{
+  "id": "wall_high_stub",
+  "desc": "Hohe Steinmauer, Einzelpfeiler: Sockel, Bruchsteinkern mit umlaufender Bruestung, vier Zinnen, Abdeckplatten",
+  "file": "models/wall_high_stub.glb",
+  "target": {
+    "wall": "WallHigh",
+    "piece": "stub"
+  },
+  "class": "wall",
+  "footprint": [
+    1,
+    1
+  ],
+  "height": 3.129,
+  "bbox": {
+    "min": [
+      -0.45,
+      0.0,
+      -0.45
+    ],
+    "max": [
+      0.45,
+      3.129,
+      0.45
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 1300,
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 502,
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 96,
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ]
+    }
+  ],
+  "tris": [
+    1300,
+    502,
+    96
+  ],
+  "budget": [
+    1500,
+    600,
+    200
+  ],
+  "materials": [
+    "M_Stone_Ashlar",
+    "M_Stone_Rubble"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0",
+    "_BUILD",
+    "_BUILDH"
+  ],
+  "bytes": 181788,
+  "source": "assets/blender/models/wall_high_stub.py",
+  "blend": "assets/src/wall_high_stub.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",
+  "lodDist": [
+    1.5
+  ]
+}
