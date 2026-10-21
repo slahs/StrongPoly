@@ -86,6 +86,8 @@ export interface AssetDef {
   hash?: string;
   /** Faktoren auf die LOD-Entfernungen (d01, d12), sonst aus der Größe abgeleitet */
   lodDist?: number[];
+  /** Höhe des Baugerüsts (z. B. Traufhöhe), sonst die Modellhöhe */
+  scaffold?: number;
   source?: string | null;
   blend?: string;
   license?: string;

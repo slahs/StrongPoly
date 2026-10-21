@@ -301,7 +301,8 @@
         "_BUILDH"
       ],
       "bytes": 1281716,
-      "hash": "3df90aa291",
+      "scaffold": 2.35,
+      "hash": "365393b2e4",
       "source": "assets/blender/models/bakery.py",
       "blend": "assets/src/bakery.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -322,7 +323,7 @@
       "bbox": {
         "min": [
           -1.51,
-          -0.053,
+          -0.049,
           -1.538
         ],
         "max": [
@@ -449,8 +450,9 @@
         "_BUILD",
         "_BUILDH"
       ],
-      "bytes": 1111248,
-      "hash": "8060f2c297",
+      "bytes": 1111808,
+      "scaffold": 1.56,
+      "hash": "418d32ea2e",
       "source": "assets/blender/models/blacksmith.py",
       "blend": "assets/src/blacksmith.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -467,16 +469,16 @@
         2,
         2
       ],
-      "height": 3.091,
+      "height": 3.092,
       "bbox": {
         "min": [
           -1.142,
-          -0.052,
+          -0.053,
           -0.906
         ],
         "max": [
           1.239,
-          3.091,
+          3.092,
           1.028
         ]
       },
@@ -571,8 +573,9 @@
         "_BUILD",
         "_BUILDH"
       ],
-      "bytes": 1034612,
-      "hash": "93bc6f432b",
+      "bytes": 1033432,
+      "scaffold": 1.5,
+      "hash": "5322e5033a",
       "source": "assets/blender/models/hovel.py",
       "blend": "assets/src/hovel.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -594,7 +597,7 @@
       "bbox": {
         "min": [
           -1.218,
-          -0.051,
+          -0.054,
           -0.906
         ],
         "max": [
@@ -690,8 +693,9 @@
         "_BUILD",
         "_BUILDH"
       ],
-      "bytes": 1041936,
-      "hash": "79b0f478bf",
+      "bytes": 1041096,
+      "scaffold": 1.5,
+      "hash": "a473ae878b",
       "source": "assets/blender/models/hovel.py",
       "blend": "assets/src/hovel_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"

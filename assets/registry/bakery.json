@@ -142,5 +142,6 @@
   "bytes": 1281716,
   "source": "assets/blender/models/bakery.py",
   "blend": "assets/src/bakery.blend",
-  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",
+  "scaffold": 2.35
 }

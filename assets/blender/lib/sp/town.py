@@ -13,9 +13,54 @@ import bmesh
 from mathutils import Matrix, Vector
 from mathutils import noise
 
-from . import mesh, uv
+from . import materials, mesh, uv
 
 UV = uv.UV_NAME
+
+# Bibliotheksmaterialien, deren Maserung entlang V laeuft (Bretter senkrecht, U quer) - alle anderen Hoelzer/Eisen: U
+GRAIN_V = {'M_Wood_Planks'}
+
+
+def mark_world(obj, grain_u=True):
+    """UVs des Objekts sind in Weltmass (1 UV = 1 Einheit) mit Maserung entlang U; town.add skaliert sie auf die
+    Kachelgroesse des zugewiesenen Materials (und dreht sie fuer GRAIN_V-Materialien)."""
+    obj['sp_uv_world'] = 1
+    obj['sp_uv_len'] = 1 if grain_u else 0
+    return obj
+
+
+def uv_world_box(obj, along=None, space='object'):
+    """Box-Projektion im Weltmass (along = Maserungsachse auf U), Skalierung spaeter in town.add"""
+    uv.box(obj, tile=1.0, space=space, along=along)
+    return mark_world(obj, grain_u=along is not None)
+
+
+def add(A, obj, **kw):
+    """A.add mit Material-gerechten Weltmass-UVs: Objekte mit sp_uv_world werden nach der Materialzuweisung durch die
+    Kachelgroesse `tile` des Materials (assets/materials.json) geteilt; fuer GRAIN_V-Materialien werden U und V getauscht,
+    damit die Maserung der Bibliothekstextur der Laengsrichtung folgt. Aendert sich `tile`, genuegt ein Neuexport."""
+    if kw.get('uv_mode', 'box') is not None:
+        for k in ('sp_uv_world', 'sp_uv_len'):
+            if k in obj:
+                del obj[k]
+    A.add(obj, **kw)
+    if obj.get('sp_uv_world') and obj.data.materials and obj.data.materials[0] is not None:
+        name = obj.data.materials[0].name
+        t = materials.tile(name)
+        swap = bool(obj.get('sp_uv_len')) and name in GRAIN_V
+        uvl = obj.data.uv_layers.get(UV)
+        if uvl is not None:
+            co = [0.0] * (len(uvl.data) * 2)
+            uvl.data.foreach_get('uv', co)
+            for i in range(0, len(co), 2):
+                u, v = co[i], co[i + 1]
+                if swap:
+                    u, v = v, -u
+                co[i], co[i + 1] = u / t, v / t
+            uvl.data.foreach_set('uv', co)
+        for k in ('sp_uv_world', 'sp_uv_len'):
+            del obj[k]
+    return obj
 
 
 # ---------------------------------------------------------------------------------------------------------------- Hoelzer
@@ -33,7 +78,7 @@ def _frame_axes(p0, p1, up):
     return a, L, x, y, z
 
 
-def timber(name, p0, p1, w, h=None, ch=0.012, up=(0, 0, 1), segs=1, bend=0.0, wob=0.0, rnd=None, tile=2.0, taper=0.0,
+def timber(name, p0, p1, w, h=None, ch=0.012, up=(0, 0, 1), segs=1, bend=0.0, wob=0.0, rnd=None, tile=1.0, taper=0.0,
            caps=True, outer_only=False):
     """Gefastes Holz von p0 nach p1, Querschnitt w (quer, lokale Y) x h (lokale Z), Fase ch auf den vier Laengskanten
     (Achteck-Querschnitt). segs > 1: Zwischenringe fuer Durchhang `bend` (Mitte sinkt entlang -Z) und Verzug `wob`
@@ -88,7 +133,7 @@ def timber(name, p0, p1, w, h=None, ch=0.012, up=(0, 0, 1), segs=1, bend=0.0, wo
             for lp, (py, pz) in zip(f.loops, pr):
                 lp[uvl].uv = (py / tile * 2 + ou, pz / tile * 2 + ov)
     bm.normal_update()
-    return mesh.obj_from_bm(name, bm)
+    return mark_world(mesh.obj_from_bm(name, bm))
 
 
 def peg(name, loc, normal, size=0.02, depth=0.007, rot=0.0):
@@ -114,7 +159,7 @@ def peg(name, loc, normal, size=0.02, depth=0.007, rot=0.0):
         for lp in f.loops:
             lp[uvl].uv = (lp.vert.co.x * 3.1 + lp.vert.co.z, lp.vert.co.y * 3.1 + lp.vert.co.z * 0.7)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    return mesh.obj_from_bm(name, bm)
+    return mark_world(mesh.obj_from_bm(name, bm))
 
 
 def box_uv(name, size, loc, rot=(0, 0, 0), bevel=0.0):
@@ -487,7 +532,7 @@ def thatch_roof(name, R, nx=14, thick=0.16, thick_eave=0.22, surf=None, rnd=None
     return ob
 
 
-def uv_roof(obj, R, tile=3.0, seed=0):
+def uv_roof(obj, R, tile=1.0, seed=0):
     """Dach-UVs: U entlang des Firsts (x), V entlang der Falllinie (wahre Laenge); Walmflaechen: U entlang y"""
     me = obj.data
     uvl = me.uv_layers.get(UV) or me.uv_layers.new(name=UV)
@@ -507,7 +552,7 @@ def uv_roof(obj, R, tile=3.0, seed=0):
             else:
                 u, v = co.x, (R.ye - abs(co.y - R.cy)) * k
             uvl.data[li].uv = (u / tile + ou, v / tile + ov)
-    return obj
+    return mark_world(obj)
 
 
 def course_rows(name, R, side, rows, row_thick=0.03, lap=1.45, xmargin=0.0, depth0=0.02, seed=0, tooth=0.0, nseg=1,
@@ -604,15 +649,15 @@ def log(name, p0, p1, r, segs=6, rnd=None):
         j = (k + 1) % segs
         f = bm.faces.new((rings[0][k], rings[0][j], rings[1][j], rings[1][k]))
         for lp, (uu, vv) in zip(f.loops, ((0, k), (0, k + 1), (1, k + 1), (1, k))):
-            lp[uvl].uv = (uu * L / 2 + ou, vv * 2 * math.pi * r / segs / 2)
+            lp[uvl].uv = (uu * L + ou, vv * 2 * math.pi * r / segs)
     for k, rev in ((0, True), (1, False)):
         vs = list(reversed(rings[k])) if rev else rings[k]
         f = bm.faces.new(vs)
         for lp in f.loops:
             c = lp.vert.co
-            lp[uvl].uv = (c.dot(y) / 0.6 + 0.3, c.dot(z) / 0.6 + 0.6)
+            lp[uvl].uv = (c.dot(y) * 3.3 + 0.3, c.dot(z) * 3.3 + 0.6)
     bm.normal_update()
-    return mesh.obj_from_bm(name, bm)
+    return mark_world(mesh.obj_from_bm(name, bm))
 
 
 def woodpile(name, x0, y0, x1, y1, h, r=0.045, rnd=None, axis='y', split=True):

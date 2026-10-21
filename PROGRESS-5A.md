@@ -60,4 +60,22 @@ Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/
 - **LookDev:** neue Kameras `3d-house`, `3e-bakery`, `3f-smithy`, `2b-town` (`lookdev_scene.ts`).
 - **Browserprüfung:** `scripts/qa/s18_town_medieval.mjs` (Platzierungsgeist, Bauanimation in Stufen 20/45/70/90 %,
   fertiges GLB, Auswahl/Hover, Varianten, Emitter) → `docs/phase5a/assets/town/qa/`.
-- **Bilder:** `docs/phase5a/assets/town/` (classic vs. medieval je Kamera, Cycles-Vorschauen, Bauphasen).
+- **Bilder:** `docs/phase5a/assets/town/` – `vergleich_<kamera>_classic-medieval.jpg` (1-rts, 2-mid, 2b-town, 3d-house,
+  3e-bakery, 3f-smithy), `cycles_vorschau_{front,rts}.jpg`, `bauphasen_{hovel,bakery,blacksmith}.jpg` (20/45/70/90 % +
+  fertig), `vorschau_wip-texturen_*.jpg` (lokaler Probelauf mit den noch nicht gemergten Texturen des Material-Agenten,
+  nicht Teil dieses Branches), LookDev-Statistik `lookdev_stats_*_medium.json`.
+- **Prüfungen:** `s18_town_medieval` 21/22 OK beim letzten vollständigen Lauf (Geist, Bauanimation, fertiges GLB,
+  Auswahl/Hover für alle drei Typen; Konsole sauber); die eine Abweichung: vier zufällig gebaute Hütten bekamen per
+  ID-Hash alle Variante B – Prüfung danach auf Zuordnung umgestellt (gleiche ID → gleiches Modell, beide Varianten
+  erreichbar). Arbeiter kamen im Testlauf nicht an (Wohnraum voll), Emitter mit Arbeiter daher nur im LookDev belegt
+  (Bäckerei-Rauch, Schmiede-Dunkelrauch + Amboss). `pnpm test`, `pnpm -r typecheck`, `pnpm build` grün.
+- **Messung** (LookDev, Mittel, Software-GL, 1280×720, Kamera RTS): classic 53 Draw-Calls/301k Dreiecke/21 Programme →
+  medieval mit Brunnen + 4 Stadt-Assets 87 Draw-Calls/334k/22 Programme (je sichtbarer Asset-Typ × LOD ≈ 6–7 Materialien
+  = Draw-Calls, auch im Schattenpass). Mit WIP-Texturen geschätzter Texturspeicher 209 MB (Material-Agent).
+- **Material-Vorbereitung:** Die WIP-Bibliothek ändert `tile` stark (z. B. Eiche 2 → 0,54, Stroh 3 → 0,54) und legt die
+  Bretter-Maserung auf V. Der Baukasten erzeugt daher Weltmaß-UVs und skaliert sie beim Hinzufügen (`town.add`) auf das
+  `tile` des Materials (Bretter gedreht) → nach dem Merge genügt ein Neuexport der vier Assets (getestet im Probelauf).
+- **Offen:** echte Texturen nach Merge prüfen und Assets neu exportieren; Variantenwahl per ID-Hash kann in kleinen
+  Gruppen gleiche Nachbarn ergeben (besser: dritte Variante oder positionsabhängige Wahl); Gerüst nur bis Traufe
+  (optionales `scaffold` im Register); Draw-Calls je Asset-Typ (Materialzahl) für große Städte in 5B senken (Atlas/
+  gemeinsame Materialien über Assets); GLB 1,0–1,25 MB je Asset unkomprimiert (Meshopt/gzip in 5B).

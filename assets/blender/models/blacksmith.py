@@ -116,12 +116,12 @@ for gi, (w0, w1, out) in enumerate((((HX0, HY1), (HX0, HY0), (-1, 0)), ((HX1, HY
     gp = town.plaster_gable(gw, f'gable_plaster{gi}', 0.02, LY - 0.02, Z_PL1, LY / 2, zt(LY / 2) - 0.1, rnd)
     gp1 = town.plaster_gable(gw, f'gable_plaster{gi}_L1', 0.02, LY - 0.02, Z_PL1, LY / 2, zt(LY / 2) - 0.1, rnd, cell=0.6, bulge=0.0)
     gpl.append((gp, gp1))
-A.add(mesh.join(F0, 'frame'), mat='M_Timber_Oak', uv_mode=None, only=0, build=(0.24, 0.52), smooth=30, wear=1.3)
-A.add(mesh.join(F1, 'frame_L1'), mat='M_Timber_Oak', uv_mode=None, only=1, build=(0.24, 0.52), smooth=0, wear=1.3)
-A.add(mesh.join(F2, 'frame_L2'), mat='M_Timber_Oak', uv_mode=None, only=2, build=(0.24, 0.52), smooth=0)
+town.add(A, mesh.join(F0, 'frame'), mat='M_Timber_Oak', uv_mode=None, only=0, build=(0.24, 0.52), smooth=30, wear=1.3)
+town.add(A, mesh.join(F1, 'frame_L1'), mat='M_Timber_Oak', uv_mode=None, only=1, build=(0.24, 0.52), smooth=0, wear=1.3)
+town.add(A, mesh.join(F2, 'frame_L2'), mat='M_Timber_Oak', uv_mode=None, only=2, build=(0.24, 0.52), smooth=0)
 for gp, gp1 in gpl:
-    A.add(gp, mat='M_Plaster_Lime', uv_mode='box', only=0, build=(0.5, 0.68), smooth=0)
-    A.add(gp1, mat='M_Plaster_Lime', uv_mode='box', only=(1, 2), build=(0.5, 0.68), smooth=0)
+    town.add(A, gp, mat='M_Plaster_Lime', uv_mode='box', only=0, build=(0.5, 0.68), smooth=0)
+    town.add(A, gp1, mat='M_Plaster_Lime', uv_mode='box', only=(1, 2), build=(0.5, 0.68), smooth=0)
 
 # Putz: Russ zur Esse hin (Front, rechts), Flecken
 for wi, w in enumerate((wf, wb, wl, wr)):
@@ -129,19 +129,19 @@ for wi, w in enumerate((wf, wb, wl, wr)):
     p0 = town.plaster(w, f'plaster{wi}', u0, u1, Z_SILL, Z_PL0, rnd, cell=0.17)
     town.grime_attr(p0, lambda x, y, z: 0.45 * max(0.0, noise.noise(Vector((x * 4.0, y * 4.0, z * 3.0 + 9.0))) - 0.15)
                     + (0.7 * max(0.0, 1.0 - abs(x - 0.52) / 0.6) * max(0.0, (z - 0.9) / 0.6) if y < HY0 + 0.05 else 0.0))
-    A.add(p0, mat='M_Plaster_Lime', uv_mode='box', only=0, build=(0.4, 0.62), smooth=60)
+    town.add(A, p0, mat='M_Plaster_Lime', uv_mode='box', only=0, build=(0.4, 0.62), smooth=60)
     p1 = town.plaster(w, f'plaster{wi}_L1', u0, u1, Z_SILL, Z_PL0, rnd, cell=0.4, bulge=0.0)
-    A.add(p1, mat='M_Plaster_Lime', uv_mode='box', only=1, build=(0.4, 0.62), smooth=0)
+    town.add(A, p1, mat='M_Plaster_Lime', uv_mode='box', only=1, build=(0.4, 0.62), smooth=0)
 body2 = town.subdivided_box('body_L2', (LX - 0.04, LY - 0.04, Z_PL0 - Z_SILL), loc=(XC, CY, Z_SILL), cuts=1)
-A.add(body2, mat='M_Plaster_Lime', uv_mode='box', only=2, build=(0.4, 0.62), smooth=0)
+town.add(A, body2, mat='M_Plaster_Lime', uv_mode='box', only=2, build=(0.4, 0.62), smooth=0)
 
 # Sockel (Bruchstein)
 stones, core = town.plinth_ring('plinth', HX0, HY0, HX1, HY1, Z_PLINTH, rnd, proud=0.03, depth=0.15, lmin=0.3, lmax=0.46, small_prob=0.15)
-A.add(mesh.join(stones, 'plinth_stones'), mat='M_Stone_Rubble', uv_mode='box', only=0, build=(0.02, 0.2), smooth=40, dirt=1.4)
-A.add(core, mat='M_Stone_Rubble', uv_mode='box', lod2='drop', build=(0.02, 0.2), smooth=0, dirt=1.6)
+town.add(A, mesh.join(stones, 'plinth_stones'), mat='M_Stone_Rubble', uv_mode='box', only=0, build=(0.02, 0.2), smooth=40, dirt=1.4)
+town.add(A, core, mat='M_Stone_Rubble', uv_mode='box', lod2='drop', build=(0.02, 0.2), smooth=0, dirt=1.6)
 for L in (1, 2):
     pb = mesh.box(f'plinth_L{L}', (LX + 0.06, LY + 0.06, Z_PLINTH + 0.03), loc=(XC, CY, -0.03))
-    A.add(pb, mat='M_Stone_Rubble', uv_mode='box', only=L, build=(0.02, 0.2), smooth=0, dirt=1.5)
+    town.add(A, pb, mat='M_Stone_Rubble', uv_mode='box', only=L, build=(0.02, 0.2), smooth=0, dirt=1.5)
 
 # Fenster, Tuer
 backs, bars = [], []
@@ -152,17 +152,17 @@ for w in (wl, wr, wb):
         bars.append(town.wall_timber(w, f'wbar_{id(w)}', um, z0, um, z1, 0.035, 0.04, depth=0.055, rnd=rnd))
         bars.append(town.wall_timber(w, f'wbarh_{id(w)}', u0, (z0 + z1) / 2 + 0.03, u1, (z0 + z1) / 2 + 0.03, 0.028, 0.03, depth=0.06, rnd=rnd))
 bk = mesh.join(backs, 'window_backs')
-uv.box(bk, tile=2.0)
-A.add(bk, mat='M_Wood_Planks', uv_mode=None, build=(0.4, 0.62), smooth=0)
+town.uv_world_box(bk, space='world')
+town.add(A, bk, mat='M_Wood_Planks', uv_mode=None, build=(0.4, 0.62), smooth=0)
 bk['sp_grime'] = 1.0
-A.add(mesh.join(bars, 'window_bars'), mat='M_Timber_Oak', uv_mode=None, build=(0.5, 0.62), smooth=0, lod1='drop', lod2='drop')
+town.add(A, mesh.join(bars, 'window_bars'), mat='M_Timber_Oak', uv_mode=None, build=(0.5, 0.62), smooth=0, lod1='drop', lod2='drop')
 door = []
 u0, u1, z0, z1, _ = wf.openings[0]
 for k in range(5):
     bw = (u1 - u0 - 0.01) / 5
     uu = u0 + 0.005 + bw * (k + 0.5)
     door.append(town.wall_timber(wf, f'door{k}', uu, z0 + 0.01, uu, z1 - 0.005 - rnd.uniform(0, 0.012), bw - 0.004, 0.035, depth=0.06, rnd=rnd))
-A.add(mesh.join(door, 'door'), mat='M_Wood_Planks', uv_mode=None, build=(0.55, 0.65), smooth=0, dirt=1.3)
+town.add(A, mesh.join(door, 'door'), mat='M_Wood_Planks', uv_mode=None, build=(0.55, 0.65), smooth=0, dirt=1.3)
 iron = [town.wall_timber(wf, f'hinge{z:.2f}', u0 + 0.12, z, u1 - 0.02, z, 0.035, 0.008, depth=0.038, rnd=rnd) for z in (z0 + 0.22, z1 - 0.22)]
 
 # ---------------------------------------------------------------- Dach (Schindeln in Lagen), First entlang X
@@ -174,19 +174,19 @@ for side in (-1, 1):
     rows0 += town.course_rows(f'shingle{side}', R, side, rows=9, row_thick=0.03, depth0=0.03, seed=21 + side, tooth=0.016, nseg=8,
                               jitter=0.01, lean=True, split=True)
 r0 = mesh.join(rows0, 'roof')
-town.uv_roof(r0, R, tile=2.0, seed=5)
+town.uv_roof(r0, R, seed=5)
 town.place(r0, 0.0, (XC, CY, 0.0))
 town.grime_attr(r0, lambda x, y, z: (0.32 if y > CY else 0.12) + 0.35 * max(0.0, noise.noise(Vector((x * 2.3, y * 2.3, 0.7))))
                 + 0.5 * max(0.0, 1.0 - abs(x - 0.52) / 0.5) * (1.0 if y < CY else 0.3))
-A.add(r0, mat='M_Roof_Shingle', uv_mode=None, only=0, build=(0.7, 0.93), smooth=0, dirt=1.2)
+town.add(A, r0, mat='M_Roof_Shingle', uv_mode=None, only=0, build=(0.7, 0.93), smooth=0, dirt=1.2)
 for L, rows in ((1, 4), (2, 1)):
     objs = []
     for side in (-1, 1):
         objs += town.course_rows(f'shingleL{L}{side}', R, side, rows=rows, row_thick=0.04, depth0=0.03, seed=3, nseg=1, jitter=0.0, lean=True)
     o = mesh.join(objs, f'roof_L{L}')
-    town.uv_roof(o, R, tile=2.0, seed=5)
+    town.uv_roof(o, R, seed=5)
     town.place(o, 0.0, (XC, CY, 0.0))
-    A.add(o, mat='M_Roof_Shingle', uv_mode=None, only=L, build=(0.7, 0.93), smooth=0, dirt=1.2)
+    town.add(A, o, mat='M_Roof_Shingle', uv_mode=None, only=L, build=(0.7, 0.93), smooth=0, dirt=1.2)
 soff = []
 for side in (-1, 1):
     bmS = __import__('bmesh').new()
@@ -197,13 +197,13 @@ for side in (-1, 1):
         f.normal_flip()
     soff.append(mesh.obj_from_bm(f'roof_under{side}', bmS))
 so = mesh.join(soff, 'roof_underside')
-uv.box(so, tile=2.0)
-A.add(so, mat='M_Wood_Planks', uv_mode=None, build=(0.68, 0.75), smooth=0, dirt=1.5)
+town.uv_world_box(so, space='world')
+town.add(A, so, mat='M_Wood_Planks', uv_mode=None, build=(0.68, 0.75), smooth=0, dirt=1.5)
 cap = [town.timber(f'ridge_board{s}', (XC - XE - 0.02, CY + s * 0.05, RIDGE + 0.05), (XC + XE + 0.02, CY + s * 0.05, RIDGE + 0.05), 0.12, 0.022, ch=0.0,
                    up=(0, s * 0.7, 0.7), segs=2, rnd=rnd) for s in (-1, 1)]
 for c in cap:
     mesh.sag(c, 0.035, 'X')
-A.add(mesh.join(cap, 'ridge_boards'), mat='M_Wood_Planks', uv_mode=None, build=(0.9, 0.95), smooth=0, lod2='keep')
+town.add(A, mesh.join(cap, 'ridge_boards'), mat='M_Wood_Planks', uv_mode=None, build=(0.9, 0.95), smooth=0, lod2='keep')
 wbd = []
 for sx in (-1, 1):
     xv = sx * (XE - 0.012)
@@ -211,7 +211,7 @@ for sx in (-1, 1):
         p0 = (XC + xv, CY + side * (YE - 0.01), R.z_main(xv, side * (YE - 0.01)) - 0.02)
         p1 = (XC + xv, CY, R.z_main(xv, 0.0) - 0.02)
         wbd.append(town.timber(f'barge{sx}_{side}', p0, p1, 0.028, 0.13, ch=0.004, up=(0, 0, 1), rnd=rnd))
-A.add(mesh.join(wbd, 'barge_boards'), mat='M_Wood_Planks', uv_mode=None, build=(0.8, 0.9), smooth=0, dirt=1.0, lod2='drop')
+town.add(A, mesh.join(wbd, 'barge_boards'), mat='M_Wood_Planks', uv_mode=None, build=(0.8, 0.9), smooth=0, dirt=1.0, lod2='drop')
 
 # ---------------------------------------------------------------- Offener Arbeitsplatz: Pultdach auf Staendern
 VX0, VX1 = HX0 + 0.04, HX1 - 0.04
@@ -220,10 +220,10 @@ ZV = Z_PL0 - 0.06
 RV = town.GableRoof((VX1 - VX0) / 2, VD, ZV, 17.0, cy=0.0, seed=6)
 rv = town.course_rows('vtiles', RV, -1, rows=5, row_thick=0.028, depth0=0.03, seed=7, tooth=0.016, nseg=7, jitter=0.009, lean=True, split=True)
 vt = mesh.join(rv, 'shed_roof')
-town.uv_roof(vt, RV, tile=2.0, seed=7)
+town.uv_roof(vt, RV, seed=7)
 town.place(vt, 0.0, ((VX0 + VX1) / 2, HY0, 0.0))
 town.grime_attr(vt, lambda x, y, z: 0.15 + 0.55 * max(0.0, 1.0 - abs(x - 0.52) / 0.45))
-A.add(vt, mat='M_Roof_Shingle', uv_mode=None, build=(0.78, 0.92), smooth=0, dirt=1.2, lod1=0.45, lod2=0.3)
+town.add(A, vt, mat='M_Roof_Shingle', uv_mode=None, build=(0.78, 0.92), smooth=0, dirt=1.2, lod1=0.45, lod2=0.3)
 YP = HY0 - VD + 0.1
 zt_front = RV.z_main(0, -VD + 0.1) - 0.05
 posts, pbases = [], []
@@ -238,9 +238,9 @@ posts.append(town.timber('shed_plate', (VX0 - 0.04, YP, zt_front - 0.05), (VX1 +
 for k in range(5):
     x = VX0 + 0.05 + k * (VX1 - VX0 - 0.1) / 4
     posts.append(town.timber(f'shed_rafter{k}', (x, HY0 + 0.02, RV.z_main(0, 0) - 0.05), (x, HY0 - VD + 0.04, RV.z_main(0, -VD + 0.04) - 0.05), 0.06, 0.07, ch=0.0, rnd=rnd))
-A.add(mesh.join(pbases, 'post_bases'), mat='M_Stone_Rubble', uv_mode='box', build=(0.05, 0.2), smooth=20, dirt=1.4, lod2='drop')
+town.add(A, mesh.join(pbases, 'post_bases'), mat='M_Stone_Rubble', uv_mode='box', build=(0.05, 0.2), smooth=20, dirt=1.4, lod2='drop')
 po = mesh.join(posts, 'shed_frame')
-A.add(po, mat='M_Timber_Oak', uv_mode=None, build=(0.6, 0.78), smooth=0, wear=1.4)
+town.add(A, po, mat='M_Timber_Oak', uv_mode=None, build=(0.6, 0.78), smooth=0, wear=1.4)
 po['sp_grime'] = 0.2
 
 # ---------------------------------------------------------------- Esse mit Rauchfang und Schlot
@@ -254,16 +254,16 @@ for L, cell in ((0, 0.18), (1, 0.6)):
     fo = town.plaster(ef, f'forge_front_L{L}', 0.0, ef.L, 0.0, EZ, rnd, inset=0.0, thick=0.5, cell=cell, bulge=0.012 if L == 0 else 0.0)
     if L == 0:
         town.grime_attr(fo, lambda x, y, z: 0.35 + 0.4 * max(0.0, (z - 0.3) / 0.25))
-    A.add(fo, mat='M_Stone_Rubble', uv_mode='box', only=L, build=(0.2, 0.4), smooth=0, dirt=1.3)
+    town.add(A, fo, mat='M_Stone_Rubble', uv_mode='box', only=L, build=(0.2, 0.4), smooth=0, dirt=1.3)
 nb = town.opening_reveal(ef, 'forge_niche_back', 0.22, 0.48, 0.1, 0.34, depth=0.45)
-uv.box(nb, tile=2.0)
-A.add(nb, mat='M_Stone_Rubble', uv_mode=None, build=(0.2, 0.4), smooth=0)
+town.uv_world_box(nb, space='world')
+town.add(A, nb, mat='M_Stone_Rubble', uv_mode=None, build=(0.2, 0.4), smooth=0)
 nb['sp_grime'] = 1.0
 # Herdplatte mit Glutbett (dunkle Kohle, Mitte)
 hearth = [town.timber('hearth_rim', (EX0 - 0.02, (EY0 + HY0) / 2, EZ + 0.03), (EX1 + 0.02, (EY0 + HY0) / 2, EZ + 0.03), HY0 - EY0 + 0.04, 0.06, ch=0.015, rnd=rnd)]
-A.add(mesh.join(hearth, 'hearth_rim'), mat='M_Stone_Rubble', uv_mode='box', build=(0.35, 0.45), smooth=0, dirt=1.5)
+town.add(A, mesh.join(hearth, 'hearth_rim'), mat='M_Stone_Rubble', uv_mode='box', build=(0.35, 0.45), smooth=0, dirt=1.5)
 coalbed = town.dome('coal_bed', ecx, (EY0 + HY0) / 2 + 0.04, EZ + 0.055, 0.2, 0.15, 0.06, segs=8, rings=1, rnd=rnd, wob=0.01)
-A.add(coalbed, mat='M_Stone_Rubble', uv_mode='box', build=(0.4, 0.45), smooth=40)
+town.add(A, coalbed, mat='M_Stone_Rubble', uv_mode='box', build=(0.4, 0.45), smooth=40)
 coalbed['sp_grime'] = 1.0
 # Rauchfang: Pyramidenstumpf ueber dem Herd, dann Schlot
 hood_lo, hood_hi = EZ + 0.42, EZ + 0.74
@@ -281,7 +281,7 @@ for i in range(4):
 __import__('bmesh').ops.recalc_face_normals(bmh, faces=bmh.faces)
 hood = mesh.obj_from_bm('forge_hood', bmh)
 town.grime_attr(hood, lambda x, y, z: 0.55 + 0.4 * (z - hood_lo) / (hood_hi - hood_lo))
-A.add(hood, mat='M_Plaster_Lime', uv_mode='box', build=(0.45, 0.6), smooth=0, dirt=1.4)
+town.add(A, hood, mat='M_Plaster_Lime', uv_mode='box', build=(0.45, 0.6), smooth=0, dirt=1.4)
 # Hood-Traeger (Eisen)
 iron.append(town.timber('hood_bar', (EX0 - 0.02, EY0 - 0.05, hood_lo - 0.02), (EX1 + 0.02, EY0 - 0.05, hood_lo - 0.02), 0.03, 0.03, ch=0.0, rnd=rnd))
 # Schlot (Bruchstein in Lagen) durch Pult- und Hauptdach
@@ -289,9 +289,9 @@ CH_TOP = RIDGE + 0.35
 chim = town.chimney_shaft('chimney', ecx, HY0 - 0.12, hood_hi, CH_TOP, 0.36, 0.3, rnd, rings=5)
 bands = [town.timber('chim_band', (ecx - 0.2, HY0 - 0.12, CH_TOP - 0.5), (ecx + 0.2, HY0 - 0.12, CH_TOP - 0.5), 0.33, 0.05, ch=0.01, rnd=rnd)]
 town.grime_attr(chim, lambda x, y, z: 0.35 + 0.6 * max(0.0, (z - (CH_TOP - 0.6)) / 0.6))
-A.add(chim, mat='M_Stone_Rubble', uv_mode='box', build=(0.45, 0.92), smooth=0, dirt=1.3, lod1='keep', lod2='keep')
+town.add(A, chim, mat='M_Stone_Rubble', uv_mode='box', build=(0.45, 0.92), smooth=0, dirt=1.3, lod1='keep', lod2='keep')
 cc = mesh.join([town.timber('chim_cap', (ecx - 0.2, HY0 - 0.12, CH_TOP + 0.03), (ecx + 0.2, HY0 - 0.12, CH_TOP + 0.03), 0.34, 0.05, ch=0.012, rnd=rnd)] + bands, 'chimney_cap')
-A.add(cc, mat='M_Stone_Rubble', uv_mode='box', build=(0.88, 0.94), smooth=0, dirt=1.5, lod2='drop')
+town.add(A, cc, mat='M_Stone_Rubble', uv_mode='box', build=(0.88, 0.94), smooth=0, dirt=1.5, lod2='drop')
 cc['sp_grime'] = 0.9
 
 # Blasebalg links der Esse (Bretter + Leder) an einem Hebel
@@ -300,13 +300,13 @@ bel = []
 for zz, wd in ((bz, 0.3), (bz + 0.12, 0.26)):
     bel.append(town.timber(f'bellows_board{zz:.2f}', (bx - 0.12, by - 0.18, zz), (bx - 0.12, by + 0.2, zz), wd, 0.025, ch=0.0, up=(0, 0, 1), rnd=rnd))
 bel.append(town.timber('bellows_nozzle', (bx + 0.02, by + 0.2, bz + 0.05), (EX0 + 0.05, by + 0.26, EZ + 0.08), 0.03, 0.03, ch=0.0, rnd=rnd))
-A.add(mesh.join(bel, 'bellows_wood'), mat='M_Wood_Planks', uv_mode=None, build=(0.85, 0.94), smooth=0, dirt=1.4, lod2='drop')
+town.add(A, mesh.join(bel, 'bellows_wood'), mat='M_Wood_Planks', uv_mode=None, build=(0.85, 0.94), smooth=0, dirt=1.4, lod2='drop')
 leather = town.dome('bellows_leather', bx - 0.12, by + 0.0, bz - 0.005, 0.13, 0.19, 0.13, segs=8, rings=1, rnd=rnd, wob=0.006)
-A.add(leather, mat='M_Leather', uv_mode='box', build=(0.85, 0.94), smooth=40, dirt=1.0, lod2='drop')
+town.add(A, leather, mat='M_Leather', uv_mode='box', build=(0.85, 0.94), smooth=40, dirt=1.0, lod2='drop')
 stand = [town.timber(f'bellows_leg{k}', (bx - 0.12 + sx * 0.11, by + sy * 0.15, 0.0), (bx - 0.12 + sx * 0.11, by + sy * 0.15, bz), 0.04, 0.04, ch=0.0, rnd=rnd)
          for k, (sx, sy) in enumerate(((-1, -1), (1, -1), (-1, 1), (1, 1)))]
 stand.append(town.timber('bellows_lever', (bx - 0.12, by - 0.18, bz + 0.14), (bx - 0.14, by - 0.55, bz + 0.42), 0.03, 0.03, ch=0.0, rnd=rnd))
-A.add(mesh.join(stand, 'bellows_stand'), mat='M_Timber_Oak', uv_mode=None, build=(0.82, 0.92), smooth=0, lod1='drop', lod2='drop')
+town.add(A, mesh.join(stand, 'bellows_stand'), mat='M_Timber_Oak', uv_mode=None, build=(0.82, 0.92), smooth=0, lod1='drop', lod2='drop')
 
 # Amboss auf Klotz
 ax, ay = 0.42, -0.78
@@ -314,7 +314,7 @@ stump = mesh.cylinder('anvil_stump', 0.13, 0.36, segs=8, loc=(ax, ay, 0.0), r_to
 mesh.displace(stump, 0.008, 9.0, seed=4)
 materials.assign(stump, 'M_Timber_Oak')
 uv.cylindrical(stump, center=(ax, ay, 0.0))
-A.add(stump, mat=None, uv_mode=None, build=(0.85, 0.94), smooth=40, dirt=1.3, lod2='drop')
+town.add(A, stump, mat=None, uv_mode=None, build=(0.85, 0.94), smooth=40, dirt=1.3, lod2='drop')
 anv = [mesh.box('anvil_foot', (0.17, 0.12, 0.06), loc=(ax, ay, 0.36), bevel=0.008),
        mesh.box('anvil_waist', (0.1, 0.07, 0.07), loc=(ax, ay, 0.42), bevel=0.006),
        mesh.box('anvil_face', (0.26, 0.1, 0.06), loc=(ax - 0.02, ay, 0.49), bevel=0.006),
@@ -338,35 +338,35 @@ for k in range(5):
     else:  # Hammer: Stiel + Kopf
         tools.append(town.timber(f'whandle{k}', wf.p(u, 1.17, -0.05), wf.p(u, 0.9, -0.05), 0.018, 0.018, ch=0.0, rnd=rnd))
         iron.append(town.timber(f'whead{k}', wf.p(u - 0.035, 1.17, -0.05), wf.p(u + 0.035, 1.17, -0.05), 0.035, 0.035, ch=0.0, rnd=rnd))
-A.add(mesh.join(tools, 'tools_wood'), mat='M_Wood_Planks', uv_mode=None, build=(0.88, 0.96), smooth=0, dirt=1.2, lod1='drop', lod2='drop')
+town.add(A, mesh.join(tools, 'tools_wood'), mat='M_Wood_Planks', uv_mode=None, build=(0.88, 0.96), smooth=0, dirt=1.2, lod1='drop', lod2='drop')
 
 # Loeschtrog
 qx, qy = 0.82, -0.8
 qt = town.trough('quench_trough', qx, qy, 0.0, L=0.36, W=0.26, H=0.3, flare=1.12)
-uv.box(qt, tile=2.0, space='object', along='x')
-A.add(qt, mat='M_Wood_Planks', uv_mode=None, build=(0.86, 0.95), smooth=0, dirt=1.4, lod2='drop')
+town.uv_world_box(qt, along='x')
+town.add(A, qt, mat='M_Wood_Planks', uv_mode=None, build=(0.86, 0.95), smooth=0, dirt=1.4, lod2='drop')
 water = mesh.box('water', (0.32, 0.24, 0.01), loc=(qx, qy, 0.22))
-A.add(water, mat='M_Iron_Wrought', uv_mode='box', build=(0.9, 0.96), smooth=0, dirt=0.0, lod2='drop')
+town.add(A, water, mat='M_Iron_Wrought', uv_mode='box', build=(0.9, 0.96), smooth=0, dirt=0.0, lod2='drop')
 water['sp_grime'] = 0.6
 
 # Kohlehaufen (links der Esse) in einem Bretterverschlag
 kx, ky = -0.27, -0.42
 coal = town.dome('coal_heap', kx, ky, 0.0, 0.26, 0.24, 0.24, segs=10, rings=2, rnd=rnd, wob=0.03)
 mesh.displace(coal, 0.025, 12.0, seed=8)
-A.add(coal, mat='M_Stone_Rubble', uv_mode='box', build=(0.8, 0.92), smooth=20, lod2='keep')
+town.add(A, coal, mat='M_Stone_Rubble', uv_mode='box', build=(0.8, 0.92), smooth=20, lod2='keep')
 coal['sp_grime'] = 1.0
 pen = [town.timber(f'pen{k}', (kx - 0.3, ky + 0.3 - k * 0.0, 0.06 + k * 0.1), (kx + 0.3, ky + 0.3, 0.06 + k * 0.1), 0.025, 0.09, ch=0.0, up=(0, 0, 1), rnd=rnd) for k in range(3)]
 pen += [town.timber(f'penx{k}', (kx - 0.31, ky + 0.3, 0.0), (kx - 0.31, ky - 0.15 - k * 0.05, 0.06 + k * 0.1), 0.025, 0.09, ch=0.0, up=(0, 0, 1), rnd=rnd) for k in range(2)]
-A.add(mesh.join(pen, 'coal_pen'), mat='M_Wood_Planks', uv_mode=None, build=(0.78, 0.9), smooth=0, dirt=1.5, lod2='drop')
+town.add(A, mesh.join(pen, 'coal_pen'), mat='M_Wood_Planks', uv_mode=None, build=(0.78, 0.9), smooth=0, dirt=1.5, lod2='drop')
 
 # Schleifstein (Rad auf Holzbock) links vorn
 gx_, gy_ = -1.0, -0.62
 wheel = mesh.cylinder('grindstone', 0.17, 0.08, segs=12, loc=(gx_, gy_, 0.36), axis='X')
-A.add(wheel, mat='M_Stone_Rubble', uv_mode='box', build=(0.88, 0.96), smooth=40, dirt=1.0, lod2='drop')
+town.add(A, wheel, mat='M_Stone_Rubble', uv_mode='box', build=(0.88, 0.96), smooth=40, dirt=1.0, lod2='drop')
 gfr = [town.timber(f'gframe{s}', (gx_ + s * 0.07, gy_ - 0.18, 0.0), (gx_ + s * 0.07, gy_ + 0.04, 0.42), 0.04, 0.04, ch=0.0, rnd=rnd) for s in (-1, 1)]
 gfr += [town.timber(f'gframeb{s}', (gx_ + s * 0.07, gy_ + 0.2, 0.0), (gx_ + s * 0.07, gy_ + 0.04, 0.42), 0.04, 0.04, ch=0.0, rnd=rnd) for s in (-1, 1)]
 gfr.append(town.timber('gtrough', (gx_ - 0.1, gy_, 0.2), (gx_ + 0.1, gy_, 0.2), 0.16, 0.08, ch=0.0, rnd=rnd))
-A.add(mesh.join(gfr, 'grind_frame'), mat='M_Timber_Oak', uv_mode=None, build=(0.86, 0.95), smooth=0, dirt=1.3, lod2='drop')
+town.add(A, mesh.join(gfr, 'grind_frame'), mat='M_Timber_Oak', uv_mode=None, build=(0.86, 0.95), smooth=0, dirt=1.3, lod2='drop')
 iron.append(town.timber('gcrank', (gx_ + 0.1, gy_, 0.36), (gx_ + 0.16, gy_, 0.36), 0.015, 0.015, ch=0.0, rnd=rnd))
 iron.append(town.timber('gcrank2', (gx_ + 0.16, gy_, 0.36), (gx_ + 0.16, gy_ - 0.09, 0.3), 0.015, 0.015, ch=0.0, rnd=rnd))
 
@@ -377,12 +377,12 @@ for k in range(5):
 body, hoops = town.barrel('barrel', HX1 + 0.12, 0.42, r=0.13, h=0.34, segs=9)
 materials.assign(body, 'M_Wood_Planks')
 uv.cylindrical(body, center=(HX1 + 0.12, 0.42, 0.0))
-A.add(body, mat=None, uv_mode=None, build=(0.9, 0.97), smooth=40, dirt=1.2, lod2='drop')
+town.add(A, body, mat=None, uv_mode=None, build=(0.9, 0.97), smooth=40, dirt=1.2, lod2='drop')
 iron += hoops
-A.add(mesh.join(iron, 'iron'), mat='M_Iron_Wrought', uv_mode='box', build=(0.88, 0.97), smooth=0, dirt=0.6, lod1='drop', lod2='drop')
+town.add(A, mesh.join(iron, 'iron'), mat='M_Iron_Wrought', uv_mode='box', build=(0.88, 0.97), smooth=0, dirt=0.6, lod1='drop', lod2='drop')
 # Spielerfarbe: Tuch ueber dem Pultdach-Rahm (Zunftzeichen)
 sign = town.timber('sign', (-0.45 + 0.2, YP - 0.065, zt_front - 0.14), (-0.45 - 0.08, YP - 0.065, zt_front - 0.14), 0.02, 0.2, ch=0.004, up=(0, 0, 1), rnd=rnd)
-A.add(sign, mat='M_Wood_Planks', uv_mode='box', team=True, build=(0.92, 0.98), smooth=0, dirt=0.3, lod2='drop')
+town.add(A, sign, mat='M_Wood_Planks', uv_mode='box', team=True, build=(0.92, 0.98), smooth=0, dirt=0.3, lod2='drop')
 
 # Pflaster am Arbeitsplatz
 flags = []
@@ -392,7 +392,7 @@ for k, (x, y, sx, sy) in enumerate(((0.45, -0.55, 0.36, 0.28), (0.1, -0.78, 0.32
                     sy, 0.045, ch=0.012, rnd=rnd)
     flags.append(f)
 fl = mesh.join(flags, 'flagstones')
-A.add(fl, mat='M_Stone_Rubble', uv_mode='box', build=(0.02, 0.15), smooth=0, dirt=1.6, lod2='drop')
+town.add(A, fl, mat='M_Stone_Rubble', uv_mode='box', build=(0.02, 0.15), smooth=0, dirt=1.6, lod2='drop')
 
 # ---------------------------------------------------------------- Anker
 anchors.anchor('smokeDark', (ecx, HY0 - 0.12, CH_TOP + 0.12), rate=2.4, staffed=True)
@@ -400,4 +400,5 @@ anchors.anchor('anvil', (ax, ay, 0.56), rate=2.2, staffed=True)
 anchors.anchor('work', (ax - 0.05, ay - 0.35, 0.0), note='Amboss')
 anchors.anchor('door', (HX0 + (DOOR[0] + DOOR[1]) / 2, HY0 - 0.3, 0.0))
 
+A.scaffold = Z_PL1  # Geruest bis zur Traufe, das Dach waechst darueber
 asset.finish(A)

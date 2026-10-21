@@ -112,3 +112,8 @@ pnpm build && node scripts/lookdev.mjs --styles=classic,medieval --qualities=med
   Laibungen (`plaster`, `plaster_gable`), Bruchsteinsockel, Strohdach als Höhenfeld mit Lagen/Krüppelwalm (`GableRoof`,
   `ThatchSurf`, `thatch_roof`), Schindel-/Ziegellagen (`course_rows`, `lean`/`split` für wenig Dreiecke und saubere AO),
   Schlot, Kuppel, Kleinteile (Fass, Holzstapel, Sack, Trog, Laib). Wandhölzer sind nur an der Außenseite gefast.
+- **UVs im Weltmaß** (`sp.town`): Hölzer, Bretter, Dachlagen erzeugen UVs in Spiel-Einheiten (`mark_world`);
+  `town.add(A, obj, …)` (statt `A.add`) teilt sie nach der Materialzuweisung durch `tile` des Materials und dreht sie für
+  Materialien mit Maserung entlang V (`GRAIN_V`, z. B. `M_Wood_Planks`). Ändert die Bibliothek `tile`, genügt ein Neuexport.
+- **Gerüsthöhe** (optional): `A.scaffold = <Traufhöhe>` → Registerfeld `scaffold`; die Baustelle stellt das Gerüst nur bis
+  dahin (sonst Modellhöhe inkl. Kamin), das Dach wächst darüber.

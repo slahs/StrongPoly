@@ -1,0 +1,323 @@
+{
+  "style": "medieval",
+  "quality": "medium",
+  "viewport": "1280x720",
+  "pageLoadS": 181.155,
+  "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte",
+  "cams": {
+    "1-rts": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "1-rts",
+      "calls": 87,
+      "triangles": 334161,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 116,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 17781354,
+      "manifestMs": 2397,
+      "assetsMs": 4316,
+      "assets": {
+        "well": {
+          "ms": 304.3999999985099,
+          "bytes": 434880,
+          "ok": true
+        },
+        "hovel": {
+          "ms": 638,
+          "bytes": 1033824,
+          "ok": true
+        },
+        "blacksmith": {
+          "ms": 877.5999999977648,
+          "bytes": 1111584,
+          "ok": true
+        },
+        "bakery": {
+          "ms": 1725.5999999977648,
+          "bytes": 1281716,
+          "ok": true
+        },
+        "hovel_b": {
+          "ms": 1918.5,
+          "bytes": 1041880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "bakery:LOD0 x1",
+        "blacksmith:LOD0 x1",
+        "hovel:LOD0 x2",
+        "hovel_b:LOD0 x1",
+        "hovel_b:LOD1 x1",
+        "well:LOD1 x1"
+      ],
+      "frameMs": 11.1,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "2-mid": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "2-mid",
+      "calls": 79,
+      "triangles": 239495,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 122,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 17859290,
+      "manifestMs": 2397,
+      "assetsMs": 4316,
+      "assets": {
+        "well": {
+          "ms": 304.3999999985099,
+          "bytes": 434880,
+          "ok": true
+        },
+        "hovel": {
+          "ms": 638,
+          "bytes": 1033824,
+          "ok": true
+        },
+        "blacksmith": {
+          "ms": 877.5999999977648,
+          "bytes": 1111584,
+          "ok": true
+        },
+        "bakery": {
+          "ms": 1725.5999999977648,
+          "bytes": 1281716,
+          "ok": true
+        },
+        "hovel_b": {
+          "ms": 1918.5,
+          "bytes": 1041880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "bakery:LOD0 x1",
+        "blacksmith:LOD0 x1",
+        "hovel:LOD0 x2",
+        "hovel_b:LOD0 x2",
+        "well:LOD0 x1"
+      ],
+      "frameMs": 8.6,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "2b-town": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "2b-town",
+      "calls": 73,
+      "triangles": 193640,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 123,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 17475258,
+      "manifestMs": 2397,
+      "assetsMs": 4316,
+      "assets": {
+        "well": {
+          "ms": 304.3999999985099,
+          "bytes": 434880,
+          "ok": true
+        },
+        "hovel": {
+          "ms": 638,
+          "bytes": 1033824,
+          "ok": true
+        },
+        "blacksmith": {
+          "ms": 877.5999999977648,
+          "bytes": 1111584,
+          "ok": true
+        },
+        "bakery": {
+          "ms": 1725.5999999977648,
+          "bytes": 1281716,
+          "ok": true
+        },
+        "hovel_b": {
+          "ms": 1918.5,
+          "bytes": 1041880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "bakery:LOD0 x1",
+        "blacksmith:LOD0 x1",
+        "hovel:LOD0 x2",
+        "hovel_b:LOD0 x2",
+        "well:LOD0 x1"
+      ],
+      "frameMs": 12.4,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3d-house": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "3d-house",
+      "calls": 69,
+      "triangles": 179457,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 123,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 17374314,
+      "manifestMs": 2397,
+      "assetsMs": 4316,
+      "assets": {
+        "well": {
+          "ms": 304.3999999985099,
+          "bytes": 434880,
+          "ok": true
+        },
+        "hovel": {
+          "ms": 638,
+          "bytes": 1033824,
+          "ok": true
+        },
+        "blacksmith": {
+          "ms": 877.5999999977648,
+          "bytes": 1111584,
+          "ok": true
+        },
+        "bakery": {
+          "ms": 1725.5999999977648,
+          "bytes": 1281716,
+          "ok": true
+        },
+        "hovel_b": {
+          "ms": 1918.5,
+          "bytes": 1041880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "bakery:LOD0 x1",
+        "blacksmith:LOD0 x1",
+        "hovel:LOD0 x2",
+        "hovel_b:LOD0 x2",
+        "well:LOD0 x1"
+      ],
+      "frameMs": 7,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3e-bakery": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "3e-bakery",
+      "calls": 75,
+      "triangles": 197521,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 123,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 17812890,
+      "manifestMs": 2397,
+      "assetsMs": 4316,
+      "assets": {
+        "well": {
+          "ms": 304.3999999985099,
+          "bytes": 434880,
+          "ok": true
+        },
+        "hovel": {
+          "ms": 638,
+          "bytes": 1033824,
+          "ok": true
+        },
+        "blacksmith": {
+          "ms": 877.5999999977648,
+          "bytes": 1111584,
+          "ok": true
+        },
+        "bakery": {
+          "ms": 1725.5999999977648,
+          "bytes": 1281716,
+          "ok": true
+        },
+        "hovel_b": {
+          "ms": 1918.5,
+          "bytes": 1041880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "bakery:LOD0 x1",
+        "blacksmith:LOD0 x1",
+        "hovel:LOD0 x2",
+        "hovel_b:LOD0 x2",
+        "well:LOD0 x1"
+      ],
+      "frameMs": 4.6,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3f-smithy": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "3f-smithy",
+      "calls": 73,
+      "triangles": 185329,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 124,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 17494470,
+      "manifestMs": 2397,
+      "assetsMs": 4316,
+      "assets": {
+        "well": {
+          "ms": 304.3999999985099,
+          "bytes": 434880,
+          "ok": true
+        },
+        "hovel": {
+          "ms": 638,
+          "bytes": 1033824,
+          "ok": true
+        },
+        "blacksmith": {
+          "ms": 877.5999999977648,
+          "bytes": 1111584,
+          "ok": true
+        },
+        "bakery": {
+          "ms": 1725.5999999977648,
+          "bytes": 1281716,
+          "ok": true
+        },
+        "hovel_b": {
+          "ms": 1918.5,
+          "bytes": 1041880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "bakery:LOD0 x1",
+        "blacksmith:LOD0 x1",
+        "hovel:LOD0 x2",
+        "hovel_b:LOD0 x2",
+        "well:LOD0 x1"
+      ],
+      "frameMs": 9.3,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    }
+  }
+}

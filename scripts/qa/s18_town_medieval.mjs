@@ -190,8 +190,16 @@ for (let k = 0; k < 7 && ids.length < 3; k++) {
 }
 if (built.hovel) ids.unshift(built.hovel.id);
 const vs = await S(([t, ids]) => ids.map((id) => window.__assets.forBuilding(t, id)?.id), [BT.Hovel, ids]);
-q.note('hovel_varianten', { ids, assets: vs });
-ok('Hütten: beide Modellvarianten in der Siedlung', new Set(vs).size === 2, JSON.stringify(vs));
+// Variantenwahl: stabil je Gebäude-ID (Hash) – kleine Gruppen können zufällig nur eine Variante zeigen, daher wird hier
+// die Zuordnung geprüft (gleiche ID → gleiches Modell, beide Varianten über einen ID-Bereich erreichbar)
+const vcheck = await S(([t, ids]) => {
+  const again = ids.map((id) => window.__assets.forBuilding(t, id)?.id);
+  const range = new Set();
+  for (let id = 1; id <= 40; id++) range.add(window.__assets.forBuilding(t, id)?.id);
+  return { again, range: [...range].sort() };
+}, [BT.Hovel, ids]);
+q.note('hovel_varianten', { ids, assets: vs, range: vcheck.range });
+ok('Hütten: Variante stabil je Gebäude-ID, beide Varianten erreichbar', JSON.stringify(vcheck.again) === JSON.stringify(vs) && vcheck.range.length === 2, JSON.stringify({ vs, range: vcheck.range }));
 
 // Arbeiter und Rauch (Bäckerei/Schmiede: Emitter aus den Ankern, nur mit Arbeiter)
 await q.speed(4);

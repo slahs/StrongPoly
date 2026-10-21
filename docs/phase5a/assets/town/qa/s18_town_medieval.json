@@ -1,0 +1,215 @@
+{
+  "name": "s18_town_medieval",
+  "base": "http://127.0.0.1:5517",
+  "query": "quick=1&dev=1&size=128&seed=3&style=medieval",
+  "at": "2026-10-21T13:28:41.682Z",
+  "checks": [
+    {
+      "label": "Manifest und Assets geladen",
+      "ok": true,
+      "extra": "{\"ok\":5,\"failed\":0,\"ms\":24022.800000000745}"
+    },
+    {
+      "label": "Overrides Hütte/Bäckerei/Schmiede aktiv, Hütte mit Variante",
+      "ok": true,
+      "extra": "{\"hovel\":\"hovel\",\"bakery\":\"bakery\",\"smithy\":\"blacksmith\",\"variants\":1}"
+    },
+    {
+      "label": "bakery: freie Stelle",
+      "ok": true,
+      "extra": "{\"x\":70,\"y\":106}"
+    },
+    {
+      "label": "bakery: Platzierungsgeist aus dem GLB",
+      "ok": true,
+      "extra": "{\"visible\":true,\"count\":1,\"fromAsset\":true}"
+    },
+    {
+      "label": "bakery: Bauauftrag angenommen",
+      "ok": true,
+      "extra": "{\"x\":70,\"y\":106}"
+    },
+    {
+      "label": "bakery: Bauanimation im Clip-Material (Fortschritt steigt)",
+      "ok": true,
+      "extra": "[{\"th\":0.2,\"prog\":0.22,\"clip\":7},{\"th\":0.45,\"prog\":0.47,\"clip\":7},{\"th\":0.7,\"prog\":0.72,\"clip\":7},{\"th\":0.9,\"prog\":0.91,\"clip\":7}]"
+    },
+    {
+      "label": "bakery: fertiges GLB (bakery), kein prozedurales Modell",
+      "ok": true,
+      "extra": "{\"id\":\"bakery\",\"glb\":7,\"proc\":0}"
+    },
+    {
+      "label": "bakery: Auswahlrahmen und Hover-Kontur aus dem Asset",
+      "ok": true,
+      "extra": "{\"frames\":4,\"hover\":true,\"edgesFromAsset\":true}"
+    },
+    {
+      "label": "blacksmith: freie Stelle",
+      "ok": true,
+      "extra": "{\"x\":70,\"y\":110}"
+    },
+    {
+      "label": "blacksmith: Platzierungsgeist aus dem GLB",
+      "ok": true,
+      "extra": "{\"visible\":true,\"count\":1,\"fromAsset\":true}"
+    },
+    {
+      "label": "blacksmith: Bauauftrag angenommen",
+      "ok": true,
+      "extra": "{\"x\":70,\"y\":110}"
+    },
+    {
+      "label": "blacksmith: Bauanimation im Clip-Material (Fortschritt steigt)",
+      "ok": true,
+      "extra": "[{\"th\":0.2,\"prog\":0.22,\"clip\":7},{\"th\":0.45,\"prog\":0.47,\"clip\":7},{\"th\":0.7,\"prog\":0.72,\"clip\":7},{\"th\":0.9,\"prog\":0.91,\"clip\":7}]"
+    },
+    {
+      "label": "blacksmith: fertiges GLB (blacksmith), kein prozedurales Modell",
+      "ok": true,
+      "extra": "{\"id\":\"blacksmith\",\"glb\":14,\"proc\":0}"
+    },
+    {
+      "label": "blacksmith: Auswahlrahmen und Hover-Kontur aus dem Asset",
+      "ok": true,
+      "extra": "{\"frames\":4,\"hover\":true,\"edgesFromAsset\":true}"
+    },
+    {
+      "label": "hovel: freie Stelle",
+      "ok": true,
+      "extra": "{\"x\":56,\"y\":102}"
+    },
+    {
+      "label": "hovel: Platzierungsgeist aus dem GLB",
+      "ok": true,
+      "extra": "{\"visible\":true,\"count\":1,\"fromAsset\":true}"
+    },
+    {
+      "label": "hovel: Bauauftrag angenommen",
+      "ok": true,
+      "extra": "{\"x\":56,\"y\":102}"
+    },
+    {
+      "label": "hovel: Bauanimation im Clip-Material (Fortschritt steigt)",
+      "ok": true,
+      "extra": "[{\"th\":0.2,\"prog\":0.2,\"clip\":6},{\"th\":0.45,\"prog\":0.45,\"clip\":6},{\"th\":0.7,\"prog\":0.7,\"clip\":6},{\"th\":0.9,\"prog\":0.9,\"clip\":6}]"
+    },
+    {
+      "label": "hovel: fertiges GLB (hovel_b), kein prozedurales Modell",
+      "ok": true,
+      "extra": "{\"id\":\"hovel_b\",\"glb\":22,\"proc\":0}"
+    },
+    {
+      "label": "hovel: Auswahlrahmen und Hover-Kontur aus dem Asset",
+      "ok": true,
+      "extra": "{\"frames\":4,\"hover\":true,\"edgesFromAsset\":true}"
+    },
+    {
+      "label": "Hütten: beide Modellvarianten in der Siedlung",
+      "ok": false,
+      "extra": "[\"hovel_b\",\"hovel_b\",\"hovel_b\",\"hovel_b\"]"
+    },
+    {
+      "label": "Emitter aus Ankern: Bäckerei Rauch am Schlot, Schmiede Rauch + Amboss (mit Arbeiter), Hütte Kaminrauch",
+      "ok": true,
+      "extra": "{\"staffed\":false,\"em\":{\"bakery\":[],\"blacksmith\":[],\"hovel\":[\"smoke@3.52\"]}}"
+    }
+  ],
+  "console": [],
+  "notes": {
+    "bakery_bau": [
+      {
+        "th": 0.2,
+        "prog": 0.22,
+        "clip": 7
+      },
+      {
+        "th": 0.45,
+        "prog": 0.47,
+        "clip": 7
+      },
+      {
+        "th": 0.7,
+        "prog": 0.72,
+        "clip": 7
+      },
+      {
+        "th": 0.9,
+        "prog": 0.91,
+        "clip": 7
+      }
+    ],
+    "blacksmith_bau": [
+      {
+        "th": 0.2,
+        "prog": 0.22,
+        "clip": 7
+      },
+      {
+        "th": 0.45,
+        "prog": 0.47,
+        "clip": 7
+      },
+      {
+        "th": 0.7,
+        "prog": 0.72,
+        "clip": 7
+      },
+      {
+        "th": 0.9,
+        "prog": 0.91,
+        "clip": 7
+      }
+    ],
+    "hovel_bau": [
+      {
+        "th": 0.2,
+        "prog": 0.2,
+        "clip": 6
+      },
+      {
+        "th": 0.45,
+        "prog": 0.45,
+        "clip": 6
+      },
+      {
+        "th": 0.7,
+        "prog": 0.7,
+        "clip": 6
+      },
+      {
+        "th": 0.9,
+        "prog": 0.9,
+        "clip": 6
+      }
+    ],
+    "hovel_varianten": {
+      "ids": [
+        41,
+        63,
+        66,
+        69
+      ],
+      "assets": [
+        "hovel_b",
+        "hovel_b",
+        "hovel_b",
+        "hovel_b"
+      ]
+    },
+    "emitter": {
+      "staffed": false,
+      "em": {
+        "bakery": [],
+        "blacksmith": [],
+        "hovel": [
+          "smoke@3.52"
+        ]
+      }
+    }
+  },
+  "data": {},
+  "passed": 21,
+  "failed": 1,
+  "consoleClean": true
+}

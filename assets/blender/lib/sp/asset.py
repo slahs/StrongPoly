@@ -39,6 +39,8 @@ class Asset:
         self.klass = klass
         self.desc = desc
         self.lod_dist = lod_dist
+        # Hoehe des Baugeruests (Traufhoehe); ohne Angabe die Gesamthoehe des Modells
+        self.scaffold = None
         self.objects = []
         self.coll = scene.collection(f'{asset_id}_src')
         self.t0 = time.time()
@@ -299,6 +301,8 @@ def finish(A, preview_on=None, bake_on=None, manifest_on=None):
     }
     if A.lod_dist:
         entry['lodDist'] = list(A.lod_dist)
+    if getattr(A, 'scaffold', None):
+        entry['scaffold'] = round(float(A.scaffold), 3)
     config.REGISTRY.mkdir(parents=True, exist_ok=True)
     with open(config.REGISTRY / f'{A.id}.json', 'w', encoding='utf-8') as f:
         json.dump(entry, f, indent=2, ensure_ascii=False)
