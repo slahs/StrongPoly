@@ -159,6 +159,128 @@
     }
   },
   "assets": {
+    "hovel": {
+      "id": "hovel",
+      "desc": "Fachwerkhaus: Bruchsteinsockel, Eichenfachwerk, Kalkputz, Strohdach mit Krueppelwalm, Kamin, Bohlentuer, Fensterladen (Spielerfarbe), Brennholz, Fass, Bank",
+      "file": "models/hovel.glb",
+      "target": {
+        "building": "Hovel"
+      },
+      "class": "house",
+      "footprint": [
+        2,
+        2
+      ],
+      "height": 3.091,
+      "bbox": {
+        "min": [
+          -1.142,
+          -0.047,
+          -0.906
+        ],
+        "max": [
+          1.239,
+          3.091,
+          1.028
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 7693,
+          "materials": [
+            "M_Ground_Grass",
+            "M_Iron_Wrought",
+            "M_Plaster_Lime",
+            "M_Roof_Thatch",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 1680,
+          "materials": [
+            "M_Ground_Grass",
+            "M_Plaster_Lime",
+            "M_Roof_Thatch",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 626,
+          "materials": [
+            "M_Ground_Grass",
+            "M_Plaster_Lime",
+            "M_Roof_Thatch",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        }
+      ],
+      "tris": [
+        7693,
+        1680,
+        626
+      ],
+      "budget": [
+        8000,
+        2800,
+        800
+      ],
+      "materials": [
+        "M_Ground_Grass",
+        "M_Iron_Wrought",
+        "M_Plaster_Lime",
+        "M_Roof_Thatch",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ],
+      "anchors": [
+        {
+          "name": "ANCHOR_smoke_0",
+          "kind": "smoke",
+          "pos": [
+            0.47,
+            3.1604,
+            -0.18
+          ],
+          "extras": {
+            "kind": "smoke",
+            "rate": 0.4,
+            "staffed": false
+          }
+        },
+        {
+          "name": "ANCHOR_door_0",
+          "kind": "door",
+          "pos": [
+            -0.15,
+            0,
+            0.96
+          ],
+          "extras": {
+            "kind": "door"
+          }
+        }
+      ],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 1055480,
+      "hash": "e69254adf0",
+      "source": "assets/blender/models/hovel.py",
+      "blend": "assets/src/hovel.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
     "well": {
       "id": "well",
       "desc": "Brunnen: Bruchsteinkranz, Eichenpfosten, Haspel mit Kurbel, Schindeldach, Eimer",

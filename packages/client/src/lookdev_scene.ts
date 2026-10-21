@@ -75,6 +75,11 @@ export const LOOKDEV_CAMS: LookdevCam[] = [
   { id: '3a-building', label: '3a Gebäude', x: -6.5, y: -7, dist: 10.5, yaw: 0.55, pitch: 20, lookHeight: 1.5, fog: 2.2 },
   { id: '3b-figures', label: '3b Figuren', x: 0.9, y: 7.3, dist: 4.4, yaw: 0.55, pitch: 13, lookHeight: 0.5, fog: 4 },
   { id: '3c-material', label: '3c Material', x: 2.5, y: 1.5, dist: 2.7, yaw: 0.45, pitch: 17, lookHeight: 0.55, fog: 5 },
+  // Stadt: Fachwerkhaus nah, Bäckerei/Schmiede nah, Häusergruppe (Varianten nebeneinander)
+  { id: '3d-house', label: '3d Haus', x: 4, y: -7, dist: 5.6, yaw: 0.5, pitch: 16, lookHeight: 1.0, fog: 3 },
+  { id: '3e-bakery', label: '3e Bäckerei', x: -3.5, y: 5.5, dist: 7.5, yaw: 0.45, pitch: 20, lookHeight: 1.1, fog: 3 },
+  { id: '3f-smithy', label: '3f Schmiede', x: 7.5, y: 5.5, dist: 7.5, yaw: -0.5, pitch: 20, lookHeight: 1.0, fog: 3 },
+  { id: '2b-town', label: '2b Häuser', x: 3, y: -5.5, dist: 12, yaw: 0.35, pitch: 34, lookHeight: 0.6, fog: 1.6 },
 ];
 
 /** Karten-Seed mit feuchtem Biom ('lush': grüne Wiesen, Laub- und Nadelbäume) */
