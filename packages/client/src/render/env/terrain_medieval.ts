@@ -211,6 +211,7 @@ vec2 spUvW;
   // Abstimmung der Bibliothekstexturen auf die Szene (Gras satter, Weg erdiger)
   // Weg: Kontrast der Spurrillen in der Textur mildern (aus RTS-Sicht sonst harte schwarze Risse)
   a2.rgb = mix( a2.rgb, vec3( dot( a2.rgb, vec3( 0.333 ) ) ) * vec3( 1.08, 1.0, 0.86 ), 0.25 ) * 0.68 + uBase[2] * 0.32 * ( 0.8 + 0.4 * nC.b );
+  a2.rgb = max( a2.rgb, uBase[2] * 0.72 );
   a0.rgb *= uLayerTint[0]; a1.rgb *= uLayerTint[1]; a2.rgb *= uLayerTint[2]; a3.rgb *= uLayerTint[3];
   vec4 alb = a0 * wt.x + a1 * wt.y + a2 * wt.z + a3 * wt.w;
   vec4 orm = o0 * wt.x + o1 * wt.y + o2 * wt.z + o3 * wt.w;

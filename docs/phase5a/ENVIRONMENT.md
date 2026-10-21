@@ -91,10 +91,11 @@ LOD aus derselben Form mit weniger Unterteilung, Moosanteil in der Datenfarbe, A
 - Material: Gras/Erde/Weg/Fels aus der Materialbibliothek als **Textur-Arrays** (je Karte ein Sampler, Safari hat 16
   Textureinheiten), Weltmaß-UVs mit der Kachelgröße der Bibliothek; Gewichte aus Terrain, Rauschflecken (trockene Stellen),
   Bodenkarte (getretene Erde, Felder mit Furchen), Umgebungskarte (Wege, Laubstreu unter Bäumen); **höhenbasierte
-  Übergänge** über die Höhe in ORM.a der Bibliothekstexturen; Makro-Variation (zwei Rauschebenen, trockene/satte Flecken);
+  Übergänge** über die Höhe in ORM.a, falls vorhanden – die ausgelieferten WebP-ORM tragen keine Höhe (Alpha = 1), daher
+  Ersatzhöhe aus AO (Hohlräume tief) + Helligkeit; Makro-Variation (zwei Rauschebenen, trockene/satte Flecken);
   Hoch: zweite gedrehte/skalierte Abtastung gegen Kachelwiederholung; Normalen der Texturen ab Mittel, Niedrig nur Albedo+ORM.
 - Wege: Wegtextur entlang der Wegrichtung (die Spurrillen der Bibliothekstextur folgen dem Weg; an Kreuzungen Weltprojektion,
-  damit nichts verschmiert), Kontrast der Rillen gemildert, Ränder mit drei Rauschfrequenzen ausgefranst, Grasstreifen in der
+  damit nichts verschmiert), Kontrast der Rillen gemildert (dunkle Rillen der Textur auf ≥ 72 % der Grundfarbe angehoben), Ränder mit drei Rauschfrequenzen ausgefranst, Grasstreifen in der
   Mitte von Karrenwegen. Fehlen Texturen, zeichnet ein prozeduraler Rückfall aus den Grundfarben der Bibliothek.
 - Texturspeicher: 3 Arrays × 4 Schichten; Mittel/Hoch 1024² (≈ 67 MB unkomprimiert inkl. Mipmaps), Niedrig 512² (≈ 17 MB).
 
