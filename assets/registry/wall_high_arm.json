@@ -69,7 +69,7 @@
     "_BUILD",
     "_BUILDH"
   ],
-  "bytes": 67204,
+  "bytes": 73084,
   "source": "assets/blender/models/wall_high_arm.py",
   "blend": "assets/src/wall_high_arm.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",

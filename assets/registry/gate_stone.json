@@ -142,7 +142,7 @@
     "_PART",
     "_PIVOT"
   ],
-  "bytes": 1168188,
+  "bytes": 1181896,
   "source": "assets/blender/models/gate_stone.py",
   "blend": "assets/src/gate_stone.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"

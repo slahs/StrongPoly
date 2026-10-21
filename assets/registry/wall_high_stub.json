@@ -27,7 +27,7 @@
   "lods": [
     {
       "node": "LOD0",
-      "tris": 1300,
+      "tris": 1286,
       "materials": [
         "M_Stone_Ashlar",
         "M_Stone_Rubble"
@@ -35,7 +35,7 @@
     },
     {
       "node": "LOD1",
-      "tris": 502,
+      "tris": 496,
       "materials": [
         "M_Stone_Ashlar",
         "M_Stone_Rubble"
@@ -51,8 +51,8 @@
     }
   ],
   "tris": [
-    1300,
-    502,
+    1286,
+    496,
     96
   ],
   "budget": [
@@ -70,7 +70,7 @@
     "_BUILD",
     "_BUILDH"
   ],
-  "bytes": 181788,
+  "bytes": 191692,
   "source": "assets/blender/models/wall_high_stub.py",
   "blend": "assets/src/wall_high_stub.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",

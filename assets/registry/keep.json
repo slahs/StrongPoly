@@ -144,7 +144,7 @@
     "_PART",
     "_PIVOT"
   ],
-  "bytes": 4230980,
+  "bytes": 4325688,
   "source": "assets/blender/models/keep.py",
   "blend": "assets/src/keep.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"

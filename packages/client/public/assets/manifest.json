@@ -961,8 +961,8 @@
         "_PART",
         "_PIVOT"
       ],
-      "bytes": 1168188,
-      "hash": "c4515c5451",
+      "bytes": 1181896,
+      "hash": "d18964091a",
       "source": "assets/blender/models/gate_stone.py",
       "blend": "assets/src/gate_stone.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1113,8 +1113,8 @@
         "_PART",
         "_PIVOT"
       ],
-      "bytes": 4230980,
-      "hash": "cbed93983b",
+      "bytes": 4325688,
+      "hash": "b81253c6ac",
       "source": "assets/blender/models/keep.py",
       "blend": "assets/src/keep.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1190,11 +1190,11 @@
         "_BUILD",
         "_BUILDH"
       ],
-      "bytes": 67204,
+      "bytes": 73084,
       "lodDist": [
         1.5
       ],
-      "hash": "2473798cd7",
+      "hash": "20e923f565",
       "source": "assets/blender/models/wall_high_arm.py",
       "blend": "assets/src/wall_high_arm.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1228,7 +1228,7 @@
       "lods": [
         {
           "node": "LOD0",
-          "tris": 1162,
+          "tris": 1128,
           "materials": [
             "M_Stone_Ashlar",
             "M_Stone_Rubble"
@@ -1236,7 +1236,7 @@
         },
         {
           "node": "LOD1",
-          "tris": 412,
+          "tris": 396,
           "materials": [
             "M_Stone_Ashlar",
             "M_Stone_Rubble"
@@ -1251,8 +1251,8 @@
         }
       ],
       "tris": [
-        1162,
-        412,
+        1128,
+        396,
         72
       ],
       "budget": [
@@ -1270,11 +1270,11 @@
         "_BUILD",
         "_BUILDH"
       ],
-      "bytes": 163904,
+      "bytes": 171220,
       "lodDist": [
         1.5
       ],
-      "hash": "a1b01a09ea",
+      "hash": "c38ff57c27",
       "source": "assets/blender/models/wall_high_post.py",
       "blend": "assets/src/wall_high_post.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1308,7 +1308,7 @@
       "lods": [
         {
           "node": "LOD0",
-          "tris": 1300,
+          "tris": 1286,
           "materials": [
             "M_Stone_Ashlar",
             "M_Stone_Rubble"
@@ -1316,7 +1316,7 @@
         },
         {
           "node": "LOD1",
-          "tris": 502,
+          "tris": 496,
           "materials": [
             "M_Stone_Ashlar",
             "M_Stone_Rubble"
@@ -1332,8 +1332,8 @@
         }
       ],
       "tris": [
-        1300,
-        502,
+        1286,
+        496,
         96
       ],
       "budget": [
@@ -1351,11 +1351,11 @@
         "_BUILD",
         "_BUILDH"
       ],
-      "bytes": 181788,
+      "bytes": 191692,
       "lodDist": [
         1.5
       ],
-      "hash": "6671152407",
+      "hash": "bae457d3c9",
       "source": "assets/blender/models/wall_high_stub.py",
       "blend": "assets/src/wall_high_stub.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
