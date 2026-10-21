@@ -46,3 +46,32 @@ Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/
 - **Prüfungen**: `s18_castle_medieval` 12/12 (Overrides, Geist aus GLB, Bauanimation Tor 35/70 % und Mauerwelle im Clip-Material, fertig 48 Arme/26 Pfosten/2 Einzelpfeiler/Tor als GLB ohne prozedurales Tor, Fallgitter hebt sich 0,98, 8/8 Soldaten durchs Tor, Auswahl/Hover-Kontur aus GLB, Konsole sauber). `s04_castle --style=medieval --fast`: Mauerzug 25/25, Tor hinaus 19/24 und herein 24/24, 22/24 auf der Mauerkrone (Sim unverändert); die beiden FPS-abhängigen Prüfungen (Mauerwelle-Zwischenstände, Bewegungssprünge < 3 %) scheitern unter der aktuellen Last von ~20 auf 4 Kernen (0,5 Bilder/s) – auch kein Asset-Befund. Schaukasten `?shots=castle|siege&style=medieval`: GLB-Bergfried/-Mauern/-Tor zusammen mit prozeduralen Türmen und Pechkesseln, Mauerstöße an Türme/Tor sauber.
 - **Messwerte** (Software-GL, keine GPU-Werte): LookDev Mittel `1-rts` classic 53 Draw-Calls/305k Dreiecke → medieval 72/375k (mit Brunnen-GLB); Schaukasten `castle` 77/444k → 95/518k, `siege` 89/462k → 107/557k. Programme +1. Mehr Draw-Calls durch 7 Materialien je Bergfried/Tor und 2 je Mauerstück (je LOD × Material ein Instanz-Mesh, plus Schattenpass).
 - **Selbstkritik**: Großform/Mittelform tragen (Silhouette liest aus der RTS-Kamera klar „Burg“, Hocheingang/Hurde/Scharwachttürme/Pechnase/Fallgitter aus der Nähe glaubwürdig), aber ohne die Bibliothekstexturen wirken die großen Bruchsteinflächen noch glatt und einfarbig – die Steinstruktur muss aus `M_Stone_Rubble`/`M_Stone_Ashlar` kommen. Die Mauer ist zwangsläufig ein Kachelsystem (identische Pfosten → regelmäßiger Zinnenrhythmus; Variation nur über Instanzfarbe/Gelände). Am Außeneck bleibt neben der Eckzinne eine schmale Lücke in der Brüstung. Bergfried-GLB 4 MB (rohe Attribute; Meshopt/Quantisierung 5B). Torflügel stehen offen (Laufzeit animiert Tore nur durch Heben).
+
+## Materialbibliothek (Teilschritt 2, Material-Agent)
+
+- **19/19 Materialien** aus `assets/PIPELINE.md` vollständig prozedural in Blender erzeugt (Skripte
+  `assets/blender/materials/M_*.py`, gemeinsame Hilfen `_common.py`, Bau `scripts/assets/build-materials.sh`): echte
+  Quellgeometrie (Quader mit Abplatzungen, gepackte Bruch-/Pflastersteine, Einzelziegel/-schindeln, ~29 000 Strohhalme,
+  gewebte Fäden, ~105 000 Grashalme + Klee/Wegerich, modellierte Blätter, Höhenfelder für Holz/Putz/Eisen/Leder/Böden/
+  Fels/Rinde) → Cycles-Draufsicht-Bake (Normal, AO, Albedo, Rauheit, Metall, Höhe) → kachelbar per Nachbar-Instanzen
+  und Torus-Rauschen (2×2 sichtgeprüft).
+- **Ausgabe nach Pipeline-Konvention:** Quellen `assets/src/textures/<M>/` (nicht eingecheckt, reproduzierbar), Werte in
+  `assets/materials.json` (`tile` physikalisch, Rückfallfarbe/-rauheit aus den Karten, `info` mit Orientierung, Tönungsbereich,
+  Atlas/Durchlicht), WebP + `_1024`/`_512` über `assets/blender/tools/textures.py`, Manifest aktualisiert.
+- **Größen:** alle Stufen 32,7 MB (Budget 40): Niedrig 5,0 MB, Mittel 18,8 MB, 2048er Sätze (Quader, Eiche, Bretter, Biberschwanz) 9,0 MB.
+  Texturspeicher (LookDev, Software-GL) mit den 6 Brunnen-Materialien: +24 / +96 / +192 MB (Niedrig/Mittel/Hoch).
+- **Format:** WebP bestätigt; KTX2 gemessen (UASTC-Normalen größer als WebP, aber GPU-Speicher ÷4) → Empfehlung 5B wegen
+  GPU-Speicher der Stufe Hoch. Details `assets/PIPELINE.md` → „Materialbibliothek“.
+- **Nachweise:** Cycles-Vorschauen `docs/phase5a/materials/<M>.jpg`, Übersicht `docs/phase5a/materials/library.jpg`;
+  Browser: `node scripts/lookdev.mjs --styles=medieval --cams=3c-material --check` (alle Stufen, Konsole sauber), Bilder
+  `docs/phase5a/materials/lookdev_3c-material_{medium,high}.jpg` (Brunnen mit Bruchstein, Eiche, Brettern, Schindeln, Eisen, Leinen).
+- **Test:** `packages/client/test/asset_materials.test.ts` (Namensliste = PIPELINE.md = materials.json, Werte, vollständige
+  Kartensätze + Stufen, Alpha der Laubkarte, Budget ≤ 40 MB).
+- **Brunnen neu exportiert** (`assets/blender/models/well.py`), weil sich `tile` seiner Materialien geändert hat.
+- **Qualität (eigene Einschätzung):** stark: Biberschwanz, Stroh, Bretter, Bruchstein, Pflaster, Gras, Laub-Atlas;
+  mittel: Quader, Putz, Schindeln, Eisen, Erde, Rinde, Leinen, Wolle (wirkt fischgratartig); schwach: Eiche (Verwitterung
+  fleckig, Beilspuren als Netz), Leder (eher Wildleder/Stein), Fels (Facetten wie Polygonplatten), Weg (Spuren lesen sich
+  als dunkle Rillen).
+- **Offen:** KTX2 (5B, GPU-Speicher Stufe Hoch); Höhenkarte (`height.png`) und Putz/Bruchstein-Blend in der Laufzeit nicht
+  genutzt; Gelände/Bäume nutzen die Boden-/Rinden-/Laubmaterialien noch nicht (Umgebungs-Agent); schwache Materialien
+  nachschärfen; Safari/M3-Prüfung der Texturen.

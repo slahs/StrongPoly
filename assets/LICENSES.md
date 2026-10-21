@@ -13,3 +13,30 @@ mit Nachweis (derzeit keine).
 | `assets/blender/models/gate_stone.py` → `gate_stone.blend/.glb/.json`, `assets/previews/gate_stone_*.jpg` | Eigenerstellung | Projektlizenz StrongPoly |
 | `assets/blender/models/wall_high_{arm,post,stub}.py` → `wall_high_*.blend/.glb/.json`, `assets/previews/wall_high_*.jpg` | Eigenerstellung | Projektlizenz StrongPoly |
 | Materialien (`M_Stone_Rubble`, `M_Stone_Ashlar`, `M_Timber_Oak`, `M_Wood_Planks`, `M_Roof_Shingle`, `M_Iron_Wrought`, `M_Cloth_Linen`) | nur Namen im GLB; Texturen aus der gemeinsamen Materialbibliothek (siehe dort) | – |
+
+## Materialbibliothek (`packages/client/public/assets/textures/M_*/`)
+
+| Dateien | Herkunft | Lizenz |
+|---|---|---|
+| `M_*/{albedo,normal,orm}[_1024,_512].webp` | vollständig prozedural erzeugt durch `assets/blender/materials/M_*.py` (Geometrie + Shader in Blender, Cycles-Render der Draufsicht, numpy-Nachbearbeitung), WebP-Kodierung mit `assets/blender/tools/textures.py` (Pillow/libwebp) | Eigenerstellung StrongPoly; keine Fremdinhalte |
+| Einträge `M_*` in `assets/materials.json` (tile, Rückfallwerte, `info`) | aus denselben Skripten | Eigenerstellung |
+| `assets/src/textures/M_*/*.png` (nicht eingecheckt, reproduzierbar) | verlustfreie Quellen derselben Skripte | Eigenerstellung |
+| `assets/blender/materials/*.py`, `scripts/assets/build-materials.sh` | Eigenerstellung | Projektlizenz |
+| `assets/src/materials/*.blend` (falls vorhanden, < 5 MB) | vom Skript gespeicherte Quellszene | Eigenerstellung |
+| `docs/phase5a/materials/*.jpg` | Cycles-Vorschaurenderings der eigenen Texturen | Eigenerstellung |
+
+Es gibt keine Bildvorlagen: Muster, Farben und Formen entstehen ausschließlich aus Zufallszahlen mit
+festem Seed (numpy, Blender-Rauschknoten) und modellierter Geometrie.
+
+## Werkzeuge (nur zur Erzeugung, nicht im Spiel ausgeliefert)
+
+| Werkzeug | Version | Lizenz | Hinweis |
+|---|---|---|---|
+| Blender (`bpy` von PyPI) | 5.2.2 LTS | GPL-2.0-or-later | Mit Blender erzeugte Inhalte (Renderings, Texturen, .blend-Daten) unterliegen nicht der GPL und gehören dem Ersteller. |
+| numpy / scipy | 2.x / 1.x | BSD-3-Clause | Rauschen, Voronoi, Filter |
+| Pillow | 13 | MIT-CMU (HPND) | PNG/JPEG/WebP |
+| OpenEXR (Python) | 3.5 | BSD-3-Clause | Lesen der Render-Passes |
+| basisu (npm `basis_universal@1.16.4-1`, Binomial Basis Universal 1.16.4) | 1.16.4 | Apache-2.0 | nur optionale KTX2-Messung (nicht ausgeliefert) |
+
+Laufzeit-Dekodierung (Sache der Pipeline): three.js `KTX2Loader` mit Basis-Transcoder aus dem
+three-Paket (MIT / Apache-2.0).

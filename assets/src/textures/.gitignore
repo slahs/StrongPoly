@@ -1,0 +1,3 @@
+# Quellen der Materialbibliothek werden von scripts/assets/build-materials.sh deterministisch erzeugt
+# (je Material 4-15 MB PNG) und daher nicht eingecheckt.
+M_*/
