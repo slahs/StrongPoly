@@ -68,6 +68,7 @@ OPEN = {
           ('win', -0.7, 2.95, 0.28, 0.48, 'shutter'), ('slit', 0.45, 3.0, 0, 0.36, 'cross')],
 }
 GARDEROBE = ('E', 0.75, 1.86)   # Seite, u, Unterkante
+HOARD = ('E', 0.15, 1.95)       # Hurde: Seite, u von/bis
 BANNER = ('S', 1.32, 2.5, 3.48)  # Seite, u, unten, oben
 
 # ---------------------------------------------------------------- Schaft unten / oben: Rasterkoerper, Unebenheit, Oeffnungen
@@ -270,7 +271,7 @@ for face in ('S', 'E', 'N', 'W'):
         w = corner_w if first else rnd.uniform(0.27, 0.36)
         if x + w > xe - 0.12:
             w = xe - x
-        if face == 'S' and (x < -L + 0.55 or x + w > L - 0.55):
+        if (face == 'S' and (x < -L + 0.55 or x + w > L - 0.55)) or (face == HOARD[0] and x + w > HOARD[1] and x < HOARD[2]):
             gap_w = rnd.uniform(0.2, 0.27)
             x += w + gap_w
             first = False
@@ -301,6 +302,32 @@ for face in ('S', 'E', 'N', 'W'):
 A.add(K.mesh.join(merl, 'merlons'), mat=RUB, uv_mode='box', smooth=35, wear=1.3, lod1='drop', lod2='drop')
 A.add(K.mesh.join(caps + copes, 'merlon_caps'), mat=ASH, uv_mode='box', smooth=30, wear=1.5, lod1='drop', lod2='drop')
 A.add(K.mesh.join(merl_p, 'merlons_proxy'), mat=RUB, uv_mode='box', smooth=0, only=(1, 2))
+
+# Hurde: hoelzerner Wehrgang vor der Bruestung (Ostseite, hinterer Teil): Kragbalken mit Kopfbaendern, Bohlenboden,
+# Bretterwand mit Schlitzen, Pultdach aus Schindeln; die Zinnen dort entfallen (die Hurde ersetzt sie)
+hf, hu0, hu1 = HOARD
+HD = 0.44                      # Ausladung vor der Bruestung
+hz = BR_TOP - 0.02             # Boden der Hurde
+ht, hp_, hr = [], [], []
+nb = 5
+for i in range(nb):
+    u = hu0 + 0.06 + (hu1 - hu0 - 0.12) * i / (nb - 1)
+    ht.append(K.mesh.beam(f'hoard_joist_{i}', (u, -PA + PT + 0.02, hz - 0.06), (u, -PA - HD - 0.04, hz - 0.06), 0.07, 0.08, bevel=0.008))
+    ht.append(K.mesh.beam(f'hoard_brace_{i}', (u, -PA - 0.01, hz - 0.5), (u, -PA - HD + 0.06, hz - 0.08), 0.05, 0.05, bevel=0.006))
+    ht.append(K.mesh.beam(f'hoard_post_{i}', (u, -PA - HD + 0.02, hz), (u, -PA - HD + 0.02, hz + 0.62), 0.06, 0.06, bevel=0.006))
+ht.append(K.mesh.beam('hoard_plate', (hu0 - 0.02, -PA - HD + 0.02, hz + 0.6), (hu1 + 0.02, -PA - HD + 0.02, hz + 0.6), 0.06, 0.06, bevel=0.006))
+A.add(K.mesh.join(K.on_face(ht, hf), 'hoarding_timber'), mat=OAK, uv_mode='box', uv_space='object', smooth=30, wear=1.2, dirt=1.1, lod1=0.5, lod2='drop')
+hp_.append(K.mesh.box('hoard_floor', (hu1 - hu0, HD + 0.06, 0.035), loc=((hu0 + hu1) / 2, -PA - HD / 2 + 0.01, hz - 0.02)))
+for k, (a, b) in enumerate(((hu0, hu0 + 0.5), (hu0 + 0.56, hu1 - 0.62), (hu1 - 0.56, hu1))):
+    hp_.append(K.mesh.box(f'hoard_wall_{k}', (b - a, 0.03, 0.56 + rnd.uniform(-0.01, 0.01)), loc=((a + b) / 2, -PA - HD, hz + 0.02)))
+for z in (hz + 0.06, hz + 0.5):
+    hp_.append(K.mesh.box(f'hoard_rail_{z:.2f}', (hu1 - hu0, 0.022, 0.05), loc=((hu0 + hu1) / 2, -PA - HD - 0.025, z)))
+A.add(K.mesh.join(K.on_face(hp_, hf), 'hoarding_planks'), mat=PLK, uv_mode='box', uv_space='world', along='z', smooth=0, dirt=1.3, lod1='keep', lod2='drop')
+hroof = K.shed_roof('hoard_roof', hu0 - 0.08, hu1 + 0.08, -PA + PT, HD + PT + 0.08, hz + 0.95, 0.36, 3, rnd, segs=5)
+A.add(K.on_face(hroof, hf)[0], mat=ROOF, uv_mode='box', smooth=25, dirt=0.9, lod1='drop', lod2='drop')
+hcore = K.mesh.prism('hoard_roof_core', [(-PA + PT, hz + 0.95), (-PA - HD - 0.08, hz + 0.59), (-PA - HD - 0.08, hz + 0.56), (-PA + PT, hz + 0.9)],
+                     hu1 - hu0 + 0.16, loc=((hu0 + hu1) / 2, 0, 0), plane='YZ')
+A.add(K.on_face(hcore, hf)[0], mat=ROOF, uv_mode='box', smooth=0, lod1='keep', lod2='keep')
 
 # Wasserspeier: Rinnsteine unter der Bruestung (Mitte jeder Seite, versetzt)
 spouts = []
@@ -341,6 +368,17 @@ for sx in (-1, 1):
     A.add(knob, mat=IRON, uv_mode='box', smooth=40, lod1='keep', lod2='drop')
 
 # ---------------------------------------------------------------- Turmaufsatz (Wohngeschoss) mit Zeltdach
+# aus der Mitte nach hinten versetzt (breiterer Wehrgang zur Front, weniger Baukasten-Symmetrie); im Ursprung gebaut, dann verschoben
+UT_OFF = (0.06, 0.3, 0.0)
+
+
+def uta(obj, **kw):
+    K.move(obj, UT_OFF)
+    if 'pivot' in kw:
+        kw['pivot'] = tuple(a + b for a, b in zip(kw['pivot'], UT_OFF))
+    return A.add(obj, **kw)
+
+
 ut = body('upper_tower', UT, WALK - 0.06, UT_TOP, 7, cell=0.26)
 ut_cuts, ut_st, ut_bk = [], [], []
 # Tuer zur Plattform (S), Fenster darueber
@@ -383,20 +421,20 @@ for face in ('S', 'E', 'N', 'W'):
     ut_cuts += [K.on_face([o], face)[0] for o in putlogs(face, UT, (5.85,), UT, [(-0.6, 0.6, 4.8, 6.2)] if face != 'S' else [(-0.8, 0.8, 4.2, 6.0)], 'ut')]
 K.boolean(ut, ut_cuts)
 K.finish_uv(ut)
-A.add(ut, mat=None, uv_mode=None, smooth=40, lod1=('planar', 6), lod2='drop')
+uta(ut, mat=None, uv_mode=None, smooth=40, lod1=('planar', 6), lod2='drop')
 uq = []
 for sx in (-1, 1):
     for sy in (-1, 1):
         uq.append(K.quoins(f'uq_{sx}{sy}', sx * UT, sy * UT, sx, sy, WALK - 0.02, UT_TOP - 0.1, rnd, course=0.22, long=0.4, short=0.24))
-A.add(K.mesh.join(uq, 'ut_quoins'), mat=ASH, uv_mode='box', smooth=35, wear=1.6, lod1=0.35, lod2='drop')
-A.add(K.mesh.join(ut_st, 'ut_openings_stone'), mat=None, uv_mode='box', smooth=30, wear=1.3, lod1=0.35, lod2='drop')
+uta(K.mesh.join(uq, 'ut_quoins'), mat=ASH, uv_mode='box', smooth=35, wear=1.6, lod1=0.35, lod2='drop')
+uta(K.mesh.join(ut_st, 'ut_openings_stone'), mat=None, uv_mode='box', smooth=30, wear=1.3, lod1=0.35, lod2='drop')
 ut_wood = [o for o in ut_bk if o.data.materials[0].name == PLK]
 ut_iron = [o for o in ut_bk if o.data.materials[0].name == IRON]
-A.add(K.mesh.join(ut_wood, 'ut_door_shutter'), mat=PLK, uv_mode='box', uv_space='object', along='z', smooth=25, lod2='drop')
-A.add(K.mesh.join(ut_iron, 'ut_iron'), mat=IRON, uv_mode='box', smooth=25, lod1='keep', lod2='drop')
+uta(K.mesh.join(ut_wood, 'ut_door_shutter'), mat=PLK, uv_mode='box', uv_space='object', along='z', smooth=25, lod2='drop')
+uta(K.mesh.join(ut_iron, 'ut_iron'), mat=IRON, uv_mode='box', smooth=25, lod1='keep', lod2='drop')
 # Traufgesims
 tg = K.frustum('ut_cornice', UT + 0.02, UT + 0.02, UT + 0.08, UT + 0.08, UT_TOP - 0.12, UT_TOP)
-A.add(tg, mat=ASH, uv_mode='box', smooth=20, lod2='drop')
+uta(tg, mat=ASH, uv_mode='box', smooth=20, lod2='drop')
 # Sparrenkoepfe unter der Traufe
 rafters = []
 for face in ('S', 'E', 'N', 'W'):
@@ -406,42 +444,42 @@ for face in ('S', 'E', 'N', 'W'):
         rr.append(K.mesh.beam(f'raft_{face}_{i}', (u, -UT + 0.1, UT_TOP + 0.04), (u, -UT - ROOF_OVER + 0.04, UT_TOP - 0.06), 0.06, 0.07))
     K.on_face(rr, face)
     rafters += rr
-A.add(K.mesh.join(rafters, 'rafter_ends'), mat=OAK, uv_mode='box', uv_space='object', smooth=30, lod1='drop', lod2='drop')
+uta(K.mesh.join(rafters, 'rafter_ends'), mat=OAK, uv_mode='box', uv_space='object', smooth=30, lod1='drop', lod2='drop')
 
 RH = UT + ROOF_OVER
 roof = K.tent_roof('roof', RH, UT_TOP - 0.04, ROOF_RISE, 13, rnd, th=0.024, step=0.0075, segs=12)
-A.add(roof, mat=ROOF, uv_mode='box', smooth=30, dirt=0.9, lod1='drop', lod2='drop')
+uta(roof, mat=ROOF, uv_mode='box', smooth=30, dirt=0.9, lod1='drop', lod2='drop')
 # Dachkern (Unterseite/Traufbrett; LOD1/2: glatte Pyramide)
 core = K.mesh.cylinder('roof_core', RH * math.sqrt(2) - 0.02, ROOF_RISE - 0.05, segs=4, loc=(0, 0, UT_TOP - 0.05), r_top=0.02)
 K.rot_z(core, math.pi / 4)
-A.add(core, mat=ROOF, uv_mode='box', smooth=0, lod1='keep', lod2='keep')
+uta(core, mat=ROOF, uv_mode='box', smooth=0, lod1='keep', lod2='keep')
 hips = []
 for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
     p0 = (sx * (RH + 0.01), sy * (RH + 0.01), UT_TOP + 0.02)
     p1 = (0, 0, UT_TOP - 0.04 + ROOF_RISE + 0.13)
     hips.append(K.mesh.beam(f'hip_{sx}{sy}', p0, p1, 0.06, 0.04, bevel=0.008))
-A.add(K.mesh.join(hips, 'hip_boards'), mat=PLK, uv_mode='box', uv_space='object', smooth=30, lod1='keep', lod2='drop')
+uta(K.mesh.join(hips, 'hip_boards'), mat=PLK, uv_mode='box', uv_space='object', smooth=30, lod1='keep', lod2='drop')
 # Kamin des Wohngeschosses (Rueckseite), Rauch-Anker an der Muendung
 CH_X, CH_Y = -0.5, 0.48
 ch = K.mesh.box('chimney', (0.26, 0.24, 1.35), loc=(CH_X, CH_Y, UT_TOP + 0.35), bevel=0.012)
 K.grid_cut(ch, cell=0.22, axes='z')
 K.wobble(ch, amount=0.006, scale=3.0, seed=11)
-A.add(ch, mat=RUB, uv_mode='box', smooth=30, dirt=1.3, lod1='keep', lod2='keep')
+uta(ch, mat=RUB, uv_mode='box', smooth=30, dirt=1.3, lod1='keep', lod2='keep')
 chc = K.cap_slab('chimney_cap', CH_X - 0.17, CH_X + 0.17, CH_Y - 0.16, CH_Y + 0.16, UT_TOP + 1.7, 0.06)
-A.add(chc, mat=ASH, uv_mode='box', smooth=20, dirt=2.0, lod2='drop')
+uta(chc, mat=ASH, uv_mode='box', smooth=20, dirt=2.0, lod2='drop')
 apex = UT_TOP - 0.04 + ROOF_RISE
 fin = [K.mesh.cylinder('finial_base', 0.09, 0.12, segs=8, loc=(0, 0, apex - 0.02)),
        K.mesh.cylinder('finial_knob', 0.06, 0.1, segs=8, loc=(0, 0, apex + 0.1), r_top=0.03)]
-A.add(K.mesh.join(fin, 'finial'), mat=IRON, uv_mode='box', smooth=40, lod2='drop')
+uta(K.mesh.join(fin, 'finial'), mat=IRON, uv_mode='box', smooth=40, lod2='drop')
 POLE_TOP = apex + 1.25
 pole = K.mesh.cylinder('flagpole', 0.028, POLE_TOP - apex, segs=6, loc=(0, 0, apex), r_top=0.02)
-A.add(pole, mat=OAK, uv_mode='box', uv_space='object', smooth=50, lod1='keep', lod2='keep')
+uta(pole, mat=OAK, uv_mode='box', uv_space='object', smooth=50, lod1='keep', lod2='keep')
 # Fahne in Spielerfarbe (flattert: Teil 'cloth', Drehpunkt am Mast)
 FL_W, FL_H = 0.95, 0.5
 flag_pts = [(0.0, 0.0), (FL_W, 0.03), (FL_W * 0.82, FL_H * 0.5), (FL_W, FL_H - 0.03), (0.0, FL_H)]
 flag = K.mesh.prism('flag', [(0.03 + x, POLE_TOP - 0.05 - FL_H + z) for x, z in flag_pts], 0.018, plane='XZ')
 K.grid_cut(flag, cell=0.16, axes='x')
-A.add(flag, mat=CLOTH, uv_mode='box', smooth=30, team=True, part='cloth', pivot=(0.0, 0.0, POLE_TOP - 0.05), dirt=0.3, lod1='keep', lod2='keep')
+uta(flag, mat=CLOTH, uv_mode='box', smooth=30, team=True, part='cloth', pivot=(0.0, 0.0, POLE_TOP - 0.05), dirt=0.3, lod1='keep', lod2='keep')
 
 # ---------------------------------------------------------------- Hocheingang: Aussentreppe, Podest, Gelaender, Vordach (Front -Y)
 D_U, D_Z = -0.42, 1.42      # Tuer (u, Schwelle)
@@ -513,13 +551,13 @@ A.add(ban, mat=CLOTH, uv_mode='box', smooth=40, team=True, dirt=0.35, lod1='keep
 lo2 = [K.mesh.box('l2_shaft', (2 * S1, 2 * S1, CORB_TOP), loc=(0, 0, 0)),
        K.frustum('l2_plinth', PL_H0, PL_H0, S1 + 0.02, S1 + 0.02, 0.0, PL_Z)]
 A.add(K.mesh.join(lo2, 'lod2_shaft'), mat=RUB, uv_mode='box', smooth=0, only=2)
-lo2u = K.mesh.box('l2_ut', (2 * UT, 2 * UT, UT_TOP - WALK), loc=(0, 0, WALK - 0.05))
+lo2u = K.mesh.box('l2_ut', (2 * UT, 2 * UT, UT_TOP - WALK), loc=(UT_OFF[0], UT_OFF[1], WALK - 0.05))
 A.add(lo2u, mat=RUB, uv_mode='box', smooth=0, only=2)
 
 # ---------------------------------------------------------------- Ankerpunkte
-anchors.anchor('flag', (0.0, 0.0, POLE_TOP), note='Mastspitze')
+anchors.anchor('flag', (UT_OFF[0], UT_OFF[1], POLE_TOP), note='Mastspitze')
 anchors.anchor('banner', (BANNER[1], BY, (BANNER[2] + BANNER[3]) / 2), note='Fassadenbanner')
 anchors.anchor('door', (D_U, Y_OUT - 0.1, 0.0), note='Fuss der Aussentreppe vor dem Hocheingang')
-anchors.anchor('smoke', (CH_X, CH_Y, UT_TOP + 1.82), rate=0.7, staffed=False, note='Rauch aus dem Kamin des Wohngeschosses')
+anchors.anchor('smoke', (CH_X + UT_OFF[0], CH_Y + UT_OFF[1], UT_TOP + 1.82), rate=0.7, staffed=False, note='Rauch aus dem Kamin des Wohngeschosses')
 
 asset.finish(A)

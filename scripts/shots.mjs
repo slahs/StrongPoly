@@ -6,7 +6,7 @@
  *
  *   node scripts/shots.mjs --out=docs/phase4/after/world [--quality=medium] [--scenes=early,town,castle,siege,figures,map]
  *                          [--viewport=1280x720] [--format=png|jpg] [--check] [--info] [--hw] [--url=http://host:port]
- *                          [--frames=24] [--seed=N] [--port=54xx] [--dist=<gebauter Client>]
+ *                          [--frames=24] [--seed=N] [--port=54xx] [--dist=<gebauter Client>] [--style=classic|medieval]
  *
  *  --check   Konsole prüfen: jede Warnung/jeder Fehler (außer bekannte Software-GL-Hinweise) lässt das Skript mit Code 2 enden
  *            (deckt Shader-Kompilierungsfehler/-warnungen und WebGL-Fehler ab)
@@ -78,6 +78,7 @@ async function main() {
     let q = `shots=${scene}&quality=${quality}`;
     if (frames) q += `&frames=${frames}`;
     if (args.seed) q += `&seed=${args.seed}`;
+    if (args.style && args.style !== true) q += `&style=${args.style}`;
     const t0 = Date.now();
     await page.goto(`${base}/?${q}`);
     await page.waitForFunction(() => window.__shots && window.__shots.ready, null, { timeout: 600000, polling: 400 });

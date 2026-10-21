@@ -324,20 +324,20 @@
       "height": 9.41,
       "bbox": {
         "min": [
-          -2.461,
+          -2.449,
           -0.028,
           -2.424
         ],
         "max": [
-          2.46,
+          2.78,
           9.41,
-          2.519
+          2.511
         ]
       },
       "lods": [
         {
           "node": "LOD0",
-          "tris": 24356,
+          "tris": 24912,
           "materials": [
             "M_Cloth_Linen",
             "M_Iron_Wrought",
@@ -350,7 +350,7 @@
         },
         {
           "node": "LOD1",
-          "tris": 6766,
+          "tris": 7147,
           "materials": [
             "M_Cloth_Linen",
             "M_Iron_Wrought",
@@ -363,7 +363,7 @@
         },
         {
           "node": "LOD2",
-          "tris": 998,
+          "tris": 962,
           "materials": [
             "M_Cloth_Linen",
             "M_Roof_Shingle",
@@ -374,9 +374,9 @@
         }
       ],
       "tris": [
-        24356,
-        6766,
-        998
+        24912,
+        7147,
+        962
       ],
       "budget": [
         25000,
@@ -397,9 +397,9 @@
           "name": "ANCHOR_flag_0",
           "kind": "flag",
           "pos": [
-            0,
+            0.06,
             9.41,
-            0
+            -0.3
           ],
           "extras": {
             "kind": "flag",
@@ -436,9 +436,9 @@
           "name": "ANCHOR_smoke_0",
           "kind": "smoke",
           "pos": [
-            -0.5,
+            -0.44,
             8.17,
-            -0.48
+            -0.78
           ],
           "extras": {
             "kind": "smoke",
@@ -455,8 +455,8 @@
         "_PART",
         "_PIVOT"
       ],
-      "bytes": 4064468,
-      "hash": "66352dabde",
+      "bytes": 4230980,
+      "hash": "cbed93983b",
       "source": "assets/blender/models/keep.py",
       "blend": "assets/src/keep.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
