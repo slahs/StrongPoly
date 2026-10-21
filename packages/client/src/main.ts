@@ -14,6 +14,7 @@ import { h } from './ui/dom';
 import { openEditor } from './editor/editor';
 import { MISSIONS } from '@strongpoly/shared';
 import { SaveStore, makeSave } from './game/saves';
+import { assetRegistry, parseStyle } from './render/assets/registry';
 
 // Icon-Galerie (?icons): rendern und den normalen Start überspringen
 if (new URLSearchParams(location.search).has('icons')) {
@@ -30,6 +31,12 @@ if (new URLSearchParams(location.search).has('tooltips')) {
 // Benchmark-Szene (?bench): eigener Einstieg ohne Netz und Sim-Worker
 if (new URLSearchParams(location.search).has('bench')) {
   (await import('./bench')).startBench();
+  await new Promise<never>(() => {});
+}
+
+// LookDev der Phase 5A (?lookdev=medieval): Referenzsiedlung im echten Renderer, Stil alt/neu, feste Kameras, Statistik
+if (new URLSearchParams(location.search).has('lookdev')) {
+  (await import('./lookdev')).startLookdev();
   await new Promise<never>(() => {});
 }
 
@@ -61,6 +68,9 @@ const settings = new Settings();
 if (new URLSearchParams(location.search).get('blood') === '0') settings.blood = false;
 const qParam = new URLSearchParams(location.search).get('quality');
 if (qParam === 'low' || qParam === 'medium' || qParam === 'high') settings.quality = qParam;
+// Grafikstil (Phase 5A): URL ?style=classic|medieval hat Vorrang vor der Einstellung; Standard bleibt 'classic'
+const styleParam = parseStyle(new URLSearchParams(location.search).get('style'));
+assetRegistry.setStyle(styleParam ?? settings.style);
 const audio = new AudioEngine();
 audio.configure(settings.audio());
 exposeAudioDebug(audio);
@@ -75,6 +85,7 @@ const hooks = {
   applySettings: () => {
     session?.applySettings();
     gs.applyGfx({ shadows: settings.shadows, quality: settings.quality });
+    assetRegistry.setStyle(styleParam ?? settings.style);
     audio.configure(settings.audio());
   },
   missions: MISSIONS.map((m) => ({ name: m.name, desc: m.desc })),
@@ -264,4 +275,6 @@ function frame(now: number): void {
 requestAnimationFrame(frame);
 (window as unknown as Record<string, unknown>).session = () => session;
 (window as unknown as Record<string, unknown>).net = () => net;
+// Prüfhilfe (Browserprüfung Stil „medieval“, scripts/qa/s17_style_medieval.mjs): Register der GLB-Assets
+(window as unknown as Record<string, unknown>).__assets = assetRegistry;
 void h;

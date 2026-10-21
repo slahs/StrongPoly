@@ -2,6 +2,7 @@ import { Rng } from '@strongpoly/shared';
 import { EntityRenderer } from './render/entities';
 import { GameScene } from './render/scene';
 import { SHOW_NAMES, ShowName, buildShowWorld, sceneSpec } from './showcase_scenes';
+import { assetRegistry, parseStyle } from './render/assets/registry';
 
 /**
  * Screenshot-/Vergleichsszenen (`?shots=<szene>`), siehe scripts/shots.mjs und README („Vergleichsszenen“).
@@ -52,6 +53,9 @@ export function startShowcase(): void {
   const rng = new Rng(0x5eed + SHOW_NAMES.indexOf(name));
   Math.random = () => rng.next();
 
+  // Grafikstil (&style=medieval): GLB-Assets vor dem ersten Bild laden (Standard 'classic' wie bisher)
+  const style = parseStyle(q.get('style')) ?? 'classic';
+  assetRegistry.setStyle(style);
   const spec = sceneSpec(name, q.has('seed') ? Number(q.get('seed')) : undefined);
   const world = buildShowWorld(spec);
   const canvas = document.getElementById('view') as HTMLCanvasElement;
@@ -134,5 +138,6 @@ export function startShowcase(): void {
     }
     requestAnimationFrame(loop);
   };
-  requestAnimationFrame(loop);
+  if (style === 'medieval') void assetRegistry.preload().then(() => requestAnimationFrame(loop));
+  else requestAnimationFrame(loop);
 }

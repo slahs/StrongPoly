@@ -33,3 +33,68 @@ Entwurf des Koordinators; der Pipeline-Agent präzisiert und ergänzt (Abschnitt
 
 ## Lizenz
 Alle Modelle/Texturen/Skripte sind Eigenerstellung dieses Projekts. Keine Übernahme fremder Modelle, Texturen, Scans oder Marken (Manor Lords ist nur Qualitätsreferenz).
+
+---
+
+## Präzisierung durch den Pipeline-Agenten (ergänzt)
+
+Begründungen und Messwerte: `docs/phase5a/ARCHITECTURE.md`. Abweichungen vom Entwurf oben sind hier ausdrücklich markiert.
+
+### Werkzeuge (ergänzt)
+- Blender als Python-Modul: **Cycles CPU** für AO-Bake und Vorschau; **EEVEE ist headless nicht verfügbar** (libEGL fehlt, der Prozess bricht ab). Die PyPI-Fassung enthält **keine Draco-/Meshopt-Bibliothek** (Exporter meldet das, Export funktioniert trotzdem unkomprimiert).
+- Gemeinsame Bibliothek `assets/blender/lib/sp/` (Python-Paket `sp`): `scene` (Zurücksetzen, Einheiten), `materials` (Platzhalter M_* aus `assets/materials.json`), `mesh` (gefaste Quader, Balken zwischen Punkten, Zylinder/Ringe, Prismen, Bruchsteine, Rauschen, Durchhang, Glätten mit harten Kanten), `uv` (Box-/Zylinderprojektion im Weltmaß), `attrs` (Vertexattribute), `bake` (AO in die Vertexfarbe), `anchors`, `checks`, `preview`, `asset` (Ablauf). Werkzeug Texturen: `assets/blender/tools/textures.py`.
+
+### Verzeichnisse (ergänzt)
+- `assets/registry/<id>.json` – Registereintrag je exportiertem Asset (schreibt `sp.asset.finish`), Quelle des Manifests
+- `assets/previews/<id>_{front,rts}.jpg` – Cycles-Vorschau je Asset
+- `assets/src/textures/<M_Name>/{albedo,normal,orm}.png` – verlustfreie Texturquellen (nicht ausgeliefert)
+- `packages/client/public/assets/manifest.json` – **erzeugt** von `node scripts/asset-manifest.mjs` (nie von Hand; Test prüft Aktualität)
+
+### Maßstab und Achsen (festgelegt)
+- **Vorderseite (Eingang) zeigt nach Blender −Y** (Blender-Vorderansicht, Numpad 1) = three **+Z** = Front der prozeduralen Modelle (`building_parts.ts`) bei Drehung `b.r = 0`; `b.r = 1` dreht im Spiel um +90° (Front → +X). *(Entwurf oben: „+Y“ – geändert.)*
+- Breite `def.w` entlang Blender X, Tiefe `def.h` entlang Blender Y, Ursprung Footprint-Mitte auf z = 0. Alles unter z = 0 verdeckt das Gelände (Schächte, Fundamente nur andeuten).
+- Eigene Vektorattribute rechnet der glTF-Exporter NICHT um: `sp.config.to_gltf()` benutzen (passiert in `sp.attrs` automatisch).
+- Mauerstücke wie `wallParts` (`models_castle.ts`): Pfosten um den Ursprung, Arm von x = 0 bis x = 0,5 (Richtung +X), Laufhöhe = `BUILDINGS[t].height`.
+
+### Vertexattribute (Schnittstelle Blender → Laufzeit)
+| GLB | Inhalt | Laufzeit (`render/assets/model.ts`) |
+| --- | --- | --- |
+| `COLOR_0` (Farbattribut `Data`, FLOAT_COLOR, Ecken) | R Ambient Occlusion (gebacken, 1 = frei), G Schmutz 0..1, B Kantenabnutzung 0..1, A Teamfarbe (1 = Spielerfarbe) | `aData` |
+| `_BUILD` (vec3) + `_BUILDH` (float) | Bauzeitfenster s0, s1 (0..1) und Unterkante y0 / Höhe h des Teils (= Blender-Objekt) | `aBuild` = (s0, s1, y0, h) wie `builder.ts` |
+| `_PART` (float) + `_PIVOT` (vec3, glTF-Raum) | Teil-Kennung (`sp.config.PART` = `materials.ts PART`/`unit_shader.ts UPART`) und Drehpunkt | `aPivot` = (Drehpunkt, Teil) – nur exportiert, wenn das Asset bewegte Teile hat |
+| `_STYLE` (vec3) + `_SLOT` (float), `_ARM` (float) | nur Figuren: Farbklasse, Sichtbarkeitsmaske, Hüft-/Oberkörperhöhe, Slot; Armstil | `aStyle`, `aMeta.z` |
+- Keine weiteren FLOAT_COLOR-Attribute für Daten verwenden: der Exporter schreibt sie zusätzlich als `COLOR_n`.
+
+### Materialien (ergänzt)
+- Einzige Quelle der Namen und Rückfallwerte: `assets/materials.json` (`base` sRGB, `rough`, `metal`, `tile` = Weltmaß einer Texturwiederholung, `dirt` = Schmutzfarbe, optional `alphaTest`, `doubleSided`, `normalScale`). Im GLB zählt nur der Materialname; die Laufzeit ersetzt jedes glTF-Material durch ihr gemeinsames Material gleichen Namens.
+- UVs: `sp.uv.box/cylindrical` erzeugen Weltmaß ÷ `tile` (eine UV-Einheit = eine Wiederholung). Ändert sich `tile`, Asset neu exportieren.
+- Laufzeittexturen: `public/assets/textures/<M_Name>/{albedo,normal,orm}.webp` (+ `_512`, `_1024` Fassungen, erzeugt von `assets/blender/tools/textures.py` aus `assets/src/textures`). Albedo sRGB, Normal **OpenGL-Konvention (Y+, Blender-Standard)**, ORM linear: R AO, G Rauheit, B Metall. Gefundene Formate in der Reihenfolge `ktx2 > webp > jpg > png` (KTX2 nur mit Transcoder unter `public/assets/basis/`, Phase 5B).
+
+### LOD (ergänzt)
+- Ein GLB mit Knoten `LOD0`, `LOD1`, `LOD2` (jeweils ein Mesh, ein Primitive je Material). Regeln je Objekt in `A.add(..., lod1=, lod2=, only=)`: `'keep'`, `'drop'`, Verhältnis 0..1 (Decimate, nie unter 12 Dreiecke), `('planar', Grad)`, oder Ersatzform mit `only=1|2`. Ohne Angabe: Teile < 6 cm (LOD1) bzw. < 18 cm (LOD2) entfallen, ≤ 16 Dreiecke bleiben, sonst Decimate 35 % / 10 %.
+- Budgets: `sp.config.BUDGETS` (keep, house, production, wall, gate, small, figure, prop); Überschreitung bricht den Export ab.
+- Laufzeit: Grenzen `assetLod0`/`assetLod1` in `quality.ts` (Mittel 30/72, Hoch 44/105, Niedrig nur LOD1/LOD2 mit Grenze 34) × Größenfaktor 0,7–2,2 (Bounding-Box-Diagonale / 3,2, überschreibbar mit `lod_dist` im Register), Hysterese ±3 Einheiten.
+
+### Ankerpunkte (ergänzt)
+- `sp.anchors.anchor(art, (x, y, z), **extras)` → glTF-Knoten `ANCHOR_<art>_<n>` mit `extras`. Emitter-Arten wie `work_fx.ts`: `smoke`, `smokeDark`, `steam`, `flame`, `sparks`, `anvil`, `dust`, `flour`, `chips` (extras `rate` = Partikel/s, `staffed` = nur mit Arbeiter); Merkpunkte `flag`, `banner`, `door`, `work`, `fx`. Hat ein Gebäude-Asset Emitter-Anker, ersetzen sie die Tabelle `EMITTERS` für diesen Typ.
+
+### Prüfungen beim Export (`sp.checks`)
+- Quellobjekte: Skalierung angewandt, nur Bibliotheksmaterialien, UVs vorhanden. Bounding-Box gegen Footprint (± 0,35), Ursprung mittig, nicht schwebend.
+- Je LOD: Dreiecke ≤ Budget, Normalen (geschlossene Teile nach außen), entartete Flächen, Attribute vorhanden; danach im GLB jedes Primitive mit `POSITION, NORMAL, TEXCOORD_0, COLOR_0, _BUILD, _BUILDH` (+ `_PART/_PIVOT`).
+- Manifest: `validateManifest` (Laufzeit und Test) prüft Dateien, LOD-Folge, Footprint gegen `BUILDINGS`, Materialien, doppelte Ziele.
+
+### Befehle
+```bash
+/home/user/bpyenv/bin/python assets/blender/models/<id>.py            # Asset bauen: .blend, GLB, Register, Manifest, Vorschau
+/home/user/bpyenv/bin/python assets/blender/models/<id>.py --fast --no-preview   # schneller Durchlauf beim Modellieren
+/home/user/bpyenv/bin/python assets/blender/tools/textures.py          # Texturquellen → WebP (+ _512/_1024), Manifest
+node scripts/asset-manifest.mjs [--check]                              # Manifest neu schreiben / prüfen
+pnpm build && node scripts/lookdev.mjs --styles=classic,medieval --qualities=medium --check   # LookDev-Aufnahmen
+```
+
+### Neues Asset – Schritt für Schritt
+1. `assets/blender/models/<id>.py` anlegen (Vorlage `well.py`): `A = asset.begin('<id>', target={'building': '<BT-Name>'}, footprint=(w, h), klass='house')`; Teile modellieren (`sp.mesh`), je Teil `A.add(obj, mat='M_…', uv_mode='box'|'cyl', part=…, team=…, lod1=…, lod2=…)`; Anker setzen; `asset.finish(A)`.
+2. Ausführen (s. o.). Ergebnis prüfen: Tabelle „Teil / LOD0 / LOD1 / LOD2“ in der Ausgabe, `assets/previews/<id>_*.jpg`.
+3. Ziel im Register: `target` = `{'building': 'Keep'}` | `{'wall': 'WallHigh', 'piece': 'arm'|'post'|'stub'}` | `{'unit': 'Peasant'}` | `{'prop': '<name>'}` (kein Spielobjekt, nur LookDev/Dekor). Ein Ziel darf nur EIN Asset haben.
+4. Im Spiel/LookDev erscheint es automatisch im Stil `medieval`: `/?lookdev=medieval&cam=3a-building`, `/?quick=1&style=medieval`. Fehlt es in der Referenzsiedlung, Zeile in `LOOKDEV_LAYOUT` (`packages/client/src/lookdev_scene.ts`) ergänzen.
+5. `pnpm test` (prüft Manifest/GLB), committen: Skript, `.blend`, GLB, Registereintrag, Manifest, Vorschau.

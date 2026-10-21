@@ -1,0 +1,268 @@
+{
+  "version": 1,
+  "ktx2": false,
+  "doc": "Erzeugt von scripts/asset-manifest.mjs - nicht von Hand bearbeiten (Quellen: assets/materials.json, assets/registry/*.json, public/assets/textures).",
+  "materials": {
+    "M_Bark": {
+      "base": "#4f4134",
+      "rough": 0.93,
+      "metal": 0,
+      "tile": 2,
+      "dirt": "#2b241c",
+      "maps": {}
+    },
+    "M_Cloth_Linen": {
+      "base": "#cfc4ab",
+      "rough": 0.92,
+      "metal": 0,
+      "tile": 1,
+      "dirt": "#6a5e4b",
+      "maps": {}
+    },
+    "M_Cloth_Wool": {
+      "base": "#7d6a55",
+      "rough": 0.95,
+      "metal": 0,
+      "tile": 1,
+      "dirt": "#3b3226",
+      "maps": {}
+    },
+    "M_Foliage": {
+      "base": "#4d6232",
+      "rough": 0.8,
+      "metal": 0,
+      "tile": 1,
+      "dirt": "#2e3a1e",
+      "alphaTest": 0.5,
+      "doubleSided": true,
+      "maps": {}
+    },
+    "M_Ground_Dirt": {
+      "base": "#7a6448",
+      "rough": 0.95,
+      "metal": 0,
+      "tile": 4,
+      "dirt": "#3e3224",
+      "maps": {}
+    },
+    "M_Ground_Grass": {
+      "base": "#62703f",
+      "rough": 0.95,
+      "metal": 0,
+      "tile": 4,
+      "dirt": "#3d3a26",
+      "maps": {}
+    },
+    "M_Ground_Path": {
+      "base": "#8a7558",
+      "rough": 0.94,
+      "metal": 0,
+      "tile": 4,
+      "dirt": "#45392a",
+      "maps": {}
+    },
+    "M_Iron_Wrought": {
+      "base": "#4a4642",
+      "rough": 0.6,
+      "metal": 0.85,
+      "tile": 1,
+      "dirt": "#3a2a1c",
+      "maps": {}
+    },
+    "M_Leather": {
+      "base": "#6a4a30",
+      "rough": 0.7,
+      "metal": 0,
+      "tile": 1,
+      "dirt": "#2e2015",
+      "maps": {}
+    },
+    "M_Plaster_Lime": {
+      "base": "#d9d0bd",
+      "rough": 0.93,
+      "metal": 0,
+      "tile": 3,
+      "dirt": "#6f6352",
+      "maps": {}
+    },
+    "M_Rock": {
+      "base": "#86827a",
+      "rough": 0.9,
+      "metal": 0,
+      "tile": 4,
+      "dirt": "#454036",
+      "maps": {}
+    },
+    "M_Roof_ClayTile": {
+      "base": "#9c5a3c",
+      "rough": 0.78,
+      "metal": 0,
+      "tile": 2,
+      "dirt": "#4a3326",
+      "maps": {}
+    },
+    "M_Roof_Shingle": {
+      "base": "#6b5947",
+      "rough": 0.85,
+      "metal": 0,
+      "tile": 2,
+      "dirt": "#2f281f",
+      "maps": {}
+    },
+    "M_Roof_Thatch": {
+      "base": "#a68b5b",
+      "rough": 0.95,
+      "metal": 0,
+      "tile": 3,
+      "dirt": "#55472f",
+      "maps": {}
+    },
+    "M_Stone_Ashlar": {
+      "base": "#9a948a",
+      "rough": 0.86,
+      "metal": 0,
+      "tile": 2,
+      "dirt": "#4a4237",
+      "maps": {}
+    },
+    "M_Stone_Cobble": {
+      "base": "#7f7a72",
+      "rough": 0.88,
+      "metal": 0,
+      "tile": 2,
+      "dirt": "#3f382e",
+      "maps": {}
+    },
+    "M_Stone_Rubble": {
+      "base": "#8c867b",
+      "rough": 0.9,
+      "metal": 0,
+      "tile": 2,
+      "dirt": "#463d31",
+      "maps": {}
+    },
+    "M_Timber_Oak": {
+      "base": "#5e4632",
+      "rough": 0.82,
+      "metal": 0,
+      "tile": 2,
+      "dirt": "#2c2219",
+      "maps": {}
+    },
+    "M_Wood_Planks": {
+      "base": "#7a5d40",
+      "rough": 0.8,
+      "metal": 0,
+      "tile": 2,
+      "dirt": "#33281c",
+      "maps": {}
+    }
+  },
+  "assets": {
+    "well": {
+      "id": "well",
+      "desc": "Brunnen: Bruchsteinkranz, Eichenpfosten, Haspel mit Kurbel, Schindeldach, Eimer",
+      "file": "models/well.glb",
+      "target": {
+        "building": "Well"
+      },
+      "class": "small",
+      "footprint": [
+        1,
+        1
+      ],
+      "height": 1.62,
+      "bbox": {
+        "min": [
+          -0.552,
+          -0.005,
+          -0.473
+        ],
+        "max": [
+          0.57,
+          1.62,
+          0.473
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 2920,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Iron_Wrought",
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 584,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Iron_Wrought",
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 156,
+          "materials": [
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        }
+      ],
+      "tris": [
+        2920,
+        584,
+        156
+      ],
+      "budget": [
+        3000,
+        1100,
+        350
+      ],
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Iron_Wrought",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ],
+      "anchors": [
+        {
+          "name": "ANCHOR_work_0",
+          "kind": "work",
+          "pos": [
+            0,
+            0,
+            0.62
+          ],
+          "extras": {
+            "kind": "work",
+            "note": "Platz fuer Wasserholer (vorn)"
+          }
+        }
+      ],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 434880,
+      "hash": "b1f0f1bf06",
+      "source": "assets/blender/models/well.py",
+      "blend": "assets/src/well.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    }
+  }
+}

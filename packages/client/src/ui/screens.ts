@@ -566,12 +566,15 @@ export class Screens {
       }
     };
     renderKeys();
+    const style = h('select', { onchange: (e) => { st.style = (e.target as HTMLSelectElement).value as 'classic' | 'medieval'; apply(); } });
+    for (const [v, l] of [['classic', 'Klassisch'], ['medieval', 'Mittelalter (Vorschau)']]) style.append(h('option', { value: v, text: l, selected: st.style === v }));
     const aaBox = h('input', { type: 'checkbox', checked: st.aa, onchange: (e) => { st.aa = (e.target as HTMLInputElement).checked; apply(); } });
     this.show([
       h('h2', { text: 'Optionen' }),
       h('h3', { text: 'Grafik' }),
       h('div', { class: 'form' },
         h('span', { text: 'Grafikstufe' }), quality,
+        h('span', { text: 'Grafikstil' }), h('div', { class: 'row' }, style, h('span', { class: 'crumb', text: 'neue 3D-Modelle, wo vorhanden' })),
         h('span', { text: 'Schatten' }), h('input', { type: 'checkbox', checked: st.shadows, onchange: (e) => { st.shadows = (e.target as HTMLInputElement).checked; apply(); } }),
         h('span', { text: 'Kantenglättung' }), h('div', { class: 'row' }, aaBox, h('span', { class: 'crumb', text: 'wirkt beim nächsten Start' })),
         h('span', { text: 'Blut bei Gefallenen' }), h('input', { type: 'checkbox', checked: st.blood, onchange: (e) => { st.blood = (e.target as HTMLInputElement).checked; apply(); } }),

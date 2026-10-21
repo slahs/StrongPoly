@@ -47,7 +47,8 @@ export const ARM = {
 
 const arr = (a: number[]): string => a.join(', ');
 
-const ANIM_PARS = /* glsl */ `
+/** Vertex-Animation der Figuren (aPivot, aMeta, aStyle, iAnim, iVar → spAnimate); auch von GLB-Figuren genutzt (render/assets/materials.ts) */
+export const UNIT_ANIM_PARS = /* glsl */ `
 const int JOB_AR[${JOB_COUNT}] = int[${JOB_COUNT}](${arr(JOB_ARM_R)});
 const int JOB_AL[${JOB_COUNT}] = int[${JOB_COUNT}](${arr(JOB_ARM_L)});
 attribute vec4 aPivot;
@@ -303,14 +304,15 @@ base *= (iVar.y > 0.0 ? iVar.y : 1.0);
 vColor = base * mix(1.0, aMeta.y, uAo);
 `;
 
-const uTintUniform = { value: UNIT_TINTS };
+/** Tonetabelle der Figuren (Haut, Haar, Stoffe) als gemeinsames Uniform */
+export const uTintUniform = { value: UNIT_TINTS };
 
 function patch(shader: THREE.WebGLProgramParametersWithUniforms, color: boolean): void {
   shader.uniforms.uTime = GFX.uTime;
   shader.uniforms.uAo = GFX.uAo;
   shader.uniforms.uTint = uTintUniform;
   shader.vertexShader = shader.vertexShader
-    .replace('void main() {', ANIM_PARS + '\nvoid main() {')
+    .replace('void main() {', UNIT_ANIM_PARS + '\nvoid main() {')
     .replace('#include <begin_vertex>', '#include <begin_vertex>\n transformed = spAnimate(transformed);');
   if (color) shader.vertexShader = shader.vertexShader.replace('#include <color_vertex>', COLOR_VERTEX);
 }

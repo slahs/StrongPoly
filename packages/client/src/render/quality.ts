@@ -69,8 +69,18 @@ export interface QualityCfg {
   ambientLife: number;
   /** Obergrenze der Umgebungsinstanzen (Vögel, Insekten, Blätter) */
   ambientMax: number;
-  /** Anisotrope Filterung der Rauschtexturen */
+  /** Anisotrope Filterung der Rauschtexturen (und der Asset-Texturen) */
   anisotropy: number;
+
+  // ---- Phase 5A (GLB-Assets, nur Stil „medieval“) ----
+  /** Abstand (Einheiten, mal Größenfaktor des Assets), bis zu dem LOD0 gezeichnet wird */
+  assetLod0: number;
+  /** Abstand, bis zu dem LOD1 gezeichnet wird; dahinter LOD2 */
+  assetLod1: number;
+  /** nutzbare LOD-Stufen von der gröbsten an (3 = LOD0..LOD2, Niedrig 2 = nie LOD0) */
+  assetLods: number;
+  /** größte Texturkantenlänge der Asset-Materialien (kleinere Fassungen `*_512.*` werden genutzt, wenn vorhanden) */
+  assetTexMax: number;
 }
 
 export const QUALITY: Record<QualityLevel, QualityCfg> = {
@@ -107,6 +117,10 @@ export const QUALITY: Record<QualityLevel, QualityCfg> = {
     ambientLife: 0,
     ambientMax: 0,
     anisotropy: 1,
+    assetLod0: 0,
+    assetLod1: 34,
+    assetLods: 2,
+    assetTexMax: 512,
   },
   medium: {
     shadows: true,
@@ -141,6 +155,10 @@ export const QUALITY: Record<QualityLevel, QualityCfg> = {
     ambientLife: 1,
     ambientMax: 90,
     anisotropy: 4,
+    assetLod0: 30,
+    assetLod1: 72,
+    assetLods: 3,
+    assetTexMax: 1024,
   },
   high: {
     shadows: true,
@@ -175,6 +193,10 @@ export const QUALITY: Record<QualityLevel, QualityCfg> = {
     ambientLife: 2,
     ambientMax: 220,
     anisotropy: 8,
+    assetLod0: 44,
+    assetLod1: 105,
+    assetLods: 3,
+    assetTexMax: 2048,
   },
 };
 

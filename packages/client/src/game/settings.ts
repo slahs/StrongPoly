@@ -47,6 +47,8 @@ export class Settings {
   scrollSpeed = 1;
   /** Blut bei Gefallenen darstellen (abschaltbar) */
   blood = true;
+  /** Grafikstil: 'classic' = prozedurale Modelle (Standard), 'medieval' = GLB-Assets der Phase 5A wo vorhanden (Vorschau); URL ?style= hat Vorrang */
+  style: 'classic' | 'medieval' = 'classic';
 
   constructor() {
     try {

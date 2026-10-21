@@ -1,0 +1,49 @@
+{
+ "albedo.etc1s": {
+  "bytes": 58073,
+  "encodeMs": 4533
+ },
+ "albedo.uastc": {
+  "bytes": 651772,
+  "encodeMs": 12085
+ },
+ "normal.uastc": {
+  "bytes": 752441,
+  "encodeMs": 16810
+ },
+ "orm.etc1s": {
+  "bytes": 35956,
+  "encodeMs": 2908
+ },
+ "orm.uastc": {
+  "bytes": 494957,
+  "encodeMs": 12482
+ },
+ "albedo.png": {
+  "bytes": 273319
+ },
+ "albedo.jpg": {
+  "bytes": 35553
+ },
+ "albedo.webp": {
+  "bytes": 12142
+ },
+ "normal.png": {
+  "bytes": 379643
+ },
+ "normal.jpg": {
+  "bytes": 125996
+ },
+ "normal.webp": {
+  "bytes": 28120
+ },
+ "orm.png": {
+  "bytes": 243767
+ },
+ "orm.jpg": {
+  "bytes": 34666
+ },
+ "orm.webp": {
+  "bytes": 8784
+ }
+}
