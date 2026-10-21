@@ -23,7 +23,34 @@ GPU-Werte**. Safari/MacBook Air M3 ist nicht gemessen.
 
 ### 2.1 Assets (Blender-Skripte, reproduzierbar; Dreiecke LOD0/LOD1/LOD2, Karten zählen)
 
-<!-- ASSETS -->
+| Asset | Beschreibung | Klasse / Rolle | Dreiecke LOD0/1/2 | Budget | Materialien | GLB |
+| --- | --- | --- | --- | --- | --- | --- |
+| `veg_birch_a` | Haengebirke, einstaemmig | tree / mature | 4680 / 658 / 121 | 6000 / 1500 / 300 | M_Bark, M_Foliage | 292 KB |
+| `veg_birch_b` | Haengebirke, kleiner, schief | tree / young | 3659 / 565 / 103 | 6000 / 1500 / 300 | M_Bark, M_Foliage | 230 KB |
+| `veg_birch_c` | Haengebirke, zweistaemmig | tree / mature | 5960 / 918 / 184 | 6000 / 1500 / 300 | M_Bark, M_Foliage | 374 KB |
+| `veg_bush_a` | Haselstrauch: viele Triebe aus dem Boden, lockere Krone | bush / bush | 1924 / 246 / 32 | 2400 / 700 / 160 | M_Bark, M_Foliage | 126 KB |
+| `veg_bush_b` | Weissdorn: dicht, rundlich | bush / bush | 1718 / 163 / 18 | 2400 / 700 / 160 | M_Bark, M_Foliage | 112 KB |
+| `veg_fence_rail` | Holzzaun: Eichenpfosten mit zwei Spaltstangen (1 Einheit) | prop / fence | 130 / 73 / 32 | 1500 / 600 / 150 | M_Timber_Oak | 18 KB |
+| `veg_fence_wattle` | Flechtzaun: Staken mit geflochtenen Haselruten (1 Einheit) | prop / fence | 939 / 240 / 43 | 1500 / 600 / 150 | M_Bark | 82 KB |
+| `veg_fern_a` | Farn (Wurmfarn), sieben Wedel | flora / fern | 392 / 132 / 12 | 420 / 140 / 40 | M_Flora | 48 KB |
+| `veg_flowers_a` | Wiesenblumen | flora / flowers | 106 / 39 / 20 | 420 / 140 / 40 | M_Flora | 15 KB |
+| `veg_flowers_b` | Wiesenblumen | flora / flowers | 111 / 43 / 20 | 420 / 140 / 40 | M_Flora | 15 KB |
+| `veg_garden_bed` | Gemuesebeet: Erdhuegel mit Brettern, Kohl und Lauch | prop / garden | 472 / 144 / 48 | 1500 / 600 / 150 | M_Flora, M_Ground_Dirt, M_Wood_Planks | 56 KB |
+| `veg_grass_a` | Grasbueschel | flora / grass | 110 / 12 / 5 | 420 / 140 / 40 | M_Flora | 16 KB |
+| `veg_grass_b` | Grasbueschel (hoch, Samenstaende) | flora / grassTall | 106 / 18 / 4 | 420 / 140 / 40 | M_Flora | 16 KB |
+| `veg_log` | liegender Baumstamm mit Rinde und Schnittflaechen | prop / log | 210 / 100 / 30 | 1500 / 600 / 150 | M_Bark, M_Timber_Oak | 28 KB |
+| `veg_oak_a` | Stieleiche, ausgewachsen, breite Krone | tree / mature | 4724 / 518 / 151 | 6000 / 1500 / 300 | M_Bark, M_Foliage | 311 KB |
+| `veg_oak_b` | Stieleiche, hoeher, unregelmaessige Krone, leicht schief | tree / mature | 3761 / 450 / 129 | 6000 / 1500 / 300 | M_Bark, M_Foliage | 250 KB |
+| `veg_oak_c` | junge Eiche | tree / young | 2277 / 312 / 73 | 6000 / 1500 / 300 | M_Bark, M_Foliage | 148 KB |
+| `veg_rock_a` | Findling: gerundet, halb eingesunken, moosig | rock / boulder | 1280 / 320 / 80 | 1500 / 500 / 150 | M_Rock | 111 KB |
+| `veg_rock_b` | kantiger Fels mit Bruchflaechen und Schichtung | rock / rock | 1280 / 320 / 80 | 1500 / 500 / 150 | M_Rock | 107 KB |
+| `veg_rock_c` | flache Felsplatte, rissig, moosig | rock / rock | 1280 / 320 / 80 | 1500 / 500 / 150 | M_Rock | 104 KB |
+| `veg_rock_d` | Lesesteine (vier Steine) | rock / stones | 1280 / 320 / 80 | 1500 / 500 / 150 | M_Rock | 119 KB |
+| `veg_spruce_a` | Fichte, ausgewachsen | tree / mature | 5683 / 586 / 150 | 6000 / 1500 / 300 | M_Bark, M_Foliage_Conifer | 380 KB |
+| `veg_spruce_b` | Fichte, mittel, dicht | tree / mature | 5544 / 560 / 150 | 6000 / 1500 / 300 | M_Bark, M_Foliage_Conifer | 370 KB |
+| `veg_spruce_c` | junge Fichte | tree / young | 3191 / 354 / 114 | 6000 / 1500 / 300 | M_Bark, M_Foliage_Conifer | 214 KB |
+
+Summe GLB 3.5 MB (unkomprimiert; gzip ≈ 65 %). Bearbeitbare Quellen: Skripte + `assets/src/veg/*.blend`.
 
 Aufbau der Bäume (`veg_trees.py`): deterministisches Skelett je Variante – Stamm mit Wurzelanlauf (Rippen am Fuß),
 Starkäste wachsen zu Zielpunkten auf einer Kronenhülle (Ellipsoid), Seitenäste bis zur Hülle; Blattkarten (Atlas `M_Foliage`,
