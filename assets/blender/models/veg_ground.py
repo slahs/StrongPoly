@@ -102,10 +102,10 @@ def grass(asset_id, seed, tall=False):
         vm = VMesh()
         if not tall:
             n = (22, 12, 5)[L]
-            tuft(vm, rng, n, (0.13, 0.27), (0.014, 0.022), [0, 1, 2, 0, 1, 5], spread=0.08, segs=(3, 2, 1)[L])
+            tuft(vm, rng, n, (0.13, 0.27), (0.014, 0.022), [0, 1, 2, 0, 1, 5], spread=0.08, segs=(3, 1, 1)[L])
         else:
             n = (18, 10, 4)[L]
-            tuft(vm, rng, n, (0.2, 0.4), (0.012, 0.018), [2, 3, 4, 1], spread=0.07, segs=(3, 2, 1)[L], lean=(0.2, 0.6))
+            tuft(vm, rng, n, (0.2, 0.4), (0.012, 0.018), [2, 3, 4, 1], spread=0.07, segs=(3, 1, 1)[L], lean=(0.2, 0.6))
             if L < 2:
                 # Samenstaende: duenner Halm + aehrenfoermiger Kopf
                 for k in range((4, 2)[L]):

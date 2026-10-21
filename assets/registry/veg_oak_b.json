@@ -80,6 +80,6 @@
     "M_Foliage": 1.0
   },
   "source": "assets/blender/models/veg_trees.py",
-  "blend": null,
+  "blend": "assets/src/veg/veg_oak_b.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
 }

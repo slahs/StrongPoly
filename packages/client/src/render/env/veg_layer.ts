@@ -105,6 +105,7 @@ export class MedievalDecor {
   private frustum = new THREE.Frustum();
   private viewDir = new THREE.Vector3(0, 0, -1);
   private lastViewDir = new THREE.Vector3(0, 9, 0);
+  private lastCamPos = new THREE.Vector3(1e9, 0, 0);
 
   constructor(
     private map: GameMap,
@@ -228,7 +229,7 @@ export class MedievalDecor {
     if (camPos) this.camPos.copy(camPos);
     const fr = Math.min(this.q.envFloraRadius, Math.max(10, camDist * 0.9));
     ENVU.uGrassFade.value.set(camX, camZ, fr * 0.72, fr * 0.98);
-    if (this.groundDirty && now - this.lastBuild >= 0.35) this.updateGround();
+    if (this.groundDirty && (now - this.lastBuild >= 0.35 || now < this.lastBuild)) this.updateGround();
     if (!this.ready) {
       this.fallback?.update(now, camX, camZ, camDist, camPos);
       return;
@@ -236,9 +237,13 @@ export class MedievalDecor {
     const moved = Math.abs(camX - this.cx) > 3 || Math.abs(camZ - this.cz) > 3;
     const zoomed = Math.abs(camDist - this.lastCamDist) > this.lastCamDist * 0.15;
     if (this.camera) this.camera.getWorldDirection(this.viewDir);
-    const turned = this.camera ? this.viewDir.dot(this.lastViewDir) < 0.985 : false;
-    if (!(this.dirty || moved || zoomed || turned) || now - this.lastBuild < 0.35) return;
+    // Sichtkegel-Auslese: auch Drehen/Verschieben der Kamera (bei festem Blickpunkt) verteilt neu
+    const turned = this.camera ? this.viewDir.dot(this.lastViewDir) < 0.985 || this.camPos.distanceToSquared(this.lastCamPos) > 4 : false;
+    // Zeit kann zurückspringen (LookDev setzt die synthetische Uhr je Kamera zurück) → dann sofort neu verteilen
+    const since = now - this.lastBuild;
+    if (!(this.dirty || moved || zoomed || turned) || (since >= 0 && since < 0.35)) return;
     this.lastViewDir.copy(this.viewDir);
+    this.lastCamPos.copy(this.camPos);
     this.dirty = false;
     this.lastBuild = now;
     this.cx = camX;

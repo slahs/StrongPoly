@@ -30,7 +30,7 @@
     },
     {
       "node": "LOD1",
-      "tris": 38,
+      "tris": 18,
       "materials": [
         "M_Flora"
       ]
@@ -45,7 +45,7 @@
   ],
   "tris": [
     106,
-    38,
+    18,
     4
   ],
   "budget": [
@@ -60,7 +60,7 @@
   "attributes": [
     "COLOR_0"
   ],
-  "bytes": 17932,
+  "bytes": 16208,
   "veg": {
     "kind": "flora",
     "role": "grassTall"
@@ -69,6 +69,6 @@
     "M_Flora": 1.0
   },
   "source": "assets/blender/models/veg_ground.py",
-  "blend": null,
+  "blend": "assets/src/veg/veg_grass_b.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
 }

@@ -432,7 +432,7 @@ def spruce(asset_id, seed, P, desc):
             sd = Vector((1, 0, 0)) if k == 0 else Vector((0, 1, 0))
             hh = H - zlast + 0.12
             data = (lambda q, uv: (needle_ao(q), 0.9, 0.5, 0.6))
-            tri += card(vm, Vector((0, 0, zlast - 0.1)), Vector((0, 0, 1)), sd, clamp(hh * 0.75, 0.22, 0.42), hh + 0.06, cell, NEEDLE, nfn_k(0.2), data,
+            tri += card(vm, Vector((0, 0, zlast - 0.14)), Vector((0, 0, 1)), sd, clamp(hh * 0.55, 0.16, 0.3), hh + 0.1, cell, NEEDLE, nfn_k(0.2), data,
                         bend=0.1 if L == 0 else 0.0)
         left = budget[L] - tri - 10
         if L == 0:

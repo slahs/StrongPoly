@@ -69,6 +69,6 @@
     "M_Rock": 4.0
   },
   "source": "assets/blender/models/veg_rocks.py",
-  "blend": null,
+  "blend": "assets/src/veg/veg_rock_d.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
 }

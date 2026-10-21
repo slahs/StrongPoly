@@ -320,7 +320,7 @@
       },
       "hash": "7919932c44",
       "source": "assets/blender/models/veg_trees.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_birch_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_birch_b": {
@@ -406,7 +406,7 @@
       },
       "hash": "beaa394ae0",
       "source": "assets/blender/models/veg_trees.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_birch_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_birch_c": {
@@ -492,7 +492,7 @@
       },
       "hash": "39b17fbcf1",
       "source": "assets/blender/models/veg_trees.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_birch_c.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_bush_a": {
@@ -572,7 +572,7 @@
       },
       "hash": "c24ecaded7",
       "source": "assets/blender/models/veg_ground.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_bush_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_bush_b": {
@@ -652,7 +652,7 @@
       },
       "hash": "cd5005b723",
       "source": "assets/blender/models/veg_ground.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_bush_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_fence_rail": {
@@ -727,7 +727,7 @@
       },
       "hash": "727b186c56",
       "source": "assets/blender/models/veg_props.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_fence_rail.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_fence_wattle": {
@@ -802,7 +802,7 @@
       },
       "hash": "7b35d5073a",
       "source": "assets/blender/models/veg_props.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_fence_wattle.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_fern_a": {
@@ -877,7 +877,7 @@
       },
       "hash": "12423a5124",
       "source": "assets/blender/models/veg_ground.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_fern_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_flowers_a": {
@@ -952,7 +952,7 @@
       },
       "hash": "0c0271a72f",
       "source": "assets/blender/models/veg_ground.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_flowers_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_flowers_b": {
@@ -1027,7 +1027,7 @@
       },
       "hash": "c28e6c6f99",
       "source": "assets/blender/models/veg_ground.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_flowers_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_garden_bed": {
@@ -1111,7 +1111,7 @@
       },
       "hash": "0383998e32",
       "source": "assets/blender/models/veg_props.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_garden_bed.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_grass_a": {
@@ -1146,7 +1146,7 @@
         },
         {
           "node": "LOD1",
-          "tris": 36,
+          "tris": 12,
           "materials": [
             "M_Flora"
           ]
@@ -1161,7 +1161,7 @@
       ],
       "tris": [
         110,
-        36,
+        12,
         5
       ],
       "budget": [
@@ -1176,7 +1176,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 17992,
+      "bytes": 15924,
       "veg": {
         "kind": "flora",
         "role": "grass"
@@ -1184,9 +1184,9 @@
       "uvTile": {
         "M_Flora": 1
       },
-      "hash": "7a341e5d8a",
+      "hash": "f0ea5ac258",
       "source": "assets/blender/models/veg_ground.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_grass_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_grass_b": {
@@ -1221,7 +1221,7 @@
         },
         {
           "node": "LOD1",
-          "tris": 38,
+          "tris": 18,
           "materials": [
             "M_Flora"
           ]
@@ -1236,7 +1236,7 @@
       ],
       "tris": [
         106,
-        38,
+        18,
         4
       ],
       "budget": [
@@ -1251,7 +1251,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 17932,
+      "bytes": 16208,
       "veg": {
         "kind": "flora",
         "role": "grassTall"
@@ -1259,9 +1259,9 @@
       "uvTile": {
         "M_Flora": 1
       },
-      "hash": "49207f7ab9",
+      "hash": "36f70caedc",
       "source": "assets/blender/models/veg_ground.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_grass_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_log": {
@@ -1341,7 +1341,7 @@
       },
       "hash": "0b2f1357d9",
       "source": "assets/blender/models/veg_props.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_log.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_oak_a": {
@@ -1513,7 +1513,7 @@
       },
       "hash": "52e7aa707b",
       "source": "assets/blender/models/veg_trees.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_oak_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_oak_c": {
@@ -1599,7 +1599,7 @@
       },
       "hash": "2bfe10d9ed",
       "source": "assets/blender/models/veg_trees.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_oak_c.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_rock_a": {
@@ -1674,7 +1674,7 @@
       },
       "hash": "2001d58f61",
       "source": "assets/blender/models/veg_rocks.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_rock_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_rock_b": {
@@ -1749,7 +1749,7 @@
       },
       "hash": "5a71918e94",
       "source": "assets/blender/models/veg_rocks.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_rock_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_rock_c": {
@@ -1824,7 +1824,7 @@
       },
       "hash": "5b42b77554",
       "source": "assets/blender/models/veg_rocks.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_rock_c.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_rock_d": {
@@ -1899,7 +1899,7 @@
       },
       "hash": "22105b1bc1",
       "source": "assets/blender/models/veg_rocks.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_rock_d.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_spruce_a": {
@@ -1983,9 +1983,9 @@
         "M_Bark": 2,
         "M_Foliage_Conifer": 1
       },
-      "hash": "bf094603ed",
+      "hash": "5efbfe3cdd",
       "source": "assets/blender/models/veg_trees.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_spruce_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_spruce_b": {
@@ -2069,9 +2069,9 @@
         "M_Bark": 2,
         "M_Foliage_Conifer": 1
       },
-      "hash": "0264f92f61",
+      "hash": "4e38ebba92",
       "source": "assets/blender/models/veg_trees.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_spruce_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_spruce_c": {
@@ -2155,9 +2155,9 @@
         "M_Bark": 2,
         "M_Foliage_Conifer": 1
       },
-      "hash": "39a2c70ba2",
+      "hash": "71fecbc018",
       "source": "assets/blender/models/veg_trees.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_spruce_c.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "well": {

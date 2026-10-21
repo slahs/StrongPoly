@@ -225,9 +225,9 @@ export const QUALITY: Record<QualityLevel, QualityCfg> = {
     assetTexMax: 2048,
     envLodScale: 1.45,
     envTreeLods: 3,
-    envGrassPerTile: 10,
+    envGrassPerTile: 8,
     envFloraRadius: 34,
-    envFloraMax: 26000,
+    envFloraMax: 20000,
     envTranslucency: 1,
   },
 };

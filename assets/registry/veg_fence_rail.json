@@ -69,6 +69,6 @@
     "M_Timber_Oak": 2.0
   },
   "source": "assets/blender/models/veg_props.py",
-  "blend": null,
+  "blend": "assets/src/veg/veg_fence_rail.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
 }

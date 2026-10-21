@@ -69,6 +69,6 @@
     "M_Flora": 1.0
   },
   "source": "assets/blender/models/veg_ground.py",
-  "blend": null,
+  "blend": "assets/src/veg/veg_fern_a.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
 }
