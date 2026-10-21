@@ -187,6 +187,9 @@ export function startLookdev(): void {
     for (const t of [GFX.uNoiseA.value, GFX.uNoiseN.value, GFX.uGround.value]) if (t) texs.add(t);
     let texBytes = 0;
     for (const t of texs) texBytes += texSize(t);
+    // Stil medieval: Gelände-Texturarrays (Uniforms im Shader, nicht an den Materialien) und Umgebungskarte
+    texBytes += gs.terrainTex.bytes;
+    if (gs.envMap) texBytes += gs.envMap.data.byteLength * 2;
     const sm = gs.sun.shadow.map;
     if (sm && gs.renderer.shadowMap.enabled) texBytes += sm.width * sm.height * 4 + sm.width * sm.height * 4;
     const gl = gs.renderer.getContext();
