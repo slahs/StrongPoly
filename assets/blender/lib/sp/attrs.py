@@ -45,7 +45,7 @@ def build_window(y0, h, H, override=None):
     return s0, max(s0 + 0.04, s1)
 
 
-def write_part(obj, src, H, parts=True):
+def write_part(obj, src, H, parts=True, build=True):
     """Schreibt _BUILD/_BUILDH/_PART/_PIVOT (+ _STYLE/_ARM bei Figuren) auf `obj` (Mesh bereits in Asset-Koordinaten).
     `src` ist das Quellobjekt (traegt die sp_*-Eigenschaften), H die Gesamthoehe des Assets. parts=False: _PART/_PIVOT
     weglassen (Asset ohne bewegte Teile; die Laufzeit setzt dann Teil 0 = statisch, spart 16 Byte je Vertex)."""
@@ -55,11 +55,13 @@ def write_part(obj, src, H, parts=True):
     h = max(1e-4, y1 - y0)
     ov = src.get('sp_build')
     s0, s1 = build_window(y0, h, H, tuple(ov) if ov is not None else None)
-    b = _attr(me, config.ATTR_BUILD, 'FLOAT_VECTOR')
-    bh = _attr(me, config.ATTR_BUILDH, 'FLOAT')
     n = len(me.vertices)
-    b.data.foreach_set('vector', [s0, s1, y0] * n)
-    bh.data.foreach_set('value', [h] * n)
+    if build:
+        # Figuren haben keine Bauanimation: build=False spart 16 Byte je Vertex (Laufzeit setzt Standardwerte)
+        b = _attr(me, config.ATTR_BUILD, 'FLOAT_VECTOR')
+        bh = _attr(me, config.ATTR_BUILDH, 'FLOAT')
+        b.data.foreach_set('vector', [s0, s1, y0] * n)
+        bh.data.foreach_set('value', [h] * n)
     if parts:
         pa = _attr(me, config.ATTR_PART, 'FLOAT')
         pv = _attr(me, config.ATTR_PIVOT, 'FLOAT_VECTOR')

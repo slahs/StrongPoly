@@ -42,6 +42,8 @@ class Asset:
         self.objects = []
         self.coll = scene.collection(f'{asset_id}_src')
         self.t0 = time.time()
+        # Figuren: Varianten (Hut/Haar/Werkzeug) getrennt backen (bake.bake_ao_groups), Ursprung = Fusspunkt statt Footprint
+        self.figure = klass == 'figure'
 
     def add(self, obj, mat=None, uv_mode='box', tile=None, uv_space='world', along=None, part=None, pivot=None, build=None,
             team=False, dirt=None, wear=None, lod1=None, lod2=None, only=None, smooth=35.0):
@@ -203,6 +205,7 @@ def finish(A, preview_on=None, bake_on=None, manifest_on=None):
     animated = any(attrs.part_id(o) != 0 for o in meshes) or any(o.get('sp_style') is not None for o in meshes)
     for L in range(3):
         parts = []
+        srcs = []
         for o in meshes:
             pol = _policy(o, L)
             if pol == 'drop':
@@ -210,18 +213,22 @@ def finish(A, preview_on=None, bake_on=None, manifest_on=None):
             c = _copy(o, f'{o.name}.L{L}', exp)
             c = _reduce(c, pol, exp)
             table.setdefault(o.name, ['-', '-', '-'])[L] = str(sum(len(p.vertices) - 2 for p in c.data.polygons))
-            attrs.write_part(c, o, H, parts=animated)
+            attrs.write_part(c, o, H, parts=animated, build=not A.figure)
             attrs.init_data(c, o)
             parts.append(c)
+            srcs.append(o)
         if not parts:
             raise SystemExit(f'{A.id}: LOD{L} ist leer')
+        if bake_on and A.figure:
+            from . import figure
+            bake_s += bake.bake_ao_groups(parts, [figure.variant_key(o) for o in srcs], samples=16 if fast else 64, distance=0.12)
         lod = mesh.join(parts, f'{A.id}_LOD{L}')
         lod.data.name = lod.name
-        if bake_on:
+        if bake_on and not A.figure:
             bake_s += bake.bake_ao(lod, samples=16 if fast else 64, distance=max(0.6, min(2.0, H * 0.6)))
-        attrs.fill_dirt_wear(lod, seed=L)
+        attrs.fill_dirt_wear(lod, seed=L, ground_h=0.14 if A.figure else 0.55)
         attrs.strip_helpers(lod)
-        tris = checks.lod_mesh(rep, lod, L, A.budget[L] if A.budget else None, parts=animated)
+        tris = checks.lod_mesh(rep, lod, L, A.budget[L] if A.budget else None, parts=animated, build=not A.figure)
         e = bpy.data.objects.new(config.LOD_NAMES[L], None)
         exp.objects.link(e)
         e.parent = root
@@ -262,7 +269,9 @@ def finish(A, preview_on=None, bake_on=None, manifest_on=None):
         export_animations=False, export_skins=False, export_morph=False,
     )
     gj, nbytes = _glb_info(glb)
-    need = ['POSITION', 'NORMAL', 'TEXCOORD_0', 'COLOR_0', '_BUILD', '_BUILDH'] + (['_PART', '_PIVOT'] if animated else [])
+    need = ['POSITION', 'NORMAL', 'TEXCOORD_0', 'COLOR_0'] + (['_BUILD', '_BUILDH'] if not A.figure else []) + (['_PART', '_PIVOT'] if animated else [])
+    if A.figure:
+        need += [config.ATTR_STYLE, config.ATTR_SLOT, config.ATTR_ARM]
     for m in gj.get('meshes', []):
         for p in m['primitives']:
             miss = [a for a in need if a not in p['attributes']]

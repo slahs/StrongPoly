@@ -1,0 +1,81 @@
+{
+  "id": "peasant",
+  "desc": "Bauer/Arbeiter: Leinentunika, Wollbeinlinge, Bundschuhe, Schaerpe+Halstuch in Spielerfarbe, Strohhut/Gugel, Werkzeug je Beruf",
+  "file": "models/peasant.glb",
+  "target": {
+    "unit": "Peasant"
+  },
+  "class": "figure",
+  "footprint": null,
+  "height": 0.965,
+  "bbox": {
+    "min": [
+      -0.156,
+      0.003,
+      -0.138
+    ],
+    "max": [
+      0.167,
+      0.965,
+      0.394
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 2484,
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Figure",
+        "M_Iron_Wrought",
+        "M_Leather"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 778,
+      "materials": [
+        "M_Figure"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 230,
+      "materials": [
+        "M_Figure"
+      ]
+    }
+  ],
+  "tris": [
+    2484,
+    778,
+    230
+  ],
+  "budget": [
+    2500,
+    800,
+    250
+  ],
+  "materials": [
+    "M_Cloth_Linen",
+    "M_Figure",
+    "M_Iron_Wrought",
+    "M_Leather"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0",
+    "_PART",
+    "_PIVOT",
+    "_STYLE",
+    "_SLOT",
+    "_ARM"
+  ],
+  "bytes": 456368,
+  "source": "assets/blender/models/peasant.py",
+  "blend": "assets/src/peasant.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",
+  "lodDist": [
+    0.45
+  ]
+}

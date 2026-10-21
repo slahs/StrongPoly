@@ -1,0 +1,81 @@
+{
+  "id": "spearman",
+  "desc": "Speerkaempfer: Gambeson mit Steppnaehten, Waffenrock+Schild in Spielerfarbe, Eisenhut, Kettenhaube/Steppkappe, Speer",
+  "file": "models/spearman.glb",
+  "target": {
+    "unit": "Spearman"
+  },
+  "class": "figure",
+  "footprint": null,
+  "height": 1.194,
+  "bbox": {
+    "min": [
+      -0.261,
+      0.003,
+      -0.149
+    ],
+    "max": [
+      0.158,
+      1.194,
+      0.562
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 2492,
+      "materials": [
+        "M_Cloth_Wool",
+        "M_Figure",
+        "M_Iron_Wrought",
+        "M_Leather"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 735,
+      "materials": [
+        "M_Figure"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 240,
+      "materials": [
+        "M_Figure"
+      ]
+    }
+  ],
+  "tris": [
+    2492,
+    735,
+    240
+  ],
+  "budget": [
+    2500,
+    800,
+    250
+  ],
+  "materials": [
+    "M_Cloth_Wool",
+    "M_Figure",
+    "M_Iron_Wrought",
+    "M_Leather"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0",
+    "_PART",
+    "_PIVOT",
+    "_STYLE",
+    "_SLOT",
+    "_ARM"
+  ],
+  "bytes": 445948,
+  "source": "assets/blender/models/spearman.py",
+  "blend": "assets/src/spearman.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",
+  "lodDist": [
+    0.45
+  ]
+}

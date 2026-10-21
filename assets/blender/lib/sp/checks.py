@@ -41,7 +41,7 @@ def source_object(rep, obj):
         rep.warn(f'{obj.name}: leeres Mesh')
 
 
-def lod_mesh(rep, obj, level, budget, parts=True):
+def lod_mesh(rep, obj, level, budget, parts=True, build=True):
     """Exportfertiges LOD-Mesh: Dreiecke gegen Budget, Normalen, entartete Flaechen."""
     me = obj.data
     tris = sum(len(p.vertices) - 2 for p in me.polygons)
@@ -64,7 +64,7 @@ def lod_mesh(rep, obj, level, budget, parts=True):
         rep.warn(f'LOD{level}: {flipped} Flaechen evtl. falsch orientiert (offenes Mesh, bitte pruefen)')
     if config.DATA_COLOR not in me.color_attributes:
         rep.err(f'LOD{level}: Datenfarbe {config.DATA_COLOR!r} fehlt')
-    for a in (config.ATTR_BUILD, config.ATTR_BUILDH) + ((config.ATTR_PART, config.ATTR_PIVOT) if parts else ()):
+    for a in ((config.ATTR_BUILD, config.ATTR_BUILDH) if build else ()) + ((config.ATTR_PART, config.ATTR_PIVOT) if parts else ()):
         if a not in me.attributes:
             rep.err(f'LOD{level}: Attribut {a} fehlt')
     return tris
