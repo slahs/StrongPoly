@@ -67,7 +67,8 @@ def build(F, q):
     fr = human.arm(F, q, 1, cloth, CA, 9, sleeve='rolled')
     human.arm(F, q, -1, cloth, CA, 10, sleeve='rolled')
     # ---- Spielerfarbe: Guertelschaerpe mit Knoten und Enden, Halstuch
-    human.belt(F, q, cloth, 0, z=0.518, h=0.032, grow=0.008, team=True, name='sash')
+    # fern (LOD2) Spielerfarbe etwas ueberzeichnet: breitere Schaerpe, Halstuch bleibt (Lesbarkeit aus RTS-Hoehe)
+    human.belt(F, q, cloth, 0, z=0.518, h=0.032 if q < 2 else 0.05, grow=0.008 if q < 2 else 0.012, team=True, name='sash')
     if q < 2:
         k = blob('sash_knot', (0.052, -0.06, 0.514), (0.014, 0.01, 0.014), segs=6 if q == 0 else 4, rings=1)
         F.add(k, cloth, 0, team=True, smooth=60)
@@ -75,11 +76,12 @@ def build(F, q):
             e = tube(f'sash_end{i}', [(0.052 + dx, -0.066, 0.508), (0.06 + dx * 2, -0.078, 0.508 - L)], [0.011, 0.013], segs=4, rf=0.3, cap1=0.0)
             F.add(e, cloth, 0, team=True, smooth=50)
     sc = [Sec((0, 0.008, 0.758), 0.095, 0.064, 0.064), Sec((0, 0.008, 0.772), 0.08, 0.058, 0.06), Sec((0, 0.01, 0.787), 0.045, 0.044, 0.044)]
-    if q == 1:
+    if q >= 1:
         sc = [sc[0], sc[2]]
-    if q < 2:
-        o = loft('scarf', sc, segs=(10, 6, 6)[q])
-        F.add(o, cloth, 0, team=True, smooth=60)
+    if q == 2:
+        sc = [Sec((0, 0.008, 0.752), 0.104, 0.072, 0.07), Sec((0, 0.01, 0.79), 0.05, 0.048, 0.048)]
+    o = loft('scarf', sc, segs=(10, 6, 5)[q])
+    F.add(o, cloth, 0, team=True, smooth=60)
     if q == 0:
         kn = blob('scarf_knot', (0.0, -0.06, 0.758), (0.016, 0.012, 0.014), segs=6, rings=1)
         F.add(kn, cloth, 0, team=True, smooth=60)
@@ -106,6 +108,9 @@ def build(F, q):
     gear.straw_hat(F, q, VIS['Hat0'], mat=LINEN)
     gear.hood(F, q, VIS['Hat1'], cls=CB, mat=LINEN)
     # ---- Werkzeuge (rechte Faust, Slot = Berufe)
+    if q == 2:
+        # fern: ein Stiel fuer alle Berufe mit Werkzeug (Silhouette)
+        gear.Tool(F, q, fr, slot=SLOT_HOE | SLOT_SHOVEL | SLOT_PADDLE | SLOT_AXE | SLOT_PICK | SLOT_HAMMER | SLOT_SMITH | SLOT_SICKLE).handle(-0.15, 0.4, r=0.013)
     if q < 2:
         # gemeinsame Stiele (ein Stiel fuer mehrere Berufe spart Dreiecke): lang, mittel, kurz
         gear.Tool(F, q, fr, slot=SLOT_HOE | SLOT_SHOVEL | SLOT_PADDLE).handle(-0.2, 0.43)

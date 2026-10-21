@@ -209,7 +209,7 @@
         },
         {
           "node": "LOD2",
-          "tris": 230,
+          "tris": 246,
           "materials": [
             "M_Figure"
           ]
@@ -218,7 +218,7 @@
       "tris": [
         2484,
         778,
-        230
+        246
       ],
       "budget": [
         2500,
@@ -240,11 +240,11 @@
         "_SLOT",
         "_ARM"
       ],
-      "bytes": 456596,
+      "bytes": 459276,
       "lodDist": [
         0.45
       ],
-      "hash": "89caed2793",
+      "hash": "2fe8b68ff7",
       "source": "assets/blender/models/peasant.py",
       "blend": "assets/src/peasant.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
