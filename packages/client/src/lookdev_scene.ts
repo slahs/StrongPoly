@@ -85,7 +85,7 @@ export const LOOKDEV_CAMS: LookdevCam[] = [
   { id: '3g-corner', label: '3g Mauerecke', x: -11.5, y: 12, dist: 7.5, yaw: -0.75, pitch: 24, lookHeight: 1.6, fog: 3 },
   // Stadt: Fachwerkhaus nah, Bäckerei/Schmiede nah, Häusergruppe (Varianten nebeneinander)
   { id: '4a-house', label: '4a Haus', x: 4, y: -7, dist: 5.6, yaw: 0.5, pitch: 16, lookHeight: 1.0, fog: 3 },
-  { id: '4b-bakery', label: '4b Bäckerei', x: -3.5, y: 5.5, dist: 7.5, yaw: 0.45, pitch: 20, lookHeight: 1.1, fog: 3 },
+  { id: '4b-bakery', label: '4b Bäckerei', x: -3.5, y: 5.5, dist: 6.5, yaw: 0.95, pitch: 27, lookHeight: 1.1, fog: 3 },
   { id: '4c-smithy', label: '4c Schmiede', x: 7.5, y: 5.5, dist: 7.5, yaw: -0.5, pitch: 20, lookHeight: 1.0, fog: 3 },
   { id: '2b-town', label: '2b Häuser', x: 3, y: -5.5, dist: 12, yaw: 0.35, pitch: 34, lookHeight: 0.6, fog: 1.6 },
 ];

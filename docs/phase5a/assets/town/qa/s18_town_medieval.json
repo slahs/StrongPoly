@@ -1,13 +1,13 @@
 {
   "name": "s18_town_medieval",
-  "base": "http://127.0.0.1:5517",
+  "base": "http://127.0.0.1:5574",
   "query": "quick=1&dev=1&size=128&seed=3&style=medieval",
-  "at": "2026-10-21T13:28:41.682Z",
+  "at": "2026-10-21T15:01:47.978Z",
   "checks": [
     {
       "label": "Manifest und Assets geladen",
       "ok": true,
-      "extra": "{\"ok\":5,\"failed\":0,\"ms\":24022.800000000745}"
+      "extra": "{\"ok\":10,\"failed\":0,\"ms\":19003}"
     },
     {
       "label": "Overrides Hütte/Bäckerei/Schmiede aktiv, Hütte mit Variante",
@@ -67,7 +67,7 @@
     {
       "label": "blacksmith: fertiges GLB (blacksmith), kein prozedurales Modell",
       "ok": true,
-      "extra": "{\"id\":\"blacksmith\",\"glb\":14,\"proc\":0}"
+      "extra": "{\"id\":\"blacksmith\",\"glb\":7,\"proc\":0}"
     },
     {
       "label": "blacksmith: Auswahlrahmen und Hover-Kontur aus dem Asset",
@@ -105,14 +105,14 @@
       "extra": "{\"frames\":4,\"hover\":true,\"edgesFromAsset\":true}"
     },
     {
-      "label": "Hütten: beide Modellvarianten in der Siedlung",
-      "ok": false,
-      "extra": "[\"hovel_b\",\"hovel_b\",\"hovel_b\",\"hovel_b\"]"
+      "label": "Hütten: Variante stabil je Gebäude-ID, beide Varianten erreichbar",
+      "ok": true,
+      "extra": "{\"vs\":[\"hovel_b\",\"hovel_b\",\"hovel\",\"hovel_b\"],\"range\":[\"hovel\",\"hovel_b\"]}"
     },
     {
       "label": "Emitter aus Ankern: Bäckerei Rauch am Schlot, Schmiede Rauch + Amboss (mit Arbeiter), Hütte Kaminrauch",
       "ok": true,
-      "extra": "{\"staffed\":false,\"em\":{\"bakery\":[],\"blacksmith\":[],\"hovel\":[\"smoke@3.52\"]}}"
+      "extra": "{\"staffed\":false,\"em\":{\"bakery\":[\"smoke@3.42\"],\"blacksmith\":[],\"hovel\":[\"smoke@3.52\"]}}"
     }
   ],
   "console": [],
@@ -186,21 +186,27 @@
     "hovel_varianten": {
       "ids": [
         41,
-        63,
-        66,
-        69
+        55,
+        58,
+        61
       ],
       "assets": [
         "hovel_b",
         "hovel_b",
-        "hovel_b",
+        "hovel",
+        "hovel_b"
+      ],
+      "range": [
+        "hovel",
         "hovel_b"
       ]
     },
     "emitter": {
       "staffed": false,
       "em": {
-        "bakery": [],
+        "bakery": [
+          "smoke@3.42"
+        ],
         "blacksmith": [],
         "hovel": [
           "smoke@3.52"
@@ -209,7 +215,7 @@
     }
   },
   "data": {},
-  "passed": 21,
-  "failed": 1,
+  "passed": 22,
+  "failed": 0,
   "consoleClean": true
 }
