@@ -14,7 +14,7 @@
   "bbox": {
     "min": [
       -1.51,
-      -0.049,
+      -0.055,
       -1.538
     ],
     "max": [
@@ -141,7 +141,7 @@
     "_BUILD",
     "_BUILDH"
   ],
-  "bytes": 1111808,
+  "bytes": 1111788,
   "source": "assets/blender/models/blacksmith.py",
   "blend": "assets/src/blacksmith.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",

@@ -10,16 +10,16 @@
     2,
     2
   ],
-  "height": 3.092,
+  "height": 3.091,
   "bbox": {
     "min": [
       -1.142,
-      -0.053,
+      -0.049,
       -0.906
     ],
     "max": [
       1.239,
-      3.092,
+      3.091,
       1.028
     ]
   },
@@ -114,7 +114,7 @@
     "_BUILD",
     "_BUILDH"
   ],
-  "bytes": 1033432,
+  "bytes": 1048540,
   "source": "assets/blender/models/hovel.py",
   "blend": "assets/src/hovel.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",

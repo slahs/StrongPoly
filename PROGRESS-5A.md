@@ -25,6 +25,57 @@ Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/
 - **Messwerte LookDev** (Software-GL, 1280×720, Kamera RTS; `docs/phase5a/lookdev/stats.json`): classic Niedrig/Mittel/Hoch 38/53/55 Draw-Calls, 128k/301k/474k Dreiecke, 14/21/23 Programme, Texturspeicher ≈ 8,7/32,7/128,7 MB (überwiegend Schattenkarte); medieval mit Brunnen-GLB +3…+5 Draw-Calls, +1 Programm, +0,2 MB (PMREM). Klassischer Stil in allen 12 `?shots`-Szenen mit identischen Draw-Calls/Dreiecken/Programmen, Pixelabweichung im Rahmen des Laufzeitrauschens (`docs/phase5a/measurements/README.md`).
 - **Offen:** echte Materialtexturen und Referenz-Assets (andere Agenten); KTX2/Meshopt erst in 5B; Safari/M3-Messung; Server liefert ohne gzip aus.
 
+## Burg (Bergfried, Mauer, Tor) – Teilschritt 3 + Teil von 4
+
+**Assets** (Skripte `assets/blender/models/`, gemeinsame Bausteine `castle_kit.py`, Mauerprofil `wall_high_parts.py`; Quellen `assets/src/*.blend`, Vorschauen `assets/previews/`):
+
+| Asset | Ziel | LOD0 / LOD1 / LOD2 Dreiecke | Materialien | GLB |
+| --- | --- | --- | --- | --- |
+| `keep` | Bergfried (5×5, Plattform 4,2) | 24.912 / 7.147 / 962 | Rubble, Ashlar, Timber_Oak, Wood_Planks, Roof_Shingle, Iron_Wrought, Cloth_Linen (7) | 4,0 MB |
+| `gate_stone` | Steintor (4×3, Plattform 3,6) | 5.994 / 2.044 / 592 | wie Bergfried (7) | 1,1 MB |
+| `wall_high_arm` | Hohe Steinmauer, Arm | 390 / 232 / 36 | Rubble, Ashlar | 66 KB |
+| `wall_high_post` | Hohe Steinmauer, Pfosten | 1.162 / 412 / 72 | Rubble, Ashlar | 160 KB |
+| `wall_high_stub` | Hohe Steinmauer, Einzelpfeiler | 1.300 / 502 / 96 | Rubble, Ashlar | 178 KB |
+
+- **Bergfried/Wohnturm** (eigener Entwurf, 12.–14. Jh.): Bruchsteinschaft mit Eckquadern (Läufer/Binder), Sockel mit Anlauf und Wasserschlag, Geschossgesims mit Rücksprung, Hocheingang im 1. OG (Rundbogenportal mit Keilsteinen, Bohlentür mit Eisenbändern, Holztreppe mit Wangen/Podest/Geländer, Schindel-Vordach auf Kopfbändern), Schießscharten (auch Kreuzscharten), kleine Rundbogenfenster mit Gewänden/Sohlbank (teils mit Läden), Rüstlöcher in Reihen, Ausbesserungen in Werkstein, Abtritterker auf Kragsteinen, Wasserspeier, Konsolfries mit offenem Pechnasen-Schlitz, vorkragende Brüstung mit unregelmäßigen Zinnen und Abdeckplatten, zwei Scharwachttürmchen auf gestuften Konsolen mit Kegeldach, aus der Mitte nach hinten versetzter Turmaufsatz (Wohngeschoss) mit Tür zur Plattform, Zwillingsfenstern unter Entlastungsbogen, Sparrenköpfen, Zeltdach aus 13 Schindellagen mit Gratbrettern, Kamin (Rauch-Anker), Knauf, hölzerne Hurde (Wehrgang vor der Brüstung, Ostseite) mit Kragbalken, Kopfbändern und Pultdach, Fahnenmast mit Fahne (Teil `cloth`) und Fassadenbanner in Spielerfarbe. Plattform auf Laufhöhe 4,2 (Wehrgang um den Aufsatz).
+- **Hohe Steinmauer**: Bruchstein mit Anlauf, Sockel mit Wasserschlag, Gesims unter dem Wehrgang, Brüstungen mit Abdeckplatten, Plattenbelag auf Laufhöhe 2,4; Pfosten mit vier Zinnen (Rhythmus 0,5 wie `wallParts`, zwei mit Scharte). **Stöße**: symmetrisches Profil, 3 mm Überlappung, eingerückte Stirnflächen als eigene Teile (keine Abnutzungs-/Schattenlinien am Stoß), UVs stetig über beide Stöße (Kachelgröße 1: u = ±(x − 0,5)), Schmutzrauschen in y gespiegelt (Pipeline-Option), gemeinsame Bauzeitfenster für Arm/Pfosten. **Ecken/T-Stöße**: Pfosten-Kern/Sockel/Gesims als Quadrat 6 mm innerhalb der Armflächen (im geraden Lauf verdeckt, an Ecken sichtbar), die Eckzinne schließt die Brüstung; an der Außenecke bleibt neben der Eckzinne eine schmale Zinnenlücke (der Pfosten kennt seine Nachbarn nicht – wie bei den prozeduralen Mauern).
+- **Steintor/Torhaus**: zwei vorspringende Flankentürme (Eckquader, Sockel/Gesims auf den Höhenlinien der Mauer, Anschluss der Mauerarme bei x = ±2), zurückgesetzte Durchfahrt mit Keilsteinbogen, Gewölbe und Fallgitterschlitz, **Fallgitter** aus Eiche mit Eisenspitzen als Teil `door` (hebt sich wie bisher um 1,7 in den Mauerkörper; die Laufzeit kennt für Tore nur das Heben, die Bohlenflügel mit Eisenbändern stehen deshalb offen an den Laibungen), Pechnase auf drei Kragsteinen über dem Tor, Türen vom Wehrgang in die Türme, Zinnen, Windenhaus mit Satteldach über dem Fallgitter, Banner/Wimpel in Spielerfarbe.
+- **Pipeline-Änderung** (minimal, rückwärtskompatibel): `sp.attrs.fill_dirt_wear(..., mirror_y=False)` + `Asset.noise_mirror_y` (Standard aus) – Schmutz-/Abnutzungsrauschen spiegelsymmetrisch für gedreht aneinanderstoßende Mauerstücke. Sonst keine Änderung an `assets/blender/lib` oder `render/assets`.
+- **Werkzeuge**: LookDev-Kameras `3d-keep`, `3e-gate`, `3f-wall`, `3g-corner`; Referenzsiedlung um Mauer-Eckstoß (L) und T-Stoß ergänzt; `scripts/shots.mjs --style=`; `scripts/qa/s04_castle.mjs --style=medieval`; neues Szenario `scripts/qa/s18_castle_medieval.mjs` (Overrides, Geist, Bauanimation Tor/Mauer, fertige GLB-Instanzen, Fallgitter, Durchmarsch, Auswahl/Hover).
+- **Nachweis** (`docs/phase5a/assets/castle/`, 960 px, LookDev Mittel, Software-GL): `1-rts`, `2-mid`, `3d-keep`, `3e-gate`, `3g-corner` je `_classic`/`_medieval`; Spiel (`s18`): `spiel_1_geist_tor`, `spiel_2_bau_35`, `spiel_2_bau_70`, `spiel_4_tor_nah`, `spiel_6_auswahl` (Tor offen, Fallgitter oben). Vorschauen Cycles: `assets/previews/{keep,gate_stone,wall_high_*}_{front,rts}.jpg`.
+- **Prüfungen**: `s18_castle_medieval` 12/12 (Overrides, Geist aus GLB, Bauanimation Tor 35/70 % und Mauerwelle im Clip-Material, fertig 48 Arme/26 Pfosten/2 Einzelpfeiler/Tor als GLB ohne prozedurales Tor, Fallgitter hebt sich 0,98, 8/8 Soldaten durchs Tor, Auswahl/Hover-Kontur aus GLB, Konsole sauber). `s04_castle --style=medieval --fast`: Mauerzug 25/25, Tor hinaus 19/24 und herein 24/24, 22/24 auf der Mauerkrone (Sim unverändert); die beiden FPS-abhängigen Prüfungen (Mauerwelle-Zwischenstände, Bewegungssprünge < 3 %) scheitern unter der aktuellen Last von ~20 auf 4 Kernen (0,5 Bilder/s) – auch kein Asset-Befund. Schaukasten `?shots=castle|siege&style=medieval`: GLB-Bergfried/-Mauern/-Tor zusammen mit prozeduralen Türmen und Pechkesseln, Mauerstöße an Türme/Tor sauber.
+- **Messwerte** (Software-GL, keine GPU-Werte): LookDev Mittel `1-rts` classic 53 Draw-Calls/305k Dreiecke → medieval 72/375k (mit Brunnen-GLB); Schaukasten `castle` 77/444k → 95/518k, `siege` 89/462k → 107/557k. Programme +1. Mehr Draw-Calls durch 7 Materialien je Bergfried/Tor und 2 je Mauerstück (je LOD × Material ein Instanz-Mesh, plus Schattenpass).
+- **Selbstkritik**: Großform/Mittelform tragen (Silhouette liest aus der RTS-Kamera klar „Burg“, Hocheingang/Hurde/Scharwachttürme/Pechnase/Fallgitter aus der Nähe glaubwürdig), aber ohne die Bibliothekstexturen wirken die großen Bruchsteinflächen noch glatt und einfarbig – die Steinstruktur muss aus `M_Stone_Rubble`/`M_Stone_Ashlar` kommen. Die Mauer ist zwangsläufig ein Kachelsystem (identische Pfosten → regelmäßiger Zinnenrhythmus; Variation nur über Instanzfarbe/Gelände). Am Außeneck bleibt neben der Eckzinne eine schmale Lücke in der Brüstung. Bergfried-GLB 4 MB (rohe Attribute; Meshopt/Quantisierung 5B). Torflügel stehen offen (Laufzeit animiert Tore nur durch Heben).
+
+## Materialbibliothek (Teilschritt 2, Material-Agent)
+
+- **19/19 Materialien** aus `assets/PIPELINE.md` vollständig prozedural in Blender erzeugt (Skripte
+  `assets/blender/materials/M_*.py`, gemeinsame Hilfen `_common.py`, Bau `scripts/assets/build-materials.sh`): echte
+  Quellgeometrie (Quader mit Abplatzungen, gepackte Bruch-/Pflastersteine, Einzelziegel/-schindeln, ~29 000 Strohhalme,
+  gewebte Fäden, ~105 000 Grashalme + Klee/Wegerich, modellierte Blätter, Höhenfelder für Holz/Putz/Eisen/Leder/Böden/
+  Fels/Rinde) → Cycles-Draufsicht-Bake (Normal, AO, Albedo, Rauheit, Metall, Höhe) → kachelbar per Nachbar-Instanzen
+  und Torus-Rauschen (2×2 sichtgeprüft).
+- **Ausgabe nach Pipeline-Konvention:** Quellen `assets/src/textures/<M>/` (nicht eingecheckt, reproduzierbar), Werte in
+  `assets/materials.json` (`tile` physikalisch, Rückfallfarbe/-rauheit aus den Karten, `info` mit Orientierung, Tönungsbereich,
+  Atlas/Durchlicht), WebP + `_1024`/`_512` über `assets/blender/tools/textures.py`, Manifest aktualisiert.
+- **Größen:** alle Stufen 32,7 MB (Budget 40): Niedrig 5,0 MB, Mittel 18,8 MB, 2048er Sätze (Quader, Eiche, Bretter, Biberschwanz) 9,0 MB.
+  Texturspeicher (LookDev, Software-GL) mit den 6 Brunnen-Materialien: +24 / +96 / +192 MB (Niedrig/Mittel/Hoch).
+- **Format:** WebP bestätigt; KTX2 gemessen (UASTC-Normalen größer als WebP, aber GPU-Speicher ÷4) → Empfehlung 5B wegen
+  GPU-Speicher der Stufe Hoch. Details `assets/PIPELINE.md` → „Materialbibliothek“.
+- **Nachweise:** Cycles-Vorschauen `docs/phase5a/materials/<M>.jpg`, Übersicht `docs/phase5a/materials/library.jpg`;
+  Browser: `node scripts/lookdev.mjs --styles=medieval --cams=3c-material --check` (alle Stufen, Konsole sauber), Bilder
+  `docs/phase5a/materials/lookdev_3c-material_{medium,high}.jpg` (Brunnen mit Bruchstein, Eiche, Brettern, Schindeln, Eisen, Leinen).
+- **Test:** `packages/client/test/asset_materials.test.ts` (Namensliste = PIPELINE.md = materials.json, Werte, vollständige
+  Kartensätze + Stufen, Alpha der Laubkarte, Budget ≤ 40 MB).
+- **Brunnen neu exportiert** (`assets/blender/models/well.py`), weil sich `tile` seiner Materialien geändert hat.
+- **Qualität (eigene Einschätzung):** stark: Biberschwanz, Stroh, Bretter, Bruchstein, Pflaster, Gras, Laub-Atlas;
+  mittel: Quader, Putz, Schindeln, Eisen, Erde, Rinde, Leinen, Wolle (wirkt fischgratartig); schwach: Eiche (Verwitterung
+  fleckig, Beilspuren als Netz), Leder (eher Wildleder/Stein), Fels (Facetten wie Polygonplatten), Weg (Spuren lesen sich
+  als dunkle Rillen).
+- **Offen:** KTX2 (5B, GPU-Speicher Stufe Hoch); Höhenkarte (`height.png`) und Putz/Bruchstein-Blend in der Laufzeit nicht
+  genutzt; Gelände/Bäume nutzen die Boden-/Rinden-/Laubmaterialien noch nicht (Umgebungs-Agent); schwache Materialien
+  nachschärfen; Safari/M3-Prüfung der Texturen.
+
 ## Stadt (Fachwerkhaus, Bäckerei, Schmiede) – Teilschritt 4
 
 - **Assets** (Skripte `assets/blender/models/{hovel,bakery,blacksmith}.py`, Baukasten `assets/blender/lib/sp/town.py`,
@@ -57,7 +108,7 @@ Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/
 - **Pipeline-Erweiterungen** (rückwärtskompatibel, siehe `assets/PIPELINE.md` „Ergänzt (Stadt-Assets)“):
   Modellvarianten je Gebäude-ID (`target.variant`, `AssetRegistry.forBuilding(bt, id)`, `variantOf`; EntityRenderer,
   Baustellen, Hover, Emitter; Tests), Mindest-Schmutz `sp_grime` je Objekt/Vertex in `sp.attrs`, Baukasten `sp.town`.
-- **LookDev:** neue Kameras `3d-house`, `3e-bakery`, `3f-smithy`, `2b-town` (`lookdev_scene.ts`).
+- **LookDev:** neue Kameras `4a-house`, `4b-bakery`, `4c-smithy`, `2b-town` (vor dem Merge `3d-house`/`3e-bakery`/`3f-smithy`) (`lookdev_scene.ts`).
 - **Browserprüfung:** `scripts/qa/s18_town_medieval.mjs` (Platzierungsgeist, Bauanimation in Stufen 20/45/70/90 %,
   fertiges GLB, Auswahl/Hover, Varianten, Emitter) → `docs/phase5a/assets/town/qa/`.
 - **Bilder:** `docs/phase5a/assets/town/` – `vergleich_<kamera>_classic-medieval.jpg` (1-rts, 2-mid, 2b-town, 3d-house,

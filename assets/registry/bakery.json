@@ -139,7 +139,7 @@
     "_BUILD",
     "_BUILDH"
   ],
-  "bytes": 1281716,
+  "bytes": 1283716,
   "source": "assets/blender/models/bakery.py",
   "blend": "assets/src/bakery.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",
