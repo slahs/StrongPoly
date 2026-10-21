@@ -3,6 +3,8 @@ import { BT, BuildingDef, ClientWorld } from '@strongpoly/shared';
 import { buildBuildingModel, TURRET_BASE_Y } from './models_buildings';
 import { tileY } from './util';
 import type { ModelGeos } from './builder';
+import { assetRegistry } from './assets/registry';
+import { mergedLod } from './assets/model';
 
 export interface GhostPlacement {
   x: number;
@@ -20,6 +22,8 @@ export class GhostRenderer {
   private accent: THREE.InstancedMesh | null = null;
   private tiles: THREE.InstancedMesh;
   private curType = -1;
+  /** Registerstand beim letzten Typwechsel (GLB-Asset fertig geladen → Vorschau neu aufbauen) */
+  private curVer = -1;
   private geoCache = new Map<number, ModelGeos>();
   private matBody = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true, transparent: true, opacity: 0.62, depthWrite: false });
   private matAcc = new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true, transparent: true, opacity: 0.62, depthWrite: false });
@@ -51,8 +55,9 @@ export class GhostRenderer {
   }
 
   private setType(def: BuildingDef): void {
-    if (this.curType === def.id) return;
+    if (this.curType === def.id && this.curVer === assetRegistry.version) return;
     this.curType = def.id;
+    this.curVer = assetRegistry.version;
     if (this.body) {
       this.group.remove(this.body);
       this.body.dispose();
@@ -64,7 +69,9 @@ export class GhostRenderer {
     for (const m of [this.preBody, this.preAccent]) if (m) this.group.remove(m);
     this.preBody = null;
     this.preAccent = null;
-    let geos = this.geoCache.get(def.id);
+    // Stil „medieval“: Vorschau aus dem GLB-Asset (LOD1, Materialfarben mit AO), sonst prozedurales Modell
+    const am = assetRegistry.forBuilding(def.id);
+    let geos: ModelGeos | undefined = am ? { body: (am.cache.ghost ??= mergedLod(am, 1, (n) => assetRegistry.materials.baseColor(n))), accent: null, merged: am.cache.ghost, tris: am.lods[Math.min(1, am.lods.length - 1)].tris } : this.geoCache.get(def.id);
     if (!geos) {
       geos = buildBuildingModel(def, 1);
       this.geoCache.set(def.id, geos);

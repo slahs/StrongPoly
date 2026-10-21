@@ -18,6 +18,8 @@ export class RtsCamera {
   scrollSpeed = 1.4;
   /** feste Blickrichtung (nur Prüfszenen/Screenshot-Werkzeug); null = Spielsteuerung über yawIndex */
   yawOverride: number | null = null;
+  /** Blickpunkt über dem Boden (nur Nahaufnahmen im LookDev; Spiel: 0) */
+  lookHeight = 0;
 
   constructor(aspect: number) {
     this.camera = new THREE.PerspectiveCamera(36, aspect, 0.5, 500);
@@ -94,10 +96,10 @@ export class RtsCamera {
     // Kamera sitzt hinter dem Blickpunkt (entgegen der Blickrichtung)
     this.camera.position.set(
       this.tx + Math.sin(this.yaw) * cp * this.dist,
-      groundY + sp * this.dist,
+      groundY + this.lookHeight + sp * this.dist,
       this.tz + Math.cos(this.yaw) * cp * this.dist,
     );
-    this.camera.lookAt(this.tx, groundY, this.tz);
+    this.camera.lookAt(this.tx, groundY + this.lookHeight, this.tz);
   }
 
   /** Schnittpunkt eines Strahls (NDC) mit dem Höhenfeld in Tile-Koordinaten. */

@@ -31,6 +31,12 @@ import { JOB, JOB_OF_BUILDING, resolveJob } from './unit_jobs';
 import { LOD_HYST, LOD_NEAR_DIST, UnitDetail, unitVariant, UnitVariant, VIS } from './units_style';
 import { groundYAt, RES_COLORS, tileY } from './util';
 import { EMITTERS } from './work_fx';
+import { assetRegistry } from './assets/registry';
+import { AssetTypeMesh } from './assets/asset_mesh';
+import { lodCfgOf } from './assets/lod';
+import { mergedLod } from './assets/model';
+import type { AssetModel } from './assets/model';
+import type { WallPiece } from './assets/manifest';
 
 const TEAM = teamTable(PLAYER_COLORS);
 const NEUTRAL = new THREE.Color(0xf2ede0);
@@ -129,6 +135,9 @@ export class EntityRenderer {
   private unitMeshes: (TypeMesh | null)[] = new Array(UNIT_TYPES).fill(null);
   private bldMeshes: (TypeMesh | null)[] = new Array(BUILDING_TYPES).fill(null);
   private wallMeshes = new Map<string, TypeMesh>();
+  /** GLB-Assets (Stil „medieval“, render/assets): Schlüssel `b:<BT>`, `w:<BT>:<Stück>`, `u:<U>` → Instanzmesh je LOD × Material */
+  private assetMeshes = new Map<string, AssetTypeMesh>();
+  private assetVer = -1;
   /** alle getragenen Waren in EINEM Mesh (Form je Instanz über Sichtbarkeits-Bits) */
   private cargo: TypeMesh;
   /** Baustellen (Fundament, Gerüst, Baumaterial, wachsende Gebäude und Mauern, Abschlusseffekt) – siehe build_sites.ts */
@@ -317,11 +326,16 @@ export class EntityRenderer {
     this.q = q;
     this.shadows = shadows;
     this.unitShadows = shadows && q.shadowUnits;
+    assetRegistry.applyQuality(q);
+    for (const [k, m] of this.assetMeshes) {
+      m.setLodCfg(lodCfgOf(q));
+      m.setShadows(k[0] === 'u' ? this.unitShadows : shadows);
+    }
     for (const m of this.unitMeshes) m?.setShadows(this.unitShadows);
     this.cargo.setShadows(false);
     for (const m of this.bldMeshes) m?.setShadows(shadows);
     for (const m of this.wallMeshes.values()) m.setShadows(shadows);
-    this.sites.setQuality(shadows, q.particleScale, lvl.detail);
+    this.sites.setQuality(shadows, q.particleScale, lvl.detail, q);
     for (const m of this.turretMeshes) m?.setShadows(shadows);
     this.rubbleStone.setShadows(shadows);
     this.rubbleWood.setShadows(shadows);
@@ -341,6 +355,8 @@ export class EntityRenderer {
       if ((o as THREE.InstancedMesh).isInstancedMesh) (o as THREE.InstancedMesh).dispose();
     });
     this.sites.dispose();
+    for (const m of this.assetMeshes.values()) m.dispose();
+    this.assetMeshes.clear();
     for (const g of this.edgeCache.values()) g.dispose();
     this.edgeCache.clear();
   }
@@ -376,6 +392,47 @@ export class EntityRenderer {
       this.wallMeshes.set(key, m);
     }
     return m;
+  }
+
+  // ------------------------------------------------------------------ GLB-Assets (Override-Register, Stil „medieval“)
+  /** Instanzmesh eines geladenen Assets (je Schlüssel); bei neuem Modell neu aufgebaut */
+  private assetMesh(key: string, model: AssetModel, unit = false): AssetTypeMesh {
+    let m = this.assetMeshes.get(key);
+    if (!m || m.model !== model) {
+      m?.dispose();
+      m = new AssetTypeMesh(model, this.group, assetRegistry.materials, TEAM, unit ? 'unit' : 'final', lodCfgOf(this.q), unit ? this.unitShadows : this.shadows, unit ? 128 : 32, unit);
+      this.assetMeshes.set(key, m);
+      m.begin();
+    }
+    return m;
+  }
+
+  /** Register geändert (Asset geladen, Stilwechsel): Asset-Meshes verwerfen und Gebäude neu schreiben */
+  private syncAssets(): void {
+    if (assetRegistry.version === this.assetVer) return;
+    this.assetVer = assetRegistry.version;
+    for (const m of this.assetMeshes.values()) m.dispose();
+    this.assetMeshes.clear();
+    this.bldDirty = true;
+  }
+
+  /** Gebäude zeichnen: GLB-Asset, falls registriert und geladen, sonst das prozedurale Modell (Rückfall) */
+  private pushBuilding(t: number, key: number, x: number, y: number, z: number, rot: number, sx: number, sy: number, team: number, a0: number, a1: number, a2: number, a3: number): void {
+    const am = assetRegistry.forBuilding(t);
+    if (am) this.assetMesh(`b:${t}`, am).push(key, x, y, z, rot, sx, sy, team, a0, a1, a2, a3);
+    else this.bldMesh(t).push(x, y, z, rot, sx, sy, team, a0, a1, a2, a3);
+  }
+
+  private pushWall(t: number, piece: WallPiece, key: number, x: number, y: number, z: number, rot: number, team: number, a0: number): void {
+    const am = assetRegistry.forWall(t, piece);
+    if (am) this.assetMesh(`w:${t}:${piece}`, am).push(key, x, y, z, rot, 1, 1, team, a0, AF.Static, 0, 1);
+    else this.wallMesh(t, piece).push(x, y, z, rot, 1, 1, team, a0, AF.Static, 0, 1);
+  }
+
+  /** Emitter eines Gebäudes: aus den Ankerpunkten des Assets, sonst die Tabelle work_fx.ts */
+  private emittersOf(t: number): { x: number; y: number; z: number; kind: string; rate: number; staffed: boolean }[] | undefined {
+    const am = assetRegistry.forBuilding(t);
+    return am && am.emitters.length ? am.emitters : EMITTERS[t];
   }
 
   // ------------------------------------------------------------------ Figuren: Beruf, Variation, Nah/Fern
@@ -535,6 +592,7 @@ export class EntityRenderer {
 
   update(dt: number, o: RenderOpts): void {
     this.lastOpts = o;
+    this.syncAssets();
     this.flameT += dt;
     if (o.camera) {
       o.camera.updateMatrixWorld();
@@ -616,6 +674,9 @@ export class EntityRenderer {
       this.bldDirty = false;
       this.rewriteBuildings(dt, o, changed);
       if (changed) this.onBuildingsChanged?.();
+    } else if (o.camera && this.assetMeshes.size) {
+      // GLB-Gebäude: LOD bei Kamerabewegung neu wählen (ohne die Gebäudeliste neu zu schreiben)
+      for (const [k, m] of this.assetMeshes) if (k[0] !== 'u') m.relod(o.camera.position);
     }
     this.updateRubble(o);
     this.updateFrames(o);
@@ -627,6 +688,8 @@ export class EntityRenderer {
     const now = o.now;
     for (const m of this.bldMeshes) m?.begin();
     for (const m of this.wallMeshes.values()) m.begin();
+    for (const [k, m] of this.assetMeshes) if (k[0] !== 'u') m.begin();
+    this.sites.camera = o.camera ? o.camera.position : null;
     this.sites.begin();
     for (const m of this.turretMeshes) m?.begin();
     this.aoLayer.n = 0;
@@ -695,9 +758,8 @@ export class EntityRenderer {
       // Mauern: Pfosten + Arme zu den vier Nachbarn (nahtlos, Ecken und T-Stücke ergeben sich von selbst)
       if (isWall) {
         const mask = wallMask;
-        const post = this.wallMesh(b.t, mask === 0 ? 'stub' : 'post');
-        post.push(cx, y, cz, 0, 1, 1, b.o, phase, AF.Static, 0, 1);
-        for (let k = 0; k < 4; k++) if (mask & (1 << k)) this.wallMesh(b.t, 'arm').push(cx, y, cz, armRot[k], 1, 1, b.o, phase, AF.Static, 0, 1);
+        this.pushWall(b.t, mask === 0 ? 'stub' : 'post', b.i * 8, cx, y, cz, 0, b.o, phase);
+        for (let k = 0; k < 4; k++) if (mask & (1 << k)) this.pushWall(b.t, 'arm', b.i * 8 + 1 + k, cx, y, cz, armRot[k], b.o, phase);
         continue;
       }
 
@@ -716,7 +778,7 @@ export class EntityRenderer {
         }
         a3 = p;
       }
-      this.bldMesh(b.t).push(cx, y, cz, rot, 1, sy, b.o, phase, flags, a2, a3);
+      this.pushBuilding(b.t, b.i, cx, y, cz, rot, 1, sy, b.o, phase, flags, a2, a3);
       if (b.u > 0 && b.t === BT.TowerRound) this.pushTurret(b, y, cx, cz, o, phase);
 
       if (rebuildLists) {
@@ -732,7 +794,7 @@ export class EntityRenderer {
             });
           }
         }
-        const em = EMITTERS[b.t];
+        const em = this.emittersOf(b.t);
         if (em && this.q.workSmoke) {
           const c = Math.cos(rot);
           const s = Math.sin(rot);
@@ -753,10 +815,12 @@ export class EntityRenderer {
       }
       const k = ease(age / 0.8);
       const shake = Math.sin(age * 60) * 0.03 * (1 - k);
-      this.bldMesh(c.type).push(c.cx + shake, c.y - 0.2 * k, c.cz, c.rot, 1, Math.max(0.05, 1 - 0.95 * k), c.owner, 0, AF.Static, 0, 1);
+      this.pushBuilding(c.type, -1 - i, c.cx + shake, c.y - 0.2 * k, c.cz, c.rot, 1, Math.max(0.05, 1 - 0.95 * k), c.owner, 0, AF.Static, 0, 1);
     }
     for (const m of this.bldMeshes) m?.end();
     for (const m of this.wallMeshes.values()) m.end();
+    const camP = o.camera ? o.camera.position : null;
+    for (const [k, m] of this.assetMeshes) if (k[0] !== 'u') m.end(camP);
     this.sites.end();
     for (const m of this.turretMeshes) m?.end();
     this.aoLayer.commit();
@@ -877,10 +941,13 @@ export class EntityRenderer {
     // Kantenlinien des überfahrenen Gebäudes
     // (während der Bauphase keine Kontur des fertigen Gebäudes anzeigen)
     if (hov && !WALL_TYPES.includes(hov.t) && BUILDINGS[hov.t].height >= 0.7 && !this.building.has(hov.i)) {
-      let eg = this.edgeCache.get(hov.t);
+      const am = assetRegistry.forBuilding(hov.t);
+      let eg = am ? am.cache.edges : this.edgeCache.get(hov.t);
       if (!eg) {
-        eg = new THREE.EdgesGeometry(buildBuildingModel(BUILDINGS[hov.t], 0, true).merged, 28);
-        this.edgeCache.set(hov.t, eg);
+        // GLB-Asset: Kanten der LOD1-Stufe (ruhiger als LOD0), sonst Grundform des prozeduralen Modells
+        eg = new THREE.EdgesGeometry(am ? mergedLod(am, 1) : buildBuildingModel(BUILDINGS[hov.t], 0, true).merged, 28);
+        if (am) am.cache.edges = eg;
+        else this.edgeCache.set(hov.t, eg);
       }
       if (this.hoverLines.geometry !== eg) this.hoverLines.geometry = eg;
       this.hoverLines.visible = true;
@@ -899,6 +966,7 @@ export class EntityRenderer {
   private updateUnits(dt: number, o: RenderOpts): void {
     const w = this.world;
     for (const m of this.unitMeshes) m?.begin();
+    for (const [k, m] of this.assetMeshes) if (k[0] === 'u') m.begin();
     this.cargo.begin();
     this.motion.update(w, { tickF: o.tickF, alpha: o.alpha, dt: o.motionDt ?? dt, paused: !!o.paused, walkW: UNIT_WALK_W, legacy: o.legacyMotion });
     const mo = this.motion;
@@ -970,16 +1038,19 @@ export class EntityRenderer {
       if (mo.walk[s]) af |= AF.Move;
       if (ax & 1) af |= RANGED[type] ? AF.Shoot : AF.Melee;
       if (ax & 2) af |= AF.Work;
-      const tm = this.unitMesh(type);
+      const ua = assetRegistry.active ? assetRegistry.forUnit(type) : null;
       let phase = (s * 0.61803) % 1;
       // Gehphase: der Shader rechnet uTime·Frequenz + phase·2π, daher die gewünschte Phase um uTime·Frequenz verschieben
       if (mo.gaitDriven && mo.walk[s] && !(af & (AF.Melee | AF.Shoot | AF.Work))) phase = (mo.gait[s] - uT * UNIT_WALK_W[type]) / PI2;
-      tm.push(x, ny, y, face, sc, sc, owner, phase, af, UNIT_WALK_W[type], af & AF.Work ? 1.1 : UNIT_CYCLE[type]);
+      const tm = ua ? this.assetMesh(`u:${type}`, ua, true) : this.unitMesh(type);
+      if (ua) (tm as AssetTypeMesh).push(id, x, ny, y, face, sc, sc, owner, phase, af, UNIT_WALK_W[type], af & AF.Work ? 1.1 : UNIT_CYCLE[type]);
+      else (tm as TypeMesh).push(x, ny, y, face, sc, sc, owner, phase, af, UNIT_WALK_W[type], af & AF.Work ? 1.1 : UNIT_CYCLE[type]);
       if (useBlob) blob.push(x, ny + 0.025, y, Math.max(0.5, def.radius * 2.3) * sc, 0, 0, 0, SIEGE[type] ? 0.32 : 0.3);
       // Figur: Beruf (Bauern), Nah/Fern-Modell, Variation (Haut, Haar, Stoffe, Größe) – ein Mesh je Typ, keine Extra-Draw-Calls
       const job = type === U.Peasant ? this.jobFor(s, id, x, y, owner, ax >> 4, carryA[s], w) : 0;
       const vr = this.variantFor(s, id, type, job);
-      tm.styleLast(vr.pack, vr.jitter, this.visMask(s, x, ny, y, camP) | vr.bits, vr.jobBit, vr.kx, vr.ky);
+      // GLB-Figuren wählen ihr LOD selbst (eigene Meshes je Stufe): Nah- und Detailteile bleiben sichtbar
+      tm.styleLast(vr.pack, vr.jitter, (ua ? VIS.Near | VIS.Detail : this.visMask(s, x, ny, y, camP)) | vr.bits, vr.jobBit, vr.kx, vr.ky);
       const sel = o.selected.has(id);
       if (sel && rings < 2048) {
         const r = Math.max(1, def.radius * 2.3) * (1 + 0.035 * Math.sin(ptr * 5 + s));
@@ -1131,15 +1202,24 @@ export class EntityRenderer {
       }
       const gy = tileY(w, Math.floor(c.x), Math.floor(c.y));
       const sc = UNIT_SCALE[c.type];
-      const cm = this.unitMesh(c.type);
-      cm.push(c.x, gy, c.y, c.face, sc, sc, c.owner, c.phase, AF.Dead, UNIT_SIDEWAYS[c.type] ? 1 : 0, age);
+      const ua = assetRegistry.active ? assetRegistry.forUnit(c.type) : null;
       const vr = unitVariant(c.type, c.id, c.type === U.Peasant ? c.job : 0);
-      cm.styleLast(vr.pack, vr.jitter, (this.detail > 0 ? VIS.Near | (this.detail === 2 ? VIS.Detail : 0) : VIS.Far) | vr.bits, vr.jobBit, vr.kx, vr.ky);
+      if (ua) {
+        const am = this.assetMesh(`u:${c.type}`, ua, true);
+        am.push(c.id, c.x, gy, c.y, c.face, sc, sc, c.owner, c.phase, AF.Dead, UNIT_SIDEWAYS[c.type] ? 1 : 0, age);
+        am.styleLast(vr.pack, vr.jitter, VIS.Near | VIS.Detail | vr.bits, vr.jobBit, vr.kx, vr.ky);
+      } else {
+        const cm = this.unitMesh(c.type);
+        cm.push(c.x, gy, c.y, c.face, sc, sc, c.owner, c.phase, AF.Dead, UNIT_SIDEWAYS[c.type] ? 1 : 0, age);
+        cm.styleLast(vr.pack, vr.jitter, (this.detail > 0 ? VIS.Near | (this.detail === 2 ? VIS.Detail : 0) : VIS.Far) | vr.bits, vr.jobBit, vr.kx, vr.ky);
+      }
       n++;
     }
     this.stats.corpses = n;
     // `end()` der Einheitenmeshes wurde schon in updateUnits aufgerufen: Zähler nachziehen
     for (const m of this.unitMeshes) m?.end();
+    const camP = o.camera ? o.camera.position : null;
+    for (const [k, m] of this.assetMeshes) if (k[0] === 'u') m.end(camP);
   }
 
   private neutral = NEUTRAL;

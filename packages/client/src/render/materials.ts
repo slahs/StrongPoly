@@ -76,7 +76,8 @@ export const AF = {
   Static: 64,
 } as const;
 
-const ANIM_PARS = /* glsl */ `
+/** Vertex-Animation der Gebäude/Modelle (aPivot, aMeta, iAnim → spAnimate); auch von den GLB-Assets genutzt (render/assets/materials.ts) */
+export const ANIM_PARS = /* glsl */ `
 attribute vec4 aPivot;
 attribute vec3 aMeta;
 attribute vec4 iAnim;
@@ -257,7 +258,7 @@ THREE.ShaderChunk.colorspace_fragment = /* glsl */ `
 gl_FragColor = linearToOutputTexel( gl_FragColor );
 `;
 
-const WORLD_POS = /* glsl */ `
+export const WORLD_POS = /* glsl */ `
 {
   vec4 spw = vec4(transformed, 1.0);
   #ifdef USE_INSTANCING
@@ -267,7 +268,7 @@ const WORLD_POS = /* glsl */ `
 }
 `;
 
-const FRAG_PARS = /* glsl */ `
+export const FRAG_PARS = /* glsl */ `
 uniform sampler2D uNoiseA;
 uniform float uTime;
 uniform float uCloud;
@@ -280,7 +281,7 @@ float spNoCloud = 0.0;
 `;
 
 /** Wolkenschatten (wandernde Aufhellung/Abdunklung) und Himmelsreflex am Rand; nach der Beleuchtung */
-const FRAG_TAIL = /* glsl */ `
+export const FRAG_TAIL = /* glsl */ `
 {
   if (uCloud > 0.001) {
     float spcl = texture2D(uNoiseA, vSpW.xz * 0.0105 + uWindDir * (uTime * 0.0042)).r;
@@ -296,7 +297,7 @@ const FRAG_TAIL = /* glsl */ `
 
 type Shader = THREE.WebGLProgramParametersWithUniforms;
 
-function shareUniforms(s: Shader): void {
+export function shareUniforms(s: Shader): void {
   s.uniforms.uTime = GFX.uTime;
   s.uniforms.uNoiseA = GFX.uNoiseA;
   s.uniforms.uCloud = GFX.uCloud;

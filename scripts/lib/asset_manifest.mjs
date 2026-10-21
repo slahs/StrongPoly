@@ -5,6 +5,7 @@
  *   - packages/client/public/assets/textures/<M_Name>/{albedo,normal,orm}[_<px>].{ktx2,webp,jpg,png}  (vorhandene Texturen)
  * Rein und deterministisch (keine Zeitstempel): derselbe Stand ergibt dieselbe Datei (Test `assets_manifest.test.ts`).
  */
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -39,6 +40,11 @@ export function imageSize(buf) {
   return null;
 }
 
+/** kurzer Inhalts-Hash (Cache-Busting: die Laufzeit hängt ?v=<hash> an, der Server liefert /assets/* als unveränderlich aus) */
+export function hashOf(buf) {
+  return crypto.createHash('sha1').update(buf).digest('hex').slice(0, 10);
+}
+
 function readJson(f) {
   return JSON.parse(fs.readFileSync(f, 'utf8'));
 }
@@ -58,7 +64,7 @@ export function scanTextures(texDir, name) {
     const main = cands.filter((c) => !c.m[1]).sort((a, b) => rank(a) - rank(b))[0] ?? cands.sort((a, b) => rank(a) - rank(b))[0];
     const buf = fs.readFileSync(path.join(dir, main.f));
     const sz = imageSize(buf) ?? { w: 0, h: 0 };
-    const entry = { file: `textures/${name}/${main.f}`, bytes: buf.length, w: sz.w, h: sz.h, format: main.m[2] === 'jpeg' ? 'jpg' : main.m[2] };
+    const entry = { file: `textures/${name}/${main.f}`, bytes: buf.length, w: sz.w, h: sz.h, format: main.m[2] === 'jpeg' ? 'jpg' : main.m[2], hash: hashOf(buf) };
     const sizes = {};
     for (const c of cands) if (c.m[1] && c.m[2] === main.m[2]) sizes[c.m[1]] = `textures/${name}/${c.f}`;
     if (Object.keys(sizes).length) entry.sizes = sizes;
@@ -99,7 +105,8 @@ export function buildManifest(root) {
       for (const m of e.materials ?? []) if (!materials[m]) problems.push(`${e.id}: unbekanntes Material ${m}`);
       if (!e.lods || e.lods.length < 1) problems.push(`${e.id}: keine LOD-Stufen`);
       const { source, blend, license, ...rest } = e;
-      assets[e.id] = { ...rest, bytes: fs.existsSync(file) ? fs.statSync(file).size : 0, source, blend, license };
+      const buf = fs.existsSync(file) ? fs.readFileSync(file) : null;
+      assets[e.id] = { ...rest, bytes: buf ? buf.length : 0, hash: buf ? hashOf(buf) : '', source, blend, license };
     }
   }
   return { manifest: { version: 1, doc: 'Erzeugt von scripts/asset-manifest.mjs - nicht von Hand bearbeiten (Quellen: assets/materials.json, assets/registry/*.json, public/assets/textures).', materials, assets }, problems };

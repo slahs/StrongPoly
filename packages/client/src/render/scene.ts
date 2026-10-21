@@ -7,6 +7,7 @@ import { GroundMap } from './groundmap';
 import { GFX, ensureNoiseTextures, setNoiseAnisotropy } from './materials';
 import { QualityCfg, qualityOf } from './quality';
 import { FOG_COLOR, TerrainRenderer } from './terrain';
+import { assetRegistry } from './assets/registry';
 
 export interface GfxSettings {
   shadows: boolean;
@@ -16,6 +17,8 @@ export interface GfxSettings {
 
 /** Richtung vom Boden zur Sonne (tiefer, warmer Sonnenstand aus Südwest, sichtbare Schatten) */
 const SUN_DIR = new THREE.Vector3(-0.38, 0.8, 0.46).normalize();
+/** Spielwert des Sonnenstands (SUN_DIR kann nur das LookDev verändern, siehe GameScene.setSun) */
+const SUN_GAME = SUN_DIR.clone();
 const SUN_DIST = 90;
 /**
  * Lichtstimmung (Refined Stylized Medieval): tiefe, warme Sonne, leicht kühler Himmel. Die Schatten bekommen dadurch
@@ -79,6 +82,7 @@ export class GameScene {
     this.renderer.toneMapping = THREE.NeutralToneMapping;
     this.renderer.toneMappingExposure = LOOK.exposure;
     ensureNoiseTextures();
+    assetRegistry.attachRenderer(this.renderer);
     this.scene.background = new THREE.Color(FOG_COLOR);
     this.scene.fog = new THREE.Fog(FOG_COLOR, 60, 200);
     this.scene.add(this.root);
@@ -114,6 +118,26 @@ export class GameScene {
   fogScale = 1;
   setOverview(scale: number): void {
     this.fogScale = scale;
+  }
+
+  /**
+   * Sonnenstand (nur LookDev/Vergleiche): Azimut in Grad (0 = Norden = −z, 90 = Osten = +x, im Uhrzeigersinn), Höhe in Grad.
+   * `null` stellt den festen Spielwert wieder her. Das Spiel ruft dies nie auf.
+   */
+  setSun(azDeg: number | null, elDeg = 50): void {
+    if (azDeg === null) SUN_DIR.copy(SUN_GAME);
+    else {
+      const az = THREE.MathUtils.degToRad(azDeg);
+      const el = THREE.MathUtils.degToRad(Math.max(2, Math.min(89, elDeg)));
+      SUN_DIR.set(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el)).normalize();
+    }
+    this.applyLook();
+    this.shadowExt = 0;
+  }
+
+  /** Nullpunkt der Shader-Zeit setzen (LookDev: reproduzierbare Animationsphase unabhängig vom Ladezeitpunkt) */
+  setClockOrigin(t0: number): void {
+    this.t0 = t0;
   }
 
   /** Lichtfarben und -stärken in die gemeinsamen Shader-Uniforms (Wasser, Rand-/Wolkenlicht) übernehmen */

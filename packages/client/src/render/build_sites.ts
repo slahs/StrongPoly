@@ -9,6 +9,11 @@ import { TypeMesh } from './instanced';
 import { AF } from './materials';
 import { buildBuildingModel, buildWallModel, ModelDetail, WALL_TYPES } from './models_buildings';
 import { groundworkGeo, materialPileGeo, SCAFFOLD_TIER, scaffoldTierGeo } from './models_construction';
+import { assetRegistry } from './assets/registry';
+import { AssetTypeMesh } from './assets/asset_mesh';
+import { lodCfgOf } from './assets/lod';
+import type { AssetModel } from './assets/model';
+import type { QualityCfg } from './quality';
 
 const ARM_ROT = [0, -Math.PI / 2, Math.PI, Math.PI / 2];
 
@@ -30,6 +35,12 @@ export class BuildSites {
   private detail: ModelDetail = 2;
   private shadows = true;
   scale = 1;
+  /** GLB-Assets im Bau (Variante 'clip': gleiche Höhenmaske wie die prozeduralen Modelle) */
+  private assetCon = new Map<string, AssetTypeMesh>();
+  private assetVer = -1;
+  private q: QualityCfg | null = null;
+  /** Kameraposition für die LOD-Wahl der GLB-Baustellen (setzt der EntityRenderer je Durchgang) */
+  camera: THREE.Vector3 | null = null;
 
   constructor(
     private parent: THREE.Object3D,
@@ -43,9 +54,14 @@ export class BuildSites {
   }
 
   /** Grafikstufe: Schatten, Partikelfaktor, Modelldetail (bei Wechsel werden Baustellenmeshes neu aufgebaut) */
-  setQuality(shadows: boolean, particleScale: number, detail: ModelDetail): void {
+  setQuality(shadows: boolean, particleScale: number, detail: ModelDetail, q?: QualityCfg): void {
     this.shadows = shadows;
     this.scale = particleScale;
+    if (q) this.q = q;
+    for (const m of this.assetCon.values()) {
+      m.setShadows(shadows);
+      if (this.q) m.setLodCfg(lodCfgOf(this.q));
+    }
     this.scaffold.setShadows(shadows);
     this.pileWood.setShadows(shadows);
     this.pileStone.setShadows(shadows);
@@ -61,6 +77,12 @@ export class BuildSites {
   }
 
   begin(): void {
+    if (assetRegistry.version !== this.assetVer) {
+      this.assetVer = assetRegistry.version;
+      for (const m of this.assetCon.values()) m.dispose();
+      this.assetCon.clear();
+    }
+    for (const m of this.assetCon.values()) m.begin();
     for (const m of this.conMeshes) m?.begin();
     for (const m of this.conWalls.values()) m.begin();
     this.ground.begin();
@@ -70,6 +92,7 @@ export class BuildSites {
   }
 
   end(): void {
+    for (const m of this.assetCon.values()) m.end(this.camera);
     for (const m of this.conMeshes) m?.end();
     for (const m of this.conWalls.values()) m.end();
     this.ground.end();
@@ -96,6 +119,25 @@ export class BuildSites {
       this.conMeshes[t] = m;
     }
     return m;
+  }
+
+  /** Baustellen-Mesh eines GLB-Assets */
+  private assetMesh(key: string, model: AssetModel): AssetTypeMesh {
+    let m = this.assetCon.get(key);
+    if (!m || m.model !== model) {
+      m?.dispose();
+      m = new AssetTypeMesh(model, this.parent, assetRegistry.materials, this.team, 'clip', lodCfgOf(this.q ?? ({ assetLod0: 30, assetLod1: 72, assetLods: 3 } as QualityCfg)), this.shadows, 8);
+      this.assetCon.set(key, m);
+      m.begin();
+    }
+    return m;
+  }
+
+  /** Höhe der Oberkante (Gerüst, Abschlusseffekt): GLB-Asset oder prozedurales Modell */
+  private topOf(t: number, def: BuildingDef): number {
+    const am = assetRegistry.forBuilding(t);
+    if (am) return am.height;
+    return this.tops[t] ?? def.height;
   }
 
   private conWall(t: number, kind: 'arm' | 'post' | 'stub'): TypeMesh {
@@ -160,13 +202,14 @@ export class BuildSites {
     const cp = constructionParams(prog);
     const cx = b.x + b.w / 2;
     const cz = b.y + b.h / 2;
-    const m = this.conMesh(b.t);
-    const top = (this.tops[b.t] ?? def.height) * sy;
+    const am = assetRegistry.forBuilding(b.t);
+    const top = (am ? am.height : (this.tops[b.t] ?? def.height)) * sy;
     if (cp.ground > 0.01) {
       const sink = (1 - cp.ground) * 0.09;
       for (let yy = 0; yy < b.h; yy++) for (let xx = 0; xx < b.w; xx++) this.ground.push(b.x + xx + 0.5, y + 0.004 - sink, b.y + yy + 0.5, 0, 1, 1, b.o);
     }
-    m.push(cx, y, cz, rot, 1, sy, b.o, phase, AF.Static, cp.raise, 0);
+    if (am) this.assetMesh(`b:${b.t}`, am).push(b.i, cx, y, cz, rot, 1, sy, b.o, phase, AF.Static, cp.raise, 0);
+    else this.conMesh(b.t).push(cx, y, cz, rot, 1, sy, b.o, phase, AF.Static, cp.raise, 0);
     if (cp.scaffold > 0.02 && top >= 1.5 && def.cat !== 'farm' && !NO_SCAFFOLD.has(b.t)) this.pushScaffold(b, y, (top + 0.35) * cp.scaffold);
     if (cp.materials > 0.02 && b.w * b.h >= 4 && def.cat !== 'farm') this.pushPiles(b, def, y, cp.materials);
     if (visible) constructionFx(this.fx, this.rect(b, def, y, top), cp, dt, this.scale);
@@ -177,15 +220,23 @@ export class BuildSites {
     const cp = constructionParams(prog);
     const cx = b.x + 0.5;
     const cz = b.y + 0.5;
-    this.conWall(b.t, mask === 0 ? 'stub' : 'post').push(cx, y, cz, 0, 1, 1, b.o, phase, AF.Static, cp.raise, 0);
-    for (let k = 0; k < 4; k++) if (mask & (1 << k)) this.conWall(b.t, 'arm').push(cx, y, cz, ARM_ROT[k], 1, 1, b.o, phase, AF.Static, cp.raise, 0);
+    const piece = mask === 0 ? 'stub' : 'post';
+    const ap = assetRegistry.forWall(b.t, piece);
+    if (ap) this.assetMesh(`w:${b.t}:${piece}`, ap).push(b.i * 8, cx, y, cz, 0, 1, 1, b.o, phase, AF.Static, cp.raise, 0);
+    else this.conWall(b.t, piece).push(cx, y, cz, 0, 1, 1, b.o, phase, AF.Static, cp.raise, 0);
+    const aa = assetRegistry.forWall(b.t, 'arm');
+    for (let k = 0; k < 4; k++) {
+      if (!(mask & (1 << k))) continue;
+      if (aa) this.assetMesh(`w:${b.t}:arm`, aa).push(b.i * 8 + 1 + k, cx, y, cz, ARM_ROT[k], 1, 1, b.o, phase, AF.Static, cp.raise, 0);
+      else this.conWall(b.t, 'arm').push(cx, y, cz, ARM_ROT[k], 1, 1, b.o, phase, AF.Static, cp.raise, 0);
+    }
     if (visible && prog > 0.02) wallFx(this.fx, cx, y, cz, def.wood, dt, this.scale);
   }
 
   /** Fertigstellung: Abschlusseffekt */
   finish(b: ClientBuilding, def: BuildingDef, y: number): void {
     if (WALL_TYPES.includes(b.t)) return;
-    finishFx(this.fx, this.rect(b, def, y, (this.tops[b.t] ?? def.height) || 1), this.scale);
+    finishFx(this.fx, this.rect(b, def, y, this.topOf(b.t, def) || 1), this.scale);
   }
 
   /** Bau abgebrochen/rückgängig gemacht (ohne Zerstörung): nur eine kleine Staubwolke */
@@ -218,6 +269,8 @@ export class BuildSites {
   }
 
   dispose(): void {
+    for (const m of this.assetCon.values()) m.dispose();
+    this.assetCon.clear();
     for (const m of this.conMeshes) m?.dispose();
     for (const m of this.conWalls.values()) m.dispose();
   }

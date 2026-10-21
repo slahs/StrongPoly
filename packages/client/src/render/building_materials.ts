@@ -48,7 +48,8 @@ float bNoise(vec2 p) {
 }
 `;
 
-const FRAG_CLIP = /* glsl */ `
+/** Höhenmaske der Bauanimation (vLocal, vBuild, vProg); auch von den GLB-Assets genutzt */
+export const FRAG_CLIP = /* glsl */ `
 float bEdge = 0.0;
 #ifdef BUILD_CLIP
 {
