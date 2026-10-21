@@ -1,0 +1,150 @@
+{
+  "style": "medieval",
+  "quality": "high",
+  "viewport": "1280x720",
+  "pageLoadS": 77.917,
+  "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte",
+  "cams": {
+    "1-rts": {
+      "style": "medieval",
+      "quality": "high",
+      "cam": "1-rts",
+      "calls": 60,
+      "triangles": 473976,
+      "programs": 24,
+      "textures": 5,
+      "geometries": 66,
+      "texBytes": 135195306,
+      "assetTexBytes": 0,
+      "geoBytes": 14527604,
+      "manifestMs": 655,
+      "assetsMs": 753,
+      "assets": {
+        "well": {
+          "ms": 97.3999999994412,
+          "bytes": 434880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "well:LOD1 x1"
+      ],
+      "frameMs": 4.1,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "2-mid": {
+      "style": "medieval",
+      "quality": "high",
+      "cam": "2-mid",
+      "calls": 55,
+      "triangles": 295621,
+      "programs": 24,
+      "textures": 5,
+      "geometries": 72,
+      "texBytes": 135195306,
+      "assetTexBytes": 0,
+      "geoBytes": 14911584,
+      "manifestMs": 655,
+      "assetsMs": 753,
+      "assets": {
+        "well": {
+          "ms": 97.3999999994412,
+          "bytes": 434880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "well:LOD0 x1"
+      ],
+      "frameMs": 4.3,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3a-building": {
+      "style": "medieval",
+      "quality": "high",
+      "cam": "3a-building",
+      "calls": 49,
+      "triangles": 184545,
+      "programs": 24,
+      "textures": 5,
+      "geometries": 72,
+      "texBytes": 135195306,
+      "assetTexBytes": 0,
+      "geoBytes": 14509732,
+      "manifestMs": 655,
+      "assetsMs": 753,
+      "assets": {
+        "well": {
+          "ms": 97.3999999994412,
+          "bytes": 434880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "well:LOD0 x1"
+      ],
+      "frameMs": 8.4,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3b-figures": {
+      "style": "medieval",
+      "quality": "high",
+      "cam": "3b-figures",
+      "calls": 53,
+      "triangles": 200890,
+      "programs": 24,
+      "textures": 5,
+      "geometries": 72,
+      "texBytes": 135195306,
+      "assetTexBytes": 0,
+      "geoBytes": 14883364,
+      "manifestMs": 655,
+      "assetsMs": 753,
+      "assets": {
+        "well": {
+          "ms": 97.3999999994412,
+          "bytes": 434880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "well:LOD0 x1"
+      ],
+      "frameMs": 3.7,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3c-material": {
+      "style": "medieval",
+      "quality": "high",
+      "cam": "3c-material",
+      "calls": 49,
+      "triangles": 189555,
+      "programs": 24,
+      "textures": 5,
+      "geometries": 72,
+      "texBytes": 135195306,
+      "assetTexBytes": 0,
+      "geoBytes": 14509732,
+      "manifestMs": 655,
+      "assetsMs": 753,
+      "assets": {
+        "well": {
+          "ms": 97.3999999994412,
+          "bytes": 434880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "well:LOD0 x1"
+      ],
+      "frameMs": 3.2,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    }
+  }
+}

@@ -1,0 +1,349 @@
+{
+  "viewport": "1280x720",
+  "gl": "Software-GL (SwiftShader) – Zeiten sind KEINE GPU-Werte",
+  "sun": "game",
+  "runs": {
+    "classic/low": {
+      "1-rts": {
+        "calls": 38,
+        "triangles": 127620,
+        "programs": 14,
+        "texMB": 8.71,
+        "assetTexMB": 0,
+        "geoMB": 11.43,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "2-mid": {
+        "calls": 42,
+        "triangles": 101686,
+        "programs": 14,
+        "texMB": 8.71,
+        "assetTexMB": 0,
+        "geoMB": 11.52,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "3a-building": {
+        "calls": 35,
+        "triangles": 71189,
+        "programs": 14,
+        "texMB": 8.71,
+        "assetTexMB": 0,
+        "geoMB": 11.3,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "3b-figures": {
+        "calls": 39,
+        "triangles": 84558,
+        "programs": 14,
+        "texMB": 8.71,
+        "assetTexMB": 0,
+        "geoMB": 11.49,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "3c-material": {
+        "calls": 35,
+        "triangles": 75581,
+        "programs": 14,
+        "texMB": 8.71,
+        "assetTexMB": 0,
+        "geoMB": 11.3,
+        "assetsMs": 0,
+        "overrides": []
+      }
+    },
+    "classic/medium": {
+      "1-rts": {
+        "calls": 53,
+        "triangles": 301429,
+        "programs": 21,
+        "texMB": 32.71,
+        "assetTexMB": 0,
+        "geoMB": 12.55,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "2-mid": {
+        "calls": 50,
+        "triangles": 198590,
+        "programs": 21,
+        "texMB": 32.71,
+        "assetTexMB": 0,
+        "geoMB": 12.56,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "3a-building": {
+        "calls": 42,
+        "triangles": 126839,
+        "programs": 21,
+        "texMB": 32.71,
+        "assetTexMB": 0,
+        "geoMB": 12.19,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "3b-figures": {
+        "calls": 46,
+        "triangles": 142638,
+        "programs": 21,
+        "texMB": 32.71,
+        "assetTexMB": 0,
+        "geoMB": 12.51,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "3c-material": {
+        "calls": 42,
+        "triangles": 131745,
+        "programs": 21,
+        "texMB": 32.71,
+        "assetTexMB": 0,
+        "geoMB": 12.19,
+        "assetsMs": 0,
+        "overrides": []
+      }
+    },
+    "classic/high": {
+      "1-rts": {
+        "calls": 55,
+        "triangles": 473632,
+        "programs": 23,
+        "texMB": 128.71,
+        "assetTexMB": 0,
+        "geoMB": 13.79,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "2-mid": {
+        "calls": 50,
+        "triangles": 292941,
+        "programs": 23,
+        "texMB": 128.71,
+        "assetTexMB": 0,
+        "geoMB": 13.78,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "3a-building": {
+        "calls": 44,
+        "triangles": 181863,
+        "programs": 23,
+        "texMB": 128.71,
+        "assetTexMB": 0,
+        "geoMB": 13.39,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "3b-figures": {
+        "calls": 48,
+        "triangles": 198212,
+        "programs": 23,
+        "texMB": 128.71,
+        "assetTexMB": 0,
+        "geoMB": 13.75,
+        "assetsMs": 0,
+        "overrides": []
+      },
+      "3c-material": {
+        "calls": 44,
+        "triangles": 186871,
+        "programs": 23,
+        "texMB": 128.71,
+        "assetTexMB": 0,
+        "geoMB": 13.39,
+        "assetsMs": 0,
+        "overrides": []
+      }
+    },
+    "medieval/low": {
+      "1-rts": {
+        "calls": 41,
+        "triangles": 127536,
+        "programs": 15,
+        "texMB": 8.93,
+        "assetTexMB": 0,
+        "geoMB": 11.41,
+        "assetsMs": 851,
+        "overrides": [
+          "well:LOD2 x1"
+        ]
+      },
+      "2-mid": {
+        "calls": 47,
+        "triangles": 102030,
+        "programs": 15,
+        "texMB": 8.93,
+        "assetTexMB": 0,
+        "geoMB": 11.59,
+        "assetsMs": 851,
+        "overrides": [
+          "well:LOD1 x1"
+        ]
+      },
+      "3a-building": {
+        "calls": 40,
+        "triangles": 71533,
+        "programs": 15,
+        "texMB": 8.93,
+        "assetTexMB": 0,
+        "geoMB": 11.37,
+        "assetsMs": 851,
+        "overrides": [
+          "well:LOD1 x1"
+        ]
+      },
+      "3b-figures": {
+        "calls": 44,
+        "triangles": 84902,
+        "programs": 15,
+        "texMB": 8.93,
+        "assetTexMB": 0,
+        "geoMB": 11.55,
+        "assetsMs": 851,
+        "overrides": [
+          "well:LOD1 x1"
+        ]
+      },
+      "3c-material": {
+        "calls": 40,
+        "triangles": 75925,
+        "programs": 15,
+        "texMB": 8.93,
+        "assetTexMB": 0,
+        "geoMB": 11.37,
+        "assetsMs": 851,
+        "overrides": [
+          "well:LOD1 x1"
+        ]
+      }
+    },
+    "medieval/medium": {
+      "1-rts": {
+        "calls": 58,
+        "triangles": 301771,
+        "programs": 22,
+        "texMB": 32.93,
+        "assetTexMB": 0,
+        "geoMB": 12.62,
+        "assetsMs": 946,
+        "overrides": [
+          "well:LOD1 x1"
+        ]
+      },
+      "2-mid": {
+        "calls": 55,
+        "triangles": 201274,
+        "programs": 22,
+        "texMB": 32.93,
+        "assetTexMB": 0,
+        "geoMB": 13,
+        "assetsMs": 946,
+        "overrides": [
+          "well:LOD0 x1"
+        ]
+      },
+      "3a-building": {
+        "calls": 47,
+        "triangles": 129519,
+        "programs": 22,
+        "texMB": 32.93,
+        "assetTexMB": 0,
+        "geoMB": 12.63,
+        "assetsMs": 946,
+        "overrides": [
+          "well:LOD0 x1"
+        ]
+      },
+      "3b-figures": {
+        "calls": 51,
+        "triangles": 145318,
+        "programs": 22,
+        "texMB": 32.93,
+        "assetTexMB": 0,
+        "geoMB": 12.96,
+        "assetsMs": 946,
+        "overrides": [
+          "well:LOD0 x1"
+        ]
+      },
+      "3c-material": {
+        "calls": 47,
+        "triangles": 134425,
+        "programs": 22,
+        "texMB": 32.93,
+        "assetTexMB": 0,
+        "geoMB": 12.63,
+        "assetsMs": 946,
+        "overrides": [
+          "well:LOD0 x1"
+        ]
+      }
+    },
+    "medieval/high": {
+      "1-rts": {
+        "calls": 60,
+        "triangles": 473976,
+        "programs": 24,
+        "texMB": 128.93,
+        "assetTexMB": 0,
+        "geoMB": 13.85,
+        "assetsMs": 753,
+        "overrides": [
+          "well:LOD1 x1"
+        ]
+      },
+      "2-mid": {
+        "calls": 55,
+        "triangles": 295621,
+        "programs": 24,
+        "texMB": 128.93,
+        "assetTexMB": 0,
+        "geoMB": 14.22,
+        "assetsMs": 753,
+        "overrides": [
+          "well:LOD0 x1"
+        ]
+      },
+      "3a-building": {
+        "calls": 49,
+        "triangles": 184545,
+        "programs": 24,
+        "texMB": 128.93,
+        "assetTexMB": 0,
+        "geoMB": 13.84,
+        "assetsMs": 753,
+        "overrides": [
+          "well:LOD0 x1"
+        ]
+      },
+      "3b-figures": {
+        "calls": 53,
+        "triangles": 200890,
+        "programs": 24,
+        "texMB": 128.93,
+        "assetTexMB": 0,
+        "geoMB": 14.19,
+        "assetsMs": 753,
+        "overrides": [
+          "well:LOD0 x1"
+        ]
+      },
+      "3c-material": {
+        "calls": 49,
+        "triangles": 189555,
+        "programs": 24,
+        "texMB": 128.93,
+        "assetTexMB": 0,
+        "geoMB": 13.84,
+        "assetsMs": 753,
+        "overrides": [
+          "well:LOD0 x1"
+        ]
+      }
+    }
+  }
+}

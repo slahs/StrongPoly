@@ -1,0 +1,150 @@
+{
+  "style": "medieval",
+  "quality": "medium",
+  "viewport": "1280x720",
+  "pageLoadS": 58.796,
+  "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte",
+  "cams": {
+    "1-rts": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "1-rts",
+      "calls": 58,
+      "triangles": 301771,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 68,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 13234360,
+      "manifestMs": 866,
+      "assetsMs": 946,
+      "assets": {
+        "well": {
+          "ms": 79.6000000005588,
+          "bytes": 434880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "well:LOD1 x1"
+      ],
+      "frameMs": 2.8,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "2-mid": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "2-mid",
+      "calls": 55,
+      "triangles": 201274,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 74,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 13630804,
+      "manifestMs": 866,
+      "assetsMs": 946,
+      "assets": {
+        "well": {
+          "ms": 79.6000000005588,
+          "bytes": 434880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "well:LOD0 x1"
+      ],
+      "frameMs": 10.7,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3a-building": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "3a-building",
+      "calls": 47,
+      "triangles": 129519,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 74,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 13246772,
+      "manifestMs": 866,
+      "assetsMs": 946,
+      "assets": {
+        "well": {
+          "ms": 79.6000000005588,
+          "bytes": 434880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "well:LOD0 x1"
+      ],
+      "frameMs": 3.1,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3b-figures": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "3b-figures",
+      "calls": 51,
+      "triangles": 145318,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 74,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 13584404,
+      "manifestMs": 866,
+      "assetsMs": 946,
+      "assets": {
+        "well": {
+          "ms": 79.6000000005588,
+          "bytes": 434880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "well:LOD0 x1"
+      ],
+      "frameMs": 5.6,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3c-material": {
+      "style": "medieval",
+      "quality": "medium",
+      "cam": "3c-material",
+      "calls": 47,
+      "triangles": 134425,
+      "programs": 22,
+      "textures": 5,
+      "geometries": 74,
+      "texBytes": 34532010,
+      "assetTexBytes": 0,
+      "geoBytes": 13246772,
+      "manifestMs": 866,
+      "assetsMs": 946,
+      "assets": {
+        "well": {
+          "ms": 79.6000000005588,
+          "bytes": 434880,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "well:LOD0 x1"
+      ],
+      "frameMs": 2.2,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    }
+  }
+}
