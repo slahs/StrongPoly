@@ -5,7 +5,7 @@
  *   <out>/<stil>/<stufe>/<kamera>.jpg  +  <out>/<stil>/<stufe>/stats.json  +  <out>/stats.json (Übersicht)
  *
  *   node scripts/lookdev.mjs [--out=docs/phase5a/lookdev] [--styles=classic,medieval] [--qualities=low,medium,high]
- *                            [--cams=1-rts,2-mid,3a-building,3b-figures,3c-material] [--viewport=1280x720] [--frames=30]
+ *                            [--cams=1-rts,2-mid,3a-building,3b-figures,3c-material,3d-landscape] [--viewport=1280x720] [--frames=30]
  *                            [--sun=game|<Stunde>] [--check] [--hw] [--port=5641] [--dist=<gebauter Client>] [--url=http://…]
  *
  *  --check  Konsole prüfen: Warnungen/Fehler (außer bekannten Software-GL-Hinweisen) → Exit-Code 2
@@ -30,7 +30,7 @@ const args = Object.fromEntries(
 const list = (v, d) => (v && v !== true && v !== 'all' ? String(v).split(',') : d);
 const styles = list(args.styles, ['classic', 'medieval']);
 const qualities = list(args.qualities, ['low', 'medium', 'high']);
-const CAMS = ['1-rts', '2-mid', '3a-building', '3b-figures', '3c-material'];
+const CAMS = ['1-rts', '2-mid', '3a-building', '3b-figures', '3c-material', '3d-landscape'];
 const cams = list(args.cams, CAMS);
 const [vw, vh] = String(args.viewport ?? '1280x720').split('x').map(Number);
 const out = path.resolve(String(args.out ?? path.join(root, 'docs', 'phase5a', 'lookdev')));
@@ -75,7 +75,7 @@ async function main() {
         });
         page.on('pageerror', (e) => msgs.push(`[Seitenfehler] ${e.message}`));
         const t0 = Date.now();
-        await page.goto(`${base}/?lookdev=${style}&quality=${quality}&cam=${cams[0]}&ui=0&stats=0&live=0&frames=${frames}&sun=${sun}`);
+        await page.goto(`${base}/?lookdev=${style}&quality=${quality}&cam=${cams[0]}&ui=0&stats=0&live=0&frames=${frames}&sun=${sun}${args.tone ? `&tone=${args.tone}` : ''}`);
         await page.waitForFunction(() => window.__lookdev && window.__lookdev.ready, null, { timeout: 900000, polling: 300 });
         const loadS = (Date.now() - t0) / 1000;
         const per = {};

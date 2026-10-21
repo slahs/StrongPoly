@@ -1,0 +1,85 @@
+{
+  "id": "veg_spruce_b",
+  "desc": "Fichte, mittel, dicht",
+  "file": "models/veg_spruce_b.glb",
+  "target": {
+    "prop": "veg_spruce_b"
+  },
+  "class": "tree",
+  "footprint": null,
+  "height": 3.395,
+  "bbox": {
+    "min": [
+      -1.062,
+      -0.161,
+      -0.927
+    ],
+    "max": [
+      0.955,
+      3.395,
+      1.054
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 5285,
+      "materials": [
+        "M_Bark",
+        "M_Foliage_Conifer"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 532,
+      "materials": [
+        "M_Bark",
+        "M_Foliage_Conifer"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 150,
+      "materials": [
+        "M_Bark",
+        "M_Foliage_Conifer"
+      ]
+    }
+  ],
+  "tris": [
+    5285,
+    532,
+    150
+  ],
+  "budget": [
+    6000,
+    1500,
+    300
+  ],
+  "materials": [
+    "M_Bark",
+    "M_Foliage_Conifer"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 360380,
+  "veg": {
+    "kind": "tree",
+    "species": "spruce",
+    "role": "mature",
+    "height": 3.3,
+    "crown": [
+      0.88,
+      1.65
+    ]
+  },
+  "uvTile": {
+    "M_Bark": 2.0,
+    "M_Foliage_Conifer": 1.0
+  },
+  "source": "assets/blender/models/veg_trees.py",
+  "blend": null,
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

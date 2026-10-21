@@ -167,6 +167,34 @@ export function computeGround(map: GroundMapLike, buildings: Iterable<GroundBuil
   return o;
 }
 
+/**
+ * Trampelpfade als Liniensegmente (Mittelpunkt Gebäude → Mittelpunkt des nächsten Lager-/Versorgungsgebäudes, höchstens
+ * 18 Felder) – dieselbe Auswahl wie die Pfade in computeGround, für die Wege des Stils medieval (env/envmap.ts).
+ */
+export function trailSegments(buildings: Iterable<GroundBuilding>): [number, number, number, number][] {
+  const list = [...buildings].sort((a, b) => a.t - b.t || a.y - b.y || a.x - b.x);
+  const hubs = list.filter((b) => HUBS.has(b.t));
+  const out: [number, number, number, number][] = [];
+  for (const b of list) {
+    const def = BUILDINGS[b.t];
+    if (!def || def.hp <= 0 || !leavesTrace(b.t) || FIELDS.has(b.t)) continue;
+    const bx = b.x + b.w / 2;
+    const by = b.y + b.h / 2;
+    let best: GroundBuilding | null = null;
+    let bd = 18;
+    for (const hb of hubs) {
+      if (hb === b) continue;
+      const d = Math.hypot(hb.x + hb.w / 2 - bx, hb.y + hb.h / 2 - by) - (hb.w + hb.h) / 4 - (b.w + b.h) / 4;
+      if (d < bd) {
+        bd = d;
+        best = hb;
+      }
+    }
+    if (best) out.push([bx, by, best.x + best.w / 2, best.y + best.h / 2]);
+  }
+  return out;
+}
+
 /** Spurstärke 0..1 an einem Tile (für Dekor: kein Gras auf Pfaden und Feldern) */
 export function groundTrace(data: Uint8Array, i: number): number {
   const k = i * 4;

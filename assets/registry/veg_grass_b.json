@@ -1,0 +1,74 @@
+{
+  "id": "veg_grass_b",
+  "desc": "Grasbueschel (hoch, Samenstaende)",
+  "file": "models/veg_grass_b.glb",
+  "target": {
+    "prop": "veg_grass_b"
+  },
+  "class": "flora",
+  "footprint": null,
+  "height": 0.508,
+  "bbox": {
+    "min": [
+      -0.164,
+      -0.01,
+      -0.197
+    ],
+    "max": [
+      0.149,
+      0.508,
+      0.195
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 106,
+      "materials": [
+        "M_Flora"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 38,
+      "materials": [
+        "M_Flora"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 4,
+      "materials": [
+        "M_Flora"
+      ]
+    }
+  ],
+  "tris": [
+    106,
+    38,
+    4
+  ],
+  "budget": [
+    420,
+    140,
+    40
+  ],
+  "materials": [
+    "M_Flora"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 17932,
+  "veg": {
+    "kind": "flora",
+    "role": "grassTall"
+  },
+  "uvTile": {
+    "M_Flora": 1.0
+  },
+  "source": "assets/blender/models/veg_ground.py",
+  "blend": null,
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

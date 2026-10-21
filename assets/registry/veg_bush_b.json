@@ -1,0 +1,79 @@
+{
+  "id": "veg_bush_b",
+  "desc": "Weissdorn: dicht, rundlich",
+  "file": "models/veg_bush_b.glb",
+  "target": {
+    "prop": "veg_bush_b"
+  },
+  "class": "bush",
+  "footprint": null,
+  "height": 1.077,
+  "bbox": {
+    "min": [
+      -0.873,
+      -0.082,
+      -0.811
+    ],
+    "max": [
+      0.761,
+      1.077,
+      0.801
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 1718,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 163,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 18,
+      "materials": [
+        "M_Foliage"
+      ]
+    }
+  ],
+  "tris": [
+    1718,
+    163,
+    18
+  ],
+  "budget": [
+    2400,
+    700,
+    160
+  ],
+  "materials": [
+    "M_Bark",
+    "M_Foliage"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 114448,
+  "veg": {
+    "kind": "bush",
+    "role": "bush",
+    "height": 0.9
+  },
+  "uvTile": {
+    "M_Bark": 2.0,
+    "M_Foliage": 1.0
+  },
+  "source": "assets/blender/models/veg_ground.py",
+  "blend": null,
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

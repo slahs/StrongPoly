@@ -1,0 +1,74 @@
+{
+  "id": "veg_rock_b",
+  "desc": "kantiger Fels mit Bruchflaechen und Schichtung",
+  "file": "models/veg_rock_b.glb",
+  "target": {
+    "prop": "veg_rock_b"
+  },
+  "class": "rock",
+  "footprint": null,
+  "height": 0.618,
+  "bbox": {
+    "min": [
+      -0.54,
+      -0.308,
+      -0.435
+    ],
+    "max": [
+      0.569,
+      0.618,
+      0.337
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 1280,
+      "materials": [
+        "M_Rock"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 320,
+      "materials": [
+        "M_Rock"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 80,
+      "materials": [
+        "M_Rock"
+      ]
+    }
+  ],
+  "tris": [
+    1280,
+    320,
+    80
+  ],
+  "budget": [
+    1500,
+    500,
+    150
+  ],
+  "materials": [
+    "M_Rock"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 109892,
+  "veg": {
+    "kind": "rock",
+    "role": "rock"
+  },
+  "uvTile": {
+    "M_Rock": 4.0
+  },
+  "source": "assets/blender/models/veg_rocks.py",
+  "blend": null,
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

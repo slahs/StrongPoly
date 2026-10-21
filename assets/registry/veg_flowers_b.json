@@ -1,0 +1,74 @@
+{
+  "id": "veg_flowers_b",
+  "desc": "Wiesenblumen",
+  "file": "models/veg_flowers_b.glb",
+  "target": {
+    "prop": "veg_flowers_b"
+  },
+  "class": "flora",
+  "footprint": null,
+  "height": 0.261,
+  "bbox": {
+    "min": [
+      -0.154,
+      -0.01,
+      -0.103
+    ],
+    "max": [
+      0.129,
+      0.261,
+      0.134
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 111,
+      "materials": [
+        "M_Flora"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 43,
+      "materials": [
+        "M_Flora"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 20,
+      "materials": [
+        "M_Flora"
+      ]
+    }
+  ],
+  "tris": [
+    111,
+    43,
+    20
+  ],
+  "budget": [
+    420,
+    140,
+    40
+  ],
+  "materials": [
+    "M_Flora"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 15020,
+  "veg": {
+    "kind": "flora",
+    "role": "flowers"
+  },
+  "uvTile": {
+    "M_Flora": 1.0
+  },
+  "source": "assets/blender/models/veg_ground.py",
+  "blend": null,
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

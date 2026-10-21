@@ -1,0 +1,85 @@
+{
+  "id": "veg_birch_c",
+  "desc": "Haengebirke, zweistaemmig",
+  "file": "models/veg_birch_c.glb",
+  "target": {
+    "prop": "veg_birch_c"
+  },
+  "class": "tree",
+  "footprint": null,
+  "height": 2.952,
+  "bbox": {
+    "min": [
+      -1.248,
+      -0.018,
+      -1.162
+    ],
+    "max": [
+      1.246,
+      2.952,
+      1.231
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 5960,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 918,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 184,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    }
+  ],
+  "tris": [
+    5960,
+    918,
+    184
+  ],
+  "budget": [
+    6000,
+    1500,
+    300
+  ],
+  "materials": [
+    "M_Bark",
+    "M_Foliage"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 382480,
+  "veg": {
+    "kind": "tree",
+    "species": "birch",
+    "role": "mature",
+    "height": 3.05,
+    "crown": [
+      0.82,
+      1.1
+    ]
+  },
+  "uvTile": {
+    "M_Bark": 2.0,
+    "M_Foliage": 1.0
+  },
+  "source": "assets/blender/models/veg_trees.py",
+  "blend": null,
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

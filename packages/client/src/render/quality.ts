@@ -81,6 +81,20 @@ export interface QualityCfg {
   assetLods: number;
   /** größte Texturkantenlänge der Asset-Materialien (kleinere Fassungen `*_512.*` werden genutzt, wenn vorhanden) */
   assetTexMax: number;
+
+  // ---- Phase 5A Umgebung (nur Stil „medieval“: Vegetation aus GLB-Assets, Gelände mit Materialbibliothek) ----
+  /** Faktor auf die LOD-Grenzen der Vegetation (env/veg_place.ts VEG_LOD) */
+  envLodScale: number;
+  /** nutzbare LOD-Stufen der Bäume (Niedrig 2 = nie LOD0) */
+  envTreeLods: number;
+  /** Grasbüschel je Wiesen-Tile nahe der Kamera (0 = nur Bodentextur) */
+  envGrassPerTile: number;
+  /** Radius (Tiles) um den Blickpunkt für Gras, Blumen, Farn */
+  envFloraRadius: number;
+  /** Obergrenze der Gras-/Blumen-/Farninstanzen */
+  envFloraMax: number;
+  /** Durchlicht der Blätter/Halme 0..1 */
+  envTranslucency: number;
 }
 
 export const QUALITY: Record<QualityLevel, QualityCfg> = {
@@ -121,6 +135,12 @@ export const QUALITY: Record<QualityLevel, QualityCfg> = {
     assetLod1: 34,
     assetLods: 2,
     assetTexMax: 512,
+    envLodScale: 0.7,
+    envTreeLods: 2,
+    envGrassPerTile: 0,
+    envFloraRadius: 12,
+    envFloraMax: 1500,
+    envTranslucency: 0.4,
   },
   medium: {
     shadows: true,
@@ -159,6 +179,12 @@ export const QUALITY: Record<QualityLevel, QualityCfg> = {
     assetLod1: 72,
     assetLods: 3,
     assetTexMax: 1024,
+    envLodScale: 1,
+    envTreeLods: 3,
+    envGrassPerTile: 6,
+    envFloraRadius: 24,
+    envFloraMax: 12000,
+    envTranslucency: 0.75,
   },
   high: {
     shadows: true,
@@ -197,6 +223,12 @@ export const QUALITY: Record<QualityLevel, QualityCfg> = {
     assetLod1: 105,
     assetLods: 3,
     assetTexMax: 2048,
+    envLodScale: 1.45,
+    envTreeLods: 3,
+    envGrassPerTile: 10,
+    envFloraRadius: 34,
+    envFloraMax: 26000,
+    envTranslucency: 1,
   },
 };
 

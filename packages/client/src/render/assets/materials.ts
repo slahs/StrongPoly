@@ -3,6 +3,7 @@ import { ANIM_PARS, FRAG_PARS, FRAG_TAIL, GFX, WORLD_POS, ensureNoiseTextures, s
 import { FRAG_CLIP } from '../building_materials';
 import { UNIT_ANIM_PARS, uTintUniform } from '../unit_shader';
 import type { MapEntry, MapKind, MaterialDef } from './manifest';
+import { patchHemiK } from '../env/uniforms';
 
 /**
  * Laufzeit-Materialbibliothek: jedes Bibliotheksmaterial `M_*` wird EIN MeshStandardMaterial (je Variante), egal wie viele
@@ -119,6 +120,8 @@ const FRAG_AO = /* glsl */ `
 function patch(s: THREE.WebGLProgramParametersWithUniforms, variant: AssetVariant, dirt: { value: THREE.Color }): void {
   ensureNoiseTextures();
   shareUniforms(s);
+  // Stil medieval: Himmelslicht aus der Umgebung (scene.environment), Halbkugel nicht doppelt (uHemiK = 0; classic 1)
+  patchHemiK(s);
   s.uniforms.uAo = GFX.uAo;
   s.uniforms.uVar = GFX.uVar;
   s.uniforms.uDirt = dirt;
@@ -283,6 +286,22 @@ export class AssetMaterials {
     await Promise.all(jobs);
   }
 
+  /** geladene Karte eines Bibliotheksmaterials (nach ensure), sonst null – z. B. für die Gelände-Texturarrays (env/) */
+  texture(name: string, kind: MapKind): THREE.Texture | null {
+    return this.tex(name, kind);
+  }
+
+  /** Umgebung für Glanz/Metall (gemeinsame kleine PMREM); `null` = scene.environment (Stil medieval: Himmel) verwenden */
+  set sceneEnv(on: boolean) {
+    this.useSceneEnv = on;
+    for (const m of this.mats.values()) {
+      m.envMap = on ? null : this.envMap();
+      m.envMapIntensity = on ? 1 : 0.45;
+      m.needsUpdate = true;
+    }
+  }
+  private useSceneEnv = false;
+
   private tex(name: string, kind: MapKind): THREE.Texture | null {
     const e = this.defs[name]?.maps?.[kind];
     if (!e) return null;
@@ -342,8 +361,8 @@ export class AssetMaterials {
       aoMap: orm,
       roughnessMap: orm,
       metalnessMap: orm,
-      envMap: this.envMap(),
-      envMapIntensity: 0.45,
+      envMap: this.useSceneEnv ? null : this.envMap(),
+      envMapIntensity: this.useSceneEnv ? 1 : 0.45,
       side: d.doubleSided ? THREE.DoubleSide : THREE.FrontSide,
       alphaTest: d.alphaTest ?? 0,
     });

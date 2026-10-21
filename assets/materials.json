@@ -19,6 +19,8 @@
     "M_Ground_Path": { "base": "#8a7558", "rough": 0.94, "metal": 0, "tile": 4, "dirt": "#45392a" },
     "M_Rock": { "base": "#86827a", "rough": 0.9, "metal": 0, "tile": 4, "dirt": "#454036" },
     "M_Bark": { "base": "#4f4134", "rough": 0.93, "metal": 0, "tile": 2, "dirt": "#2b241c" },
-    "M_Foliage": { "base": "#4d6232", "rough": 0.8, "metal": 0, "tile": 1, "dirt": "#2e3a1e", "alphaTest": 0.5, "doubleSided": true }
+    "M_Foliage": { "base": "#4d6232", "rough": 0.8, "metal": 0, "tile": 1, "dirt": "#2e3a1e", "alphaTest": 0.5, "doubleSided": true },
+    "M_Foliage_Conifer": { "base": "#2f4527", "rough": 0.82, "metal": 0, "tile": 1, "dirt": "#1f2a18", "alphaTest": 0.5, "doubleSided": true },
+    "M_Flora": { "base": "#6f8a3e", "rough": 0.75, "metal": 0, "tile": 1, "dirt": "#3a4422", "doubleSided": true }
   }
 }

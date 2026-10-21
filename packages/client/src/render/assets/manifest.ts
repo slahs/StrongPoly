@@ -87,6 +87,10 @@ export interface AssetDef {
   source?: string | null;
   blend?: string;
   license?: string;
+  /** Vegetation/Umgebung (assets/blender/lib/sp/veg.py): Laufzeitklasse, Art, Rolle im Katalog */
+  veg?: { kind: string; species?: string; role?: string; [k: string]: unknown };
+  /** Kachelgröße je Material beim Export (UV im Weltmaß / tile); die Laufzeit gleicht spätere Änderungen von tile aus */
+  uvTile?: Record<string, number>;
 }
 
 export interface AssetManifest {
