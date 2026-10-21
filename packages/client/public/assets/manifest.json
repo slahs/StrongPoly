@@ -311,6 +311,247 @@
       "blend": "assets/src/keep.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
+    "wall_high_arm": {
+      "id": "wall_high_arm",
+      "desc": "Hohe Steinmauer, Arm: Bruchstein mit Anlauf, Sockel mit Wasserschlag, Gesims, Wehrgang mit Bruestungen, Ruest-/Balkenloecher",
+      "file": "models/wall_high_arm.glb",
+      "target": {
+        "wall": "WallHigh",
+        "piece": "arm"
+      },
+      "class": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "height": 2.76,
+      "bbox": {
+        "min": [
+          -0.003,
+          0,
+          -0.45
+        ],
+        "max": [
+          0.503,
+          2.76,
+          0.45
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 390,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 232,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 36,
+          "materials": [
+            "M_Stone_Rubble"
+          ]
+        }
+      ],
+      "tris": [
+        390,
+        232,
+        36
+      ],
+      "budget": [
+        1500,
+        600,
+        200
+      ],
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 67204,
+      "lodDist": [
+        1.5
+      ],
+      "hash": "2473798cd7",
+      "source": "assets/blender/models/wall_high_arm.py",
+      "blend": "assets/src/wall_high_arm.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "wall_high_post": {
+      "id": "wall_high_post",
+      "desc": "Hohe Steinmauer, Pfosten: Kern fuer Ecken/T-Stoesse (im geraden Lauf verdeckt), vier Zinnen mit Abdeckplatten, zwei mit Scharte",
+      "file": "models/wall_high_post.glb",
+      "target": {
+        "wall": "WallHigh",
+        "piece": "post"
+      },
+      "class": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "height": 3.117,
+      "bbox": {
+        "min": [
+          -0.444,
+          0,
+          -0.444
+        ],
+        "max": [
+          0.444,
+          3.117,
+          0.444
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 1162,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 412,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 72,
+          "materials": [
+            "M_Stone_Rubble"
+          ]
+        }
+      ],
+      "tris": [
+        1162,
+        412,
+        72
+      ],
+      "budget": [
+        1500,
+        600,
+        200
+      ],
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 163904,
+      "lodDist": [
+        1.5
+      ],
+      "hash": "a1b01a09ea",
+      "source": "assets/blender/models/wall_high_post.py",
+      "blend": "assets/src/wall_high_post.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "wall_high_stub": {
+      "id": "wall_high_stub",
+      "desc": "Hohe Steinmauer, Einzelpfeiler: Sockel, Bruchsteinkern mit umlaufender Bruestung, vier Zinnen, Abdeckplatten",
+      "file": "models/wall_high_stub.glb",
+      "target": {
+        "wall": "WallHigh",
+        "piece": "stub"
+      },
+      "class": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "height": 3.129,
+      "bbox": {
+        "min": [
+          -0.45,
+          0,
+          -0.45
+        ],
+        "max": [
+          0.45,
+          3.129,
+          0.45
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 1300,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 502,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 96,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        }
+      ],
+      "tris": [
+        1300,
+        502,
+        96
+      ],
+      "budget": [
+        1500,
+        600,
+        200
+      ],
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 181788,
+      "lodDist": [
+        1.5
+      ],
+      "hash": "6671152407",
+      "source": "assets/blender/models/wall_high_stub.py",
+      "blend": "assets/src/wall_high_stub.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
     "well": {
       "id": "well",
       "desc": "Brunnen: Bruchsteinkranz, Eichenpfosten, Haspel mit Kurbel, Schindeldach, Eimer",

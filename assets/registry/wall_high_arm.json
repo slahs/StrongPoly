@@ -1,0 +1,79 @@
+{
+  "id": "wall_high_arm",
+  "desc": "Hohe Steinmauer, Arm: Bruchstein mit Anlauf, Sockel mit Wasserschlag, Gesims, Wehrgang mit Bruestungen, Ruest-/Balkenloecher",
+  "file": "models/wall_high_arm.glb",
+  "target": {
+    "wall": "WallHigh",
+    "piece": "arm"
+  },
+  "class": "wall",
+  "footprint": [
+    1,
+    1
+  ],
+  "height": 2.76,
+  "bbox": {
+    "min": [
+      -0.003,
+      0.0,
+      -0.45
+    ],
+    "max": [
+      0.503,
+      2.76,
+      0.45
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 390,
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 232,
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 36,
+      "materials": [
+        "M_Stone_Rubble"
+      ]
+    }
+  ],
+  "tris": [
+    390,
+    232,
+    36
+  ],
+  "budget": [
+    1500,
+    600,
+    200
+  ],
+  "materials": [
+    "M_Stone_Ashlar",
+    "M_Stone_Rubble"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0",
+    "_BUILD",
+    "_BUILDH"
+  ],
+  "bytes": 67204,
+  "source": "assets/blender/models/wall_high_arm.py",
+  "blend": "assets/src/wall_high_arm.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",
+  "lodDist": [
+    1.5
+  ]
+}
