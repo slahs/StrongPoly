@@ -8,7 +8,9 @@ Qualitätsreferenz). Fremdquellen wären nur als CC0 mit Nachweis zulässig – 
 
 | Dateien | Herkunft | Lizenz |
 |---|---|---|
-| `M_*/albedo_*.ktx2`, `normal_*.ktx2`, `orm_*.ktx2`, `material.json`, `library.json` | vollständig prozedural erzeugt durch `assets/blender/materials/M_*.py` (Geometrie + Shader in Blender, Cycles-Render der Draufsicht, numpy-Nachbearbeitung, Kodierung mit basisu) | Eigenerstellung StrongPoly; keine Fremdinhalte |
+| `M_*/{albedo,normal,orm}[_1024,_512].webp` | vollständig prozedural erzeugt durch `assets/blender/materials/M_*.py` (Geometrie + Shader in Blender, Cycles-Render der Draufsicht, numpy-Nachbearbeitung), WebP-Kodierung mit `assets/blender/tools/textures.py` (Pillow/libwebp) | Eigenerstellung StrongPoly; keine Fremdinhalte |
+| Einträge `M_*` in `assets/materials.json` (tile, Rückfallwerte, `info`) | aus denselben Skripten | Eigenerstellung |
+| `assets/src/textures/M_*/*.png` (nicht eingecheckt, reproduzierbar) | verlustfreie Quellen derselben Skripte | Eigenerstellung |
 | `assets/blender/materials/*.py`, `scripts/assets/build-materials.sh` | Eigenerstellung | Projektlizenz |
 | `assets/src/materials/*.blend` (falls vorhanden, < 5 MB) | vom Skript gespeicherte Quellszene | Eigenerstellung |
 | `docs/phase5a/materials/*.jpg` | Cycles-Vorschaurenderings der eigenen Texturen | Eigenerstellung |
@@ -24,7 +26,7 @@ festem Seed (numpy, Blender-Rauschknoten) und modellierter Geometrie.
 | numpy / scipy | 2.x / 1.x | BSD-3-Clause | Rauschen, Voronoi, Filter |
 | Pillow | 13 | MIT-CMU (HPND) | PNG/JPEG/WebP |
 | OpenEXR (Python) | 3.5 | BSD-3-Clause | Lesen der Render-Passes |
-| basisu (npm `basis_universal@1.16.4-1`, Binomial Basis Universal 1.16.4) | 1.16.4 | Apache-2.0 | KTX2-Kodierung (ETC1S/UASTC) |
+| basisu (npm `basis_universal@1.16.4-1`, Binomial Basis Universal 1.16.4) | 1.16.4 | Apache-2.0 | nur optionale KTX2-Messung (nicht ausgeliefert) |
 
 Laufzeit-Dekodierung (Sache der Pipeline): three.js `KTX2Loader` mit Basis-Transcoder aus dem
 three-Paket (MIT / Apache-2.0).

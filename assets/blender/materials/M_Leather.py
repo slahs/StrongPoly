@@ -18,7 +18,8 @@ SPEC = C.Spec(
     description="Pflanzlich gegerbtes Leder: Narbung, Knickfalten, Poren, Kratzer, abgeriebene Stellen",
     orientation="isotrop",
     tint={"hue": [-0.04, 0.04], "saturation": [0.6, 1.25], "value": [0.6, 1.35]},
-    notes="Grundton mittelbraun; ueber tint dunkler/heller faerbbar (z. B. Ruestungsleder dunkel).",
+    notes="Grundton mittelbraun; ueber tint dunkler/heller faerbbar. Narbung im Spiel ~1,3x vergroessert (tile 0,25).",
+    game_tile=0.25,
 )
 
 

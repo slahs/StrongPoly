@@ -39,9 +39,9 @@ def build(scene, tile):
     u, v = X / T, Y / T
     p1, e1, _ = facets(n, 7, 1, 0.5, rng)
     p2, e2, _ = facets(n, 19, 2, 0.35, rng)
-    H = C.blur(p1 * T, 3) * 0.25 + C.blur(p2 * T, 2) * 0.10
-    H += C.spectral(n, 3, beta=2.6, fmin=1) * 0.06
-    H -= (1 - e1) * 0.012 + (1 - e2) * 0.004
+    H = C.blur(p1 * T, 2) * 0.6 + C.blur(p2 * T, 1.5) * 0.22
+    H += C.spectral(n, 3, beta=2.8, fmin=1) * 0.05
+    H -= (1 - e1) * 0.02 + (1 - e2) * 0.006
     # Schichtung
     strat = C.streaks(u, v + C.spectral(n, 4, beta=3.0, fmin=1) * 0.02, 5, 256, 4, beta=2.2)
     H += strat * 0.006
@@ -53,15 +53,15 @@ def build(scene, tile):
     crack = C.smoothstep(0.02, 0.0, ce) * C.smoothstep(0.0, 1.0, C.spectral(n, 9, beta=2.0, fmin=2) + 0.6)
     H -= crack * 0.03
     grain = C.spectral(n, 10, beta=1.2, fmin=80)
-    H += grain * 0.0012 + C.spectral(n, 11, beta=0.8, fmin=300) * 0.00035
-    hp = H - C.blur(H, 12)
-    cav = C.smoothstep(0.0, -0.006, hp)
-    ridge = C.smoothstep(0.0, 0.006, hp)
+    H += grain * 0.0005 + C.spectral(n, 11, beta=0.8, fmin=300) * 0.00012
+    hp = C.blur(H, 2) - C.blur(H, 40)
+    cav = C.smoothstep(-0.004, -0.02, hp)
+    ridge = C.smoothstep(0.004, 0.02, hp)
     base = np.array([0.255, 0.240, 0.205])
     m1 = C.spectral(n, 12, beta=2.4, fmin=1)
     m2 = C.spectral(n, 13, beta=1.4, fmin=30)
-    col = base * (1 + 0.12 * m1 + 0.06 * m2 + 0.08 * strat)[..., None]
-    col = col * (1 - 0.3 * cav[..., None]) * (1 + 0.12 * ridge[..., None])
+    col = base * (1 + 0.14 * m1 + 0.04 * m2 + 0.10 * strat)[..., None]
+    col = col * (1 - 0.25 * cav[..., None]) * (1 + 0.08 * ridge[..., None])
     col = col * (1 - 0.6 * crack[..., None])
     # Flechten
     lmask = C.smoothstep(0.7, 1.4, C.spectral(n, 14, beta=2.2, fmin=4)) * (1 - cav)

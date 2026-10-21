@@ -15,7 +15,7 @@ import _common as C  # noqa: E402
 
 T = 4.0
 SPEC = C.Spec(
-    "M_Ground_Path", seed=6212, tile_m=T, tiers=("2k", "1k", "512"), kind="ground", ao_distance=0.04,
+    "M_Ground_Path", seed=6212, tile_m=T, tiers=("1k", "512"), kind="ground", ao_distance=0.04,
     description="Festgefahrener Erdweg mit Radspuren, Kies, Hufspuren und ausgetrockneten Pfuetzen",
     orientation="V entlang des Weges, U quer; Spurmitten bei U=0.32 und U=0.68 (Spurweite 1,44 m)",
     tint={"hue": [-0.02, 0.02], "saturation": [0.85, 1.1], "value": [0.85, 1.12]},
@@ -31,15 +31,17 @@ def build(scene, tile):
     # Radspuren (entlang V), leicht maeandernd
     rut = np.zeros((n, n), np.float32)
     rim = np.zeros((n, n), np.float32)
+    trough = np.zeros((n, n), np.float32)
     mean = C.spectral(256, 3, beta=3.0, fmin=1)
     for c0 in (0.32, 0.68):
         cu = c0 + C.sample(mean, 0.2 + c0, v) * 0.008
         d = np.abs(((u - cu + 0.5) % 1 - 0.5) * T)
         wdt = 0.085 + 0.025 * C.sample(mean, 0.7, v + c0)
         rut = np.maximum(rut, C.smoothstep(wdt, wdt * 0.55, d))
+        trough = np.maximum(trough, C.smoothstep(0.32, 0.06, d))
         rim = np.maximum(rim, np.exp(-((d - wdt * 1.6) / 0.08) ** 2))
     depth = 0.035 + 0.012 * C.spectral(n, 4, beta=2.5, fmin=1)
-    H = H - rut * depth + rim * 0.006 * (0.6 + 0.4 * C.spectral(n, 5, beta=2.0, fmin=4))
+    H = H - rut * depth * 0.6 - trough * 0.014 + rim * 0.004 * (0.6 + 0.4 * C.spectral(n, 5, beta=2.0, fmin=4))
     # Laengsriefen in der Spur (Reifen/Eisenring)
     H += rut * C.streaks(v, u, 6, 1024, 6, beta=1.2) * 0.0012
     # Hufspuren in der Mitte und daneben
@@ -76,9 +78,9 @@ def build(scene, tile):
     H += C.spectral(n, 11, beta=1.0, fmin=300) * 0.0004 * (1 - pud)
     # Farben
     dry = np.array([0.245, 0.195, 0.135])
-    comp = np.array([0.135, 0.105, 0.075])
+    comp = np.array([0.19, 0.152, 0.108])
     m1 = C.spectral(n, 12, beta=2.0, fmin=3)
-    rb = C.blur(rut, 4) * (0.6 + 0.4 * C.smoothstep(-1.0, 1.0, C.spectral(n, 14, beta=2.2, fmin=3)))
+    rb = np.maximum(C.blur(rut, 4), trough * 0.5) * (0.6 + 0.4 * C.smoothstep(-1.0, 1.0, C.spectral(n, 14, beta=2.2, fmin=3)))
     col = dry * (1 - rb[..., None]) + comp * rb[..., None]
     col = col * (1 + 0.13 * m1 + 0.07 * C.spectral(n, 13, beta=1.2, fmin=60))[..., None]
     org = C.smoothstep(1.4, 2.2, C.spectral(n, 15, beta=1.8, fmin=20)) * (1 - rb)

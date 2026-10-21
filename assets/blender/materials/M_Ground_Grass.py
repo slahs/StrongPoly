@@ -1,6 +1,6 @@
 """M_Ground_Grass - dichte, gemischte Wiese (Draufsicht-Kachel fuer Terrain).
 
-Echte Geometrie: ~110 000 einzelne Grashalme (geneigte, gebogene, spitz zulaufende
+Echte Geometrie: ~105 000 einzelne Grashalme (geneigte, gebogene, spitz zulaufende
 Streifen; gruen, gelbgruen, einzelne trockene), Kleepolster (Dreiblatt mit Kerbe und hellem
 Winkelzeichen), Wegerich-Rosetten, darunter Streu und Erde. Isotrop.
 """
@@ -14,7 +14,7 @@ import _common as C  # noqa: E402
 
 T = 2.5
 SPEC = C.Spec(
-    "M_Ground_Grass", seed=6818, tile_m=T, tiers=("2k", "1k", "512"), kind="ground", ao_distance=0.03, albedo_ao=0.5,
+    "M_Ground_Grass", seed=6818, tile_m=T, tiers=("1k", "512"), kind="ground", ao_distance=0.03, albedo_ao=0.5,
     description="Dichte gemischte Wiese: Grashalme, Klee, Wegerich, trockene Halme, Streu",
     orientation="isotrop (Boden); fuer grosse Flaechen mit Makro-Variation/zweiter Kachelgroesse mischen",
     tint={"hue": [-0.04, 0.03], "saturation": [0.75, 1.15], "value": [0.8, 1.15]},
@@ -26,14 +26,14 @@ def build(scene, tile):
     rng = np.random.default_rng(SPEC.seed)
     dens = C.spectral(256, 1, beta=2.4, fmin=2)
     # Halme: Dichte ueber Rauschen moduliert (Buelten)
-    B = 110000
+    B = 190000
     P = rng.random((B, 2)) * T
     d = C.sample(dens, P[:, 0] / T, P[:, 1] / T)
     keep = rng.random(B) < np.clip(0.55 + 0.35 * d, 0.1, 1)
     P = P[keep]
     B = len(P)
     L = rng.lognormal(np.log(0.07), 0.35, B)
-    W = rng.uniform(0.0022, 0.0045, B)
+    W = rng.uniform(0.0025, 0.005, B)
     az = rng.uniform(0, 2 * np.pi, B)
     inc = np.clip(rng.normal(0.55, 0.3, B), 0.05, 1.3)
     bend = rng.uniform(0.2, 0.9, B)
@@ -45,8 +45,8 @@ def build(scene, tile):
     t = S.attr("t")
     k = S.attr("kind")
     r = S.attr("rnd")
-    green = S.ramp(r, [(0.0, (0.050, 0.090, 0.020)), (0.35, (0.075, 0.115, 0.026)), (0.7, (0.095, 0.130, 0.035)),
-                       (1.0, (0.115, 0.140, 0.045))])
+    green = S.ramp(r, [(0.0, (0.055, 0.100, 0.022)), (0.35, (0.080, 0.130, 0.028)), (0.7, (0.100, 0.150, 0.036)),
+                       (1.0, (0.125, 0.160, 0.045))])
     dry = S.ramp(r, [(0.0, (0.20, 0.17, 0.085)), (1.0, (0.27, 0.23, 0.12))])
     yel = S.mixc(green, (0.17, 0.16, 0.055), 0.6)
     col = S.mixc(green, yel, S.smooth(k, 0.72, 0.74))

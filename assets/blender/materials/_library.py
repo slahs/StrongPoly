@@ -1,6 +1,6 @@
-"""Bibliotheksuebersicht: library.json (Laufzeit) + library.jpg (Uebersichtstafel der Vorschauen).
+"""Bibliotheksuebersicht: Groessen der Laufzeittexturen + library.jpg (Uebersichtstafel der Vorschauen).
 
-Liest alle packages/client/public/assets/textures/M_*/material.json. Laeuft ohne bpy
+Liest assets/materials.json und packages/client/public/assets/textures/M_*/*.webp. Laeuft ohne bpy
 (nur numpy/Pillow), wird von scripts/assets/build-materials.sh am Ende aufgerufen.
 """
 import json
@@ -17,53 +17,31 @@ NAMES = ["M_Stone_Ashlar", "M_Stone_Rubble", "M_Stone_Cobble", "M_Plaster_Lime",
          "M_Leather", "M_Ground_Grass", "M_Ground_Dirt", "M_Ground_Path", "M_Rock", "M_Bark", "M_Foliage"]
 
 
-def gpu_bytes(res, fmt):
-    """Geschaetzter GPU-Speicher inkl. Mipmaps: KTX2 -> BC7/ASTC 4x4 (1 B/px), sonst RGBA8 (4 B/px)."""
-    bpp = 1.0 if fmt == "ktx2" else 4.0
-    return int(res * res * bpp * 4 / 3)
-
-
 def main():
-    mats = []
+    """Uebersicht der Laufzeitgroessen (WebP je Stufe) aus public/assets/textures + Tafel library.jpg."""
+    with open(os.path.join(REPO, "assets", "materials.json"), encoding="utf-8") as f:
+        lib = json.load(f)["materials"]
+    rows = []
     tot = {}
-    gpu = {}
     for nm in NAMES:
-        p = os.path.join(TEX, nm, "material.json")
-        if not os.path.exists(p):
+        d = os.path.join(TEX, nm)
+        if not os.path.isdir(d):
             print("[lib] fehlt:", nm)
             continue
-        with open(p, encoding="utf-8") as f:
-            m = json.load(f)
-        tiers = {}
-        for t, files in m["bytes"].items():
-            s = sum(files.values())
-            tiers[t] = s
-            tot[t] = tot.get(t, 0) + s
-            fmt = "ktx2" if any(k.endswith(".ktx2") for k in files) else "webp"
-            g = 3 * gpu_bytes(m["resolutions"][t], fmt)
-            gpu[t] = gpu.get(t, 0) + g
-        mats.append({"name": nm, "path": f"{nm}/material.json", "description": m["description"],
-                     "tileSize": m["tileSize"], "tiers": m["tiers"], "resolutions": m["resolutions"],
-                     "alphaMode": m["alphaMode"], "bytes": tiers})
-    lib = {
-        "schema": 1,
-        "description": "StrongPoly PBR-Materialbibliothek (Phase 5A), prozedural in Blender erzeugt",
-        "convention": {
-            "maps": "albedo (sRGB), normal (OpenGL +Y, Tangentenraum), orm (R=AO, G=Roughness, B=Metallic, A=Hoehe)",
-            "fileName": "{albedo,normal,orm}_{2k,1k,512}.ktx2",
-            "tileSize": "Spiel-Einheiten je Texturwiederholung (1 Einheit ~ 1,85 m)",
-            "qualityTiers": {"high": "2k falls vorhanden, sonst 1k", "medium": "1k", "low": "512"},
-            "ktx2": "Albedo/ORM: Basis ETC1S, Normal: UASTC (+RDO, Zstandard); Mipmaps enthalten",
-        },
-        "materials": mats,
-        "totals": {"bytesPerTier": tot, "bytesAll": sum(tot.values()),
-                   "gpuBytesPerTierEstimate": gpu},
-        "license": "Eigenerstellung StrongPoly, siehe assets/LICENSES.md",
-    }
-    with open(os.path.join(TEX, "library.json"), "w", encoding="utf-8") as f:
-        json.dump(lib, f, indent=2, ensure_ascii=False)
-        f.write("\n")
-    print("[lib] library.json:", len(mats), "Materialien, Summe", round(sum(tot.values()) / 1e6, 2), "MB", tot)
+        per = {}
+        for fn in os.listdir(d):
+            if fn.endswith(".webp"):
+                stem = fn[:-5]
+                tier = stem.split("_")[1] if "_" in stem else "voll"
+                per[tier] = per.get(tier, 0) + os.path.getsize(os.path.join(d, fn))
+        for k, v in per.items():
+            tot[k] = tot.get(k, 0) + v
+        info = lib.get(nm, {}).get("info", {})
+        rows.append((nm, lib.get(nm, {}).get("tile"), info.get("srcPx"), per))
+    for nm, tile, src, per in rows:
+        print(f"[lib] {nm:16s} tile={tile} src={src} " + " ".join(f"{k}={v / 1e6:.2f}MB" for k, v in sorted(per.items())))
+    print("[lib] Summe", " ".join(f"{k}={v / 1e6:.2f}MB" for k, v in sorted(tot.items())),
+          f"gesamt={sum(tot.values()) / 1e6:.2f}MB")
     sheet()
 
 

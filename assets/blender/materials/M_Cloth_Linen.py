@@ -19,7 +19,8 @@ SPEC = C.Spec(
     description="Grobes Leinen in Leinwandbindung, ungebleicht, mit Noppen und leichten Flecken",
     orientation="U = Schuss, V = Kette",
     tint={"hue": [-0.5, 0.5], "saturation": [0.0, 1.6], "value": [0.35, 1.15]},
-    notes="Heller Naturton als Basis fuer Einfaerbung (tint/baseColorFactor); Webstruktur v. a. im Normal.",
+    notes="Heller Naturton als Basis fuer Einfaerbung; Webstruktur im Spiel bewusst ~4x vergroessert (tile 0,25), sonst unter Pixelgroesse.",
+    game_tile=0.25,
 )
 
 

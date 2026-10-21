@@ -16,7 +16,7 @@ import _common as C  # noqa: E402
 
 T = 2.0
 SPEC = C.Spec(
-    "M_Plaster_Lime", seed=5404, tile_m=T, tiers=("2k", "1k", "512"), kind="wall", ao_distance=0.03,
+    "M_Plaster_Lime", seed=5404, tile_m=T, tiers=("1k", "512"), kind="wall", ao_distance=0.03,
     description="Kalkputz mit Kellenstruktur, Tuencheschichten, Haarrissen, Schmutzlaeufen und kleinen Abplatzungen",
     orientation="U horizontal, V nach oben (Schmutzlaeufe nach unten)",
     tint={"hue": [-0.03, 0.03], "saturation": [0.7, 1.2], "value": [0.85, 1.05]},

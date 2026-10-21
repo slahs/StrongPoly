@@ -51,9 +51,9 @@ def build(scene, tile):
     grooves = np.clip(rings, 0, 1) ** 2 * 0.0005 + G2 * 0.00035 + G1 * 0.0007
     # Beilspuren: Mulden quer zur Faser (Zellen in V gestreckt)
     F1, F2, IDb = C.worley(n, 16, 4, jitter=0.85, aspect=(1.0, 0.3))
-    dish = -(1.0 - np.clip(F1 / 0.75, 0, 1) ** 2) * 0.0034
+    dish = -(1.0 - np.clip(F1 / 0.75, 0, 1) ** 2) * 0.0024
     dvar = np.random.default_rng(5).uniform(0.4, 1.3, 256)[IDb]
-    H = C.blur(dish * dvar, 3) + grooves + C.spectral(n, 6, beta=2.8, fmin=1) * 0.0018
+    H = C.blur(dish * dvar, 8) + grooves * 1.3 + C.spectral(n, 6, beta=2.8, fmin=1) * 0.0018
     # Trockenrisse
     crack = np.zeros((n, n), np.float32)
     for i in range(7):

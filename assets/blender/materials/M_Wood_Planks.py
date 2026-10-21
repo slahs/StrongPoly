@@ -15,7 +15,7 @@ import _common as C  # noqa: E402
 
 T = 1.5
 SPEC = C.Spec(
-    "M_Wood_Planks", seed=5606, tile_m=T, tiers=("1k", "512"), kind="wall", ao_distance=0.025,
+    "M_Wood_Planks", seed=5606, tile_m=T, tiers=("2k", "1k", "512"), kind="wall", ao_distance=0.025,
     description="Senkrechte, verwitterte Bretter mit Fugen, Saegeriefen, Aesten und geschmiedeten Naegeln",
     orientation="V entlang der Bretter (senkrecht), U quer; fuer Boeden um 90 Grad drehen",
     tint={"hue": [-0.02, 0.02], "saturation": [0.8, 1.15], "value": [0.75, 1.12]},

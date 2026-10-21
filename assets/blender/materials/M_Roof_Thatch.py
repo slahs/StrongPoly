@@ -1,6 +1,6 @@
 """M_Roof_Thatch - Strohdach (Langstroh/Reet), goldgrau verwittert.
 
-Echte Geometrie: ~20 000 einzelne Halme als 3D-Kurven (Cycles-Kurvenprimitive) mit
+Echte Geometrie: ~29 000 einzelne Halme als 3D-Kurven (Cycles-Kurvenprimitive) mit
 Durchmesser 2,5-5 mm, leicht gebogen, in Lagen (Gaengen) geschichtet: die Fussenden jeder Lage
 liegen hoeher und decken die Lage darunter (wie Ziegel), Richtung entlang des Gefaelles mit
 Streuung. Shader: Halmfarben (goldgelb bis grau verwittert), dunklere, feuchte Tiefe,
@@ -17,7 +17,7 @@ import _common as C  # noqa: E402
 T = 1.0
 COURSE = 0.25
 SPEC = C.Spec(
-    "M_Roof_Thatch", seed=6515, tile_m=T, tiers=("2k", "1k", "512"), kind="wall", ao_distance=0.05, albedo_ao=0.7,
+    "M_Roof_Thatch", seed=6515, tile_m=T, tiers=("1k", "512"), kind="wall", ao_distance=0.05, albedo_ao=0.7,
     description="Strohdach aus Langstroh in Lagen, goldgrau verwittert, mit Moos- und Algenflecken",
     orientation="V = Dachgefaelle aufwaerts (Halme laufen entlang V, Fussenden zeigen nach unten)",
     tint={"hue": [-0.03, 0.02], "saturation": [0.7, 1.15], "value": [0.8, 1.12]},

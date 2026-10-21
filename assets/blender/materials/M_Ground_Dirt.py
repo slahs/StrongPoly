@@ -14,7 +14,7 @@ import _common as C  # noqa: E402
 
 T = 4.0
 SPEC = C.Spec(
-    "M_Ground_Dirt", seed=6111, tile_m=T, tiers=("2k", "1k", "512"), kind="ground", ao_distance=0.03,
+    "M_Ground_Dirt", seed=6111, tile_m=T, tiers=("1k", "512"), kind="ground", ao_distance=0.03,
     description="Offene, kruemelige Erde mit Schollen, Kieseln, Zweigresten und feuchten Partien",
     orientation="isotrop (Boden)",
     tint={"hue": [-0.02, 0.02], "saturation": [0.8, 1.15], "value": [0.8, 1.15]},

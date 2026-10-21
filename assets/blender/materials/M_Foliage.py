@@ -36,16 +36,16 @@ SPEC = C.Spec(
     notes="Fuer Karten-Baeume: Zelle je Karte; Alpha-Test (alphaCutoff) statt Blending, Mipmaps mit Alpha-Erhalt.",
 )
 
-OAK = lambda t: 0.30 * np.sin(np.pi * np.clip(t, 0, 1) ** 0.85) ** 0.9 * (0.72 + 0.28 * np.cos(2 * np.pi * 4.5 * t))
+OAK = lambda t: 0.32 * np.sin(np.pi * np.clip(t, 0, 1) ** 0.85) ** 0.9 * (0.62 + 0.38 * np.abs(np.cos(np.pi * 4.5 * t)) ** 0.5)
 BEECH = lambda t: 0.30 * np.sin(np.pi * np.clip(t, 0, 1) ** 0.9) ** 0.85 * (1 + 0.04 * np.sin(2 * np.pi * 7 * t))
 SHRUB = lambda t: 0.33 * np.sin(np.pi * np.clip(t, 0, 1) ** 0.8) ** 0.9 * (1 + 0.08 * np.sin(2 * np.pi * 9 * t))
 BIRCH = lambda t: 0.40 * np.clip(np.minimum(t / 0.35, (1 - t) / 0.65), 0, 1) ** 0.8 * (1 + 0.06 * np.sin(2 * np.pi * 11 * t))
 
 KINDS = {
-    "oak": dict(wf=OAK, L=(0.07, 0.10), n_main=9, side=5, per=5, droop=0.0, col=0.0, twig_r=0.004),
-    "beech": dict(wf=BEECH, L=(0.06, 0.085), n_main=10, side=6, per=5, droop=0.0, col=0.33, twig_r=0.0035),
-    "shrub": dict(wf=SHRUB, L=(0.035, 0.05), n_main=14, side=8, per=7, droop=0.0, col=0.6, twig_r=0.003),
-    "birch": dict(wf=BIRCH, L=(0.035, 0.05), n_main=12, side=7, per=6, droop=0.5, col=0.85, twig_r=0.0022),
+    "oak": dict(wf=OAK, L=(0.08, 0.12), n_main=9, side=6, per=7, droop=0.0, col=0.0, twig_r=0.004),
+    "beech": dict(wf=BEECH, L=(0.065, 0.09), n_main=10, side=7, per=7, droop=0.0, col=0.33, twig_r=0.0035),
+    "shrub": dict(wf=SHRUB, L=(0.04, 0.055), n_main=14, side=9, per=10, droop=0.0, col=0.6, twig_r=0.003),
+    "birch": dict(wf=BIRCH, L=(0.04, 0.055), n_main=12, side=8, per=9, droop=0.5, col=0.85, twig_r=0.0022),
 }
 
 
@@ -73,7 +73,7 @@ def build(scene, tile):
         cx, cy = u0 + CELL / 2, v0 + CELL / 2
         # Hauptzweig von unten links nach oben
         start = (u0 + CELL * 0.5 + rng.normal(0, 0.02), v0 + CELL * 0.04, 0.0)
-        main = twig_path(rng, start, (rng.normal(0, 0.15), 1.0, 0), CELL * 0.78, rng.normal(0, 0.03), 14)
+        main = twig_path(rng, start, (rng.normal(0, 0.08), 1.0, 0), CELL * 0.86, rng.normal(0, 0.012), 14)
         branches = [(main, k["twig_r"])]
         for si in range(k["side"]):
             t0 = 0.15 + 0.75 * si / max(1, k["side"] - 1)
@@ -84,7 +84,7 @@ def build(scene, tile):
             ang = side * rng.uniform(0.6, 1.1)
             c, s = math.cos(ang), math.sin(ang)
             dd = np.array([c * d0[0] - s * d0[1], s * d0[0] + c * d0[1], 0])
-            Lb = CELL * rng.uniform(0.18, 0.34) * (1.1 - 0.5 * t0)
+            Lb = CELL * rng.uniform(0.24, 0.40) * (1.1 - 0.5 * t0)
             br = twig_path(rng, p0, dd, Lb, -side * rng.uniform(0.0, 0.08) - k["droop"] * 0.05, 8)
             branches.append((br, k["twig_r"] * 0.6))
         # Zweige als Kurven
@@ -109,15 +109,16 @@ def build(scene, tile):
                 if k["droop"] > 0:
                     ang = ang * (1 - k["droop"]) + (-math.pi) * k["droop"] + rng.normal(0, 0.25)
                 L = rng.uniform(*k["L"])
-                v, q, st = C.leaf_grid(L, k["wf"], nx=8, ny=22, fold=rng.uniform(0.15, 0.4),
+                v, q, st = C.leaf_grid(L, k["wf"], nx=8, ny=40, fold=rng.uniform(0.15, 0.4),
                                        curl=rng.uniform(-0.15, 0.1))
                 # Blattstiel-Versatz, Neigung und Drehung um die Mittelrippe
                 v[:, 1] += L * 0.12
                 R = C.rot_z(ang) @ C.rot_axis((1, 0, 0), rng.uniform(-0.5, 0.35)) @ C.rot_axis((0, 1, 0), rng.normal(0, 0.35))
                 v = v @ R.T + p + np.array([0, 0, 0.006 + rng.uniform(0, 0.03)])
-                # in der Zelle halten
-                v[:, 0] = np.clip(v[:, 0], u0 + 0.004, u0 + CELL - 0.004)
-                v[:, 1] = np.clip(v[:, 1], v0 + 0.004, v0 + CELL - 0.004)
+                # Blaetter, die ueber die Zelle hinausragen, entfallen (keine Ueberlappung im Atlas)
+                if (v[:, 0].min() < u0 + 0.006 or v[:, 0].max() > u0 + CELL - 0.006 or
+                        v[:, 1].min() < v0 + 0.006 or v[:, 1].max() > v0 + CELL - 0.006):
+                    continue
                 Vs.append(v)
                 Qs.append(q + off)
                 off += len(v)

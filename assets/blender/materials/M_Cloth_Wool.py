@@ -19,7 +19,8 @@ SPEC = C.Spec(
     description="Gewalktes Wolltuch in 2/2-Koeper mit Flaum, Naturwolle als Faerbebasis",
     orientation="U = Schuss, V = Kette (Koepergrat diagonal)",
     tint={"hue": [-0.5, 0.5], "saturation": [0.0, 1.8], "value": [0.3, 1.1]},
-    notes="Heller Naturton als Basis fuer Einfaerbung (Teamfarben, Faerberfarben).",
+    notes="Heller Naturton als Basis fuer Einfaerbung; Bindung im Spiel bewusst ~3,5x vergroessert (tile 0,3), sonst unter Pixelgroesse.",
+    game_tile=0.3,
 )
 
 

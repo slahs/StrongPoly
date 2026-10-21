@@ -9,9 +9,10 @@ Verfahren (siehe assets/PIPELINE.md, Abschnitt "Materialbibliothek"):
   2. Eine orthografische Kamera blickt senkrecht auf genau eine Kachel. Cycles rendert
      Normal- und AO-Pass sowie AOVs (albedo, rough, metal, height). Das ist ein "Bake"
      per Draufsicht: Nachbarkacheln werfen AO in die Raender -> nahtlos.
-  3. numpy-Nachbearbeitung -> Albedo (sRGB), Normal (OpenGL, +Y), ORM(+Hoehe in A).
-  4. Downscale mit Normalen-Renormierung (+ Toksvig-Roughness), Kodierung KTX2/WebP,
-     material.json, Nahtpruefung (2x2), Cycles-Vorschau.
+  3. numpy-Nachbearbeitung -> Albedo (sRGB), Normal (OpenGL, +Y), ORM (R AO, G Rauheit, B Metall), Hoehe.
+  4. Downscale mit Normalen-Renormierung (+ Toksvig-Roughness) auf 2048/1024 -> verlustfreie Quellen
+     assets/src/textures/<M>/*.png, Eintrag in assets/materials.json (tile, Rueckfallwerte, info),
+     WebP + Stufen per assets/blender/tools/textures.py, Nahtpruefung (2x2), Cycles-Vorschau.
 
 Aufruf: build-materials.sh oder  bpyenv/bin/python M_Name.py [--stage all|render|post|preview]
 """
@@ -866,7 +867,7 @@ class Spec:
                  ao_strength=1.0, albedo_ao=0.0, samples=32, res=2048, description="", orientation="",
                  tint=None, roughness_factor=1.0, metalness_factor=1.0, normal_scale=1.0, alpha=False,
                  alpha_cutoff=0.5, translucency=None, atlas=None, notes="", tiled=True, cam_height=20.0,
-                 height_scale_note=None, curve_shape="THICK", preview_uv_scale=1.0):
+                 height_scale_note=None, curve_shape="THICK", preview_uv_scale=1.0, game_tile=None):
         self.name = name
         self.seed = seed
         self.tile_m = tile_m if isinstance(tile_m, (tuple, list)) else (tile_m, tile_m)
@@ -875,8 +876,8 @@ class Spec:
         self.ao_distance = ao_distance
         self.ao_strength = ao_strength
         self.albedo_ao = albedo_ao
-        self.samples = int(os.environ.get("STRONGPOLY_MAT_SAMPLES", samples))
         self.res = int(os.environ.get("STRONGPOLY_MAT_RES", res))
+        self.samples = int(os.environ.get("STRONGPOLY_MAT_SAMPLES", samples))
         self.description = description
         self.orientation = orientation
         self.tint = tint or {"hue": [-0.015, 0.015], "saturation": [0.9, 1.1], "value": [0.88, 1.08]}
@@ -892,6 +893,9 @@ class Spec:
         self.cam_height = cam_height
         self.curve_shape = curve_shape
         self.preview_uv_scale = preview_uv_scale
+        # Kachelgroesse im Spiel (Einheiten); Standard = physikalisches Mass / 1,85 m
+        gt = game_tile if game_tile is not None else (self.tile_m[0] / GAME_UNIT_M)
+        self.game_tile = (gt, gt * self.tile_m[1] / self.tile_m[0])
 
     @property
     def work(self):
@@ -1195,8 +1199,10 @@ def _box_uv_mesh(name, sx, sy, sz, T, mat):
     return ob
 
 
-def _preview_material(spec, tdir, res_tag):
-    from_png = lambda k: os.path.join(tdir, f"{k}_{res_tag}.png")
+def _preview_material(spec, tdir):
+    def from_png(k):  # ausgelieferte WebP-Datei der Stufe Mittel (1024)
+        p = os.path.join(tdir, f"{k}_1024.webp")
+        return p if os.path.exists(p) else os.path.join(tdir, f"{k}.webp")
     m = bpy.data.materials.new(spec.name + "_preview")
     m.use_nodes = True
     nt = m.node_tree
@@ -1213,7 +1219,7 @@ def _preview_material(spec, tdir, res_tag):
             im.alpha_mode = "STRAIGHT"
         n = nt.nodes.new("ShaderNodeTexImage")
         n.image = im
-        n.interpolation = "Cubic" if False else "Linear"
+        n.interpolation = "Linear"
         nt.links.new(uvn.outputs[0], n.inputs[0])
         return n
 
@@ -1271,7 +1277,7 @@ def _look_at(ob, target):
     ob.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
 
 
-def render_preview(spec, tdir, out_jpg, res_tag="1k", samples=None):
+def render_preview(spec, tdir, out_jpg, samples=None):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     s = bpy.context.scene
     s.render.engine = "CYCLES"
@@ -1286,6 +1292,7 @@ def render_preview(spec, tdir, out_jpg, res_tag="1k", samples=None):
     except Exception:
         pass
     s.cycles.max_bounces = 4
+    s.cycles.transparent_max_bounces = 64
     s.render.resolution_x = 1280
     s.render.resolution_y = 720
     s.view_settings.view_transform = "AgX"
@@ -1296,9 +1303,10 @@ def render_preview(spec, tdir, out_jpg, res_tag="1k", samples=None):
     bg.inputs["Color"].default_value = (0.42, 0.52, 0.68, 1)
     bg.inputs["Strength"].default_value = 0.45
     s.world = w
-    T = spec.tile_m
+    # Vorschau im Spielmassstab: eine Wiederholung = tile (Spiel-Einheiten) * 1,85 m
+    T = (spec.game_tile[0] * GAME_UNIT_M, spec.game_tile[1] * GAME_UNIT_M)
     Tm = max(T)
-    mat = _preview_material(spec, tdir, res_tag)
+    mat = _preview_material(spec, tdir)
     gm = bpy.data.materials.new("ground")
     gm.use_nodes = True
     gm.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.16, 0.15, 0.14, 1)
@@ -1337,7 +1345,7 @@ def render_preview(spec, tdir, out_jpg, res_tag="1k", samples=None):
         mesh_from_arrays("Ground", gv, gq, smooth=False, material=gm)
         target = (0.0, 0.0, 0.55)
         cam_dir = mathutils.Vector((0.35, -1.0, 0.3)).normalized()
-        dist = 3.2
+        dist = 4.6
         sun_d = mathutils.Vector((-0.4, 0.8, -0.45)).normalized()  # Gegenlicht-Anteil
     if sph is not None:
         sph.data.materials.append(mat)
@@ -1402,61 +1410,122 @@ def _foliage_preview_bush(spec, mat):
 # --------------------------------------------------------------------------------------
 
 def texel_density(spec, res):
-    return round(res / (spec.tile_m[0] / GAME_UNIT_M), 1)
+    return round(res / spec.game_tile[0], 1)
 
 
-def write_material_json(spec, M, sizes, seams):
-    tu = [round(spec.tile_m[0] / GAME_UNIT_M, 4), round(spec.tile_m[1] / GAME_UNIT_M, 4)]
-    tiers_avail = list(spec.tiers)
-    tier_map = {"high": "2k" if "2k" in tiers_avail else "1k", "medium": "1k", "low": "512"}
-    files = {}
-    for k in ("albedo", "normal", "orm"):
-        files[k] = {t: {f: f"{k}_{t}.{f}" for f in ("ktx2", "webp") if os.path.exists(
-            os.path.join(TEX_OUT, spec.name, f"{k}_{t}.{f}"))} for t in tiers_avail}
-    j = {
-        "name": spec.name,
-        "schema": 1,
-        "description": spec.description,
-        "tileSize": tu,
-        "tileSizeMeters": [spec.tile_m[0], spec.tile_m[1]],
-        "orientation": spec.orientation,
-        "tiled": spec.tiled,
-        "factors": {"baseColor": [1.0, 1.0, 1.0], "roughness": spec.roughness_factor,
-                    "metalness": spec.metalness_factor, "normalScale": spec.normal_scale, "aoIntensity": 1.0},
-        "tint": spec.tint,
-        "texelDensity": {t: texel_density(spec, TIER_RES[t]) for t in tiers_avail},
-        "recommendedTexelDensity": 256,
-        "resolutions": {t: TIER_RES[t] for t in tiers_avail},
-        "tiers": tier_map,
-        "maps": {
-            "albedo": {"colorSpace": "srgb", "channels": "RGB" + ("A=alpha" if spec.alpha else ""),
-                       "files": files["albedo"]},
-            "normal": {"colorSpace": "linear", "convention": "OpenGL (+Y oben), Tangentenraum, glTF-konform",
-                       "files": files["normal"]},
-            "orm": {"colorSpace": "linear", "channels": "R=AO, G=Roughness, B=Metallic, A=Hoehe (0..1)",
-                    "files": files["orm"]},
-        },
-        "height": {"channel": "orm.a", "rangeMeters": [round(v, 5) for v in M["height_range_m"]],
-                   "depthMeters": round(M["height_range_m"][1] - M["height_range_m"][0], 5)},
-        "alphaMode": "MASK" if spec.alpha else "OPAQUE",
-        "bytes": sizes,
-        "seamCheck": seams,
-        "source": {"script": f"assets/blender/materials/{spec.name}.py", "seed": spec.seed,
-                   "blend": f"assets/src/materials/{spec.name}.blend" if os.path.exists(
-                       os.path.join(SRC_OUT, spec.name + ".blend")) else None},
-        "license": "Eigenerstellung StrongPoly (prozedural in Blender erzeugt), siehe assets/LICENSES.md",
-    }
-    if spec.alpha:
-        j["alphaCutoff"] = spec.alpha_cutoff
-    if spec.translucency:
-        j["translucency"] = spec.translucency
-    if spec.atlas:
-        j["atlas"] = spec.atlas
-    if spec.notes:
-        j["notes"] = spec.notes
-    with open(os.path.join(TEX_OUT, spec.name, "material.json"), "w", encoding="utf-8") as f:
-        json.dump(j, f, indent=2, ensure_ascii=False)
-        f.write("\n")
+MATERIALS_JSON = os.path.join(REPO, "assets", "materials.json")
+SRC_TEX = os.path.join(REPO, "assets", "src", "textures")
+TEX_TOOL = os.path.join(REPO, "assets", "blender", "tools", "textures.py")
+
+
+def _hex(lin_rgb):
+    c = lin2srgb(np.asarray(lin_rgb, np.float64))
+    return "#" + "".join(f"{int(round(v * 255)):02x}" for v in c)
+
+
+def _fmt_entry(d):
+    """Eine Zeile je Material wie in assets/materials.json ueblich."""
+    return "{ " + json.dumps(d, ensure_ascii=False, separators=(", ", ": "))[1:-1] + " }"
+
+
+def update_library_entry(spec, M, src_res):
+    """Traegt Kachelgroesse, Rueckfallwerte und Bibliotheks-Infos in assets/materials.json ein (einzige Quelle der
+    Materialdaten). Bestehende Felder wie dirt/alphaTest/doubleSided bleiben erhalten."""
+    import fcntl
+    m = M["alpha"] > 0.5 if spec.alpha else np.ones(M["rough"].shape, bool)
+    with open(MATERIALS_JSON + ".lock", "w") as lk:
+        fcntl.flock(lk, fcntl.LOCK_EX)
+        with open(MATERIALS_JSON, encoding="utf-8") as f:
+            lib = json.load(f)
+        d = lib["materials"].get(spec.name, {})
+        d["base"] = _hex(M["albedo"][m].mean(0))
+        d["rough"] = round(float(M["rough"][m].mean()), 2)
+        d["metal"] = round(float(M["metal"][m].mean()), 2)
+        d["tile"] = round(spec.game_tile[0], 3)
+        d.setdefault("dirt", "#40362a")
+        if spec.alpha:
+            d["alphaTest"] = spec.alpha_cutoff
+            d["doubleSided"] = True
+        if spec.normal_scale != 1.0:
+            d["normalScale"] = spec.normal_scale
+        info = {
+            "desc": spec.description,
+            "orient": spec.orientation,
+            "tileM": [spec.tile_m[0], spec.tile_m[1]],
+            "srcPx": src_res,
+            "texelPerUnit": texel_density(spec, src_res),
+            "heightMm": round((M["height_range_m"][1] - M["height_range_m"][0]) * 1000, 1),
+            "tint": spec.tint,
+            "script": f"assets/blender/materials/{spec.name}.py",
+            "seed": spec.seed,
+        }
+        if spec.notes:
+            info["notes"] = spec.notes
+        if spec.translucency:
+            info["translucency"] = spec.translucency
+        if spec.atlas:
+            info["atlas"] = spec.atlas
+        d["info"] = info
+        lib["materials"][spec.name] = d
+        lines = ["{", '  "_doc": ' + json.dumps(lib["_doc"], ensure_ascii=False) + ",", '  "materials": {']
+        names = list(lib["materials"].keys())
+        for i, n in enumerate(names):
+            lines.append(f'    "{n}": ' + _fmt_entry(lib["materials"][n]) + ("," if i < len(names) - 1 else ""))
+        lines += ["  }", "}", ""]
+        tmp = MATERIALS_JSON + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+        os.replace(tmp, MATERIALS_JSON)
+        fcntl.flock(lk, fcntl.LOCK_UN)
+    try:
+        os.remove(MATERIALS_JSON + ".lock")
+    except OSError:
+        pass
+
+
+def write_sources(spec, M, src_res):
+    """Verlustfreie Quellen nach assets/src/textures/<M_Name>/ (Konvention der Pipeline):
+    albedo.png (sRGB, RGBA bei Alpha), normal.png (OpenGL +Y), orm.png (R AO, G Rauheit, B Metall),
+    zusaetzlich height.png (16 bit, 0..1 ueber heightMm; von der Laufzeit derzeit nicht genutzt)."""
+    from PIL import Image
+    R = downscale(M, src_res, spec.tiled)
+    maps = pack_maps(R, spec)
+    d = os.path.join(SRC_TEX, spec.name)
+    os.makedirs(d, exist_ok=True)
+    for k in ("albedo", "normal"):
+        save_png(maps[k], os.path.join(d, k + ".png"))
+    save_png(np.ascontiguousarray(maps["orm"][..., :3]), os.path.join(d, "orm.png"))
+    h16 = np.clip(np.round(R["height"] * 65535), 0, 65535).astype(np.uint16)
+    Image.fromarray(h16).save(os.path.join(d, "height.png"))
+    return R, maps
+
+
+def run_texture_tool(name):
+    """Werkzeug der Pipeline: Quellen -> WebP (+ _512/_1024) und Manifest."""
+    r = subprocess.run([sys.executable, TEX_TOOL, f"--only={name}"], cwd=REPO, stdout=subprocess.PIPE,
+                       stderr=subprocess.STDOUT, text=True)
+    out = r.stdout.strip().splitlines()
+    log("textures.py:", " | ".join(x for x in out if name in x) or (out[-1] if out else ""))
+    if r.returncode != 0:
+        raise RuntimeError("textures.py fehlgeschlagen:\n" + r.stdout[-2000:])
+    sizes = {}
+    tdir = os.path.join(TEX_OUT, name)
+    for f in sorted(os.listdir(tdir)):
+        if f.endswith(".webp"):
+            sizes[f] = os.path.getsize(os.path.join(tdir, f))
+    return sizes
+
+
+def ktx2_measure(spec, maps1k):
+    """Nur Messung fuer die Formatentscheidung (Phase 5B): KTX2 der 1024er Karten im Arbeitsordner."""
+    out = {}
+    for k, arr in maps1k.items():
+        png = os.path.join(spec.work, f"{k}_1k.png")
+        save_png(arr if k != "orm" else np.ascontiguousarray(arr[..., :3]), png)
+        dst = os.path.join(spec.work, f"{k}_1k.ktx2")
+        encode_ktx2(png, dst, k)
+        out[k] = os.path.getsize(dst)
+    return out
 
 
 def save_blend(spec):
@@ -1478,12 +1547,11 @@ def save_blend(spec):
 def run(spec, build, post_extra=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", default="all", choices=["all", "render", "post", "preview"])
-    ap.add_argument("--formats", default=os.environ.get("STRONGPOLY_MAT_FORMATS", "ktx2"))
+    ap.add_argument("--ktx2", action="store_true", help="zusaetzlich KTX2 (1024) im Arbeitsordner messen")
     args, _ = ap.parse_known_args(sys.argv[1:])
     exr = os.path.join(spec.work, "passes.exr")
-    tdir = os.path.join(TEX_OUT, spec.name)
-    os.makedirs(tdir, exist_ok=True)
     os.makedirs(DOC_OUT, exist_ok=True)
+    src_res = 2048 if "2k" in spec.tiers else 1024
     t0 = time.time()
     if args.stage in ("all", "render"):
         s, tile = new_scene(spec)
@@ -1491,42 +1559,27 @@ def run(spec, build, post_extra=None):
         if spec.tiled:
             tile_instances(tile, spec.tile_m)
         s.cycles.samples = spec.samples
-        blend_size = save_blend(spec)
+        save_blend(spec)
         render_exr(exr)
-        with open(os.path.join(spec.work, "blend_size.txt"), "w") as f:
-            f.write(str(blend_size))
     if args.stage in ("all", "render", "post"):
         P = load_exr(exr)
         M = postprocess(spec, P, post_extra)
         np.savez_compressed(os.path.join(spec.work, "master.npz"),
                             **{k: v.astype(np.float16) for k, v in M.items() if isinstance(v, np.ndarray)})
-        sizes = {}
-        seams = {}
-        fmts = [f.strip() for f in args.formats.split(",") if f.strip()]
-        for f in os.listdir(tdir):
-            if f.split(".")[0].rsplit("_", 1)[-1] in TIER_RES and f.split(".")[-1] in ("ktx2", "webp", "png", "jpg"):
-                os.remove(os.path.join(tdir, f))
-        for t in spec.tiers:
-            R = downscale(M, TIER_RES[t], spec.tiled)
-            maps = pack_maps(R, spec)
-            sizes[t] = {}
-            for k, arr in maps.items():
-                png = os.path.join(spec.work, f"{k}_{t}.png")
-                save_png(arr, png)
-                if "ktx2" in fmts:
-                    dst = os.path.join(tdir, f"{k}_{t}.ktx2")
-                    encode_ktx2(png, dst, k)
-                    sizes[t][k + ".ktx2"] = os.path.getsize(dst)
-                if "webp" in fmts:
-                    dst = os.path.join(tdir, f"{k}_{t}.webp")
-                    encode_webp(arr, dst, k)
-                    sizes[t][k + ".webp"] = os.path.getsize(dst)
-            if t == "1k" and spec.tiled:
-                seams = {k: [round(v, 3) for v in seam_metric(maps[k][..., :3])] for k in maps}
-                save_seam_sheet(maps, os.path.join(spec.work, "seam_2x2.jpg"))
-        write_material_json(spec, M, sizes, seams)
-        log("Groessen:", json.dumps(sizes), "Naht:", json.dumps(seams))
+        write_sources(spec, M, src_res)
+        R1 = downscale(M, 1024, spec.tiled)
+        maps1 = pack_maps(R1, spec)
+        info = {"srcPx": src_res}
+        if spec.tiled:
+            info["seam"] = {k: [round(v, 3) for v in seam_metric(maps1[k][..., :3])] for k in maps1}
+            save_seam_sheet(maps1, os.path.join(spec.work, "seam_2x2.jpg"))
+        update_library_entry(spec, M, src_res)
+        info["webp"] = run_texture_tool(spec.name)
+        if args.ktx2:
+            info["ktx2_1k"] = ktx2_measure(spec, maps1)
+        with open(os.path.join(spec.work, "info.json"), "w") as f:
+            json.dump(info, f, indent=1)
+        log("Info:", json.dumps(info))
     if args.stage in ("all", "preview"):
-        render_preview(spec, spec.work, os.path.join(DOC_OUT, spec.name + ".jpg"),
-                       res_tag="1k" if "1k" in spec.tiers else spec.tiers[0])
+        render_preview(spec, os.path.join(TEX_OUT, spec.name), os.path.join(DOC_OUT, spec.name + ".jpg"))
     log(f"{spec.name} fertig in {time.time() - t0:.0f}s")
