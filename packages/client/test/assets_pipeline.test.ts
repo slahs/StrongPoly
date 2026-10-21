@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { describe, expect, it } from 'vitest';
 import { BT, BUILDINGS, BuildingRec, ClientBuilding, ClientWorld, GameMap, U } from '@strongpoly/shared';
-import { buildingKey, buildingTypeOf, targetKey, validateManifest, wallKey } from '../src/render/assets/manifest';
+import { buildingKey, buildingTypeOf, targetKey, validateManifest, variantKey, variantOf, wallKey } from '../src/render/assets/manifest';
 import type { AssetManifest } from '../src/render/assets/manifest';
 import { convertGeometry, mergedLod, modelFromScene } from '../src/render/assets/model';
 import { lodCfgOf, lodScale, pickLod } from '../src/render/assets/lod';
@@ -72,6 +72,21 @@ describe('Asset-Manifest (public/assets/manifest.json)', () => {
     expect(targetKey({ prop: 'woodpile' })).toBeNull();
     expect(parseStyle('medieval')).toBe('medieval');
     expect(parseStyle('x')).toBeNull();
+  });
+  it('Modellvarianten: eigener Schlüssel je Variante, Auswahl stabil je Gebäude-ID und gestreut', () => {
+    expect(targetKey({ building: 'Hovel', variant: 1 })).toBe(variantKey(BT.Hovel, 1));
+    expect(targetKey({ building: 'Hovel', variant: 0 })).toBe(buildingKey(BT.Hovel));
+    expect(targetKey({ building: 'Hovel', variant: 1.5 })).toBeNull();
+    const m = JSON.parse(JSON.stringify(MANIFEST)) as AssetManifest;
+    m.assets.well_b = { ...JSON.parse(JSON.stringify(MANIFEST.assets.well)), id: 'well_b', target: { building: 'Well', variant: 1 } };
+    expect(validateManifest(m, exists).filter((p) => p.startsWith('well_b'))).toEqual([]);
+    for (let id = 1; id < 50; id++) expect(variantOf(id, 2)).toBe(variantOf(id, 2));
+    const counts = [0, 0];
+    for (let id = 1; id <= 40; id++) counts[variantOf(id, 2)]++;
+    expect(Math.min(...counts)).toBeGreaterThan(10);
+    // vier aufeinanderfolgende IDs (typische Häusergruppe) nutzen beide Varianten
+    expect(new Set([5, 6, 7, 8].map((id) => variantOf(id, 2))).size).toBe(2);
+    expect(variantOf(7, 1)).toBe(0);
   });
 });
 
@@ -279,6 +294,21 @@ describe('Override-Register und Rückfall', () => {
     expect(r.forBuilding(BT.Keep)?.id).toBe('well');
     r.setStyle('classic');
     expect(r.forBuilding(BT.Well)).toBeNull();
+  });
+  it('Modellvarianten im Register: Variante je Gebäude-ID, Rückfall auf das Grundmodell', async () => {
+    const def = MANIFEST.assets.well;
+    const man = JSON.parse(JSON.stringify(MANIFEST)) as AssetManifest;
+    man.assets.well_b = { ...JSON.parse(JSON.stringify(def)), id: 'well_b', target: { building: 'Well', variant: 1 } };
+    const r = stubRegistry(() => parseGlb(def.file), man);
+    r.setStyle('medieval');
+    await r.preload();
+    expect(r.variants.get(buildingKey(BT.Well))).toBe(1);
+    expect(r.forBuilding(BT.Well)?.id).toBe('well');
+    const ids = [1, 2, 3, 4, 5, 6, 7, 8].map((id) => r.forBuilding(BT.Well, id)?.id);
+    expect(new Set(ids)).toEqual(new Set(['well', 'well_b']));
+    for (let id = 1; id <= 8; id++) expect(r.forBuilding(BT.Well, id)?.id).toBe(variantOf(id, 2) ? 'well_b' : 'well');
+    r.register(variantKey(BT.Well, 1), null);
+    for (let id = 1; id <= 8; id++) expect(r.forBuilding(BT.Well, id)?.id).toBe('well');
   });
   it('AssetTypeMesh: ein InstancedMesh je LOD × Material, LOD nach Kameraabstand, relod nur bei Änderung', async () => {
     const def = MANIFEST.assets.well;

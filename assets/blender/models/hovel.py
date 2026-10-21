@@ -172,7 +172,7 @@ for wi, (w, ms) in enumerate(walls):
                 lod0.append(town.peg(f'pegp{wi}_{i}_{z:.2f}', w.p((u0 + u1) / 2 + rnd.uniform(-0.01, 0.01), z, 0.0), w.out,
                                      rot=rnd.uniform(-0.3, 0.3)))
 # Balkenkoepfe der Dachbalken ueber dem Rahm (Traufseiten)
-for k, x in enumerate((-0.68, -0.23, 0.23, 0.68)):
+for k, x in enumerate((-0.68, -0.23, 0.23, 0.68) if VARIANT == 'a' else ()):
     for sy, yy in ((-1, Y0), (1, Y1)):
         lod0.append(town.timber(f'beamhead_{k}_{sy}', (x, yy - sy * 0.3, Z_PL1 + 0.045), (x, yy + sy * 0.07, Z_PL1 + 0.045),
                                 0.085, 0.09, ch=0.01, rnd=rnd))
@@ -330,20 +330,33 @@ if VARIANT == 'a':
     A.add(ridge, mat='M_Ground_Grass', uv_mode='box', build=(0.9, 0.95), smooth=50, dirt=1.0, lod1='keep', lod2='keep')
     ROOF_Z = S.z
 else:
-    RIDGE = Z_PL1 + 0.05 + 0.08 + (LY / 2) * t50
+    RIDGE = Z_PL1 + 0.07 + (LY / 2) * t50
     R = town.GableRoof(XE, YE, RIDGE, PITCH, sag=0.03, cy=CY, seed=3)
     ROOF_Z = R.z
     rows0 = []
     for side in (-1, 1):
-        rows0 += town.course_rows(f'shingle{side}', R, side, rows=9, row_thick=0.028, depth0=0.03, seed=7 + side, tooth=0.012,
-                                  nseg=6, jitter=0.01, x_split=[-XE, -0.2 + rnd.uniform(-0.1, 0.1), XE])
+        rows0 += town.course_rows(f'shingle{side}', R, side, rows=10, row_thick=0.03, depth0=0.03, seed=7 + side, tooth=0.016,
+                                  nseg=7, jitter=0.01, lean=True, split=True)
     sh0 = mesh.join(rows0, 'shingles')
     town.uv_roof(sh0, R, tile=2.0, seed=2)
+    town.grime_attr(sh0, lambda x, y, z: (0.3 if y > CY else 0.08) + 0.35 * max(0.0, __import__('mathutils').noise.noise(Vector((x * 2.4, y * 2.4, 0.3)))))
+    soff = []
+    for side in (-1, 1):
+        bmS = __import__('bmesh').new()
+        pts = [bmS.verts.new((xx, CY + yy, R.z_main(xx, CY + yy) - 0.004)) for (xx, yy) in ((-XE, side * YE), (XE, side * YE), (XE, 0.0), (-XE, 0.0))]
+        f = bmS.faces.new(pts)
+        bmS.normal_update()
+        if f.normal.z > 0:
+            f.normal_flip()
+        soff.append(mesh.obj_from_bm(f'roof_under{side}', bmS))
+    so = mesh.join(soff, 'roof_underside')
+    uv.box(so, tile=2.0)
+    A.add(so, mat='M_Wood_Planks', uv_mode=None, build=(0.68, 0.75), smooth=0, dirt=1.5)
     A.add(sh0, mat='M_Roof_Shingle', uv_mode=None, only=0, build=(0.7, 0.93), smooth=0, dirt=1.2)
     for L, rows in ((1, 4), (2, 1)):
         objs = []
         for side in (-1, 1):
-            objs += town.course_rows(f'shingleL{L}{side}', R, side, rows=rows, row_thick=0.04, depth0=0.03, seed=3, nseg=1, jitter=0.0)
+            objs += town.course_rows(f'shingleL{L}{side}', R, side, rows=rows, row_thick=0.04, depth0=0.03, seed=3, nseg=1, jitter=0.0, lean=True)
         o = mesh.join(objs, f'shingles_L{L}')
         town.uv_roof(o, R, tile=2.0, seed=2)
         A.add(o, mat='M_Roof_Shingle', uv_mode=None, only=L, build=(0.7, 0.93), smooth=0, dirt=1.2)
@@ -367,34 +380,64 @@ for side in (-1, 1):
                                 0.055, 0.07, ch=0.0, rnd=rnd))
 A.add(mesh.join(raft, 'rafters'), mat='M_Timber_Oak', uv_mode=None, build=(0.58, 0.72), smooth=0, lod1='drop', lod2='drop')
 
-gb = []
-gx = X1 + 0.03
-for sx in (-1, 1):
-    n = 9
-    y_lo, y_hi = Y0 - 0.02, Y1 + 0.02
-    for k in range(n):
-        ya = y_lo + (y_hi - y_lo) * k / n + 0.003
-        yb = y_lo + (y_hi - y_lo) * (k + 1) / n - 0.003
-        zt_a = R.under_z(sx * gx, ya, TH_UNDER) - 0.015
-        zt_b = R.under_z(sx * gx, yb, TH_UNDER) - 0.015
-        zb = Z_PL1 - 0.06 - rnd.uniform(0.0, 0.025)
-        if min(zt_a, zt_b) < zb + 0.05:
-            continue
-        pts = [(ya, zb), (yb, zb), (yb, zt_b), (ya, zt_a)]
-        bmb = __import__('bmesh').new()
-        v0 = [bmb.verts.new((sx * gx, y, z)) for (y, z) in pts]
-        v1 = [bmb.verts.new((sx * (gx - 0.025), y, z)) for (y, z) in pts]
-        bmb.faces.new(v0)
-        bmb.faces.new(list(reversed(v1)))
-        for i in range(4):
-            j = (i + 1) % 4
-            bmb.faces.new((v0[i], v1[i], v1[j], v0[j]))
-        __import__('bmesh').ops.recalc_face_normals(bmb, faces=bmb.faces)
-        gb.append(mesh.obj_from_bm(f'gableboard{sx}_{k}', bmb))
-    # Deckleisten auf den Fugen
-gbo = mesh.join(gb, 'gable_boards')
-uv.box(gbo, tile=2.0, space='object', along='z')
-A.add(gbo, mat='M_Wood_Planks', uv_mode=None, build=(0.55, 0.74), smooth=0, dirt=1.1, lod2='keep')
+if VARIANT == 'a':
+    gb = []
+    gx = X1 + 0.03
+    for sx in (-1, 1):
+        n = 9
+        y_lo, y_hi = Y0 - 0.02, Y1 + 0.02
+        for k in range(n):
+            ya = y_lo + (y_hi - y_lo) * k / n + 0.003
+            yb = y_lo + (y_hi - y_lo) * (k + 1) / n - 0.003
+            zt_a = R.under_z(sx * gx, ya, TH_UNDER) - 0.015
+            zt_b = R.under_z(sx * gx, yb, TH_UNDER) - 0.015
+            zb = Z_PL1 - 0.06 - rnd.uniform(0.0, 0.025)
+            if min(zt_a, zt_b) < zb + 0.05:
+                continue
+            pts = [(ya, zb), (yb, zb), (yb, zt_b), (ya, zt_a)]
+            bmb = __import__('bmesh').new()
+            v0 = [bmb.verts.new((sx * gx, y, z)) for (y, z) in pts]
+            v1 = [bmb.verts.new((sx * (gx - 0.025), y, z)) for (y, z) in pts]
+            bmb.faces.new(v0)
+            bmb.faces.new(list(reversed(v1)))
+            for i in range(4):
+                j = (i + 1) % 4
+                bmb.faces.new((v0[i], v1[i], v1[j], v0[j]))
+            __import__('bmesh').ops.recalc_face_normals(bmb, faces=bmb.faces)
+            gb.append(mesh.obj_from_bm(f'gableboard{sx}_{k}', bmb))
+        # Deckleisten auf den Fugen
+    gbo = mesh.join(gb, 'gable_boards')
+    uv.box(gbo, tile=2.0, space='object', along='z')
+    A.add(gbo, mat='M_Wood_Planks', uv_mode=None, build=(0.55, 0.74), smooth=0, dirt=1.1, lod2='keep')
+else:
+    # Variante B: Fachwerkgiebel mit Putz (Ortgangsparren, Kehlriegel, Giebelstaender, Streben)
+    G0, G1, G2 = [], [], []
+    for gi, (w0, w1, out) in enumerate((((X0, Y1), (X0, Y0), (-1, 0)), ((X1, Y0), (X1, Y1), (1, 0)))):
+        gw = town.Wall(w0, w1, out, Z_PL1, RIDGE)
+
+        def zt(u):
+            return RIDGE - 0.1 - abs(u - LY / 2) * t50
+        ZK = Z_PL1 + 0.42
+        uk = (RIDGE - 0.1 - 0.08 - ZK) / t50
+        ms = [
+            (-0.03, zt(-0.03) - 0.06, LY / 2, zt(LY / 2) - 0.07, 0.1, 'rafter'),
+            (LY + 0.03, zt(LY + 0.03) - 0.06, LY / 2, zt(LY / 2) - 0.07, 0.1, 'rafter'),
+            (LY / 2 - uk, ZK, LY / 2 + uk, ZK, 0.07, 'rail'),
+            (LY / 2, Z_PL1, LY / 2 + rnd.uniform(-0.01, 0.01), zt(LY / 2) - 0.1, 0.09, 'post'),
+            (0.22, Z_PL1 + 0.02, LY / 2 - 0.05, ZK - 0.04, 0.07, 'brace'),
+            (LY - 0.22, Z_PL1 + 0.02, LY / 2 + 0.05, ZK - 0.04, 0.07, 'brace'),
+        ]
+        g0, g1, g2 = town.frame_lods(gw, ms, rnd, f'gfw{gi}', Z_PL1, RIDGE - 0.25, pegs=True, post_pegs=False)
+        G0 += g0
+        G1 += g1
+        G2 += g2
+        gp = town.plaster_gable(gw, f'gable_plaster{gi}', 0.02, LY - 0.02, Z_PL1, LY / 2, zt(LY / 2) - 0.1, rnd)
+        A.add(gp, mat='M_Plaster_Lime', uv_mode='box', only=0, build=(0.55, 0.74), smooth=0)
+        gp1 = town.plaster_gable(gw, f'gable_plaster{gi}_L1', 0.02, LY - 0.02, Z_PL1, LY / 2, zt(LY / 2) - 0.1, rnd, cell=0.6, bulge=0.0)
+        A.add(gp1, mat='M_Plaster_Lime', uv_mode='box', only=(1, 2), build=(0.55, 0.74), smooth=0)
+    A.add(mesh.join(G0, 'gable_frame'), mat='M_Timber_Oak', uv_mode=None, only=0, build=(0.5, 0.7), smooth=30, wear=1.3)
+    A.add(mesh.join(G1, 'gable_frame_L1'), mat='M_Timber_Oak', uv_mode=None, only=1, build=(0.5, 0.7), smooth=0)
+    A.add(mesh.join(G2, 'gable_frame_L2'), mat='M_Timber_Oak', uv_mode=None, only=2, build=(0.5, 0.7), smooth=0)
 # Windbretter: entlang der Ortgangkante unter der Dachhaut
 wb_ = []
 for sx in (-1, 1):

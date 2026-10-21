@@ -1,7 +1,7 @@
 import type * as THREE from 'three';
 import type { QualityCfg } from '../quality';
 import { AssetMaterials } from './materials';
-import { buildingKey, targetKey, unitKey, validateManifest, wallKey } from './manifest';
+import { buildingKey, targetKey, unitKey, validateManifest, variantKey, variantOf, wallKey } from './manifest';
 import type { AssetDef, AssetManifest, WallPiece } from './manifest';
 import { modelFromScene } from './model';
 import type { AssetModel } from './model';
@@ -56,6 +56,8 @@ export class AssetRegistry {
   problems: string[] = [];
   /** Zielschlüssel → Asset-ID */
   readonly overrides = new Map<string, string>();
+  /** Gebäudeschlüssel (`b:<BT>`) → Anzahl lückenloser Modellvarianten 1..n neben dem Grundmodell */
+  readonly variants = new Map<string, number>();
   private manual = new Map<string, string | null>();
   private models = new Map<string, AssetModel>();
   private pending = new Map<string, Promise<AssetModel | null>>();
@@ -132,6 +134,14 @@ export class AssetRegistry {
     for (const [k, v] of this.manual) {
       if (v === null) this.overrides.delete(k);
       else this.overrides.set(k, v);
+    }
+    this.variants.clear();
+    for (const k of this.overrides.keys()) {
+      const m = /^(b:\d+)#\d+$/.exec(k);
+      if (!m || this.variants.has(m[1])) continue;
+      let n = 0;
+      while (this.overrides.has(`${m[1]}#${n + 1}`)) n++;
+      this.variants.set(m[1], n);
     }
   }
 
@@ -224,8 +234,18 @@ export class AssetRegistry {
     return null;
   }
 
-  forBuilding(bt: number): AssetModel | null {
-    return this.forKey(buildingKey(bt));
+  /** Modell eines Gebäudetyps; mit `id` (Gebäude-ID) ggf. eine Modellvariante (stabil je Gebäude, Rückfall Grundmodell) */
+  forBuilding(bt: number, id?: number): AssetModel | null {
+    const base = buildingKey(bt);
+    const n = id !== undefined && id >= 0 ? (this.variants.get(base) ?? 0) : 0;
+    if (n > 0) {
+      const v = variantOf(id as number, n + 1);
+      if (v > 0) {
+        const m = this.forKey(variantKey(bt, v));
+        if (m) return m;
+      }
+    }
+    return this.forKey(base);
   }
 
   forWall(bt: number, piece: WallPiece): AssetModel | null {
