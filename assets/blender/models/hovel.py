@@ -472,7 +472,7 @@ for v in chim.data.vertices:
     v.co.x += rnd.uniform(-0.008, 0.008)
     v.co.y += rnd.uniform(-0.008, 0.008)
 town.grime_attr(chim, lambda x, y, z: max(0.0, (z - (ch_top - 0.35)) / 0.35) * 0.8)
-A.add(chim, mat='M_Stone_Rubble', uv_mode='box', build=(0.3, 0.9), smooth=0, dirt=1.2)
+A.add(chim, mat='M_Stone_Rubble', uv_mode='box', build=(0.76, 0.95), smooth=0, dirt=1.2)
 caps = [mesh.stone('chim_cap', (0.33, 0.31, 0.06), loc=(cx, cyk, ch_top + 0.02), seed=3, rough=0.03, subdiv=0, bevel=0.2),
         mesh.stone('chim_band', (0.3, 0.28, 0.05), loc=(cx, cyk, ch_top - 0.17), seed=4, rough=0.03, subdiv=0, bevel=0.2)]
 cp = mesh.join(caps, 'chimney_cap')

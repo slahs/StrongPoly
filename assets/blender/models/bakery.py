@@ -467,25 +467,9 @@ A.add(ar, mat='M_Stone_Rubble', uv_mode='box', build=(0.4, 0.48), smooth=20, dir
 ar['sp_grime'] = 0.6
 # Rauchabzug ueber dem Ofenloch
 CH_TOP = 2.7
-z = OZ + 0.6
-courses = []
-k = 0
-while z < CH_TOP - 0.02:
-    h = min(rnd.uniform(0.2, 0.27), CH_TOP - z)
-    t = (z - OZ - 0.6) / (CH_TOP - OZ - 0.6)
-    w_ = 0.27 * (1.0 - 0.1 * t) + rnd.uniform(-0.008, 0.008)
-    d_ = 0.22 * (1.0 - 0.1 * t) + rnd.uniform(-0.008, 0.008)
-    ox, oy = rnd.uniform(-0.008, 0.008), rnd.uniform(-0.006, 0.006)
-    ang = rnd.uniform(-0.05, 0.05)
-    courses.append(town.timber(f'chim_c{k}', (mcx + ox, OY0 + 0.1 + oy, z), (mcx + ox, OY0 + 0.1 + oy, z + h), d_, w_, ch=0.0,
-                               up=(math.cos(ang), math.sin(ang), 0), rnd=rnd))
-    z += h
-    k += 1
-chim = mesh.join(courses, 'oven_chimney')
+chim = town.chimney_shaft('oven_chimney', mcx, OY0 + 0.1, OZ + 0.6, CH_TOP, 0.28, 0.23, rnd, rings=5)
 town.grime_attr(chim, lambda x, y, z: max(0.0, (z - (CH_TOP - 0.5)) / 0.5) * 0.9 + 0.2)
-A.add(chim, mat='M_Stone_Rubble', uv_mode='box', build=(0.45, 0.9), smooth=0, dirt=1.2, lod1=0.45, lod2='drop')
-chl = town.subdivided_box('oven_chimney_L2', (0.26, 0.21, CH_TOP - (OZ + 0.6)), loc=(mcx, OY0 + 0.1, OZ + 0.6), cuts=1)
-A.add(chl, mat='M_Stone_Rubble', uv_mode='box', only=2, build=(0.45, 0.9), smooth=0)
+A.add(chim, mat='M_Stone_Rubble', uv_mode='box', build=(0.45, 0.9), smooth=0, dirt=1.2, lod1='keep', lod2='keep')
 ccap = [town.timber('ch_cap', (mcx - 0.165, OY0 + 0.1, CH_TOP + 0.045), (mcx + 0.165, OY0 + 0.1, CH_TOP + 0.045), 0.29, 0.05, ch=0.012, rnd=rnd),
         town.timber('ch_band', (mcx - 0.155, OY0 + 0.1, CH_TOP - 0.42), (mcx + 0.155, OY0 + 0.1, CH_TOP - 0.42), 0.27, 0.05, ch=0.012, rnd=rnd)]
 cc = mesh.join(ccap, 'chimney_cap')

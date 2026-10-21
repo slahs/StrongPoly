@@ -500,10 +500,10 @@ def uv_roof(obj, R, tile=3.0, seed=0):
         hip = abs(n.x) > abs(n.y) * 1.2 and abs(n.x) > 0.25
         for li in p.loop_indices:
             co = me.vertices[me.loops[li].vertex_index].co
-            if hip:
+            if abs(n.z) < 0.35:  # senkrechte Schnittflaechen (Traufe, Ortgang, Lagenstirn): V = Hoehe
+                u, v = (co.y, co.z) if abs(n.x) > abs(n.y) else (co.x, co.z)
+            elif hip:
                 u, v = co.y * math.copysign(1, co.x), (R.xe - abs(co.x)) * kh
-            elif abs(n.z) < 0.25 and abs(n.x) > abs(n.y):
-                u, v = co.y, co.z
             else:
                 u, v = co.x, (R.ye - abs(co.y - R.cy)) * k
             uvl.data[li].uv = (u / tile + ou, v / tile + ov)
@@ -858,3 +858,27 @@ def subdivided_box(name, size, loc, cuts=2):
     bm.to_mesh(o.data)
     bm.free()
     return o
+
+
+def chimney_shaft(name, cx, cy, z0, z1, w, d, rnd, taper=0.09, rings=4, jitter=0.009):
+    """Gemauerter Schlot als durchgehender, leicht konischer Schaft mit unregelmaessigen Kanten (Ringe mit Versatz)"""
+    bm = bmesh.new()
+    rows = []
+    for k in range(rings + 1):
+        t = k / rings
+        z = z0 + (z1 - z0) * t
+        s = 1.0 - taper * t
+        ox, oy = rnd.uniform(-jitter, jitter), rnd.uniform(-jitter, jitter)
+        row = []
+        for (sx, sy) in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+            row.append(bm.verts.new((cx + ox + sx * (w / 2 * s + rnd.uniform(-jitter, jitter)),
+                                     cy + oy + sy * (d / 2 * s + rnd.uniform(-jitter, jitter)), z)))
+        rows.append(row)
+    for k in range(rings):
+        for i in range(4):
+            j = (i + 1) % 4
+            bm.faces.new((rows[k][i], rows[k][j], rows[k + 1][j], rows[k + 1][i]))
+    bm.faces.new(rows[-1])
+    bm.faces.new(list(reversed(rows[0])))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    return mesh.obj_from_bm(name, bm)

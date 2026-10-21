@@ -18,15 +18,15 @@
       -1.46
     ],
     "max": [
-      1.632,
+      1.649,
       3.529,
-      1.425
+      1.416
     ]
   },
   "lods": [
     {
       "node": "LOD0",
-      "tris": 7983,
+      "tris": 7943,
       "materials": [
         "M_Cloth_Linen",
         "M_Iron_Wrought",
@@ -39,7 +39,7 @@
     },
     {
       "node": "LOD1",
-      "tris": 2674,
+      "tris": 2682,
       "materials": [
         "M_Cloth_Linen",
         "M_Plaster_Lime",
@@ -51,7 +51,7 @@
     },
     {
       "node": "LOD2",
-      "tris": 593,
+      "tris": 589,
       "materials": [
         "M_Plaster_Lime",
         "M_Roof_ClayTile",
@@ -62,9 +62,9 @@
     }
   ],
   "tris": [
-    7983,
-    2674,
-    593
+    7943,
+    2682,
+    589
   ],
   "budget": [
     8000,
@@ -139,7 +139,7 @@
     "_BUILD",
     "_BUILDH"
   ],
-  "bytes": 1286464,
+  "bytes": 1281716,
   "source": "assets/blender/models/bakery.py",
   "blend": "assets/src/bakery.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"

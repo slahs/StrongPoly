@@ -1,0 +1,148 @@
+{
+  "id": "blacksmith",
+  "desc": "Schmiede: Fachwerk-Werkstatt, offener Arbeitsplatz unter Pultdach, gemauerte Esse mit Schlot, Blasebalg, Amboss, Loeschtrog, Werkzeugwand, Kohlehaufen, Schleifstein",
+  "file": "models/blacksmith.glb",
+  "target": {
+    "building": "Blacksmith"
+  },
+  "class": "production",
+  "footprint": [
+    3,
+    3
+  ],
+  "height": 2.684,
+  "bbox": {
+    "min": [
+      -1.51,
+      -0.053,
+      -1.538
+    ],
+    "max": [
+      1.25,
+      2.684,
+      1.031
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 7156,
+      "materials": [
+        "M_Iron_Wrought",
+        "M_Leather",
+        "M_Plaster_Lime",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 1867,
+      "materials": [
+        "M_Iron_Wrought",
+        "M_Leather",
+        "M_Plaster_Lime",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 668,
+      "materials": [
+        "M_Plaster_Lime",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    }
+  ],
+  "tris": [
+    7156,
+    1867,
+    668
+  ],
+  "budget": [
+    8000,
+    2800,
+    800
+  ],
+  "materials": [
+    "M_Iron_Wrought",
+    "M_Leather",
+    "M_Plaster_Lime",
+    "M_Roof_Shingle",
+    "M_Stone_Rubble",
+    "M_Timber_Oak",
+    "M_Wood_Planks"
+  ],
+  "anchors": [
+    {
+      "name": "ANCHOR_smokeDark_0",
+      "kind": "smokeDark",
+      "pos": [
+        0.52,
+        2.75,
+        0.1
+      ],
+      "extras": {
+        "kind": "smokeDark",
+        "rate": 2.4,
+        "staffed": true
+      }
+    },
+    {
+      "name": "ANCHOR_anvil_0",
+      "kind": "anvil",
+      "pos": [
+        0.42,
+        0.56,
+        0.78
+      ],
+      "extras": {
+        "kind": "anvil",
+        "rate": 2.2,
+        "staffed": true
+      }
+    },
+    {
+      "name": "ANCHOR_work_0",
+      "kind": "work",
+      "pos": [
+        0.37,
+        0.0,
+        1.13
+      ],
+      "extras": {
+        "kind": "work",
+        "note": "Amboss"
+      }
+    },
+    {
+      "name": "ANCHOR_door_0",
+      "kind": "door",
+      "pos": [
+        -0.175,
+        0.0,
+        0.28
+      ],
+      "extras": {
+        "kind": "door"
+      }
+    }
+  ],
+  "attributes": [
+    "COLOR_0",
+    "_BUILD",
+    "_BUILDH"
+  ],
+  "bytes": 1111248,
+  "source": "assets/blender/models/blacksmith.py",
+  "blend": "assets/src/blacksmith.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

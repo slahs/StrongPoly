@@ -98,3 +98,17 @@ pnpm build && node scripts/lookdev.mjs --styles=classic,medieval --qualities=med
 3. Ziel im Register: `target` = `{'building': 'Keep'}` | `{'wall': 'WallHigh', 'piece': 'arm'|'post'|'stub'}` | `{'unit': 'Peasant'}` | `{'prop': '<name>'}` (kein Spielobjekt, nur LookDev/Dekor). Ein Ziel darf nur EIN Asset haben.
 4. Im Spiel/LookDev erscheint es automatisch im Stil `medieval`: `/?lookdev=medieval&cam=3a-building`, `/?quick=1&style=medieval`. Fehlt es in der Referenzsiedlung, Zeile in `LOOKDEV_LAYOUT` (`packages/client/src/lookdev_scene.ts`) ergänzen.
 5. `pnpm test` (prüft Manifest/GLB), committen: Skript, `.blend`, GLB, Registereintrag, Manifest, Vorschau.
+
+### Ergänzt (Stadt-Assets): Modellvarianten, Verschmutzung je Vertex, Baukasten `sp.town`
+- **Modellvarianten** (rückwärtskompatibel): Ziel `{'building': 'Hovel', 'variant': 1}` → Schlüssel `b:<BT>#1`. Gibt es zu
+  einem Gebäudetyp die Varianten 1..n (lückenlos), wählt `AssetRegistry.forBuilding(bt, id)` je Gebäude-ID stabil eine
+  von n+1 Formen (`variantOf`, Hash der ID); fehlt/lädt eine Variante noch, gilt das Grundmodell. Baustelle, fertiges
+  Gebäude, Hover-Kontur und Emitter benutzen dieselbe ID; der Platzierungsgeist zeigt das Grundmodell. Instanzmeshes
+  je Asset-ID (`b:<BT>:<Asset-ID>`). Variante als eigenes Skript bzw. Skriptschalter (`hovel.py --variant=b` → `hovel_b`).
+- **Mindest-Schmutz** (`sp.attrs`): Objekt-Eigenschaft `sp_grime` (0..1) bzw. Float-Attribut `sp_grime` (POINT) je Vertex
+  (`sp.town.grime_attr(obj, fn)`) hebt den Schmutzkanal G mindestens auf diesen Wert: Lehmflecken, Russ an Esse/Ofen,
+  Verwitterung/Moos auf der Wetterseite von Dächern. Wird nicht exportiert (nur in COLOR_0.G eingerechnet).
+- **Baukasten `sp.town`**: Fachwerkwand (`Wall`, `frame_lods` mit LOD1/LOD2-Kanthölzern und Holznägeln), Putzfelder mit
+  Laibungen (`plaster`, `plaster_gable`), Bruchsteinsockel, Strohdach als Höhenfeld mit Lagen/Krüppelwalm (`GableRoof`,
+  `ThatchSurf`, `thatch_roof`), Schindel-/Ziegellagen (`course_rows`, `lean`/`split` für wenig Dreiecke und saubere AO),
+  Schlot, Kuppel, Kleinteile (Fass, Holzstapel, Sack, Trog, Laib). Wandhölzer sind nur an der Außenseite gefast.
