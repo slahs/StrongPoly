@@ -6,3 +6,4 @@ dist
 coverage
 .claude/worktrees/
 __pycache__
+*.blend1

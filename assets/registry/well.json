@@ -1,0 +1,104 @@
+{
+  "id": "well",
+  "desc": "Brunnen: Bruchsteinkranz, Eichenpfosten, Haspel mit Kurbel, Schindeldach, Eimer",
+  "file": "models/well.glb",
+  "target": {
+    "building": "Well"
+  },
+  "class": "small",
+  "footprint": [
+    1,
+    1
+  ],
+  "height": 1.62,
+  "bbox": {
+    "min": [
+      -0.552,
+      -0.005,
+      -0.473
+    ],
+    "max": [
+      0.57,
+      1.62,
+      0.473
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 2920,
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Iron_Wrought",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 584,
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Iron_Wrought",
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 156,
+      "materials": [
+        "M_Roof_Shingle",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ]
+    }
+  ],
+  "tris": [
+    2920,
+    584,
+    156
+  ],
+  "budget": [
+    3000,
+    1100,
+    350
+  ],
+  "materials": [
+    "M_Cloth_Linen",
+    "M_Iron_Wrought",
+    "M_Roof_Shingle",
+    "M_Stone_Rubble",
+    "M_Timber_Oak",
+    "M_Wood_Planks"
+  ],
+  "anchors": [
+    {
+      "name": "ANCHOR_work_0",
+      "kind": "work",
+      "pos": [
+        0.0,
+        0.0,
+        0.62
+      ],
+      "extras": {
+        "kind": "work",
+        "note": "Platz fuer Wasserholer (vorn)"
+      }
+    }
+  ],
+  "attributes": [
+    "COLOR_0",
+    "_BUILD",
+    "_BUILDH"
+  ],
+  "bytes": 434880,
+  "source": "assets/blender/models/well.py",
+  "blend": "assets/src/well.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}
