@@ -240,11 +240,11 @@
         "_SLOT",
         "_ARM"
       ],
-      "bytes": 456368,
+      "bytes": 456216,
       "lodDist": [
         0.45
       ],
-      "hash": "a0e86d69c2",
+      "hash": "7551ecf096",
       "source": "assets/blender/models/peasant.py",
       "blend": "assets/src/peasant.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -322,11 +322,11 @@
         "_SLOT",
         "_ARM"
       ],
-      "bytes": 445948,
+      "bytes": 446404,
       "lodDist": [
         0.45
       ],
-      "hash": "b5b55eb9aa",
+      "hash": "0a5de9bb5e",
       "source": "assets/blender/models/spearman.py",
       "blend": "assets/src/spearman.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"

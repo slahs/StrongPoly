@@ -71,7 +71,7 @@
     "_SLOT",
     "_ARM"
   ],
-  "bytes": 445948,
+  "bytes": 446404,
   "source": "assets/blender/models/spearman.py",
   "blend": "assets/src/spearman.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",

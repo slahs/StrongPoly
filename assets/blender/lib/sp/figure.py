@@ -301,8 +301,15 @@ class Fig:
         return f'{base}.L{self.L}'
 
     def add(self, obj, mat, cls=FIXED, part=None, pivot=None, mask=0, slot=0, arm=None, team=False, up=UPPER, smooth=55.0,
-            uv='box', dirt=None, wear=None):
+            uv='box', dirt=None, wear=None, rough=None):
         obj.name = f'{obj.name}.L{self.L}' if not obj.name.endswith(f'.L{self.L}') else obj.name
+        # Stoff in LOD0: leichte Unregelmaessigkeit (Knitter, ~1,5 mm), damit die Flaechen nicht wie Plastik wirken
+        if rough is None:
+            rough = 0.0015 if (self.L == 0 and mat and mat.startswith('M_Cloth')) else 0.0
+        if rough > 0:
+            from . import mesh as _mesh
+            _mesh.displace(obj, amount=rough, scale=26.0, seed=self.n)
+            self.n += 1
         obj['sp_style'] = (float(cls), float(mask), float(up), float(slot))
         if arm is not None:
             obj['sp_arm'] = float(arm)

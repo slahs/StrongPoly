@@ -71,7 +71,7 @@
     "_SLOT",
     "_ARM"
   ],
-  "bytes": 456368,
+  "bytes": 456216,
   "source": "assets/blender/models/peasant.py",
   "blend": "assets/src/peasant.blend",
   "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen",

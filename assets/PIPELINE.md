@@ -98,3 +98,28 @@ pnpm build && node scripts/lookdev.mjs --styles=classic,medieval --qualities=med
 3. Ziel im Register: `target` = `{'building': 'Keep'}` | `{'wall': 'WallHigh', 'piece': 'arm'|'post'|'stub'}` | `{'unit': 'Peasant'}` | `{'prop': '<name>'}` (kein Spielobjekt, nur LookDev/Dekor). Ein Ziel darf nur EIN Asset haben.
 4. Im Spiel/LookDev erscheint es automatisch im Stil `medieval`: `/?lookdev=medieval&cam=3a-building`, `/?quick=1&style=medieval`. Fehlt es in der Referenzsiedlung, Zeile in `LOOKDEV_LAYOUT` (`packages/client/src/lookdev_scene.ts`) ergänzen.
 5. `pnpm test` (prüft Manifest/GLB), committen: Skript, `.blend`, GLB, Registereintrag, Manifest, Vorschau.
+
+### Figuren (ergänzt, Figuren-Agent)
+- Baukasten `assets/blender/lib/sp/figure.py` (Loft aus Querschnitten `Sec`, `tube`, `blob`, `cut`, `split_z`, Formfunktionen
+  `folds`/`quilt`, Registrierung `Fig.add`), `human.py` (Kopf mit Gesicht, Haar/Bart, Rumpf, geteilte Schöße, Beine mit Knie,
+  Schuhe, Arme mit Faust), `gear.py` (Werkzeuge, Hüte/Hauben, Eisenhut), `figpreview.py` (Cycles-Vorschau mit Tönen je Instanz).
+  Beispiele: `assets/blender/models/peasant.py`, `spearman.py`. Aufruf wie bei Gebäuden; `klass='figure'`, Ziel `{'unit': '<U-Name>'}`.
+- Maßstab: Figur ~0,93 hoch (≈ 1,72 m, ≈ 7,3 Kopfhöhen), blickt nach Blender −Y (three +Z), rechte Hand = +X (`arm_r`).
+  Gelenke (`SK` in `figure.py`): Hüfte 0,478, Knie 0,268, Schulter 0,745 (x ±0,1), Kopfdrehpunkt 0,79.
+- Teile/Drehpunkte wie `unit_shader.ts UPART`: Oberschenkel `leg_l/leg_r` (Drehpunkt Hüfte), Unterschenkel+Schuh `shin_l/shin_r`
+  (Drehpunkt Knie, x/z gleich der Hüfte, `sp_style[2]` = Hüfthöhe), Arm+Hand+Werkzeug `arm_r/arm_l` (Schulter), Kopf+Haar+Hut
+  `head`. Rock-/Tunikaschöße sind in zwei Hälften geteilt und hängen an den Oberschenkeln (wie ein vorn/hinten geschlitzter
+  Rock) – so schneiden die Beine beim Gehen nicht durch den Stoff. Kragen von Kapuze/Haube sind statisch (`split_z`), nur der
+  Kopfteil dreht mit.
+- `sp_style = (Farbklasse, Maske, Hüfthöhe, Slot)`: Klassen 1 Haut, 2 Haar, 3/4 Stoff A/B je Instanz (`units_style.ts`), **neu:
+  Klasse ≥ 16 = fester Ton** `UNIT_TINTS[Klasse − 16]` (`figure.TONE('leather')` usw.: Holz, Stroh, Leder, Eisen ohne eigenes
+  Material). Maske: Bits `Hair0..2`, `Beard`, `Hat0..2`; Slot: Berufsbits (`1 << JOB`), 0 = immer. `sp_arm`: Armstil (9/10 =
+  Bauernarm nach Beruf, 1 = Stoß). Getönte und spielerfarbene Teile normiert die Laufzeit auf die mittlere Albedo ihres
+  Materials (kleinste Mipmap bzw. Grundfarbe): die Bibliothekstextur liefert nur Struktur, der Ton die Farbe.
+- Material `M_Figure` (ohne Textur): Haut, Haar, Holz, Stroh; ferne LOD-Stufen bestehen nur aus `M_Figure` (1 Draw-Call je
+  Stufe). LOD0 nutzt zusätzlich `M_Cloth_Linen|M_Cloth_Wool`, `M_Leather`, `M_Iron_Wrought`.
+- Export Figuren: keine `_BUILD/_BUILDH` (keine Bauanimation), dafür `_STYLE/_SLOT/_ARM` Pflicht; AO-Bake je Variante
+  (`bake.bake_ao_groups`: Körper allein, jede Hut-/Haar-/Werkzeugvariante mit dem Körper als Verdecker); Schmutzzone am Boden
+  nur bis 0,14. LOD-Grenzen der Figuren × 0,45 (`lod_dist`), Budget `figure` 2.500/800/250 gilt für alle Varianten zusammen.
+- Tests: `packages/client/test/assets_figures.test.ts`; QA im Spiel: `scripts/qa/s18_figures_medieval.mjs`.
+
