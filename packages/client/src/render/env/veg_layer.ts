@@ -100,6 +100,11 @@ export class MedievalDecor {
   private occupied: Int32Array | null = null;
   private blds: ReadonlyMap<number, GroundBuilding> | null = null;
   private biome: Biome;
+  /** Kamera für die Sichtprüfung (Instanzen außerhalb des erweiterten Sichtkegels entfallen) */
+  private camera: THREE.Camera | null = null;
+  private frustum = new THREE.Frustum();
+  private viewDir = new THREE.Vector3(0, 0, -1);
+  private lastViewDir = new THREE.Vector3(0, 9, 0);
 
   constructor(
     private map: GameMap,
@@ -196,6 +201,11 @@ export class MedievalDecor {
     this.camPos.copy(p);
   }
 
+  /** Kamera setzen (GameScene): Sichtprüfung je Instanz; Drehen der Kamera verteilt neu */
+  setCamera(c: THREE.Camera): void {
+    this.camera = c;
+  }
+
   private setupMesh(m: THREE.InstancedMesh, cls: VegClass, lod: number): void {
     // Fernformen (LOD2) werfen keine Schatten: liegen fast immer außerhalb der eingepassten Schattenkamera (spart Draw-Calls)
     m.castShadow = this.shadows && this.q.shadowDecor && cls !== 'flora' && lod < 2;
@@ -225,7 +235,10 @@ export class MedievalDecor {
     }
     const moved = Math.abs(camX - this.cx) > 3 || Math.abs(camZ - this.cz) > 3;
     const zoomed = Math.abs(camDist - this.lastCamDist) > this.lastCamDist * 0.15;
-    if (!(this.dirty || moved || zoomed) || now - this.lastBuild < 0.35) return;
+    if (this.camera) this.camera.getWorldDirection(this.viewDir);
+    const turned = this.camera ? this.viewDir.dot(this.lastViewDir) < 0.985 : false;
+    if (!(this.dirty || moved || zoomed || turned) || now - this.lastBuild < 0.35) return;
+    this.lastViewDir.copy(this.viewDir);
     this.dirty = false;
     this.lastBuild = now;
     this.cx = camX;
@@ -258,6 +271,20 @@ export class MedievalDecor {
     const env = this.env;
     const radius = Math.min(q.decorRadius, Math.max(36, this.camDist * 1.55 + 14));
     const cp = this.camPos.x < 1e8 ? this.camPos : new THREE.Vector3(camX, 30, camZ);
+    // erweiterter Sichtkegel: Rand 5 Einheiten (Schatten knapp außerhalb stehender Bäume fallen noch ins Bild)
+    let visible: ((x: number, y: number, z: number, r: number) => boolean) | null = null;
+    if (this.camera) {
+      this.camera.updateMatrixWorld();
+      const pm = new THREE.Matrix4().multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
+      this.frustum.setFromProjectionMatrix(pm);
+      const sph = new THREE.Sphere();
+      const fr = this.frustum;
+      visible = (x, y, z, r) => {
+        sph.center.set(x, y, z);
+        sph.radius = r + 5;
+        return fr.intersectsSphere(sph);
+      };
+    }
     const st: VegStats = placeVegetation(
       {
         w: map.w,
@@ -277,6 +304,7 @@ export class MedievalDecor {
         radius,
         q: vq,
         cat,
+        visible,
       },
       (id, lod, x, y, z, rot, s, sy, lean, r, g, b) => L(id, lod).push(x, y, z, rot, s, sy, lean, r, g, b),
     );
@@ -294,6 +322,7 @@ export class MedievalDecor {
       const dz = p.y - cp.z;
       const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
       if (dist > radius * 1.2) continue;
+      if (visible && !visible(p.x, base + 0.4, p.y, 1.5)) continue;
       const lod = vegLod(cls, dist, vq);
       if (cls === 'flora' && lod > 1) continue;
       const s = p.s ?? 1;

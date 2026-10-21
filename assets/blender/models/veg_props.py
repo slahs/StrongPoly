@@ -141,7 +141,7 @@ def garden_bed(L):
                 vm.face(ids2, (VG.pal(6, 0.2), VG.pal(6, 0.6), VG.pal(6, 0.95), VG.pal(6, 0.6)), (n,) * 4, (d,) * 4, VG.FLORA)
             VG.flower_head(vm, rng, c + Vector((0, 0, 0.06)), 1, 'ball', 0.05)
         else:
-            VG.flower_head(vm, rng, c + Vector((0, 0, 0.05)), 6, 'ball', 0.09)
+            VG.flower_head(vm, rng, c + Vector((0, 0, 0.05)), 5, 'ball', 0.08)
     if L == 0:
         for k in range(10):
             base = Vector((-0.66 + k * 0.145, 0.18 + rng.uniform(-0.02, 0.02), 0.08))

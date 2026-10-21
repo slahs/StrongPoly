@@ -326,6 +326,7 @@ export class GameScene {
     if (this.decor) {
       this.root.remove(this.decor.group);
       this.decor.group.traverse((o) => (o as THREE.Mesh).geometry?.dispose?.());
+      if (this.decor instanceof MedievalDecor) this.decor.dispose();
     }
     if (this.ambient) {
       this.root.remove(this.ambient.group);
@@ -540,6 +541,7 @@ export class GameScene {
       fog.far = this.cam.dist * 4.4 * this.fogScale;
     }
     this.terrain?.flush();
+    if (this.decor instanceof MedievalDecor) this.decor.setCamera(this.cam.camera);
     this.decor?.update(now, this.cam.tx, this.cam.tz, this.cam.dist, this.cam.camera.position);
     this.ambient?.update(this.cam.tx, this.cam.tz, this.cam.camera.position.y - Math.sin(this.cam.pitch) * this.cam.dist, GFX.uWindDir.value);
     this.renderer.render(this.scene, this.cam.camera);

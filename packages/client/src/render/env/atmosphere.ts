@@ -45,8 +45,8 @@ export interface MedievalLook {
 
 export const MEDIEVAL_LOOK: MedievalLook = {
   sunIntensity: 3.5,
-  zenith: [0.12, 0.23, 0.5],
-  horizon: [0.54, 0.6, 0.66],
+  zenith: [0.1, 0.21, 0.52],
+  horizon: [0.52, 0.59, 0.68],
   ground: [0.16, 0.15, 0.12],
   aureole: 0.55,
   envIntensity: 0.85,

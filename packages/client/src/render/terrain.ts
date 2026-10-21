@@ -83,6 +83,18 @@ function dune(seed: number, x: number, y: number): number {
   return r * 0.7 + (n - 0.5) * 0.9;
 }
 
+// Stil medieval: natürlicheres, dunkleres Wasser (grünlich im Flachen, tiefes Blaugrau statt Türkis)
+const WM_SHALLOW = col(0x5f8a7c);
+const WM_MID = col(0x3b6a74);
+const WM_DEEP = col(0x22475a);
+
+/** Wassertönung des Stils medieval */
+export function waterTintMed(depth: number, moat: boolean): RGB {
+  const d = clamp01(depth);
+  if (moat) return mix(MOAT_SHALLOW, MOAT_DEEP, d);
+  return d < 0.5 ? mix(WM_SHALLOW, WM_MID, d * 2) : mix(WM_MID, WM_DEEP, (d - 0.5) * 2);
+}
+
 /** Wassertönung nach Tiefe 0 (Ufer) .. 1 (tief) */
 export function waterTint(depth: number, moat: boolean): RGB {
   const d = clamp01(depth);
@@ -770,7 +782,7 @@ export class TerrainRenderer {
     // Schaum entlang des Ufers: die Tile-Mitte bekommt nur einen Teil (glatter Saum, schmale Rinnen füllen sich nicht ganz mit Schaum)
     const fc = (info.reduce((s, v) => s + v.foam, 0) / 4) * 0.45;
     const tintOf = (d: number, px: number, py: number): RGB => {
-      const c = waterTint(d, moat);
+      const c = this.med ? waterTintMed(d, moat) : waterTint(d, moat);
       return fogC([c[0] * (1 + jitter), c[1] * (1 + jitter), c[2] * (1 + jitter)], px, py);
     };
     const cols = corners.map(([px, py], k) => tintOf(info[k].depth, px, py));

@@ -147,6 +147,8 @@ export interface VegPlaceInput {
   radius: number;
   q: VegQuality;
   cat: VegCatalog;
+  /** Sichtprüfung (Kugel um den Fußpunkt, Radius r): false = außerhalb des erweiterten Sichtkegels, entfällt */
+  visible?: ((x: number, y: number, z: number, r: number) => boolean) | null;
 }
 
 export interface VegStats {
@@ -187,6 +189,7 @@ export function placeVegetation(inp: VegPlaceInput, emit: VegEmit): VegStats {
   let floraN = 0;
   const out = (cls: VegClass, id: string | null | undefined, x: number, y: number, z: number, rot: number, s: number, sy: number, lean: number, tr: number, tg: number, tb: number, top = 0.5): void => {
     if (!id) return;
+    if (inp.visible && !inp.visible(x, y + top, z, cls === 'tree' ? 3 : cls === 'flora' ? 0.6 : 1.5)) return;
     const dx = x - cp.x;
     const dy = y + top - cp.y;
     const dz = z - cp.z;

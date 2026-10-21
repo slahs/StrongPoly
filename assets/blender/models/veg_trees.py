@@ -361,8 +361,8 @@ def spruce(asset_id, seed, P, desc):
     whorl = 0
     while z < H - 0.12:
         tz = z / H
-        n = P['per_whorl'] if tz < 0.8 else max(3, P['per_whorl'] - 2)
-        Rz = P['base_r'] * (1 - (z - P['z0']) / (H - P['z0'])) ** 0.92 + 0.07
+        n = P['per_whorl'] if tz < 0.85 else max(4, P['per_whorl'] - 1)
+        Rz = P['base_r'] * (1 - (z - P['z0']) / (H - P['z0'])) ** 0.92 + 0.13
         for k in range(n):
             a = roll + k * 2 * math.pi / n + rng.uniform(-0.25, 0.25)
             hd = Vector((math.cos(a), math.sin(a), 0))

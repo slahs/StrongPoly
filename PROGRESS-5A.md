@@ -7,7 +7,7 @@ Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/
 - [ ] 2 Import- und Materialpipeline (Blender-Skripte, Materialbibliothek, GLB-Export, Loader, Fallback) – Pipeline-Teil erledigt (Blender-Bibliothek `assets/blender/lib/sp`, GLB-Export, Laufzeit `render/assets`, Rückfall, Beispiel-Asset Brunnen; siehe „Pipeline“); offen: Materialbibliothek-Texturen (Material-Agent)
 - [ ] 3 Erstes hochwertiges Referenzgebäude (Bergfried)
 - [ ] 4 Weitere Referenzobjekte (Fachwerkhaus, Bäckerei/Schmiede, Mauer + Tor) und Figuren (Bauer, Soldat)
-- [ ] 5 Referenzumgebung (Terrain mit Weg/Gras/Steinen/Bäumen, Licht, Atmosphäre)
+- [x] 5 Referenzumgebung (Terrain mit Weg/Gras/Steinen/Bäumen, Licht, Atmosphäre) – Stil medieval, siehe „Umgebung (Terrain, Vegetation, Licht)“
 - [ ] 6 Vergleich (`?lookdev=medieval`, alt/neu, 3 Kameras) + Performance – Werkzeug erledigt (`?lookdev`, `scripts/lookdev.mjs`, Statistik; siehe „Pipeline“); offen: Vergleich mit den fertigen Referenz-Assets
 - [ ] 7 Dokumentation + Mac-Testanleitung
 
@@ -24,3 +24,25 @@ Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/
 - **Tests** `client/test/assets_pipeline.test.ts` (17): Manifest aktuell/gültig/Fehlererkennung, GLB → Modell (echte Datei), Anker aus extras, Attribut-Zuordnung, LOD-Hysterese, Materialbibliothek/Texturwahl, Register/Rückfall, AssetTypeMesh, EntityRenderer mit Asset + Baustelle + Rückfall + classic.
 - **Messwerte LookDev** (Software-GL, 1280×720, Kamera RTS; `docs/phase5a/lookdev/stats.json`): classic Niedrig/Mittel/Hoch 38/53/55 Draw-Calls, 128k/301k/474k Dreiecke, 14/21/23 Programme, Texturspeicher ≈ 8,7/32,7/128,7 MB (überwiegend Schattenkarte); medieval mit Brunnen-GLB +3…+5 Draw-Calls, +1 Programm, +0,2 MB (PMREM). Klassischer Stil in allen 12 `?shots`-Szenen mit identischen Draw-Calls/Dreiecken/Programmen, Pixelabweichung im Rahmen des Laufzeitrauschens (`docs/phase5a/measurements/README.md`).
 - **Offen:** echte Materialtexturen und Referenz-Assets (andere Agenten); KTX2/Meshopt erst in 5B; Safari/M3-Messung; Server liefert ohne gzip aus.
+
+## Umgebung (Terrain, Vegetation, Licht) – Teilschritt 5
+
+Ausführlich mit Bildern und Messwerten: `docs/phase5a/ENVIRONMENT.md`. Konventionen: `assets/PIPELINE.md` (Abschnitt „Vegetation und Umgebung“).
+
+- **Vegetation (24 GLB-Assets, Blender-Skripte `assets/blender/models/veg_*.py`, Bibliothek `sp/veg.py`):** Stieleiche, Hängebirke,
+  Fichte je 3 Varianten (inkl. Jungbaum) aus Skelett + Blattkarten (M_Foliage-Atlas bzw. eigene Nadeltextur M_Foliage_Conifer),
+  Kronennormalen, analytische AO, LOD0/1/2 ≤ 6000/1500/300; Hasel/Weißdorn; Gras (2), Wiesenblumen (2), Farn als Geometrie mit
+  Palette M_Flora (kein Alpha-Overdraw); Findling/Fels/Platte/Lesesteine (≤ 1280 Dreiecke, Cycles-AO, Moosanteil); Holzzaun,
+  Flechtzaun, Gemüsebeet, liegender Stamm.
+- **Laufzeit `render/env/`:** `veg_layer.ts` (MedievalDecor: Instancing je Asset × LOD × Material, prozeduraler Rückfall),
+  `veg_place.ts` (Verteilung rein/deterministisch, LOD je Instanz, Sichtkegel-Auslese), `veg_material.ts` (Wind, Alpha-Test auch im
+  Schattenpass, Durchlicht, Birkenrinde/Moos), `terrain_medieval.ts` (Textur-Arrays Gras/Erde/Weg/Fels, höhenbasierte Übergänge,
+  Anti-Kachelung), `envmap.ts` (Wege mit Richtung/Fahrspuren, Kronendach), `atmosphere.ts` (Sonne, Himmel/PMREM, Nebel, AgX).
+- **Renderer-Erweiterungen (rückwärtskompatibel, classic unverändert):** `scene.ts` (Stilumschaltung, Licht/Himmel/Nebel/
+  Tonemapping medieval, eingepasste Schattenkamera, `whenEnvReady`, `setEnvExtras`), `terrain.ts` (Option `medieval`: Tönung, `aMed`,
+  Wasserfarben), `groundmap.ts` (`trailSegments`), `quality.ts` (Felder `env*`), `assets/materials.ts` (`texture()`, `sceneEnv`,
+  Halbkugel-Gewicht), `assets/manifest.ts` (`veg`, `uvTile`), `lookdev.ts`/`lookdev_scene.ts` (Wege, Requisiten, Kamera `3d-landscape`,
+  `&tone=`), `bench.ts` (wartet auf die Umgebung), `scripts/lookdev.mjs` (neue Kamera, `--tone`).
+- **Tests:** `client/test/env_medieval.test.ts` (Atmosphäre, Umgebungskarte, Trampelpfade, Gelände-Attribute, Budgets/GLB der
+  Vegetation, Verteilung deterministisch/monoton/frei von Gebäuden-Wegen-Wasser, LookDev-Daten).
+<!-- ENV-ZAHLEN -->

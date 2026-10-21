@@ -1099,7 +1099,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 56684,
+      "bytes": 56924,
       "veg": {
         "kind": "prop",
         "role": "garden"
@@ -1109,7 +1109,7 @@
         "M_Ground_Dirt": 4,
         "M_Wood_Planks": 2
       },
-      "hash": "cb7402bf9d",
+      "hash": "0383998e32",
       "source": "assets/blender/models/veg_props.py",
       "blend": null,
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1427,7 +1427,7 @@
       },
       "hash": "a7900a3742",
       "source": "assets/blender/models/veg_trees.py",
-      "blend": null,
+      "blend": "assets/src/veg/veg_oak_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "veg_oak_b": {
@@ -1914,20 +1914,20 @@
       "height": 3.981,
       "bbox": {
         "min": [
-          -0.973,
-          -0.03,
-          -1.053
+          -1.027,
+          -0.033,
+          -1.111
         ],
         "max": [
-          0.961,
+          1.022,
           3.981,
-          0.961
+          1.01
         ]
       },
       "lods": [
         {
           "node": "LOD0",
-          "tris": 5377,
+          "tris": 5683,
           "materials": [
             "M_Bark",
             "M_Foliage_Conifer"
@@ -1935,7 +1935,7 @@
         },
         {
           "node": "LOD1",
-          "tris": 556,
+          "tris": 586,
           "materials": [
             "M_Bark",
             "M_Foliage_Conifer"
@@ -1951,8 +1951,8 @@
         }
       ],
       "tris": [
-        5377,
-        556,
+        5683,
+        586,
         150
       ],
       "budget": [
@@ -1968,7 +1968,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 368508,
+      "bytes": 389492,
       "veg": {
         "kind": "tree",
         "species": "spruce",
@@ -1983,7 +1983,7 @@
         "M_Bark": 2,
         "M_Foliage_Conifer": 1
       },
-      "hash": "55e4ca9654",
+      "hash": "bf094603ed",
       "source": "assets/blender/models/veg_trees.py",
       "blend": null,
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -2000,20 +2000,20 @@
       "height": 3.395,
       "bbox": {
         "min": [
-          -1.062,
-          -0.161,
-          -0.927
+          -1.128,
+          -0.171,
+          -0.976
         ],
         "max": [
-          0.955,
+          1.014,
           3.395,
-          1.054
+          1.115
         ]
       },
       "lods": [
         {
           "node": "LOD0",
-          "tris": 5285,
+          "tris": 5544,
           "materials": [
             "M_Bark",
             "M_Foliage_Conifer"
@@ -2021,7 +2021,7 @@
         },
         {
           "node": "LOD1",
-          "tris": 532,
+          "tris": 560,
           "materials": [
             "M_Bark",
             "M_Foliage_Conifer"
@@ -2037,8 +2037,8 @@
         }
       ],
       "tris": [
-        5285,
-        532,
+        5544,
+        560,
         150
       ],
       "budget": [
@@ -2054,7 +2054,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 360380,
+      "bytes": 378376,
       "veg": {
         "kind": "tree",
         "species": "spruce",
@@ -2069,7 +2069,7 @@
         "M_Bark": 2,
         "M_Foliage_Conifer": 1
       },
-      "hash": "e8e70a8a7b",
+      "hash": "0264f92f61",
       "source": "assets/blender/models/veg_trees.py",
       "blend": null,
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -2086,20 +2086,20 @@
       "height": 2.208,
       "bbox": {
         "min": [
-          -0.706,
-          -0.194,
-          -0.784
+          -0.764,
+          -0.218,
+          -0.836
         ],
         "max": [
-          0.739,
+          0.795,
           2.208,
-          0.8
+          0.853
         ]
       },
       "lods": [
         {
           "node": "LOD0",
-          "tris": 3030,
+          "tris": 3191,
           "materials": [
             "M_Bark",
             "M_Foliage_Conifer"
@@ -2107,7 +2107,7 @@
         },
         {
           "node": "LOD1",
-          "tris": 332,
+          "tris": 354,
           "materials": [
             "M_Bark",
             "M_Foliage_Conifer"
@@ -2123,8 +2123,8 @@
         }
       ],
       "tris": [
-        3030,
-        332,
+        3191,
+        354,
         114
       ],
       "budget": [
@@ -2140,7 +2140,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 207140,
+      "bytes": 218760,
       "veg": {
         "kind": "tree",
         "species": "spruce",
@@ -2155,7 +2155,7 @@
         "M_Bark": 2,
         "M_Foliage_Conifer": 1
       },
-      "hash": "c4e2fa09d1",
+      "hash": "39a2c70ba2",
       "source": "assets/blender/models/veg_trees.py",
       "blend": null,
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"

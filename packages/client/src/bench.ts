@@ -899,6 +899,7 @@ export function startBench(): void {
     }
     requestAnimationFrame(loop);
   };
-  if (style === 'medieval') void assetRegistry.preload().then(() => requestAnimationFrame(loop));
+  // medieval: zusätzlich Bodentexturen und Vegetation (env/) laden, bevor gemessen wird
+  if (style === 'medieval') void assetRegistry.preload().then(() => gs.whenEnvReady()).then(() => requestAnimationFrame(loop));
   else requestAnimationFrame(loop);
 }

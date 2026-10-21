@@ -10,20 +10,20 @@
   "height": 3.981,
   "bbox": {
     "min": [
-      -0.973,
-      -0.03,
-      -1.053
+      -1.027,
+      -0.033,
+      -1.111
     ],
     "max": [
-      0.961,
+      1.022,
       3.981,
-      0.961
+      1.01
     ]
   },
   "lods": [
     {
       "node": "LOD0",
-      "tris": 5377,
+      "tris": 5683,
       "materials": [
         "M_Bark",
         "M_Foliage_Conifer"
@@ -31,7 +31,7 @@
     },
     {
       "node": "LOD1",
-      "tris": 556,
+      "tris": 586,
       "materials": [
         "M_Bark",
         "M_Foliage_Conifer"
@@ -47,8 +47,8 @@
     }
   ],
   "tris": [
-    5377,
-    556,
+    5683,
+    586,
     150
   ],
   "budget": [
@@ -64,7 +64,7 @@
   "attributes": [
     "COLOR_0"
   ],
-  "bytes": 368508,
+  "bytes": 389492,
   "veg": {
     "kind": "tree",
     "species": "spruce",
