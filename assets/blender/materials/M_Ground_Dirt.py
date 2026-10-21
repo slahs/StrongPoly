@@ -64,7 +64,7 @@ def build(scene, tile):
     wet = C.smoothstep(-0.2, 0.9, C.spectral(n, 9, beta=2.6, fmin=1) - 4.0 * (H - C.blur(H, 30)))
     dry = 1 - wet
     soil_dry = np.array([0.175, 0.135, 0.095])
-    soil_wet = np.array([0.075, 0.056, 0.040])
+    soil_wet = np.array([0.092, 0.068, 0.048])
     m1 = C.spectral(n, 10, beta=1.4, fmin=40)
     col = soil_dry * dry[..., None] + soil_wet * wet[..., None]
     col = col * (1 + 0.12 * m1)[..., None]

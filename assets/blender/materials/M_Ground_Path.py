@@ -35,11 +35,11 @@ def build(scene, tile):
     for c0 in (0.32, 0.68):
         cu = c0 + C.sample(mean, 0.2 + c0, v) * 0.008
         d = np.abs(((u - cu + 0.5) % 1 - 0.5) * T)
-        wdt = 0.11 + 0.03 * C.sample(mean, 0.7, v + c0)
-        rut = np.maximum(rut, C.smoothstep(wdt, wdt * 0.25, d))
-        rim = np.maximum(rim, np.exp(-((d - wdt * 1.25) / 0.05) ** 2))
+        wdt = 0.085 + 0.025 * C.sample(mean, 0.7, v + c0)
+        rut = np.maximum(rut, C.smoothstep(wdt, wdt * 0.55, d))
+        rim = np.maximum(rim, np.exp(-((d - wdt * 1.6) / 0.08) ** 2))
     depth = 0.035 + 0.012 * C.spectral(n, 4, beta=2.5, fmin=1)
-    H = H - rut * depth + rim * 0.01 * (0.6 + 0.4 * C.spectral(n, 5, beta=2.0, fmin=4))
+    H = H - rut * depth + rim * 0.006 * (0.6 + 0.4 * C.spectral(n, 5, beta=2.0, fmin=4))
     # Laengsriefen in der Spur (Reifen/Eisenring)
     H += rut * C.streaks(v, u, 6, 1024, 6, beta=1.2) * 0.0012
     # Hufspuren in der Mitte und daneben
@@ -55,7 +55,7 @@ def build(scene, tile):
     H -= hoof * 0.012
     # ausgetrocknete Pfuetzen in den Spuren (tiefe Stellen)
     lowH = C.blur(H, 6)
-    pud = rut * C.smoothstep(0.4, 1.2, C.spectral(n, 7, beta=2.5, fmin=2))
+    pud = C.blur(rut, 3) * C.smoothstep(0.1, 0.9, C.spectral(n, 7, beta=2.5, fmin=2))
     pud = C.smoothstep(0.25, 0.45, pud)
     flat = pud * (lowH - H) * 0.85  # Schlamm glaettet die Oberflaeche
     H = H + flat
@@ -64,7 +64,7 @@ def build(scene, tile):
     H -= mudcrack * 0.0025
     pud_edge = pud * (1 - pud) * 4
     # Kies
-    P, R = C.poisson_torus(rng, T, lambda r: r.uniform(0.004, 0.014), 9000, gap=0.002)
+    P, R = C.poisson_torus(rng, T, lambda r: r.uniform(0.006, 0.02) if r.random() < 0.9 else r.uniform(0.02, 0.045), 9000, gap=0.002)
     st = C.cell_stones(rng, n, T, P, R, gap=0.0, round_frac=0.9, dome=0.7, height=R * 0.9, surf_amp=0.05,
                        seed=9, weight_frac=1.0)
     inside = st["rel"] < 0.95
@@ -75,11 +75,14 @@ def build(scene, tile):
     H = np.maximum(H, stoneH)
     H += C.spectral(n, 11, beta=1.0, fmin=300) * 0.0004 * (1 - pud)
     # Farben
-    dry = np.array([0.215, 0.175, 0.128])
-    comp = np.array([0.185, 0.150, 0.110])
+    dry = np.array([0.245, 0.195, 0.135])
+    comp = np.array([0.135, 0.105, 0.075])
     m1 = C.spectral(n, 12, beta=2.0, fmin=3)
-    col = dry * (1 - rut[..., None] * 0.3) + comp * (rut[..., None] * 0.3)
-    col = col * (1 + 0.08 * m1 + 0.06 * C.spectral(n, 13, beta=1.2, fmin=60))[..., None]
+    rb = C.blur(rut, 4) * (0.6 + 0.4 * C.smoothstep(-1.0, 1.0, C.spectral(n, 14, beta=2.2, fmin=3)))
+    col = dry * (1 - rb[..., None]) + comp * rb[..., None]
+    col = col * (1 + 0.13 * m1 + 0.07 * C.spectral(n, 13, beta=1.2, fmin=60))[..., None]
+    org = C.smoothstep(1.4, 2.2, C.spectral(n, 15, beta=1.8, fmin=20)) * (1 - rb)
+    col = col * (1 - 0.45 * org[..., None])
     hp = H - C.blur(H, 5)
     col = col * (1 + np.clip(hp / 0.003, -1, 1) * 0.10)[..., None]
     mud = np.array([0.105, 0.085, 0.065])
@@ -90,7 +93,7 @@ def build(scene, tile):
     scol = C.palette_pick(rng, len(P), [(0.30, 0.28, 0.25), (0.36, 0.31, 0.24), (0.22, 0.21, 0.20),
                                         (0.40, 0.36, 0.30)], jitter=0.08)[st["ID"]]
     col = col * (1 - is_stone[..., None]) + scol * is_stone[..., None]
-    rough = 0.93 - 0.25 * pud + 0.03 * mudcrack
+    rough = 0.93 - 0.12 * rb - 0.2 * pud + 0.03 * mudcrack
     rough = rough * (1 - is_stone) + 0.7 * is_stone
     C.hf_build(SPEC, tile, H.astype(np.float32), np.clip(col, 0, 1).astype(np.float32), rough.astype(np.float32),
                geo_res=1024, split_sigma=1.2)
