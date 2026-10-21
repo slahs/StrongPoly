@@ -24,7 +24,7 @@ export const TERRAIN_LAYERS = ['M_Ground_Grass', 'M_Ground_Dirt', 'M_Ground_Path
 
 /** Farbabstimmung je Schicht (Multiplikator auf die Bibliothekstextur): Gras, Erde, Weg, Fels */
 export const LAYER_TINT: [number, number, number][] = [
-  [1.0, 1.14, 0.84],
+  [1.0, 1.07, 0.88],
   [0.95, 0.9, 0.84],
   [0.86, 0.74, 0.58],
   [1.0, 1.0, 1.0],
@@ -200,7 +200,10 @@ vec2 spUvW;
     spBk = 0.8;
   #endif
   // ---- höhenbasierte Mischung (Höhe = ORM.a der Textur): Erde füllt Fugen, Gras/Kies liegt darüber
+  // Höhe: ORM.a, falls die Textur sie trägt (Bibliothek: Alpha = Höhe); sonst Ersatz aus AO (Hohlräume tief) und Helligkeit
   vec4 hgt = vec4( o0.a, o1.a, o2.a, o3.a );
+  vec4 hProxy = clamp( vec4( o0.r, o1.r, o2.r, o3.r ) * 0.7 + vec4( dot( a0.rgb, vec3( 0.6 ) ), dot( a1.rgb, vec3( 0.6 ) ), dot( a2.rgb, vec3( 0.6 ) ), dot( a3.rgb, vec3( 0.6 ) ) ) - 0.35, 0.0, 1.0 );
+  hgt = mix( hgt, hProxy, step( vec4( 0.995 ), hgt ) );
   vec4 wt = w + hgt * 0.55 * min( vec4( 1.0 ), w * 4.0 );
   float mx = max( max( wt.x, wt.y ), max( wt.z, wt.w ) );
   wt = max( wt - ( mx - 0.22 ), vec4( 0.0 ) );

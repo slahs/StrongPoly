@@ -87,7 +87,14 @@ LOD aus derselben Form mit weniger Unterteilung, Moosanteil in der Datenfarbe, A
 - Tonemapping AgX + Abstimmung; das globale Grading aus `materials.ts` wird im Stil medieval übersprungen (`spGradeMode`),
   classic unverändert. **Kein Bloom** (zusätzliche Render-Ziele/Programme, auf Safari/M3 nicht gemessen – bewusst weggelassen).
 
-<!-- TONE -->
+### Tonemapping-Vergleich AgX ↔ ACES (Mittel, gleiche Szene/Sonne, links AgX, rechts ACES)
+![AgX/ACES Landschaft](assets/environment/tonemapping_agx_aces_3d-landscape.jpg)
+![AgX/ACES RTS](assets/environment/tonemapping_agx_aces_1-rts.jpg)
+
+Entscheidung **AgX**: ACES verdunkelt die Schatten deutlich (Figuren im Hausschatten schlechter lesbar), sättigt Ziegelrot
+und Grün stark (Richtung Postkarte) und verschiebt helle Töne ins Gelbliche. AgX rollt Lichter weicher ab und hält
+Stein/Putz/Holz neutral; die fehlende Spannung gleicht die Abstimmung aus (Sättigung 1,12, Kontrast 1,06). ACES bleibt
+für Vergleiche abrufbar (`&tone=aces`).
 
 ## 5. LookDev
 - Szene ergänzt (`lookdev_scene.ts`): Karrenweg vom Tor über den Platz, Abzweig zum Bergfried, Gasse zur Schmiede,
