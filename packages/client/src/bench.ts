@@ -1,3 +1,4 @@
+import { assetRegistry, parseStyle } from './render/assets/registry';
 import {
   BT,
   BUILDINGS,
@@ -678,6 +679,9 @@ export function startBench(): void {
   const canvas = document.getElementById('view') as HTMLCanvasElement;
   const gs = new GameScene(canvas);
   gs.gfx.pixelRatio = Number(q.get('pr') ?? 1);
+  // &style=medieval: GLB-Assets der Phase 5A (wo registriert) statt prozeduraler Modelle; Messung startet nach dem Laden
+  const style = parseStyle(q.get('style')) ?? 'classic';
+  assetRegistry.setStyle(style);
   // &nodraw=1: Draw-Calls werden zu No-ops. So misst man die reine JS-Zeit (Szenengraph, Instanzdaten, Uploads),
   // unabhängig davon, wie langsam der Rasterizer (z. B. SwiftShader) den Befehlspuffer abarbeitet.
   const nodraw = q.get('nodraw') === '1';
@@ -895,5 +899,6 @@ export function startBench(): void {
     }
     requestAnimationFrame(loop);
   };
-  requestAnimationFrame(loop);
+  if (style === 'medieval') void assetRegistry.preload().then(() => requestAnimationFrame(loop));
+  else requestAnimationFrame(loop);
 }

@@ -97,6 +97,8 @@ export function buildManifest(root) {
   }
   const regDir = path.join(root, 'assets', 'registry');
   const assets = {};
+  // KTX2 nur, wenn der Basis-Transcoder mit ausgeliefert wird (public/assets/basis/, Kopie aus three/examples/jsm/libs/basis)
+  const ktx2 = fs.existsSync(path.join(pub, 'basis', 'basis_transcoder.wasm')) && fs.existsSync(path.join(pub, 'basis', 'basis_transcoder.js'));
   if (fs.existsSync(regDir)) {
     for (const f of fs.readdirSync(regDir).filter((x) => x.endsWith('.json')).sort()) {
       const e = readJson(path.join(regDir, f));
@@ -109,7 +111,7 @@ export function buildManifest(root) {
       assets[e.id] = { ...rest, bytes: buf ? buf.length : 0, hash: buf ? hashOf(buf) : '', source, blend, license };
     }
   }
-  return { manifest: { version: 1, doc: 'Erzeugt von scripts/asset-manifest.mjs - nicht von Hand bearbeiten (Quellen: assets/materials.json, assets/registry/*.json, public/assets/textures).', materials, assets }, problems };
+  return { manifest: { version: 1, ktx2, doc: 'Erzeugt von scripts/asset-manifest.mjs - nicht von Hand bearbeiten (Quellen: assets/materials.json, assets/registry/*.json, public/assets/textures).', materials, assets }, problems };
 }
 
 export function manifestPath(root) {

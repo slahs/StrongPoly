@@ -1,0 +1,91 @@
+{
+  "name": "s17_style_medieval",
+  "base": "http://127.0.0.1:5558",
+  "query": "quick=1&dev=1&size=128&seed=3&style=medieval",
+  "at": "2026-10-21T09:08:18.393Z",
+  "checks": [
+    {
+      "label": "Manifest und Assets geladen",
+      "ok": true,
+      "extra": "{\"ok\":1,\"failed\":0,\"ms\":5930.300000000745}"
+    },
+    {
+      "label": "Override Brunnen aktiv",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "label": "freie Stelle gefunden",
+      "ok": true,
+      "extra": "{\"x\":62,\"y\":113}"
+    },
+    {
+      "label": "Platzierungsgeist zeigt das GLB-Modell",
+      "ok": true,
+      "extra": "{\"visible\":true,\"count\":1,\"fromAsset\":true}"
+    },
+    {
+      "label": "Sofortbau: Gebäude steht sofort in der Sim (volle HP)",
+      "ok": true,
+      "extra": "{\"tick\":391,\"n\":384,\"prog\":0.57,\"clip\":6,\"fin\":0,\"hp\":200}"
+    },
+    {
+      "label": "Bauanimation: GLB im Clip-Material während des Baus (Fortschritt steigt stetig)",
+      "ok": true,
+      "extra": "[{\"tick\":391,\"n\":384,\"prog\":0.57,\"clip\":6,\"fin\":0,\"hp\":200}]"
+    },
+    {
+      "label": "fertig: GLB-Modell, kein prozedurales Modell für den Brunnen",
+      "ok": true,
+      "extra": "{\"glb\":6,\"proc\":0}"
+    },
+    {
+      "label": "Auswahlrahmen sichtbar",
+      "ok": true,
+      "extra": "{\"frames\":4,\"hover\":true,\"edgesFromAsset\":true}"
+    },
+    {
+      "label": "Hover-Kontur aus der GLB-Geometrie",
+      "ok": true,
+      "extra": "{\"frames\":4,\"hover\":true,\"edgesFromAsset\":true}"
+    },
+    {
+      "label": "Stil classic: prozedurales Modell, keine GLB-Instanzen",
+      "ok": true,
+      "extra": "{\"glb\":0,\"proc\":1}"
+    }
+  ],
+  "console": [],
+  "notes": {
+    "bau": [
+      {
+        "tick": 391,
+        "n": 384,
+        "prog": 0.57,
+        "clip": 6,
+        "fin": 0,
+        "hp": 200
+      },
+      {
+        "tick": 395,
+        "n": 384,
+        "prog": 0.86,
+        "clip": 6,
+        "fin": 0,
+        "hp": 200
+      },
+      {
+        "tick": 397,
+        "n": 384,
+        "prog": 1,
+        "clip": 0,
+        "fin": 6,
+        "hp": 200
+      }
+    ]
+  },
+  "data": {},
+  "passed": 10,
+  "failed": 0,
+  "consoleClean": true
+}

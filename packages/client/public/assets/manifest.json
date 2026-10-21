@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "ktx2": false,
   "doc": "Erzeugt von scripts/asset-manifest.mjs - nicht von Hand bearbeiten (Quellen: assets/materials.json, assets/registry/*.json, public/assets/textures).",
   "materials": {
     "M_Bark": {

@@ -85,7 +85,7 @@ async function main() {
             await page.waitForFunction(() => window.__lookdev.ready, null, { timeout: 900000, polling: 300 });
           }
           const file = path.join(dir, `${cam}.jpg`);
-          await page.screenshot({ path: file, type: 'jpeg', quality: 88 });
+          await page.screenshot({ path: file, type: 'jpeg', quality: Number(args.jpeg ?? 82) });
           const st = await page.evaluate(() => window.__lookdev.stats());
           per[cam] = st;
           console.error(`${style.padEnd(8)} ${quality.padEnd(6)} ${cam.padEnd(12)} Draw-Calls ${String(st.calls).padStart(4)}  Dreiecke ${String(Math.round(st.triangles / 1000)).padStart(4)}k  Programme ${st.programs}  Tex ≈${(st.texBytes / 1048576).toFixed(1)} MB  Geo ≈${(st.geoBytes / 1048576).toFixed(1)} MB  GLB: ${st.overrides.join(' ') || '—'}`);

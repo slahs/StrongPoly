@@ -275,4 +275,6 @@ function frame(now: number): void {
 requestAnimationFrame(frame);
 (window as unknown as Record<string, unknown>).session = () => session;
 (window as unknown as Record<string, unknown>).net = () => net;
+// Prüfhilfe (Browserprüfung Stil „medieval“, scripts/qa/s17_style_medieval.mjs): Register der GLB-Assets
+(window as unknown as Record<string, unknown>).__assets = assetRegistry;
 void h;

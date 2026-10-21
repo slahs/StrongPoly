@@ -91,6 +91,8 @@ export interface AssetDef {
 
 export interface AssetManifest {
   version: number;
+  /** Basis-Transcoder liegt unter public/assets/basis/ (sonst werden KTX2-Karten ignoriert) */
+  ktx2?: boolean;
   materials: Record<string, MaterialDef>;
   assets: Record<string, AssetDef>;
 }

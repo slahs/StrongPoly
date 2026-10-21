@@ -146,6 +146,7 @@ export class AssetRegistry {
         this.manifest = m;
         this.problems = validateManifest(m);
         this.materials.configure(m.materials, this.base);
+        this.materials.useKtx2 = !!m.ktx2;
         this.materials.version = {};
         for (const md of Object.values(m.materials)) for (const e of Object.values(md.maps ?? {})) if (e?.hash) this.materials.version[e.file] = e.hash;
         this.manifestState = 'ready';

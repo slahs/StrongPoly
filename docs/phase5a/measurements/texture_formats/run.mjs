@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import { findChromium, loadPlaywright, serveDist } from '/home/user/StrongPoly/.claude/worktrees/agent-af7d14ba736e68caa/scripts/lib/browser.mjs';
+const dir = '/tmp/claude-0/-home-user-StrongPoly/7790b50a-18ae-5266-b53e-ba32399649e4/scratchpad/agent5p/ktx';
+const pw = await loadPlaywright('/home/user/StrongPoly/.claude/worktrees/agent-af7d14ba736e68caa');
+const { srv, url } = await serveDist(dir, 5643);
+const browser = await pw.chromium.launch({ executablePath: findChromium(), args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--no-sandbox'] });
+const page = await browser.newPage();
+page.on('console', (m) => console.log('[' + m.type() + ']', m.text().slice(0, 200)));
+page.on('pageerror', (e) => console.log('[pageerror]', e.message));
+await page.goto(url + '/index.html');
+await page.waitForFunction(() => window.__res, null, { timeout: 300000 });
+const res = await page.evaluate(() => window.__res);
+console.log(JSON.stringify(res, null, 1));
+fs.writeFileSync(dir + '/browser.json', JSON.stringify(res, null, 1));
+await browser.close();
+srv.close();

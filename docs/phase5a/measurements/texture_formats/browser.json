@@ -1,0 +1,102 @@
+{
+ "ext": [
+  "WEBGL_compressed_texture_astc",
+  "EXT_texture_compression_bptc",
+  "WEBGL_compressed_texture_s3tc",
+  "WEBGL_compressed_texture_etc",
+  "WEBGL_compressed_texture_etc1"
+ ],
+ "gl": "WebKit WebGL",
+ "files": {
+  "albedo.webp": {
+   "loadMs": 0,
+   "uploadMs": 21,
+   "format": 1023,
+   "compressed": false,
+   "w": 1024,
+   "h": 1024,
+   "mips": 0
+  },
+  "albedo.jpg": {
+   "loadMs": 129,
+   "uploadMs": 17,
+   "format": 1023,
+   "compressed": false,
+   "w": 1024,
+   "h": 1024,
+   "mips": 0
+  },
+  "albedo.png": {
+   "loadMs": 19,
+   "uploadMs": 24,
+   "format": 1023,
+   "compressed": false,
+   "w": 1024,
+   "h": 1024,
+   "mips": 0
+  },
+  "normal.webp": {
+   "loadMs": 16,
+   "uploadMs": 19,
+   "format": 1023,
+   "compressed": false,
+   "w": 1024,
+   "h": 1024,
+   "mips": 0
+  },
+  "orm.webp": {
+   "loadMs": 16,
+   "uploadMs": 18,
+   "format": 1023,
+   "compressed": false,
+   "w": 1024,
+   "h": 1024,
+   "mips": 0
+  },
+  "albedo.etc1s.ktx2": {
+   "loadMs": 28,
+   "uploadMs": 2,
+   "format": 36492,
+   "compressed": true,
+   "w": 1024,
+   "h": 1024,
+   "mips": 11
+  },
+  "albedo.uastc.ktx2": {
+   "loadMs": 89,
+   "uploadMs": 1,
+   "format": 37808,
+   "compressed": true,
+   "w": 1024,
+   "h": 1024,
+   "mips": 11
+  },
+  "normal.uastc.ktx2": {
+   "loadMs": 187,
+   "uploadMs": 1,
+   "format": 37808,
+   "compressed": true,
+   "w": 1024,
+   "h": 1024,
+   "mips": 11
+  },
+  "orm.etc1s.ktx2": {
+   "loadMs": 127,
+   "uploadMs": 2,
+   "format": 36492,
+   "compressed": true,
+   "w": 1024,
+   "h": 1024,
+   "mips": 11
+  },
+  "orm.uastc.ktx2": {
+   "loadMs": 67,
+   "uploadMs": 1,
+   "format": 37808,
+   "compressed": true,
+   "w": 1024,
+   "h": 1024,
+   "mips": 11
+  }
+ }
+}
