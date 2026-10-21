@@ -64,7 +64,7 @@
   "attributes": [
     "COLOR_0"
   ],
-  "bytes": 378376,
+  "bytes": 378320,
   "veg": {
     "kind": "tree",
     "species": "spruce",
@@ -76,7 +76,7 @@
     ]
   },
   "uvTile": {
-    "M_Bark": 2.0,
+    "M_Bark": 0.541,
     "M_Foliage_Conifer": 1.0
   },
   "source": "assets/blender/models/veg_trees.py",

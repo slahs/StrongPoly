@@ -67,15 +67,15 @@
   "attributes": [
     "COLOR_0"
   ],
-  "bytes": 56924,
+  "bytes": 57532,
   "veg": {
     "kind": "prop",
     "role": "garden"
   },
   "uvTile": {
     "M_Flora": 1.0,
-    "M_Ground_Dirt": 4.0,
-    "M_Wood_Planks": 2.0
+    "M_Ground_Dirt": 2.162,
+    "M_Wood_Planks": 0.811
   },
   "source": "assets/blender/models/veg_props.py",
   "blend": "assets/src/veg/veg_garden_bed.blend",

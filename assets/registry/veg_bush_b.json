@@ -63,15 +63,15 @@
   "attributes": [
     "COLOR_0"
   ],
-  "bytes": 114448,
+  "bytes": 114356,
   "veg": {
     "kind": "bush",
     "role": "bush",
     "height": 0.9
   },
   "uvTile": {
-    "M_Bark": 2.0,
-    "M_Foliage": 1.0
+    "M_Bark": 0.541,
+    "M_Foliage": 0.541
   },
   "source": "assets/blender/models/veg_ground.py",
   "blend": "assets/src/veg/veg_bush_b.blend",

@@ -4,28 +4,130 @@
   "doc": "Erzeugt von scripts/asset-manifest.mjs - nicht von Hand bearbeiten (Quellen: assets/materials.json, assets/registry/*.json, public/assets/textures).",
   "materials": {
     "M_Bark": {
-      "base": "#4f4134",
-      "rough": 0.93,
+      "base": "#4b463e",
+      "rough": 0.88,
       "metal": 0,
-      "tile": 2,
+      "tile": 0.541,
       "dirt": "#2b241c",
-      "maps": {}
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Bark/albedo.webp",
+          "bytes": 170610,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "528a1b681d",
+          "sizes": {
+            "512": "textures/M_Bark/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Bark/normal.webp",
+          "bytes": 910114,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "5974cab7a6",
+          "sizes": {
+            "512": "textures/M_Bark/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Bark/orm.webp",
+          "bytes": 373632,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "8e6b9b7319",
+          "sizes": {
+            "512": "textures/M_Bark/orm_512.webp"
+          }
+        }
+      }
     },
     "M_Cloth_Linen": {
-      "base": "#cfc4ab",
-      "rough": 0.92,
+      "base": "#a0998a",
+      "rough": 0.87,
       "metal": 0,
-      "tile": 1,
+      "tile": 0.25,
       "dirt": "#6a5e4b",
-      "maps": {}
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Cloth_Linen/albedo.webp",
+          "bytes": 218874,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "280f463394",
+          "sizes": {
+            "512": "textures/M_Cloth_Linen/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Cloth_Linen/normal.webp",
+          "bytes": 667108,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "bd4eba793c",
+          "sizes": {
+            "512": "textures/M_Cloth_Linen/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Cloth_Linen/orm.webp",
+          "bytes": 390298,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "aa2c5556eb",
+          "sizes": {
+            "512": "textures/M_Cloth_Linen/orm_512.webp"
+          }
+        }
+      }
     },
     "M_Cloth_Wool": {
-      "base": "#7d6a55",
-      "rough": 0.95,
+      "base": "#aea89e",
+      "rough": 0.92,
       "metal": 0,
-      "tile": 1,
+      "tile": 0.3,
       "dirt": "#3b3226",
-      "maps": {}
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Cloth_Wool/albedo.webp",
+          "bytes": 105206,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "c71e496441",
+          "sizes": {
+            "512": "textures/M_Cloth_Wool/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Cloth_Wool/normal.webp",
+          "bytes": 568656,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "e337506ec6",
+          "sizes": {
+            "512": "textures/M_Cloth_Wool/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Cloth_Wool/orm.webp",
+          "bytes": 284576,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "f41db3dd0f",
+          "sizes": {
+            "512": "textures/M_Cloth_Wool/orm_512.webp"
+          }
+        }
+      }
     },
     "M_Flora": {
       "base": "#6f8a3e",
@@ -62,14 +164,48 @@
       }
     },
     "M_Foliage": {
-      "base": "#4d6232",
-      "rough": 0.8,
+      "base": "#405128",
+      "rough": 0.54,
       "metal": 0,
-      "tile": 1,
+      "tile": 0.541,
       "dirt": "#2e3a1e",
       "alphaTest": 0.5,
       "doubleSided": true,
-      "maps": {}
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Foliage/albedo.webp",
+          "bytes": 53770,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "eb138056a8",
+          "sizes": {
+            "512": "textures/M_Foliage/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Foliage/normal.webp",
+          "bytes": 239858,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "bef957f074",
+          "sizes": {
+            "512": "textures/M_Foliage/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Foliage/orm.webp",
+          "bytes": 184790,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "606c082810",
+          "sizes": {
+            "512": "textures/M_Foliage/orm_512.webp"
+          }
+        }
+      }
     },
     "M_Foliage_Conifer": {
       "base": "#2f4527",
@@ -116,127 +252,951 @@
       }
     },
     "M_Ground_Dirt": {
-      "base": "#7a6448",
-      "rough": 0.95,
-      "metal": 0,
-      "tile": 4,
-      "dirt": "#3e3224",
-      "maps": {}
-    },
-    "M_Ground_Grass": {
-      "base": "#62703f",
-      "rough": 0.95,
-      "metal": 0,
-      "tile": 4,
-      "dirt": "#3d3a26",
-      "maps": {}
-    },
-    "M_Ground_Path": {
-      "base": "#8a7558",
-      "rough": 0.94,
-      "metal": 0,
-      "tile": 4,
-      "dirt": "#45392a",
-      "maps": {}
-    },
-    "M_Iron_Wrought": {
-      "base": "#4a4642",
-      "rough": 0.6,
-      "metal": 0.85,
-      "tile": 1,
-      "dirt": "#3a2a1c",
-      "maps": {}
-    },
-    "M_Leather": {
-      "base": "#6a4a30",
-      "rough": 0.7,
-      "metal": 0,
-      "tile": 1,
-      "dirt": "#2e2015",
-      "maps": {}
-    },
-    "M_Plaster_Lime": {
-      "base": "#d9d0bd",
-      "rough": 0.93,
-      "metal": 0,
-      "tile": 3,
-      "dirt": "#6f6352",
-      "maps": {}
-    },
-    "M_Rock": {
-      "base": "#86827a",
-      "rough": 0.9,
-      "metal": 0,
-      "tile": 4,
-      "dirt": "#454036",
-      "maps": {}
-    },
-    "M_Roof_ClayTile": {
-      "base": "#9c5a3c",
-      "rough": 0.78,
-      "metal": 0,
-      "tile": 2,
-      "dirt": "#4a3326",
-      "maps": {}
-    },
-    "M_Roof_Shingle": {
-      "base": "#6b5947",
-      "rough": 0.85,
-      "metal": 0,
-      "tile": 2,
-      "dirt": "#2f281f",
-      "maps": {}
-    },
-    "M_Roof_Thatch": {
-      "base": "#a68b5b",
-      "rough": 0.95,
-      "metal": 0,
-      "tile": 3,
-      "dirt": "#55472f",
-      "maps": {}
-    },
-    "M_Stone_Ashlar": {
-      "base": "#9a948a",
-      "rough": 0.86,
-      "metal": 0,
-      "tile": 2,
-      "dirt": "#4a4237",
-      "maps": {}
-    },
-    "M_Stone_Cobble": {
-      "base": "#7f7a72",
+      "base": "#6a5e4f",
       "rough": 0.88,
       "metal": 0,
-      "tile": 2,
-      "dirt": "#3f382e",
-      "maps": {}
+      "tile": 2.162,
+      "dirt": "#3e3224",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Ground_Dirt/albedo.webp",
+          "bytes": 208522,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "f8c8adb5ab",
+          "sizes": {
+            "512": "textures/M_Ground_Dirt/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Ground_Dirt/normal.webp",
+          "bytes": 875706,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "aa8d0d1f3f",
+          "sizes": {
+            "512": "textures/M_Ground_Dirt/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Ground_Dirt/orm.webp",
+          "bytes": 345568,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "7a0e1efac8",
+          "sizes": {
+            "512": "textures/M_Ground_Dirt/orm_512.webp"
+          }
+        }
+      }
     },
-    "M_Stone_Rubble": {
-      "base": "#8c867b",
+    "M_Ground_Grass": {
+      "base": "#515834",
+      "rough": 0.7,
+      "metal": 0,
+      "tile": 1.351,
+      "dirt": "#3d3a26",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Ground_Grass/albedo.webp",
+          "bytes": 397234,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "3fb29547dd",
+          "sizes": {
+            "512": "textures/M_Ground_Grass/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Ground_Grass/normal.webp",
+          "bytes": 804956,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "2ad6f4566a",
+          "sizes": {
+            "512": "textures/M_Ground_Grass/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Ground_Grass/orm.webp",
+          "bytes": 544310,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "b75af4d235",
+          "sizes": {
+            "512": "textures/M_Ground_Grass/orm_512.webp"
+          }
+        }
+      }
+    },
+    "M_Ground_Path": {
+      "base": "#867967",
       "rough": 0.9,
       "metal": 0,
-      "tile": 2,
-      "dirt": "#463d31",
-      "maps": {}
+      "tile": 2.162,
+      "dirt": "#45392a",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Ground_Path/albedo.webp",
+          "bytes": 232442,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "ff9bfd1bf1",
+          "sizes": {
+            "512": "textures/M_Ground_Path/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Ground_Path/normal.webp",
+          "bytes": 773486,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "c19d330f14",
+          "sizes": {
+            "512": "textures/M_Ground_Path/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Ground_Path/orm.webp",
+          "bytes": 247804,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "538edd4423",
+          "sizes": {
+            "512": "textures/M_Ground_Path/orm_512.webp"
+          }
+        }
+      }
     },
-    "M_Timber_Oak": {
-      "base": "#5e4632",
+    "M_Iron_Wrought": {
+      "base": "#65615e",
+      "rough": 0.6,
+      "metal": 0.52,
+      "tile": 0.27,
+      "dirt": "#3a2a1c",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Iron_Wrought/albedo.webp",
+          "bytes": 121166,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "002da31995",
+          "sizes": {
+            "512": "textures/M_Iron_Wrought/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Iron_Wrought/normal.webp",
+          "bytes": 436268,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "ce546bb878",
+          "sizes": {
+            "512": "textures/M_Iron_Wrought/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Iron_Wrought/orm.webp",
+          "bytes": 155432,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "49617d89fa",
+          "sizes": {
+            "512": "textures/M_Iron_Wrought/orm_512.webp"
+          }
+        }
+      }
+    },
+    "M_Leather": {
+      "base": "#664932",
+      "rough": 0.61,
+      "metal": 0,
+      "tile": 0.25,
+      "dirt": "#2e2015",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Leather/albedo.webp",
+          "bytes": 131282,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "3cbb3fcdaa",
+          "sizes": {
+            "512": "textures/M_Leather/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Leather/normal.webp",
+          "bytes": 644356,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "b730eaddf7",
+          "sizes": {
+            "512": "textures/M_Leather/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Leather/orm.webp",
+          "bytes": 182760,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "ebb2c20442",
+          "sizes": {
+            "512": "textures/M_Leather/orm_512.webp"
+          }
+        }
+      }
+    },
+    "M_Plaster_Lime": {
+      "base": "#b6ae9e",
+      "rough": 0.89,
+      "metal": 0,
+      "tile": 1.081,
+      "dirt": "#6f6352",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Plaster_Lime/albedo.webp",
+          "bytes": 192384,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "6f0e864479",
+          "sizes": {
+            "512": "textures/M_Plaster_Lime/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Plaster_Lime/normal.webp",
+          "bytes": 562946,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "f187eb609a",
+          "sizes": {
+            "512": "textures/M_Plaster_Lime/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Plaster_Lime/orm.webp",
+          "bytes": 225682,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "ce96b0be79",
+          "sizes": {
+            "512": "textures/M_Plaster_Lime/orm_512.webp"
+          }
+        }
+      }
+    },
+    "M_Rock": {
+      "base": "#858278",
+      "rough": 0.81,
+      "metal": 0,
+      "tile": 1.622,
+      "dirt": "#454036",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Rock/albedo.webp",
+          "bytes": 167202,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "3741bbfb68",
+          "sizes": {
+            "512": "textures/M_Rock/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Rock/normal.webp",
+          "bytes": 892636,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "c1b8ff6b93",
+          "sizes": {
+            "512": "textures/M_Rock/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Rock/orm.webp",
+          "bytes": 349212,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "85e41639e8",
+          "sizes": {
+            "512": "textures/M_Rock/orm_512.webp"
+          }
+        }
+      }
+    },
+    "M_Roof_ClayTile": {
+      "base": "#826757",
+      "rough": 0.79,
+      "metal": 0,
+      "tile": 0.649,
+      "dirt": "#4a3326",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Roof_ClayTile/albedo.webp",
+          "bytes": 137092,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "44759c0617",
+          "sizes": {
+            "512": "textures/M_Roof_ClayTile/albedo_512.webp",
+            "1024": "textures/M_Roof_ClayTile/albedo_1024.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Roof_ClayTile/normal.webp",
+          "bytes": 1469982,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "532b3e6713",
+          "sizes": {
+            "512": "textures/M_Roof_ClayTile/normal_512.webp",
+            "1024": "textures/M_Roof_ClayTile/normal_1024.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Roof_ClayTile/orm.webp",
+          "bytes": 339600,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "d7c060d5df",
+          "sizes": {
+            "512": "textures/M_Roof_ClayTile/orm_512.webp",
+            "1024": "textures/M_Roof_ClayTile/orm_1024.webp"
+          }
+        }
+      }
+    },
+    "M_Roof_Shingle": {
+      "base": "#696257",
+      "rough": 0.84,
+      "metal": 0,
+      "tile": 0.649,
+      "dirt": "#2f281f",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Roof_Shingle/albedo.webp",
+          "bytes": 48908,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "f6648250f6",
+          "sizes": {
+            "512": "textures/M_Roof_Shingle/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Roof_Shingle/normal.webp",
+          "bytes": 152766,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "0e8ff01ec2",
+          "sizes": {
+            "512": "textures/M_Roof_Shingle/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Roof_Shingle/orm.webp",
+          "bytes": 83816,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "898b40928e",
+          "sizes": {
+            "512": "textures/M_Roof_Shingle/orm_512.webp"
+          }
+        }
+      }
+    },
+    "M_Roof_Thatch": {
+      "base": "#6b6352",
+      "rough": 0.7,
+      "metal": 0,
+      "tile": 0.541,
+      "dirt": "#55472f",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Roof_Thatch/albedo.webp",
+          "bytes": 252478,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "8470873b4c",
+          "sizes": {
+            "512": "textures/M_Roof_Thatch/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Roof_Thatch/normal.webp",
+          "bytes": 579264,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "50480f7675",
+          "sizes": {
+            "512": "textures/M_Roof_Thatch/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Roof_Thatch/orm.webp",
+          "bytes": 408418,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "775572f4f8",
+          "sizes": {
+            "512": "textures/M_Roof_Thatch/orm_512.webp"
+          }
+        }
+      }
+    },
+    "M_Stone_Ashlar": {
+      "base": "#8f8677",
+      "rough": 0.86,
+      "metal": 0,
+      "tile": 1.351,
+      "dirt": "#4a4237",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Stone_Ashlar/albedo.webp",
+          "bytes": 94422,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "931f425610",
+          "sizes": {
+            "512": "textures/M_Stone_Ashlar/albedo_512.webp",
+            "1024": "textures/M_Stone_Ashlar/albedo_1024.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Stone_Ashlar/normal.webp",
+          "bytes": 1796796,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "2ae4ed36bb",
+          "sizes": {
+            "512": "textures/M_Stone_Ashlar/normal_512.webp",
+            "1024": "textures/M_Stone_Ashlar/normal_1024.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Stone_Ashlar/orm.webp",
+          "bytes": 191952,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "b9e9f5122a",
+          "sizes": {
+            "512": "textures/M_Stone_Ashlar/orm_512.webp",
+            "1024": "textures/M_Stone_Ashlar/orm_1024.webp"
+          }
+        }
+      }
+    },
+    "M_Stone_Cobble": {
+      "base": "#7d776d",
+      "rough": 0.79,
+      "metal": 0,
+      "tile": 1.081,
+      "dirt": "#3f382e",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Stone_Cobble/albedo.webp",
+          "bytes": 126386,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "5b92f5c17e",
+          "sizes": {
+            "512": "textures/M_Stone_Cobble/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Stone_Cobble/normal.webp",
+          "bytes": 760336,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "96ee0dfefd",
+          "sizes": {
+            "512": "textures/M_Stone_Cobble/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Stone_Cobble/orm.webp",
+          "bytes": 207856,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "858e4c06e5",
+          "sizes": {
+            "512": "textures/M_Stone_Cobble/orm_512.webp"
+          }
+        }
+      }
+    },
+    "M_Stone_Rubble": {
+      "base": "#888276",
       "rough": 0.82,
       "metal": 0,
-      "tile": 2,
+      "tile": 1.081,
+      "dirt": "#463d31",
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Stone_Rubble/albedo.webp",
+          "bytes": 164526,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "cbcd7da583",
+          "sizes": {
+            "512": "textures/M_Stone_Rubble/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Stone_Rubble/normal.webp",
+          "bytes": 845230,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "2c46f7dc40",
+          "sizes": {
+            "512": "textures/M_Stone_Rubble/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Stone_Rubble/orm.webp",
+          "bytes": 328076,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "a4fd0ab92a",
+          "sizes": {
+            "512": "textures/M_Stone_Rubble/orm_512.webp"
+          }
+        }
+      }
+    },
+    "M_Timber_Oak": {
+      "base": "#6b6156",
+      "rough": 0.77,
+      "metal": 0,
+      "tile": 0.541,
       "dirt": "#2c2219",
-      "maps": {}
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Timber_Oak/albedo.webp",
+          "bytes": 340240,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "5393ae372e",
+          "sizes": {
+            "512": "textures/M_Timber_Oak/albedo_512.webp",
+            "1024": "textures/M_Timber_Oak/albedo_1024.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Timber_Oak/normal.webp",
+          "bytes": 2480018,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "c35c9cc3de",
+          "sizes": {
+            "512": "textures/M_Timber_Oak/normal_512.webp",
+            "1024": "textures/M_Timber_Oak/normal_1024.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Timber_Oak/orm.webp",
+          "bytes": 584970,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "18aa797ad0",
+          "sizes": {
+            "512": "textures/M_Timber_Oak/orm_512.webp",
+            "1024": "textures/M_Timber_Oak/orm_1024.webp"
+          }
+        }
+      }
     },
     "M_Wood_Planks": {
-      "base": "#7a5d40",
-      "rough": 0.8,
+      "base": "#756a60",
+      "rough": 0.78,
       "metal": 0,
-      "tile": 2,
+      "tile": 0.811,
       "dirt": "#33281c",
-      "maps": {}
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Wood_Planks/albedo.webp",
+          "bytes": 177020,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "62c0889fc2",
+          "sizes": {
+            "512": "textures/M_Wood_Planks/albedo_512.webp",
+            "1024": "textures/M_Wood_Planks/albedo_1024.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Wood_Planks/normal.webp",
+          "bytes": 1215986,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "57f7c109e4",
+          "sizes": {
+            "512": "textures/M_Wood_Planks/normal_512.webp",
+            "1024": "textures/M_Wood_Planks/normal_1024.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Wood_Planks/orm.webp",
+          "bytes": 144968,
+          "w": 2048,
+          "h": 2048,
+          "format": "webp",
+          "hash": "06551d5fbd",
+          "sizes": {
+            "512": "textures/M_Wood_Planks/orm_512.webp",
+            "1024": "textures/M_Wood_Planks/orm_1024.webp"
+          }
+        }
+      }
     }
   },
   "assets": {
+    "gate_stone": {
+      "id": "gate_stone",
+      "desc": "Steintor: Torhaus mit zwei Flankentuermen, Rundbogendurchfahrt, Fallgitter (hebt sich), offene Bohlenfluegel, Pechnase auf Kragsteinen, Zinnen, Banner in Spielerfarbe",
+      "file": "models/gate_stone.glb",
+      "target": {
+        "building": "GateStone"
+      },
+      "class": "gate",
+      "footprint": [
+        4,
+        3
+      ],
+      "height": 5.39,
+      "bbox": {
+        "min": [
+          -2.035,
+          -0.005,
+          -1.28
+        ],
+        "max": [
+          2.035,
+          5.39,
+          1.538
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 5994,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Iron_Wrought",
+            "M_Roof_Shingle",
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 2044,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Iron_Wrought",
+            "M_Roof_Shingle",
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 592,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Roof_Shingle",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        }
+      ],
+      "tris": [
+        5994,
+        2044,
+        592
+      ],
+      "budget": [
+        6000,
+        2100,
+        600
+      ],
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Iron_Wrought",
+        "M_Roof_Shingle",
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ],
+      "anchors": [
+        {
+          "name": "ANCHOR_door_0",
+          "kind": "door",
+          "pos": [
+            0,
+            0,
+            1.75
+          ],
+          "extras": {
+            "kind": "door",
+            "note": "vor der Durchfahrt (aussen)"
+          }
+        },
+        {
+          "name": "ANCHOR_flag_0",
+          "kind": "flag",
+          "pos": [
+            -1.79,
+            5.15,
+            -1.02
+          ],
+          "extras": {
+            "kind": "flag",
+            "note": "Wimpelmast"
+          }
+        },
+        {
+          "name": "ANCHOR_banner_0",
+          "kind": "banner",
+          "pos": [
+            -1.38,
+            2.1,
+            1.52
+          ],
+          "extras": {
+            "kind": "banner",
+            "note": "Turmbanner"
+          }
+        },
+        {
+          "name": "ANCHOR_banner_1",
+          "kind": "banner",
+          "pos": [
+            1.38,
+            2.1,
+            1.52
+          ],
+          "extras": {
+            "kind": "banner",
+            "note": "Turmbanner"
+          }
+        }
+      ],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH",
+        "_PART",
+        "_PIVOT"
+      ],
+      "bytes": 1168188,
+      "hash": "c4515c5451",
+      "source": "assets/blender/models/gate_stone.py",
+      "blend": "assets/src/gate_stone.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "keep": {
+      "id": "keep",
+      "desc": "Bergfried/Wohnturm: Bruchstein mit Eckquadern, Hocheingang mit Holztreppe, Konsolfries, Zinnen, Scharwachttuerme, Turmaufsatz mit Zeltdach, Banner in Spielerfarbe",
+      "file": "models/keep.glb",
+      "target": {
+        "building": "Keep"
+      },
+      "class": "keep",
+      "footprint": [
+        5,
+        5
+      ],
+      "height": 9.41,
+      "bbox": {
+        "min": [
+          -2.449,
+          -0.028,
+          -2.424
+        ],
+        "max": [
+          2.78,
+          9.41,
+          2.511
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 24912,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Iron_Wrought",
+            "M_Roof_Shingle",
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 7147,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Iron_Wrought",
+            "M_Roof_Shingle",
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble",
+            "M_Timber_Oak",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 962,
+          "materials": [
+            "M_Cloth_Linen",
+            "M_Roof_Shingle",
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble",
+            "M_Timber_Oak"
+          ]
+        }
+      ],
+      "tris": [
+        24912,
+        7147,
+        962
+      ],
+      "budget": [
+        25000,
+        8750,
+        2500
+      ],
+      "materials": [
+        "M_Cloth_Linen",
+        "M_Iron_Wrought",
+        "M_Roof_Shingle",
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble",
+        "M_Timber_Oak",
+        "M_Wood_Planks"
+      ],
+      "anchors": [
+        {
+          "name": "ANCHOR_flag_0",
+          "kind": "flag",
+          "pos": [
+            0.06,
+            9.41,
+            -0.3
+          ],
+          "extras": {
+            "kind": "flag",
+            "note": "Mastspitze"
+          }
+        },
+        {
+          "name": "ANCHOR_banner_0",
+          "kind": "banner",
+          "pos": [
+            1.32,
+            2.99,
+            2.1
+          ],
+          "extras": {
+            "kind": "banner",
+            "note": "Fassadenbanner"
+          }
+        },
+        {
+          "name": "ANCHOR_door_0",
+          "kind": "door",
+          "pos": [
+            -0.42,
+            0,
+            2.57
+          ],
+          "extras": {
+            "kind": "door",
+            "note": "Fuss der Aussentreppe vor dem Hocheingang"
+          }
+        },
+        {
+          "name": "ANCHOR_smoke_0",
+          "kind": "smoke",
+          "pos": [
+            -0.44,
+            8.17,
+            -0.78
+          ],
+          "extras": {
+            "kind": "smoke",
+            "rate": 0.7,
+            "staffed": false,
+            "note": "Rauch aus dem Kamin des Wohngeschosses"
+          }
+        }
+      ],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH",
+        "_PART",
+        "_PIVOT"
+      ],
+      "bytes": 4230980,
+      "hash": "cbed93983b",
+      "source": "assets/blender/models/keep.py",
+      "blend": "assets/src/keep.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
     "veg_birch_a": {
       "id": "veg_birch_a",
       "desc": "Haengebirke, einstaemmig",
@@ -303,7 +1263,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 298780,
+      "bytes": 298692,
       "veg": {
         "kind": "tree",
         "species": "birch",
@@ -315,10 +1275,10 @@
         ]
       },
       "uvTile": {
-        "M_Bark": 2,
-        "M_Foliage": 1
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
       },
-      "hash": "7919932c44",
+      "hash": "53c83a1f69",
       "source": "assets/blender/models/veg_trees.py",
       "blend": "assets/src/veg/veg_birch_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -389,7 +1349,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 235596,
+      "bytes": 235504,
       "veg": {
         "kind": "tree",
         "species": "birch",
@@ -401,10 +1361,10 @@
         ]
       },
       "uvTile": {
-        "M_Bark": 2,
-        "M_Foliage": 1
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
       },
-      "hash": "beaa394ae0",
+      "hash": "ebe6f146c7",
       "source": "assets/blender/models/veg_trees.py",
       "blend": "assets/src/veg/veg_birch_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -475,7 +1435,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 382480,
+      "bytes": 382392,
       "veg": {
         "kind": "tree",
         "species": "birch",
@@ -487,10 +1447,10 @@
         ]
       },
       "uvTile": {
-        "M_Bark": 2,
-        "M_Foliage": 1
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
       },
-      "hash": "39b17fbcf1",
+      "hash": "4e78022893",
       "source": "assets/blender/models/veg_trees.py",
       "blend": "assets/src/veg/veg_birch_c.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -560,17 +1520,17 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 129192,
+      "bytes": 129104,
       "veg": {
         "kind": "bush",
         "role": "bush",
         "height": 1.2
       },
       "uvTile": {
-        "M_Bark": 2,
-        "M_Foliage": 1
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
       },
-      "hash": "c24ecaded7",
+      "hash": "44e3828adf",
       "source": "assets/blender/models/veg_ground.py",
       "blend": "assets/src/veg/veg_bush_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -640,17 +1600,17 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 114448,
+      "bytes": 114356,
       "veg": {
         "kind": "bush",
         "role": "bush",
         "height": 0.9
       },
       "uvTile": {
-        "M_Bark": 2,
-        "M_Foliage": 1
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
       },
-      "hash": "cd5005b723",
+      "hash": "68d940ab16",
       "source": "assets/blender/models/veg_ground.py",
       "blend": "assets/src/veg/veg_bush_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -717,15 +1677,15 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 18400,
+      "bytes": 20464,
       "veg": {
         "kind": "prop",
         "role": "fence"
       },
       "uvTile": {
-        "M_Timber_Oak": 2
+        "M_Timber_Oak": 0.541
       },
-      "hash": "727b186c56",
+      "hash": "6febfd4ddc",
       "source": "assets/blender/models/veg_props.py",
       "blend": "assets/src/veg/veg_fence_rail.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -792,15 +1752,15 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 83492,
+      "bytes": 91360,
       "veg": {
         "kind": "prop",
         "role": "fence"
       },
       "uvTile": {
-        "M_Bark": 2
+        "M_Bark": 0.541
       },
-      "hash": "7b35d5073a",
+      "hash": "c325af8e65",
       "source": "assets/blender/models/veg_props.py",
       "blend": "assets/src/veg/veg_fence_wattle.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1099,17 +2059,17 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 56924,
+      "bytes": 57532,
       "veg": {
         "kind": "prop",
         "role": "garden"
       },
       "uvTile": {
         "M_Flora": 1,
-        "M_Ground_Dirt": 4,
-        "M_Wood_Planks": 2
+        "M_Ground_Dirt": 2.162,
+        "M_Wood_Planks": 0.811
       },
-      "hash": "0383998e32",
+      "hash": "c9b59c4352",
       "source": "assets/blender/models/veg_props.py",
       "blend": "assets/src/veg/veg_garden_bed.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1330,16 +2290,16 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 28568,
+      "bytes": 32816,
       "veg": {
         "kind": "prop",
         "role": "log"
       },
       "uvTile": {
-        "M_Bark": 2,
-        "M_Timber_Oak": 2
+        "M_Bark": 0.541,
+        "M_Timber_Oak": 0.541
       },
-      "hash": "0b2f1357d9",
+      "hash": "6de00461f4",
       "source": "assets/blender/models/veg_props.py",
       "blend": "assets/src/veg/veg_log.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1410,7 +2370,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 318768,
+      "bytes": 318676,
       "veg": {
         "kind": "tree",
         "species": "oak",
@@ -1422,10 +2382,10 @@
         ]
       },
       "uvTile": {
-        "M_Bark": 2,
-        "M_Foliage": 1
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
       },
-      "hash": "a7900a3742",
+      "hash": "5bd4ef04f2",
       "source": "assets/blender/models/veg_trees.py",
       "blend": "assets/src/veg/veg_oak_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1496,7 +2456,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 255732,
+      "bytes": 255640,
       "veg": {
         "kind": "tree",
         "species": "oak",
@@ -1508,10 +2468,10 @@
         ]
       },
       "uvTile": {
-        "M_Bark": 2,
-        "M_Foliage": 1
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
       },
-      "hash": "52e7aa707b",
+      "hash": "12882e5d44",
       "source": "assets/blender/models/veg_trees.py",
       "blend": "assets/src/veg/veg_oak_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1582,7 +2542,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 151088,
+      "bytes": 150996,
       "veg": {
         "kind": "tree",
         "species": "oak",
@@ -1594,10 +2554,10 @@
         ]
       },
       "uvTile": {
-        "M_Bark": 2,
-        "M_Foliage": 1
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
       },
-      "hash": "2bfe10d9ed",
+      "hash": "69afeabc12",
       "source": "assets/blender/models/veg_trees.py",
       "blend": "assets/src/veg/veg_oak_c.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1664,15 +2624,15 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 113492,
+      "bytes": 152164,
       "veg": {
         "kind": "rock",
         "role": "boulder"
       },
       "uvTile": {
-        "M_Rock": 4
+        "M_Rock": 1.622
       },
-      "hash": "2001d58f61",
+      "hash": "bb863d528c",
       "source": "assets/blender/models/veg_rocks.py",
       "blend": "assets/src/veg/veg_rock_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1739,15 +2699,15 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 109892,
+      "bytes": 144840,
       "veg": {
         "kind": "rock",
         "role": "rock"
       },
       "uvTile": {
-        "M_Rock": 4
+        "M_Rock": 1.622
       },
-      "hash": "5a71918e94",
+      "hash": "61cf8dd3e9",
       "source": "assets/blender/models/veg_rocks.py",
       "blend": "assets/src/veg/veg_rock_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1814,15 +2774,15 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 106532,
+      "bytes": 145444,
       "veg": {
         "kind": "rock",
         "role": "rock"
       },
       "uvTile": {
-        "M_Rock": 4
+        "M_Rock": 1.622
       },
-      "hash": "5b42b77554",
+      "hash": "5152d66a92",
       "source": "assets/blender/models/veg_rocks.py",
       "blend": "assets/src/veg/veg_rock_c.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1889,15 +2849,15 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 121656,
+      "bytes": 129120,
       "veg": {
         "kind": "rock",
         "role": "stones"
       },
       "uvTile": {
-        "M_Rock": 4
+        "M_Rock": 1.622
       },
-      "hash": "22105b1bc1",
+      "hash": "7c8ac063b1",
       "source": "assets/blender/models/veg_rocks.py",
       "blend": "assets/src/veg/veg_rock_d.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -1968,7 +2928,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 389492,
+      "bytes": 389436,
       "veg": {
         "kind": "tree",
         "species": "spruce",
@@ -1980,10 +2940,10 @@
         ]
       },
       "uvTile": {
-        "M_Bark": 2,
+        "M_Bark": 0.541,
         "M_Foliage_Conifer": 1
       },
-      "hash": "5efbfe3cdd",
+      "hash": "db9a25833c",
       "source": "assets/blender/models/veg_trees.py",
       "blend": "assets/src/veg/veg_spruce_a.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -2054,7 +3014,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 378376,
+      "bytes": 378320,
       "veg": {
         "kind": "tree",
         "species": "spruce",
@@ -2066,10 +3026,10 @@
         ]
       },
       "uvTile": {
-        "M_Bark": 2,
+        "M_Bark": 0.541,
         "M_Foliage_Conifer": 1
       },
-      "hash": "4e38ebba92",
+      "hash": "ac2636932b",
       "source": "assets/blender/models/veg_trees.py",
       "blend": "assets/src/veg/veg_spruce_b.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
@@ -2140,7 +3100,7 @@
       "attributes": [
         "COLOR_0"
       ],
-      "bytes": 218760,
+      "bytes": 218704,
       "veg": {
         "kind": "tree",
         "species": "spruce",
@@ -2152,12 +3112,253 @@
         ]
       },
       "uvTile": {
-        "M_Bark": 2,
+        "M_Bark": 0.541,
         "M_Foliage_Conifer": 1
       },
-      "hash": "71fecbc018",
+      "hash": "1ad7619fc8",
       "source": "assets/blender/models/veg_trees.py",
       "blend": "assets/src/veg/veg_spruce_c.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "wall_high_arm": {
+      "id": "wall_high_arm",
+      "desc": "Hohe Steinmauer, Arm: Bruchstein mit Anlauf, Sockel mit Wasserschlag, Gesims, Wehrgang mit Bruestungen, Ruest-/Balkenloecher",
+      "file": "models/wall_high_arm.glb",
+      "target": {
+        "wall": "WallHigh",
+        "piece": "arm"
+      },
+      "class": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "height": 2.76,
+      "bbox": {
+        "min": [
+          -0.003,
+          0,
+          -0.45
+        ],
+        "max": [
+          0.503,
+          2.76,
+          0.45
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 390,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 232,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 36,
+          "materials": [
+            "M_Stone_Rubble"
+          ]
+        }
+      ],
+      "tris": [
+        390,
+        232,
+        36
+      ],
+      "budget": [
+        1500,
+        600,
+        200
+      ],
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 67204,
+      "lodDist": [
+        1.5
+      ],
+      "hash": "2473798cd7",
+      "source": "assets/blender/models/wall_high_arm.py",
+      "blend": "assets/src/wall_high_arm.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "wall_high_post": {
+      "id": "wall_high_post",
+      "desc": "Hohe Steinmauer, Pfosten: Kern fuer Ecken/T-Stoesse (im geraden Lauf verdeckt), vier Zinnen mit Abdeckplatten, zwei mit Scharte",
+      "file": "models/wall_high_post.glb",
+      "target": {
+        "wall": "WallHigh",
+        "piece": "post"
+      },
+      "class": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "height": 3.117,
+      "bbox": {
+        "min": [
+          -0.444,
+          0,
+          -0.444
+        ],
+        "max": [
+          0.444,
+          3.117,
+          0.444
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 1162,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 412,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 72,
+          "materials": [
+            "M_Stone_Rubble"
+          ]
+        }
+      ],
+      "tris": [
+        1162,
+        412,
+        72
+      ],
+      "budget": [
+        1500,
+        600,
+        200
+      ],
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 163904,
+      "lodDist": [
+        1.5
+      ],
+      "hash": "a1b01a09ea",
+      "source": "assets/blender/models/wall_high_post.py",
+      "blend": "assets/src/wall_high_post.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "wall_high_stub": {
+      "id": "wall_high_stub",
+      "desc": "Hohe Steinmauer, Einzelpfeiler: Sockel, Bruchsteinkern mit umlaufender Bruestung, vier Zinnen, Abdeckplatten",
+      "file": "models/wall_high_stub.glb",
+      "target": {
+        "wall": "WallHigh",
+        "piece": "stub"
+      },
+      "class": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "height": 3.129,
+      "bbox": {
+        "min": [
+          -0.45,
+          0,
+          -0.45
+        ],
+        "max": [
+          0.45,
+          3.129,
+          0.45
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 1300,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 502,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 96,
+          "materials": [
+            "M_Stone_Ashlar",
+            "M_Stone_Rubble"
+          ]
+        }
+      ],
+      "tris": [
+        1300,
+        502,
+        96
+      ],
+      "budget": [
+        1500,
+        600,
+        200
+      ],
+      "materials": [
+        "M_Stone_Ashlar",
+        "M_Stone_Rubble"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0",
+        "_BUILD",
+        "_BUILDH"
+      ],
+      "bytes": 181788,
+      "lodDist": [
+        1.5
+      ],
+      "hash": "6671152407",
+      "source": "assets/blender/models/wall_high_stub.py",
+      "blend": "assets/src/wall_high_stub.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "well": {
@@ -2259,8 +3460,8 @@
         "_BUILD",
         "_BUILDH"
       ],
-      "bytes": 434880,
-      "hash": "b1f0f1bf06",
+      "bytes": 439116,
+      "hash": "10563d46d3",
       "source": "assets/blender/models/well.py",
       "blend": "assets/src/well.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"

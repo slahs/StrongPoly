@@ -60,13 +60,13 @@
   "attributes": [
     "COLOR_0"
   ],
-  "bytes": 121656,
+  "bytes": 129120,
   "veg": {
     "kind": "rock",
     "role": "stones"
   },
   "uvTile": {
-    "M_Rock": 4.0
+    "M_Rock": 1.622
   },
   "source": "assets/blender/models/veg_rocks.py",
   "blend": "assets/src/veg/veg_rock_d.blend",

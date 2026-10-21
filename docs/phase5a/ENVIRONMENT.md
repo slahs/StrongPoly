@@ -115,7 +115,7 @@ LOD aus derselben Form mit weniger Unterteilung, Moosanteil in der Datenfarbe, A
   classic unverändert. **Kein Bloom** (zusätzliche Render-Ziele/Programme, auf Safari/M3 nicht gemessen – bewusst weggelassen).
 
 ### Tonemapping-Vergleich AgX ↔ ACES (Mittel, gleiche Szene/Sonne, links AgX, rechts ACES)
-![AgX/ACES Landschaft](assets/environment/tonemapping_agx_aces_3d-landscape.jpg)
+![AgX/ACES Landschaft](assets/environment/tonemapping_agx_aces_3h-landscape.jpg)
 ![AgX/ACES RTS](assets/environment/tonemapping_agx_aces_1-rts.jpg)
 
 Entscheidung **AgX**: ACES verdunkelt die Schatten deutlich (Figuren im Hausschatten schlechter lesbar), sättigt Ziegelrot
@@ -127,7 +127,7 @@ für Vergleiche abrufbar (`&tone=aces`).
 - Szene ergänzt (`lookdev_scene.ts`): Karrenweg vom Tor über den Platz, Abzweig zum Bergfried, Gasse zur Schmiede,
   Fußpfad zur Bäckerei (`road`), einzelne Solitärbäume (`tree`), Gärten mit Flechtzaun, Weide mit Holzzaun, Findling,
   Lesesteine, liegender Stamm (`prop`, `propLine`); Waldsäume wie bisher.
-- Neue Kamera `3d-landscape` (Landschafts-Nahkamera: Garten, Waldsaum Eiche/Birke/Fichte, Wiese).
+- Neue Kamera `3h-landscape` (Landschafts-Nahkamera: Garten, Waldsaum Eiche/Birke/Fichte, Wiese).
 - `&tone=agx|aces` (Vergleich), LookDev wartet auf Bodentexturen und Vegetation (`GameScene.whenEnvReady`), ebenso `?bench&style=medieval`.
 
 <!-- MESSUNG -->

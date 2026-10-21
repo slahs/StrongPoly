@@ -60,13 +60,13 @@
   "attributes": [
     "COLOR_0"
   ],
-  "bytes": 83492,
+  "bytes": 91360,
   "veg": {
     "kind": "prop",
     "role": "fence"
   },
   "uvTile": {
-    "M_Bark": 2.0
+    "M_Bark": 0.541
   },
   "source": "assets/blender/models/veg_props.py",
   "blend": "assets/src/veg/veg_fence_wattle.blend",

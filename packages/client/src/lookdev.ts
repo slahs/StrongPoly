@@ -16,7 +16,7 @@ import { setToneOp } from './render/env/atmosphere';
  * Dekor, EntityRenderer mit Override-Register), feste Kameras, Stil alt/neu, Qualitätsstufe, Sonnenstand, Statistik.
  *
  *   ?lookdev=medieval|classic   Stil (gleichbedeutend &style=)
- *   &cam=1-rts|2-mid|3a-building|3b-figures|3c-material|3d-landscape   &tone=agx|aces (nur medieval)
+ *   &cam=1-rts|2-mid|3a-building|3b-figures|3c-material|3h-landscape   &tone=agx|aces (nur medieval)
  *   &quality=low|medium|high    &sun=game|<Stunde 6..19>     &frames=N (Einschwingen, Standard 30)
  *   &ui=0 (ohne Leiste, für Aufnahmen)  &stats=0 (ohne Statistik)  &live=0 (Standbild nach dem Einschwingen)
  *

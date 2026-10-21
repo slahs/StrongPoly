@@ -335,7 +335,7 @@ describe('LookDev-Umgebung', () => {
       expect(MANIFEST.assets[p.id], p.id).toBeDefined();
       expect(p.x >= 0 && p.y >= 0 && p.x < spec.size && p.y < spec.size).toBe(true);
     }
-    expect(LOOKDEV_CAMS.map((c) => c.id)).toContain('3d-landscape');
+    expect(LOOKDEV_CAMS.map((c) => c.id)).toContain('3h-landscape');
     expect(LOOKDEV_LAYOUT.some((it) => it.kind === 'road')).toBe(true);
   });
 });

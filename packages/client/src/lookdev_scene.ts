@@ -83,6 +83,9 @@ export const LOOKDEV_LAYOUT: LayoutItem[] = [
   { kind: 'building', t: BT.GateStone, x: -1, y: 11, note: 'Steintor' },
   { kind: 'wall', t: BT.WallHigh, x0: -12, y0: 12, x1: -2, y1: 12 },
   { kind: 'wall', t: BT.WallHigh, x0: 3, y0: 12, x1: 13, y1: 12 },
+  // Eckstoß (L) im Westen, T-Stoß im Osten (Prüfung der Mauerstücke an Ecken/Abzweigen)
+  { kind: 'wall', t: BT.WallHigh, x0: -12, y0: 11, x1: -12, y1: 7 },
+  { kind: 'wall', t: BT.WallHigh, x0: 8, y0: 13, x1: 8, y1: 15 },
   // Figuren
   { kind: 'unit', t: U.Peasant, x: 1.4, y: 6.2, face: 0.5, mode: 'idle' },
   { kind: 'unit', t: U.Peasant, x: 2.4, y: 2.6, face: 2.6, mode: 'work' },
@@ -111,7 +114,12 @@ export const LOOKDEV_CAMS: LookdevCam[] = [
   { id: '3a-building', label: '3a Gebäude', x: -6.5, y: -7, dist: 10.5, yaw: 0.55, pitch: 20, lookHeight: 1.5, fog: 2.2 },
   { id: '3b-figures', label: '3b Figuren', x: 0.9, y: 7.3, dist: 4.4, yaw: 0.55, pitch: 13, lookHeight: 0.5, fog: 4 },
   { id: '3c-material', label: '3c Material', x: 2.5, y: 1.5, dist: 2.7, yaw: 0.45, pitch: 17, lookHeight: 0.55, fog: 5 },
-  { id: '3d-landscape', label: '3d Landschaft', x: 10.5, y: -6, dist: 10, yaw: -0.75, pitch: 13, lookHeight: 1.1, fog: 2.6 },
+  // Burg: Bergfried ganz, Steintor mit Mauer, Mauerstoß am Tor (nah)
+  { id: '3d-keep', label: '3d Bergfried', x: -8.5, y: -10.5, dist: 15, yaw: 0.62, pitch: 15, lookHeight: 3.3, fog: 2 },
+  { id: '3e-gate', label: '3e Tor', x: 1, y: 12.5, dist: 10.5, yaw: -0.55, pitch: 14, lookHeight: 1.7, fog: 2.5 },
+  { id: '3f-wall', label: '3f Mauer', x: -3.6, y: 12.5, dist: 5.2, yaw: 0.8, pitch: 13, lookHeight: 1.3, fog: 4 },
+  { id: '3g-corner', label: '3g Mauerecke', x: -11.5, y: 12, dist: 7.5, yaw: -0.75, pitch: 24, lookHeight: 1.6, fog: 3 },
+  { id: '3h-landscape', label: '3h Landschaft', x: 10.5, y: -6, dist: 10, yaw: -0.75, pitch: 13, lookHeight: 1.1, fog: 2.6 },
 ];
 
 /** Karten-Seed mit feuchtem Biom ('lush': grüne Wiesen, Laub- und Nadelbäume) */

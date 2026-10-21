@@ -40,6 +40,8 @@ class Asset:
         self.desc = desc
         self.lod_dist = lod_dist
         self.objects = []
+        # Mauerstuecke: Schmutz-/Abnutzungsrauschen spiegelsymmetrisch in y (nahtlose Stoesse gedrehter Instanzen)
+        self.noise_mirror_y = False
         self.coll = scene.collection(f'{asset_id}_src')
         self.t0 = time.time()
 
@@ -219,7 +221,7 @@ def finish(A, preview_on=None, bake_on=None, manifest_on=None):
         lod.data.name = lod.name
         if bake_on:
             bake_s += bake.bake_ao(lod, samples=16 if fast else 64, distance=max(0.6, min(2.0, H * 0.6)))
-        attrs.fill_dirt_wear(lod, seed=L)
+        attrs.fill_dirt_wear(lod, seed=L, mirror_y=A.noise_mirror_y)
         attrs.strip_helpers(lod)
         tris = checks.lod_mesh(rep, lod, L, A.budget[L] if A.budget else None, parts=animated)
         e = bpy.data.objects.new(config.LOD_NAMES[L], None)

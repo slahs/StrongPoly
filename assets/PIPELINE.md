@@ -101,6 +101,119 @@ pnpm build && node scripts/lookdev.mjs --styles=classic,medieval --qualities=med
 
 ---
 
+## Materialbibliothek (Material-Agent, ergänzt)
+
+Alle 19 Bibliotheksmaterialien sind vollständig prozedural in Blender erzeugt (keine Fotos/Scans/Fremdtexturen).
+Skripte: `assets/blender/materials/M_*.py` + gemeinsame Hilfen `_common.py`; Bau: `scripts/assets/build-materials.sh [M_Name …]`.
+
+### Verfahren
+1. **Echte Quellgeometrie je Material** (deterministisch, feste Seeds): Quader mit gerundeten, verwitterten Kanten und
+   muscheligen Abplatzungen (Kugel-Ausschnitte) im Fugenbett; Bruch-/Pflastersteine als dicht gepackte, gerundete Körper
+   (gewichtete periodische Voronoi-Packung); Biberschwanzziegel und Holzschindeln als geschlossene, geneigte, überlappende
+   Einzelkörper; Stroh (~29 000 Halme), Leinen/Wolle (Fäden in Leinwand-/Köperbindung, Flaum) und Zweige als
+   Cycles-3D-Kurven; Gras (~105 000 Halmstreifen, ~2 600 Kleepflanzen, Wegerich-Rosetten) und Laub (einzeln modellierte, gefaltete Blätter an
+   Zweigen) als Netze; Holz, Putz, Eisen, Leder, Erde, Weg, Fels, Rinde als Höhenfeld-Ebene mit ~1 Mio. Vertices aus
+   periodischen Feldern (Maserung, Kellenzüge, Hammerschläge, Narben, Schollen, Fahrspuren, Bruchfacetten, Furchen).
+   Feinstruktur (Korn, Poren, Fasern, Riefen) per Shader-Bump in Metern.
+2. **Kachelbarkeit:** Inhalt der Kachel liegt in der Sammlung `TILE`, die 8-mal um ±T versetzt instanziert wird
+   (Überhänge, Schatten/AO über die Ränder); Shader-Rauschen über Torus-Abbildung (4D-Rauschen), numpy-Felder per
+   Spektralsynthese/periodischem Worley. Nahtprüfung: 2×2-Kachelung + Kennzahl Randsprung/Nachbarsprung (Arbeitsordner
+   `seam_2x2.jpg`, Kennzahl > 1 nur dort, wo eine Fuge exakt auf dem Rand liegt – sichtgeprüft ohne Naht).
+3. **„Bake“ per Draufsicht:** orthografische Kamera exakt über einer Kachel, Cycles CPU (2 Threads, 2048², 8–16 spp – bei stark ausgelastetem
+   Rechner; Eisen, Leder, Wolle, Laub direkt 1024² –, ohne Lichtsprünge): Normal-Pass (Weltraum = Tangentenraum der Draufsicht, inkl. Bump), AO-Pass (Reichweite je
+   Material 0,1–6 cm), AOVs `albedo` (ohne Licht), `rough`, `metal`, `height`. Laub-Atlas mit Alpha (Film transparent,
+   Farbränder per nächstem Nachbarn aufgefüllt gegen dunkle Säume).
+4. **Nachbearbeitung (numpy):** Albedo linear → sRGB; Normal OpenGL (+Y oben), normiert; ORM = R AO (leicht geglättet),
+   G Rauheit, B Metall; Höhe 0..1 über `info.heightMm`. Für sehr tiefe Strukturen (Dach-, Stroh-, Gras-, Laub-, Rinden- und
+   Stoffmaterialien) ist ein Teil der AO in die Albedo eingerechnet (`albedo_ao` 0,3–0,7), weil three die `aoMap` nur auf
+   indirektes Licht anwendet. Downscale mit Normalen-Renormierung und Toksvig-Anpassung der Rauheit.
+5. **Ausgabe nach Pipeline-Konvention:** verlustfreie Quellen `assets/src/textures/<M>/{albedo,normal,orm}.png`
+   (+ `height.png` 16 bit, derzeit nicht ausgeliefert), Eintrag in `assets/materials.json`, dann
+   `assets/blender/tools/textures.py --only=<M>` (WebP + `_1024`/`_512`, Manifest), Cycles-Vorschau aus den
+   ausgelieferten 1024er WebP: `docs/phase5a/materials/<M>.jpg`, Übersicht `docs/phase5a/materials/library.jpg`.
+
+Die PNG-Quellen (je Material 3–15 MB) und die Render-EXR werden **nicht eingecheckt** (`assets/src/textures/.gitignore`),
+sie entstehen deterministisch neu. `.blend`-Quellen liegen nur vor, wo sie ≤ 5 MB sind (Stroh, Leinen, Wolle, Laub);
+bei den Höhenfeld-/Steinmaterialien (20–30 MB) ist das Skript die bearbeitbare Quelle.
+
+### Einträge in `assets/materials.json`
+- `tile` = Spiel-Einheiten je Texturwiederholung = physikalisches Maß / 1,85 m (Ausnahme: Leinen 0,25, Wolle 0,3,
+  Leder 0,25 – bewusst 1,3–4× vergrößert, sonst liegt die Webstruktur selbst in der Nahansicht unter einem Pixel).
+- `base`/`rough`/`metal` = Mittelwerte der Karten (Rückfall ohne Textur), `dirt` unverändert.
+- `info`: Beschreibung, Orientierung (U/V), Kachelmaß in m, Quellauflösung, Texel je Einheit, Relieftiefe (mm),
+  empfohlener Tönungsbereich für Instanzvariation (`tint`: hue ±, saturation, value), Skript + Seed; Laub zusätzlich
+  `atlas` (2×2-Zellen, UV-Ursprung unten links) und `translucency` (Durchlicht-Hinweis). Die Laufzeit liest `info` nicht.
+
+### Orientierung
+Wände: U horizontal, V nach oben (Quader-Lagerfugen, Bruchstein flach gelagert, Putz-Schmutzläufe nach unten).
+Holz: `M_Timber_Oak` Faser entlang U (Balkenachse), `M_Wood_Planks` Bretter senkrecht entlang V. Dächer: V = Gefälle
+aufwärts (Ziegel-/Schindelunterkanten zeigen nach −V, Halme entlang V). Weg: V = Wegrichtung, Spuren bei U = 0,32/0,68.
+Rinde: V = Stammachse. Böden, Fels, Leder: isotrop.
+
+### Materialliste, Auflösungen, Dateigrößen (WebP, ausgeliefert)
+| Material | tile Einh. (m) | Quelle px | px/Einh. | 2048 KB | 1024 KB | 512 KB | KTX2-1024 KB (Messung) | Relief mm |
+|---|---|---|---|---|---|---|---|---|
+| `M_Stone_Ashlar` | 1.351 (2.5 m) | 2048 | 1515.5 | 2083 | 379 | 90 | 1119 | 50.6 |
+| `M_Stone_Rubble` | 1.081 (2.0 m) | 1024 | 947.2 | – | 1338 | 328 | 1853 | 92.1 |
+| `M_Stone_Cobble` | 1.081 (2.0 m) | 1024 | 947.2 | – | 1095 | 268 | 1818 | 56.1 |
+| `M_Plaster_Lime` | 1.081 (2.0 m) | 1024 | 947.2 | – | 981 | 230 | 1677 | 25.0 |
+| `M_Timber_Oak` | 0.541 (1.0 m) | 2048 | 3788.8 | 3405 | 953 | 233 | 1704 | 19.8 |
+| `M_Wood_Planks` | 0.811 (1.5 m) | 2048 | 2525.9 | 1538 | 455 | 110 | 1128 | 19.3 |
+| `M_Roof_ClayTile` | 0.649 (1.2 m) | 2048 | 3157.3 | 1947 | 372 | 102 | 997 | 33.4 |
+| `M_Roof_Thatch` | 0.541 (1.0 m) | 1024 | 1894.4 | – | 1240 | 373 | 1751 | 86.5 |
+| `M_Roof_Shingle` | 0.649 (1.2 m) | 1024 | 1578.7 | – | 285 | 95 | 937 | 29.4 |
+| `M_Iron_Wrought` | 0.27 (0.5 m) | 1024 | 3788.8 | – | 713 | 202 | 1546 | 3.2 |
+| `M_Cloth_Linen` | 0.25 (0.12 m) | 1024 | 4096.0 | – | 1276 | 427 | 1584 | 1.7 |
+| `M_Cloth_Wool` | 0.3 (0.16 m) | 1024 | 3413.3 | – | 958 | 345 | 1553 | 3.4 |
+| `M_Leather` | 0.25 (0.35 m) | 1024 | 4096.0 | – | 958 | 256 | 1716 | 4.4 |
+| `M_Ground_Grass` | 1.351 (2.5 m) | 1024 | 757.8 | – | 1746 | 414 | 1888 | 138.6 |
+| `M_Ground_Dirt` | 2.162 (4.0 m) | 1024 | 473.6 | – | 1430 | 338 | 1836 | 113.6 |
+| `M_Ground_Path` | 2.162 (4.0 m) | 1024 | 473.6 | – | 1254 | 303 | 1808 | 89.9 |
+| `M_Rock` | 1.622 (3.0 m) | 1024 | 631.5 | – | 1409 | 347 | 1862 | 519.6 |
+| `M_Bark` | 0.541 (1.0 m) | 1024 | 1894.4 | – | 1454 | 358 | 1860 | 44.5 |
+| `M_Foliage` | 0.541 (1.0 m) | 1024 | 1894.4 | – | 478 | 169 | 947 | 89.7 |
+| **Summe** | | | | 9.0 MB | 18.8 MB | 5.0 MB | 29.6 MB | |
+
+Gesamt aller Stufen: **32,7 MB** (Budget ≤ 40 MB). „px/Einh.“ = Texel je Spiel-Einheit der größten Fassung (Richtwert 256).
+
+### Formatentscheidung (Messung an den echten Karten)
+- **Ausgeliefert: WebP** (Entscheidung der Pipeline, bestätigt). Anteil an der Gesamtgröße: Normal 64 %, ORM 22 %,
+  Albedo 14 %. Normal-WebP q95 (Ashlar 1024): mittlerer Winkelfehler 2,5°, 99-%-Quantil 15° (Kanten;
+  4:2:0-Farbunterabtastung) bei 0,3 MB gegenüber verlustfrei 1,4 MB – in Cycles-Vorschau und LookDev unauffällig.
+- **KTX2/Basis gemessen** (basisu 1.16.4, Albedo/ORM ETC1S q255, Normal UASTC Stufe 2 + RDO λ=2 + Zstd 19, jeweils
+  mit Mipmaps; Spalte „KTX2-1024“): Summe der 1024er Stufe ≈ 29,6 MB gegenüber ≈ 18,8 MB WebP, d. h. **Dateien ~1,6×
+  größer** (UASTC-Normalen 0,8–1,4 MB je Karte), dafür **GPU-Speicher ÷4** (BC7/ASTC 1 Byte/Pixel statt RGBA8 4 Byte)
+  und Transkodieren im Worker statt Dekodieren im Hauptthread. Einzeltest (Testrender Ashlar 1024): ETC1S-Albedo
+  41,5 dB PSNR / 146 KB, UASTC-Normal 1,7° (λ=1) bis 3,5° (λ=6) Fehler / 1,16–0,88 MB, ETC1S-Normal 5,2° (blockig,
+  unbrauchbar).
+- **GPU-Speicher (geschätzt, RGBA8 + Mipmaps, 3 Karten je Material):** 512 → 4,2 MB, 1024 → 16,8 MB,
+  2048 → 67 MB je Material. Alle 19 Materialien gleichzeitig: Niedrig ≈ 80 MB, Mittel ≈ 319 MB, Hoch ≈ 520 MB
+  (4 Materialien mit 2048). **Gemessen** im LookDev (`?lookdev=medieval`, Kamera `3c-material`, Software-GL; nur der
+  Brunnen nutzt bisher 6 Bibliotheksmaterialien): Texturspeicher Niedrig/Mittel/Hoch 32,9 / 128,9 / 320,9 MB gegenüber
+  8,7 / 32,7 / 128,7 MB ohne Bibliothekstexturen (Pipeline-Messung, „classic“) → **+24 / +96 / +192 MB für 6 Materialien**
+  (Hoch: Eiche und Bretter in 2048). Bilder: `docs/phase5a/materials/lookdev_3c-material_{medium,high}.jpg`. **Mit KTX2 (5B) ÷4** – für Hoch auf dem M3 der wichtigste
+  Grund für KTX2; die Laufzeit ist vorbereitet (`<karte>.ktx2` + Transcoder), `STRONGPOLY_MAT_KTX2=1` erzeugt die Messung.
+- **Download/Ladezeit (Schätzung, alle 19 Materialien):** Niedrig 5,0 MB, Mittel 18,8 MB, Hoch 25,6 MB → bei 50 Mbit/s
+  ≈ 0,8 / 3,0 / 4,1 s; Dekodieren ~16 ms je 1024²-WebP (Pipeline-Messung, Software-GL) → ≈ 0,9 s Hauptthread für 57 Karten
+  (einmalig beim ersten Laden des Stils `medieval`, danach Browser-Cache). Eine Szene lädt nur die genutzten Materialien.
+
+### Qualitätsstufen
+Niedrig `_512`, Mittel `_1024`, Hoch = größte vorhandene Fassung. 2048 nur für `M_Stone_Ashlar`, `M_Timber_Oak`,
+`M_Wood_Planks`, `M_Roof_ClayTile` (Stein/Holz/Dach mit Nahansicht-Nutzen; Budget). Weitere 2048er Sätze entstehen durch
+`"2k"` in `tiers` des Skripts + `STAGE=post` (der 2048er Render liegt immer vor). Texeldichte bereits bei 1024 meist 400–2000 px je Einheit (Richtwert 256),
+die 2048er Fassung lohnt nur für Nahaufnahmen/LookDev.
+
+### Hinweise für Asset-Autoren
+- Gebrauchsspuren gebäudebezogen über `COLOR_0` (Schmutz/Kantenabnutzung), nicht in den Kacheltexturen.
+- Putzschäden: `M_Plaster_Lime` enthält nur eine kleine Abplatzung; größere Schäden per Hoehen-Blend mit
+  `M_Stone_Rubble` (Höhe in `assets/src/textures/M_Plaster_Lime/height.png`; ein Laufzeit-Blend ist noch nicht gebaut).
+- Laub: Karten je Atlas-Zelle (`info.atlas.cells`), Alpha-Test 0,5, doppelseitig; Durchlicht als Wrap-/Rückseitenlicht.
+- Stoffe: heller Naturton, Leder mittelbraun; Einfärben über Material-/Instanzfarbe (Teamfarbe über die bestehende Teamfarben-Logik, Bereich in `info.tint`).
+
+### Werkzeuge der Materialbibliothek
+`~/bpyenv` zusätzlich: `pip install Pillow OpenEXR scipy`. Optional `STRONGPOLY_MAT_KTX2=1` (installiert basisu über npm
+`basis_universal@1.16.4-1` in den Arbeitsordner, misst KTX2 nur im Arbeitsordner).
+
 ## Vegetation und Umgebung (Teilschritt 5, ergänzt)
 
 Begründungen, Messwerte und Bilder: `docs/phase5a/ENVIRONMENT.md`.

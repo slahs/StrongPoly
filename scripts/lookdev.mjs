@@ -5,7 +5,7 @@
  *   <out>/<stil>/<stufe>/<kamera>.jpg  +  <out>/<stil>/<stufe>/stats.json  +  <out>/stats.json (Übersicht)
  *
  *   node scripts/lookdev.mjs [--out=docs/phase5a/lookdev] [--styles=classic,medieval] [--qualities=low,medium,high]
- *                            [--cams=1-rts,2-mid,3a-building,3b-figures,3c-material,3d-landscape] [--viewport=1280x720] [--frames=30]
+ *                            [--cams=1-rts,2-mid,3a-building,3b-figures,3c-material,3d-keep,3e-gate,3f-wall,3g-corner,3h-landscape] [--viewport=1280x720] [--frames=30]
  *                            [--sun=game|<Stunde>] [--check] [--hw] [--port=5641] [--dist=<gebauter Client>] [--url=http://…]
  *                            [--tone=agx|aces] (nur medieval) [--timeout=<s je Bild, Standard 900>]
  *
@@ -31,7 +31,7 @@ const args = Object.fromEntries(
 const list = (v, d) => (v && v !== true && v !== 'all' ? String(v).split(',') : d);
 const styles = list(args.styles, ['classic', 'medieval']);
 const qualities = list(args.qualities, ['low', 'medium', 'high']);
-const CAMS = ['1-rts', '2-mid', '3a-building', '3b-figures', '3c-material', '3d-landscape'];
+const CAMS = ['1-rts', '2-mid', '3a-building', '3b-figures', '3c-material', '3d-keep', '3e-gate', '3f-wall', '3g-corner', '3h-landscape'];
 const cams = list(args.cams, CAMS);
 const [vw, vh] = String(args.viewport ?? '1280x720').split('x').map(Number);
 const out = path.resolve(String(args.out ?? path.join(root, 'docs', 'phase5a', 'lookdev')));

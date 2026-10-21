@@ -60,13 +60,13 @@
   "attributes": [
     "COLOR_0"
   ],
-  "bytes": 18400,
+  "bytes": 20464,
   "veg": {
     "kind": "prop",
     "role": "fence"
   },
   "uvTile": {
-    "M_Timber_Oak": 2.0
+    "M_Timber_Oak": 0.541
   },
   "source": "assets/blender/models/veg_props.py",
   "blend": "assets/src/veg/veg_fence_rail.blend",
