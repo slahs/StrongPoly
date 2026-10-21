@@ -1,0 +1,1242 @@
+{
+  "style": "medieval",
+  "quality": "low",
+  "viewport": "1280x720",
+  "pageLoadS": 80.922,
+  "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte",
+  "cams": {
+    "1-rts": {
+      "style": "medieval",
+      "quality": "low",
+      "cam": "1-rts",
+      "calls": 87,
+      "triangles": 141228,
+      "programs": 20,
+      "textures": 47,
+      "geometries": 108,
+      "texBytes": 59468446,
+      "assetTexBytes": 58982385,
+      "geoBytes": 13918274,
+      "manifestMs": 1472,
+      "assetsMs": 2984,
+      "assets": {
+        "veg_garden_bed": {
+          "ms": 1020,
+          "bytes": 57532,
+          "ok": true
+        },
+        "veg_spruce_a": {
+          "ms": 1020.3000000007451,
+          "bytes": 389436,
+          "ok": true
+        },
+        "veg_spruce_c": {
+          "ms": 1020.3000000007451,
+          "bytes": 218704,
+          "ok": true
+        },
+        "veg_flowers_a": {
+          "ms": 1023.1000000014901,
+          "bytes": 14960,
+          "ok": true
+        },
+        "veg_rock_a": {
+          "ms": 1031.4000000022352,
+          "bytes": 152164,
+          "ok": true
+        },
+        "veg_grass_a": {
+          "ms": 1038.699999999255,
+          "bytes": 15924,
+          "ok": true
+        },
+        "veg_birch_c": {
+          "ms": 1154.800000000745,
+          "bytes": 382392,
+          "ok": true
+        },
+        "veg_bush_a": {
+          "ms": 1154.9000000022352,
+          "bytes": 129104,
+          "ok": true
+        },
+        "veg_birch_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 235504,
+          "ok": true
+        },
+        "veg_oak_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 255640,
+          "ok": true
+        },
+        "veg_bush_b": {
+          "ms": 1161.1000000014901,
+          "bytes": 114356,
+          "ok": true
+        },
+        "veg_fern_a": {
+          "ms": 1164.6000000014901,
+          "bytes": 49312,
+          "ok": true
+        },
+        "veg_flowers_b": {
+          "ms": 1167.199999999255,
+          "bytes": 15020,
+          "ok": true
+        },
+        "veg_rock_c": {
+          "ms": 1180.199999999255,
+          "bytes": 145444,
+          "ok": true
+        },
+        "veg_spruce_b": {
+          "ms": 1199.1000000014901,
+          "bytes": 378320,
+          "ok": true
+        },
+        "veg_oak_a": {
+          "ms": 1214.199999999255,
+          "bytes": 318676,
+          "ok": true
+        },
+        "veg_rock_b": {
+          "ms": 1221.5,
+          "bytes": 144840,
+          "ok": true
+        },
+        "veg_fence_wattle": {
+          "ms": 1309,
+          "bytes": 91360,
+          "ok": true
+        },
+        "veg_oak_c": {
+          "ms": 1320.199999999255,
+          "bytes": 150996,
+          "ok": true
+        },
+        "veg_rock_d": {
+          "ms": 1324.1000000014901,
+          "bytes": 129120,
+          "ok": true
+        },
+        "veg_grass_b": {
+          "ms": 1366.4000000022352,
+          "bytes": 16208,
+          "ok": true
+        },
+        "veg_birch_a": {
+          "ms": 1390,
+          "bytes": 298692,
+          "ok": true
+        },
+        "veg_fence_rail": {
+          "ms": 1390.699999999255,
+          "bytes": 20464,
+          "ok": true
+        },
+        "veg_log": {
+          "ms": 1390.699999999255,
+          "bytes": 32816,
+          "ok": true
+        },
+        "well": {
+          "ms": 1391.3999999985099,
+          "bytes": 439116,
+          "ok": true
+        },
+        "wall_high_arm": {
+          "ms": 1392.5,
+          "bytes": 67204,
+          "ok": true
+        },
+        "gate_stone": {
+          "ms": 1392.5,
+          "bytes": 1168188,
+          "ok": true
+        },
+        "wall_high_post": {
+          "ms": 1392.5,
+          "bytes": 163904,
+          "ok": true
+        },
+        "wall_high_stub": {
+          "ms": 1392.5,
+          "bytes": 181788,
+          "ok": true
+        },
+        "keep": {
+          "ms": 1510.5,
+          "bytes": 4230980,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "gate_stone:LOD1 x1",
+        "keep:LOD1 x1",
+        "wall_high_post:LOD1 x30",
+        "well:LOD2 x1"
+      ],
+      "frameMs": 4.1,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "2-mid": {
+      "style": "medieval",
+      "quality": "low",
+      "cam": "2-mid",
+      "calls": 96,
+      "triangles": 127415,
+      "programs": 22,
+      "textures": 50,
+      "geometries": 133,
+      "texBytes": 59730589,
+      "assetTexBytes": 58982385,
+      "geoBytes": 14726216,
+      "manifestMs": 1472,
+      "assetsMs": 2984,
+      "assets": {
+        "veg_garden_bed": {
+          "ms": 1020,
+          "bytes": 57532,
+          "ok": true
+        },
+        "veg_spruce_a": {
+          "ms": 1020.3000000007451,
+          "bytes": 389436,
+          "ok": true
+        },
+        "veg_spruce_c": {
+          "ms": 1020.3000000007451,
+          "bytes": 218704,
+          "ok": true
+        },
+        "veg_flowers_a": {
+          "ms": 1023.1000000014901,
+          "bytes": 14960,
+          "ok": true
+        },
+        "veg_rock_a": {
+          "ms": 1031.4000000022352,
+          "bytes": 152164,
+          "ok": true
+        },
+        "veg_grass_a": {
+          "ms": 1038.699999999255,
+          "bytes": 15924,
+          "ok": true
+        },
+        "veg_birch_c": {
+          "ms": 1154.800000000745,
+          "bytes": 382392,
+          "ok": true
+        },
+        "veg_bush_a": {
+          "ms": 1154.9000000022352,
+          "bytes": 129104,
+          "ok": true
+        },
+        "veg_birch_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 235504,
+          "ok": true
+        },
+        "veg_oak_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 255640,
+          "ok": true
+        },
+        "veg_bush_b": {
+          "ms": 1161.1000000014901,
+          "bytes": 114356,
+          "ok": true
+        },
+        "veg_fern_a": {
+          "ms": 1164.6000000014901,
+          "bytes": 49312,
+          "ok": true
+        },
+        "veg_flowers_b": {
+          "ms": 1167.199999999255,
+          "bytes": 15020,
+          "ok": true
+        },
+        "veg_rock_c": {
+          "ms": 1180.199999999255,
+          "bytes": 145444,
+          "ok": true
+        },
+        "veg_spruce_b": {
+          "ms": 1199.1000000014901,
+          "bytes": 378320,
+          "ok": true
+        },
+        "veg_oak_a": {
+          "ms": 1214.199999999255,
+          "bytes": 318676,
+          "ok": true
+        },
+        "veg_rock_b": {
+          "ms": 1221.5,
+          "bytes": 144840,
+          "ok": true
+        },
+        "veg_fence_wattle": {
+          "ms": 1309,
+          "bytes": 91360,
+          "ok": true
+        },
+        "veg_oak_c": {
+          "ms": 1320.199999999255,
+          "bytes": 150996,
+          "ok": true
+        },
+        "veg_rock_d": {
+          "ms": 1324.1000000014901,
+          "bytes": 129120,
+          "ok": true
+        },
+        "veg_grass_b": {
+          "ms": 1366.4000000022352,
+          "bytes": 16208,
+          "ok": true
+        },
+        "veg_birch_a": {
+          "ms": 1390,
+          "bytes": 298692,
+          "ok": true
+        },
+        "veg_fence_rail": {
+          "ms": 1390.699999999255,
+          "bytes": 20464,
+          "ok": true
+        },
+        "veg_log": {
+          "ms": 1390.699999999255,
+          "bytes": 32816,
+          "ok": true
+        },
+        "well": {
+          "ms": 1391.3999999985099,
+          "bytes": 439116,
+          "ok": true
+        },
+        "wall_high_arm": {
+          "ms": 1392.5,
+          "bytes": 67204,
+          "ok": true
+        },
+        "gate_stone": {
+          "ms": 1392.5,
+          "bytes": 1168188,
+          "ok": true
+        },
+        "wall_high_post": {
+          "ms": 1392.5,
+          "bytes": 163904,
+          "ok": true
+        },
+        "wall_high_stub": {
+          "ms": 1392.5,
+          "bytes": 181788,
+          "ok": true
+        },
+        "keep": {
+          "ms": 1510.5,
+          "bytes": 4230980,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "gate_stone:LOD1 x1",
+        "keep:LOD1 x1",
+        "wall_high_post:LOD1 x30",
+        "well:LOD1 x1"
+      ],
+      "frameMs": 368.3,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3a-building": {
+      "style": "medieval",
+      "quality": "low",
+      "cam": "3a-building",
+      "calls": 82,
+      "triangles": 108541,
+      "programs": 22,
+      "textures": 50,
+      "geometries": 135,
+      "texBytes": 55274143,
+      "assetTexBytes": 58982385,
+      "geoBytes": 14256828,
+      "manifestMs": 1472,
+      "assetsMs": 2984,
+      "assets": {
+        "veg_garden_bed": {
+          "ms": 1020,
+          "bytes": 57532,
+          "ok": true
+        },
+        "veg_spruce_a": {
+          "ms": 1020.3000000007451,
+          "bytes": 389436,
+          "ok": true
+        },
+        "veg_spruce_c": {
+          "ms": 1020.3000000007451,
+          "bytes": 218704,
+          "ok": true
+        },
+        "veg_flowers_a": {
+          "ms": 1023.1000000014901,
+          "bytes": 14960,
+          "ok": true
+        },
+        "veg_rock_a": {
+          "ms": 1031.4000000022352,
+          "bytes": 152164,
+          "ok": true
+        },
+        "veg_grass_a": {
+          "ms": 1038.699999999255,
+          "bytes": 15924,
+          "ok": true
+        },
+        "veg_birch_c": {
+          "ms": 1154.800000000745,
+          "bytes": 382392,
+          "ok": true
+        },
+        "veg_bush_a": {
+          "ms": 1154.9000000022352,
+          "bytes": 129104,
+          "ok": true
+        },
+        "veg_birch_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 235504,
+          "ok": true
+        },
+        "veg_oak_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 255640,
+          "ok": true
+        },
+        "veg_bush_b": {
+          "ms": 1161.1000000014901,
+          "bytes": 114356,
+          "ok": true
+        },
+        "veg_fern_a": {
+          "ms": 1164.6000000014901,
+          "bytes": 49312,
+          "ok": true
+        },
+        "veg_flowers_b": {
+          "ms": 1167.199999999255,
+          "bytes": 15020,
+          "ok": true
+        },
+        "veg_rock_c": {
+          "ms": 1180.199999999255,
+          "bytes": 145444,
+          "ok": true
+        },
+        "veg_spruce_b": {
+          "ms": 1199.1000000014901,
+          "bytes": 378320,
+          "ok": true
+        },
+        "veg_oak_a": {
+          "ms": 1214.199999999255,
+          "bytes": 318676,
+          "ok": true
+        },
+        "veg_rock_b": {
+          "ms": 1221.5,
+          "bytes": 144840,
+          "ok": true
+        },
+        "veg_fence_wattle": {
+          "ms": 1309,
+          "bytes": 91360,
+          "ok": true
+        },
+        "veg_oak_c": {
+          "ms": 1320.199999999255,
+          "bytes": 150996,
+          "ok": true
+        },
+        "veg_rock_d": {
+          "ms": 1324.1000000014901,
+          "bytes": 129120,
+          "ok": true
+        },
+        "veg_grass_b": {
+          "ms": 1366.4000000022352,
+          "bytes": 16208,
+          "ok": true
+        },
+        "veg_birch_a": {
+          "ms": 1390,
+          "bytes": 298692,
+          "ok": true
+        },
+        "veg_fence_rail": {
+          "ms": 1390.699999999255,
+          "bytes": 20464,
+          "ok": true
+        },
+        "veg_log": {
+          "ms": 1390.699999999255,
+          "bytes": 32816,
+          "ok": true
+        },
+        "well": {
+          "ms": 1391.3999999985099,
+          "bytes": 439116,
+          "ok": true
+        },
+        "wall_high_arm": {
+          "ms": 1392.5,
+          "bytes": 67204,
+          "ok": true
+        },
+        "gate_stone": {
+          "ms": 1392.5,
+          "bytes": 1168188,
+          "ok": true
+        },
+        "wall_high_post": {
+          "ms": 1392.5,
+          "bytes": 163904,
+          "ok": true
+        },
+        "wall_high_stub": {
+          "ms": 1392.5,
+          "bytes": 181788,
+          "ok": true
+        },
+        "keep": {
+          "ms": 1510.5,
+          "bytes": 4230980,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "gate_stone:LOD1 x1",
+        "keep:LOD1 x1",
+        "wall_high_post:LOD1 x30",
+        "well:LOD1 x1"
+      ],
+      "frameMs": 4.8,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3b-figures": {
+      "style": "medieval",
+      "quality": "low",
+      "cam": "3b-figures",
+      "calls": 91,
+      "triangles": 118384,
+      "programs": 22,
+      "textures": 50,
+      "geometries": 141,
+      "texBytes": 59730589,
+      "assetTexBytes": 58982385,
+      "geoBytes": 15078632,
+      "manifestMs": 1472,
+      "assetsMs": 2984,
+      "assets": {
+        "veg_garden_bed": {
+          "ms": 1020,
+          "bytes": 57532,
+          "ok": true
+        },
+        "veg_spruce_a": {
+          "ms": 1020.3000000007451,
+          "bytes": 389436,
+          "ok": true
+        },
+        "veg_spruce_c": {
+          "ms": 1020.3000000007451,
+          "bytes": 218704,
+          "ok": true
+        },
+        "veg_flowers_a": {
+          "ms": 1023.1000000014901,
+          "bytes": 14960,
+          "ok": true
+        },
+        "veg_rock_a": {
+          "ms": 1031.4000000022352,
+          "bytes": 152164,
+          "ok": true
+        },
+        "veg_grass_a": {
+          "ms": 1038.699999999255,
+          "bytes": 15924,
+          "ok": true
+        },
+        "veg_birch_c": {
+          "ms": 1154.800000000745,
+          "bytes": 382392,
+          "ok": true
+        },
+        "veg_bush_a": {
+          "ms": 1154.9000000022352,
+          "bytes": 129104,
+          "ok": true
+        },
+        "veg_birch_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 235504,
+          "ok": true
+        },
+        "veg_oak_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 255640,
+          "ok": true
+        },
+        "veg_bush_b": {
+          "ms": 1161.1000000014901,
+          "bytes": 114356,
+          "ok": true
+        },
+        "veg_fern_a": {
+          "ms": 1164.6000000014901,
+          "bytes": 49312,
+          "ok": true
+        },
+        "veg_flowers_b": {
+          "ms": 1167.199999999255,
+          "bytes": 15020,
+          "ok": true
+        },
+        "veg_rock_c": {
+          "ms": 1180.199999999255,
+          "bytes": 145444,
+          "ok": true
+        },
+        "veg_spruce_b": {
+          "ms": 1199.1000000014901,
+          "bytes": 378320,
+          "ok": true
+        },
+        "veg_oak_a": {
+          "ms": 1214.199999999255,
+          "bytes": 318676,
+          "ok": true
+        },
+        "veg_rock_b": {
+          "ms": 1221.5,
+          "bytes": 144840,
+          "ok": true
+        },
+        "veg_fence_wattle": {
+          "ms": 1309,
+          "bytes": 91360,
+          "ok": true
+        },
+        "veg_oak_c": {
+          "ms": 1320.199999999255,
+          "bytes": 150996,
+          "ok": true
+        },
+        "veg_rock_d": {
+          "ms": 1324.1000000014901,
+          "bytes": 129120,
+          "ok": true
+        },
+        "veg_grass_b": {
+          "ms": 1366.4000000022352,
+          "bytes": 16208,
+          "ok": true
+        },
+        "veg_birch_a": {
+          "ms": 1390,
+          "bytes": 298692,
+          "ok": true
+        },
+        "veg_fence_rail": {
+          "ms": 1390.699999999255,
+          "bytes": 20464,
+          "ok": true
+        },
+        "veg_log": {
+          "ms": 1390.699999999255,
+          "bytes": 32816,
+          "ok": true
+        },
+        "well": {
+          "ms": 1391.3999999985099,
+          "bytes": 439116,
+          "ok": true
+        },
+        "wall_high_arm": {
+          "ms": 1392.5,
+          "bytes": 67204,
+          "ok": true
+        },
+        "gate_stone": {
+          "ms": 1392.5,
+          "bytes": 1168188,
+          "ok": true
+        },
+        "wall_high_post": {
+          "ms": 1392.5,
+          "bytes": 163904,
+          "ok": true
+        },
+        "wall_high_stub": {
+          "ms": 1392.5,
+          "bytes": 181788,
+          "ok": true
+        },
+        "keep": {
+          "ms": 1510.5,
+          "bytes": 4230980,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "gate_stone:LOD1 x1",
+        "keep:LOD1 x1",
+        "wall_high_post:LOD1 x30",
+        "well:LOD1 x1"
+      ],
+      "frameMs": 14.2,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3c-material": {
+      "style": "medieval",
+      "quality": "low",
+      "cam": "3c-material",
+      "calls": 86,
+      "triangles": 102705,
+      "programs": 22,
+      "textures": 50,
+      "geometries": 143,
+      "texBytes": 59730589,
+      "assetTexBytes": 58982385,
+      "geoBytes": 14757564,
+      "manifestMs": 1472,
+      "assetsMs": 2984,
+      "assets": {
+        "veg_garden_bed": {
+          "ms": 1020,
+          "bytes": 57532,
+          "ok": true
+        },
+        "veg_spruce_a": {
+          "ms": 1020.3000000007451,
+          "bytes": 389436,
+          "ok": true
+        },
+        "veg_spruce_c": {
+          "ms": 1020.3000000007451,
+          "bytes": 218704,
+          "ok": true
+        },
+        "veg_flowers_a": {
+          "ms": 1023.1000000014901,
+          "bytes": 14960,
+          "ok": true
+        },
+        "veg_rock_a": {
+          "ms": 1031.4000000022352,
+          "bytes": 152164,
+          "ok": true
+        },
+        "veg_grass_a": {
+          "ms": 1038.699999999255,
+          "bytes": 15924,
+          "ok": true
+        },
+        "veg_birch_c": {
+          "ms": 1154.800000000745,
+          "bytes": 382392,
+          "ok": true
+        },
+        "veg_bush_a": {
+          "ms": 1154.9000000022352,
+          "bytes": 129104,
+          "ok": true
+        },
+        "veg_birch_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 235504,
+          "ok": true
+        },
+        "veg_oak_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 255640,
+          "ok": true
+        },
+        "veg_bush_b": {
+          "ms": 1161.1000000014901,
+          "bytes": 114356,
+          "ok": true
+        },
+        "veg_fern_a": {
+          "ms": 1164.6000000014901,
+          "bytes": 49312,
+          "ok": true
+        },
+        "veg_flowers_b": {
+          "ms": 1167.199999999255,
+          "bytes": 15020,
+          "ok": true
+        },
+        "veg_rock_c": {
+          "ms": 1180.199999999255,
+          "bytes": 145444,
+          "ok": true
+        },
+        "veg_spruce_b": {
+          "ms": 1199.1000000014901,
+          "bytes": 378320,
+          "ok": true
+        },
+        "veg_oak_a": {
+          "ms": 1214.199999999255,
+          "bytes": 318676,
+          "ok": true
+        },
+        "veg_rock_b": {
+          "ms": 1221.5,
+          "bytes": 144840,
+          "ok": true
+        },
+        "veg_fence_wattle": {
+          "ms": 1309,
+          "bytes": 91360,
+          "ok": true
+        },
+        "veg_oak_c": {
+          "ms": 1320.199999999255,
+          "bytes": 150996,
+          "ok": true
+        },
+        "veg_rock_d": {
+          "ms": 1324.1000000014901,
+          "bytes": 129120,
+          "ok": true
+        },
+        "veg_grass_b": {
+          "ms": 1366.4000000022352,
+          "bytes": 16208,
+          "ok": true
+        },
+        "veg_birch_a": {
+          "ms": 1390,
+          "bytes": 298692,
+          "ok": true
+        },
+        "veg_fence_rail": {
+          "ms": 1390.699999999255,
+          "bytes": 20464,
+          "ok": true
+        },
+        "veg_log": {
+          "ms": 1390.699999999255,
+          "bytes": 32816,
+          "ok": true
+        },
+        "well": {
+          "ms": 1391.3999999985099,
+          "bytes": 439116,
+          "ok": true
+        },
+        "wall_high_arm": {
+          "ms": 1392.5,
+          "bytes": 67204,
+          "ok": true
+        },
+        "gate_stone": {
+          "ms": 1392.5,
+          "bytes": 1168188,
+          "ok": true
+        },
+        "wall_high_post": {
+          "ms": 1392.5,
+          "bytes": 163904,
+          "ok": true
+        },
+        "wall_high_stub": {
+          "ms": 1392.5,
+          "bytes": 181788,
+          "ok": true
+        },
+        "keep": {
+          "ms": 1510.5,
+          "bytes": 4230980,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "gate_stone:LOD1 x1",
+        "keep:LOD1 x1",
+        "wall_high_post:LOD1 x30",
+        "well:LOD1 x1"
+      ],
+      "frameMs": 8.9,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3h-landscape": {
+      "style": "medieval",
+      "quality": "low",
+      "cam": "3h-landscape",
+      "calls": 98,
+      "triangles": 181865,
+      "programs": 22,
+      "textures": 50,
+      "geometries": 158,
+      "texBytes": 59730589,
+      "assetTexBytes": 58982385,
+      "geoBytes": 14801594,
+      "manifestMs": 1472,
+      "assetsMs": 2984,
+      "assets": {
+        "veg_garden_bed": {
+          "ms": 1020,
+          "bytes": 57532,
+          "ok": true
+        },
+        "veg_spruce_a": {
+          "ms": 1020.3000000007451,
+          "bytes": 389436,
+          "ok": true
+        },
+        "veg_spruce_c": {
+          "ms": 1020.3000000007451,
+          "bytes": 218704,
+          "ok": true
+        },
+        "veg_flowers_a": {
+          "ms": 1023.1000000014901,
+          "bytes": 14960,
+          "ok": true
+        },
+        "veg_rock_a": {
+          "ms": 1031.4000000022352,
+          "bytes": 152164,
+          "ok": true
+        },
+        "veg_grass_a": {
+          "ms": 1038.699999999255,
+          "bytes": 15924,
+          "ok": true
+        },
+        "veg_birch_c": {
+          "ms": 1154.800000000745,
+          "bytes": 382392,
+          "ok": true
+        },
+        "veg_bush_a": {
+          "ms": 1154.9000000022352,
+          "bytes": 129104,
+          "ok": true
+        },
+        "veg_birch_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 235504,
+          "ok": true
+        },
+        "veg_oak_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 255640,
+          "ok": true
+        },
+        "veg_bush_b": {
+          "ms": 1161.1000000014901,
+          "bytes": 114356,
+          "ok": true
+        },
+        "veg_fern_a": {
+          "ms": 1164.6000000014901,
+          "bytes": 49312,
+          "ok": true
+        },
+        "veg_flowers_b": {
+          "ms": 1167.199999999255,
+          "bytes": 15020,
+          "ok": true
+        },
+        "veg_rock_c": {
+          "ms": 1180.199999999255,
+          "bytes": 145444,
+          "ok": true
+        },
+        "veg_spruce_b": {
+          "ms": 1199.1000000014901,
+          "bytes": 378320,
+          "ok": true
+        },
+        "veg_oak_a": {
+          "ms": 1214.199999999255,
+          "bytes": 318676,
+          "ok": true
+        },
+        "veg_rock_b": {
+          "ms": 1221.5,
+          "bytes": 144840,
+          "ok": true
+        },
+        "veg_fence_wattle": {
+          "ms": 1309,
+          "bytes": 91360,
+          "ok": true
+        },
+        "veg_oak_c": {
+          "ms": 1320.199999999255,
+          "bytes": 150996,
+          "ok": true
+        },
+        "veg_rock_d": {
+          "ms": 1324.1000000014901,
+          "bytes": 129120,
+          "ok": true
+        },
+        "veg_grass_b": {
+          "ms": 1366.4000000022352,
+          "bytes": 16208,
+          "ok": true
+        },
+        "veg_birch_a": {
+          "ms": 1390,
+          "bytes": 298692,
+          "ok": true
+        },
+        "veg_fence_rail": {
+          "ms": 1390.699999999255,
+          "bytes": 20464,
+          "ok": true
+        },
+        "veg_log": {
+          "ms": 1390.699999999255,
+          "bytes": 32816,
+          "ok": true
+        },
+        "well": {
+          "ms": 1391.3999999985099,
+          "bytes": 439116,
+          "ok": true
+        },
+        "wall_high_arm": {
+          "ms": 1392.5,
+          "bytes": 67204,
+          "ok": true
+        },
+        "gate_stone": {
+          "ms": 1392.5,
+          "bytes": 1168188,
+          "ok": true
+        },
+        "wall_high_post": {
+          "ms": 1392.5,
+          "bytes": 163904,
+          "ok": true
+        },
+        "wall_high_stub": {
+          "ms": 1392.5,
+          "bytes": 181788,
+          "ok": true
+        },
+        "keep": {
+          "ms": 1510.5,
+          "bytes": 4230980,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "gate_stone:LOD1 x1",
+        "keep:LOD1 x1",
+        "wall_high_post:LOD1 x30",
+        "well:LOD1 x1"
+      ],
+      "frameMs": 22.5,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    },
+    "3e-gate": {
+      "style": "medieval",
+      "quality": "low",
+      "cam": "3e-gate",
+      "calls": 100,
+      "triangles": 137067,
+      "programs": 22,
+      "textures": 50,
+      "geometries": 158,
+      "texBytes": 59730589,
+      "assetTexBytes": 58982385,
+      "geoBytes": 14920986,
+      "manifestMs": 1472,
+      "assetsMs": 2984,
+      "assets": {
+        "veg_garden_bed": {
+          "ms": 1020,
+          "bytes": 57532,
+          "ok": true
+        },
+        "veg_spruce_a": {
+          "ms": 1020.3000000007451,
+          "bytes": 389436,
+          "ok": true
+        },
+        "veg_spruce_c": {
+          "ms": 1020.3000000007451,
+          "bytes": 218704,
+          "ok": true
+        },
+        "veg_flowers_a": {
+          "ms": 1023.1000000014901,
+          "bytes": 14960,
+          "ok": true
+        },
+        "veg_rock_a": {
+          "ms": 1031.4000000022352,
+          "bytes": 152164,
+          "ok": true
+        },
+        "veg_grass_a": {
+          "ms": 1038.699999999255,
+          "bytes": 15924,
+          "ok": true
+        },
+        "veg_birch_c": {
+          "ms": 1154.800000000745,
+          "bytes": 382392,
+          "ok": true
+        },
+        "veg_bush_a": {
+          "ms": 1154.9000000022352,
+          "bytes": 129104,
+          "ok": true
+        },
+        "veg_birch_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 235504,
+          "ok": true
+        },
+        "veg_oak_b": {
+          "ms": 1154.9000000022352,
+          "bytes": 255640,
+          "ok": true
+        },
+        "veg_bush_b": {
+          "ms": 1161.1000000014901,
+          "bytes": 114356,
+          "ok": true
+        },
+        "veg_fern_a": {
+          "ms": 1164.6000000014901,
+          "bytes": 49312,
+          "ok": true
+        },
+        "veg_flowers_b": {
+          "ms": 1167.199999999255,
+          "bytes": 15020,
+          "ok": true
+        },
+        "veg_rock_c": {
+          "ms": 1180.199999999255,
+          "bytes": 145444,
+          "ok": true
+        },
+        "veg_spruce_b": {
+          "ms": 1199.1000000014901,
+          "bytes": 378320,
+          "ok": true
+        },
+        "veg_oak_a": {
+          "ms": 1214.199999999255,
+          "bytes": 318676,
+          "ok": true
+        },
+        "veg_rock_b": {
+          "ms": 1221.5,
+          "bytes": 144840,
+          "ok": true
+        },
+        "veg_fence_wattle": {
+          "ms": 1309,
+          "bytes": 91360,
+          "ok": true
+        },
+        "veg_oak_c": {
+          "ms": 1320.199999999255,
+          "bytes": 150996,
+          "ok": true
+        },
+        "veg_rock_d": {
+          "ms": 1324.1000000014901,
+          "bytes": 129120,
+          "ok": true
+        },
+        "veg_grass_b": {
+          "ms": 1366.4000000022352,
+          "bytes": 16208,
+          "ok": true
+        },
+        "veg_birch_a": {
+          "ms": 1390,
+          "bytes": 298692,
+          "ok": true
+        },
+        "veg_fence_rail": {
+          "ms": 1390.699999999255,
+          "bytes": 20464,
+          "ok": true
+        },
+        "veg_log": {
+          "ms": 1390.699999999255,
+          "bytes": 32816,
+          "ok": true
+        },
+        "well": {
+          "ms": 1391.3999999985099,
+          "bytes": 439116,
+          "ok": true
+        },
+        "wall_high_arm": {
+          "ms": 1392.5,
+          "bytes": 67204,
+          "ok": true
+        },
+        "gate_stone": {
+          "ms": 1392.5,
+          "bytes": 1168188,
+          "ok": true
+        },
+        "wall_high_post": {
+          "ms": 1392.5,
+          "bytes": 163904,
+          "ok": true
+        },
+        "wall_high_stub": {
+          "ms": 1392.5,
+          "bytes": 181788,
+          "ok": true
+        },
+        "keep": {
+          "ms": 1510.5,
+          "bytes": 4230980,
+          "ok": true
+        }
+      },
+      "overrides": [
+        "gate_stone:LOD1 x1",
+        "keep:LOD1 x1",
+        "wall_high_post:LOD1 x30",
+        "well:LOD1 x1"
+      ],
+      "frameMs": 19.4,
+      "gl": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "note": "Software-GL: Zeiten/Bildraten sind KEINE GPU-Werte"
+    }
+  }
+}

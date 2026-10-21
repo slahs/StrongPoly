@@ -92,8 +92,21 @@ Ausführlich mit Bildern und Messwerten: `docs/phase5a/ENVIRONMENT.md`. Konventi
 - **Renderer-Erweiterungen (rückwärtskompatibel, classic unverändert):** `scene.ts` (Stilumschaltung, Licht/Himmel/Nebel/
   Tonemapping medieval, eingepasste Schattenkamera, `whenEnvReady`, `setEnvExtras`), `terrain.ts` (Option `medieval`: Tönung, `aMed`,
   Wasserfarben), `groundmap.ts` (`trailSegments`), `quality.ts` (Felder `env*`), `assets/materials.ts` (`texture()`, `sceneEnv`,
-  Halbkugel-Gewicht), `assets/manifest.ts` (`veg`, `uvTile`), `lookdev.ts`/`lookdev_scene.ts` (Wege, Requisiten, Kamera `3d-landscape`,
-  `&tone=`), `bench.ts` (wartet auf die Umgebung), `scripts/lookdev.mjs` (neue Kamera, `--tone`).
+  Halbkugel-Gewicht), `assets/manifest.ts` (`veg`, `uvTile`), `lookdev.ts`/`lookdev_scene.ts` (Wege, Requisiten, Kamera `3h-landscape`,
+  `&tone=`), `bench.ts` (wartet auf die Umgebung), `scripts/lookdev.mjs` (neue Kamera, `--tone`, `--timeout`), `scripts/bench-fps.mjs` (`--style=`),
+  `scripts/qa/s17_style_medieval.mjs` (Bauanimation im 640×360-Fenster beobachtet, s. u.).
 - **Tests:** `client/test/env_medieval.test.ts` (Atmosphäre, Umgebungskarte, Trampelpfade, Gelände-Attribute, Budgets/GLB der
   Vegetation, Verteilung deterministisch/monoton/frei von Gebäuden-Wegen-Wasser, LookDev-Daten).
-<!-- ENV-ZAHLEN -->
+- **Zahlen (Software-GL/SwiftShader, keine GPU-Werte; Details `docs/phase5a/ENVIRONMENT.md` §7):** LookDev 1280×720
+  medieval Niedrig/Mittel/Hoch 82–100 / 86–112 / 100–117 Draw-Calls, 103–182k / 240–581k / 349k–1,11 Mio. Dreiecke,
+  20–22 / 26–27 / 29 Programme (classic 35–42 / 41–53 / 43–55 Calls, 14 / 21 / 23 Programme). Texturen der GLB-Bibliothek
+  56 / 224 / 368 MB + Gelände-Arrays 17 / 67 / 67 MB (unkomprimiert geschätzt). `?bench&style=medieval` (2000 Einheiten):
+  JS je Bild ohne Raster 7,6 / 8,5 / 9,4 ms (classic 5,3 / 5,3 / 6,3 ms), 83–91 Draw-Calls – Ziel ≤ 8 ms auf Mittel knapp verfehlt.
+- **Bilder:** `docs/phase5a/assets/environment/{medieval,classic}/{low,medium,high}/*.jpg` (Kameras 1-rts, 2-mid, 3a, 3b, 3c,
+  3e-gate, 3h-landscape, je `stats.json`), AgX/ACES-Vergleich `docs/phase5a/assets/environment/tonemapping_agx_aces_*.jpg`.
+- **Prüfungen:** `pnpm test`, `pnpm -r typecheck`, `pnpm build` grün; `?quick=1&style=medieval` und LookDev ohne
+  Konsolenmeldungen; QA s17 10/10, s18 12/12; classic: alle 12 `?shots`-Szenen mit identischen Draw-Calls/Dreiecken/Programmen.
+  s17 beobachtet die Bauanimation jetzt in 640×360: in 1280×720 braucht ein Bild im Stil medieval unter SwiftShader ≈ 2,5 s
+  (Gelände-Shader ≈ 60 % davon), der Brunnen ist schneller fertig – kein Fehler im Spiel, aber ein Hinweis auf die Füllratenkosten.
+- **Offen:** Messung auf echter GPU/Safari (M3), `M_Ground_Path`/`M_Rock` nicht neu gebacken (im Shader ausgeglichen), keine
+  ausgelieferten Höhenkarten (Höhen-Ersatz aus AO/Helligkeit), KTX2-Kompression der Bibliothek, JS-Zeit Mittel 8,5 ms.
