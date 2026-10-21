@@ -1,0 +1,74 @@
+{
+  "id": "veg_fence_rail",
+  "desc": "Holzzaun: Eichenpfosten mit zwei Spaltstangen (1 Einheit)",
+  "file": "models/veg_fence_rail.glb",
+  "target": {
+    "prop": "veg_fence_rail"
+  },
+  "class": "prop",
+  "footprint": null,
+  "height": 0.69,
+  "bbox": {
+    "min": [
+      -0.542,
+      -0.051,
+      -0.082
+    ],
+    "max": [
+      0.531,
+      0.69,
+      0.059
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 130,
+      "materials": [
+        "M_Timber_Oak"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 73,
+      "materials": [
+        "M_Timber_Oak"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 32,
+      "materials": [
+        "M_Timber_Oak"
+      ]
+    }
+  ],
+  "tris": [
+    130,
+    73,
+    32
+  ],
+  "budget": [
+    1500,
+    600,
+    150
+  ],
+  "materials": [
+    "M_Timber_Oak"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 20464,
+  "veg": {
+    "kind": "prop",
+    "role": "fence"
+  },
+  "uvTile": {
+    "M_Timber_Oak": 0.541
+  },
+  "source": "assets/blender/models/veg_props.py",
+  "blend": "assets/src/veg/veg_fence_rail.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

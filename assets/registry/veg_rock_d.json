@@ -1,0 +1,74 @@
+{
+  "id": "veg_rock_d",
+  "desc": "Lesesteine (vier Steine)",
+  "file": "models/veg_rock_d.glb",
+  "target": {
+    "prop": "veg_rock_d"
+  },
+  "class": "rock",
+  "footprint": null,
+  "height": 0.145,
+  "bbox": {
+    "min": [
+      -0.339,
+      -0.069,
+      -0.253
+    ],
+    "max": [
+      0.209,
+      0.145,
+      0.264
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 1280,
+      "materials": [
+        "M_Rock"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 320,
+      "materials": [
+        "M_Rock"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 80,
+      "materials": [
+        "M_Rock"
+      ]
+    }
+  ],
+  "tris": [
+    1280,
+    320,
+    80
+  ],
+  "budget": [
+    1500,
+    500,
+    150
+  ],
+  "materials": [
+    "M_Rock"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 129120,
+  "veg": {
+    "kind": "rock",
+    "role": "stones"
+  },
+  "uvTile": {
+    "M_Rock": 1.622
+  },
+  "source": "assets/blender/models/veg_rocks.py",
+  "blend": "assets/src/veg/veg_rock_d.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

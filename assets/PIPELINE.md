@@ -256,3 +256,40 @@ die 2048er Fassung lohnt nur für Nahaufnahmen/LookDev.
   Materialien mit Maserung entlang V (`GRAIN_V`, z. B. `M_Wood_Planks`). Ändert die Bibliothek `tile`, genügt ein Neuexport.
 - **Gerüsthöhe** (optional): `A.scaffold = <Traufhöhe>` → Registerfeld `scaffold`; die Baustelle stellt das Gerüst nur bis
   dahin (sonst Modellhöhe inkl. Kamin), das Dach wächst darüber.
+## Vegetation und Umgebung (Teilschritt 5, ergänzt)
+
+Begründungen, Messwerte und Bilder: `docs/phase5a/ENVIRONMENT.md`.
+
+### Exportweg `sp.veg` (neben `sp.asset`)
+- Vegetation und Umgebungs-Requisiten entstehen als **Daten** (`sp.veg.VMesh`: Ecken, Flächen, je Ecke UV/Normale/Datenfarbe) –
+  Hunderte Blattkarten je Baum wären als Blender-Objekte zu langsam. `veg.tube` (Äste/Stämme/Ruten mit Rinden-UV),
+  `veg.card` (Blattkarte, optional geknickt), `veg.export(id, [LOD0, LOD1, LOD2], klasse, …)` schreibt GLB, Registereintrag
+  (gleiches Schema, Ziel `{'prop': id}`, zusätzlich `veg` = Klasse/Art/Rolle und `uvTile` = Kachelgröße je Material beim
+  Export) und auf Wunsch die `.blend` (`assets/src/veg/`). Kein `_BUILD/_PART` (Vegetation ist kein Gebäude).
+- Skripte: `assets/blender/models/veg_trees.py` (Eiche, Birke, Fichte je 3 Varianten), `veg_ground.py` (Gras, Blumen,
+  Farn, Büsche), `veg_rocks.py` (Findling, Fels, Platte, Lesesteine), `veg_props.py` (Holzzaun, Flechtzaun, Gemüsebeet,
+  liegender Stamm); Texturen der Vegetation, die nicht in der Materialbibliothek liegen: `assets/blender/tools/veg_textures.py`
+  (`M_Foliage_Conifer` Nadelzweig, `M_Flora` Farbpalette) → `tools/textures.py`.
+- Budgets (`sp.veg.BUDGETS`, Export bricht ab): Baum 6000/1500/300 (Karten zählen), Busch 2400/700/160, Flora 420/140/40,
+  Fels 1500/500/150, Requisit 1500/600/150.
+
+- Ergänzte Bibliotheksmaterialien (Umgebung, nicht vom Material-Agenten): `M_Foliage_Conifer`, `M_Flora` (Quellen `assets/blender/tools/veg_textures.py`).
+
+### Datenfarbe der Vegetation (COLOR_0 → `aData`)
+| Kanal | Bedeutung |
+| --- | --- |
+| R | AO (Bäume analytisch aus der Lage in der Krone, Felsen/Zäune per Cycles-Bake) |
+| G | Biegsamkeit für den Wind (0 starr … 1 Zweig-/Halmspitze); Felsen: Moosanteil |
+| B | Zufallswert je Zweig/Karte/Halm (Flatterphase, Farbvariation) |
+| A | Laub/Flora: Durchlicht; `M_Bark`: Birkenrinde (1 = weiß, 0 = Borke) |
+
+### Konventionen
+- Blattkarten: Atlas `M_Foliage` 2×2 (Eiche/Buche/Strauch/Birke, Blender-UV unten links), Kartenbasis = Zweigansatz unten Mitte;
+  Normalen der Karten zeigen von der Kronenmitte nach außen (weiche Kronenbeleuchtung), Rückseiten werden zur Laufzeit NICHT
+  umgedreht.
+- `M_Flora`: Palette, U = Spalte (16 Farben, siehe `veg_textures.py PALETTE`), V = Basis (0) → Spitze (1). Gras/Blumen/Farn
+  sind Geometrie ohne Alpha (kein Overdraw durch Alpha-Test in dichtem Gras).
+- Holz-Röhren: Maserung entlang U (`tube(..., swap_uv=True)`), Rinde: V entlang der Achse.
+- Zaunstücke: 1 Einheit lang entlang +X (−0,5 … +0,5), Pfosten am Anfang; im LookDev als `propLine` aneinandergereiht.
+- Laufzeit (`render/env/`): ein Material je Bibliotheksname für alle Vegetations-Assets (`veg_material.ts`), Instancing je
+  (Asset × LOD × Material) (`veg_layer.ts`), Verteilung rein/deterministisch (`veg_place.ts`), LOD-Grenzen `VEG_LOD` × Stufe.

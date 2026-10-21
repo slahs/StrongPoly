@@ -1,0 +1,79 @@
+{
+  "id": "veg_log",
+  "desc": "liegender Baumstamm mit Rinde und Schnittflaechen",
+  "file": "models/veg_log.glb",
+  "target": {
+    "prop": "veg_log"
+  },
+  "class": "prop",
+  "footprint": null,
+  "height": 0.274,
+  "bbox": {
+    "min": [
+      -0.851,
+      -0.03,
+      -0.197
+    ],
+    "max": [
+      0.856,
+      0.274,
+      0.13
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 210,
+      "materials": [
+        "M_Bark",
+        "M_Timber_Oak"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 100,
+      "materials": [
+        "M_Bark",
+        "M_Timber_Oak"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 30,
+      "materials": [
+        "M_Bark",
+        "M_Timber_Oak"
+      ]
+    }
+  ],
+  "tris": [
+    210,
+    100,
+    30
+  ],
+  "budget": [
+    1500,
+    600,
+    150
+  ],
+  "materials": [
+    "M_Bark",
+    "M_Timber_Oak"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 32816,
+  "veg": {
+    "kind": "prop",
+    "role": "log"
+  },
+  "uvTile": {
+    "M_Bark": 0.541,
+    "M_Timber_Oak": 0.541
+  },
+  "source": "assets/blender/models/veg_props.py",
+  "blend": "assets/src/veg/veg_log.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

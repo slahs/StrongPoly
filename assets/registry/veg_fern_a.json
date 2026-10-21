@@ -1,0 +1,74 @@
+{
+  "id": "veg_fern_a",
+  "desc": "Farn (Wurmfarn), sieben Wedel",
+  "file": "models/veg_fern_a.glb",
+  "target": {
+    "prop": "veg_fern_a"
+  },
+  "class": "flora",
+  "footprint": null,
+  "height": 0.28,
+  "bbox": {
+    "min": [
+      -0.377,
+      0.0,
+      -0.458
+    ],
+    "max": [
+      0.349,
+      0.28,
+      0.368
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 392,
+      "materials": [
+        "M_Flora"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 132,
+      "materials": [
+        "M_Flora"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 12,
+      "materials": [
+        "M_Flora"
+      ]
+    }
+  ],
+  "tris": [
+    392,
+    132,
+    12
+  ],
+  "budget": [
+    420,
+    140,
+    40
+  ],
+  "materials": [
+    "M_Flora"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 49312,
+  "veg": {
+    "kind": "flora",
+    "role": "fern"
+  },
+  "uvTile": {
+    "M_Flora": 1.0
+  },
+  "source": "assets/blender/models/veg_ground.py",
+  "blend": "assets/src/veg/veg_fern_a.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

@@ -1,0 +1,79 @@
+{
+  "id": "veg_bush_a",
+  "desc": "Haselstrauch: viele Triebe aus dem Boden, lockere Krone",
+  "file": "models/veg_bush_a.glb",
+  "target": {
+    "prop": "veg_bush_a"
+  },
+  "class": "bush",
+  "footprint": null,
+  "height": 1.349,
+  "bbox": {
+    "min": [
+      -0.945,
+      -0.009,
+      -0.839
+    ],
+    "max": [
+      0.887,
+      1.349,
+      0.971
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 1924,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 246,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 32,
+      "materials": [
+        "M_Foliage"
+      ]
+    }
+  ],
+  "tris": [
+    1924,
+    246,
+    32
+  ],
+  "budget": [
+    2400,
+    700,
+    160
+  ],
+  "materials": [
+    "M_Bark",
+    "M_Foliage"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 129104,
+  "veg": {
+    "kind": "bush",
+    "role": "bush",
+    "height": 1.2
+  },
+  "uvTile": {
+    "M_Bark": 0.541,
+    "M_Foliage": 0.541
+  },
+  "source": "assets/blender/models/veg_ground.py",
+  "blend": "assets/src/veg/veg_bush_a.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

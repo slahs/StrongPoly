@@ -7,7 +7,7 @@ Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/
 - [ ] 2 Import- und Materialpipeline (Blender-Skripte, Materialbibliothek, GLB-Export, Loader, Fallback) – Pipeline-Teil erledigt (Blender-Bibliothek `assets/blender/lib/sp`, GLB-Export, Laufzeit `render/assets`, Rückfall, Beispiel-Asset Brunnen; siehe „Pipeline“); offen: Materialbibliothek-Texturen (Material-Agent)
 - [ ] 3 Erstes hochwertiges Referenzgebäude (Bergfried)
 - [ ] 4 Weitere Referenzobjekte (Fachwerkhaus, Bäckerei/Schmiede, Mauer + Tor) und Figuren (Bauer, Soldat)
-- [ ] 5 Referenzumgebung (Terrain mit Weg/Gras/Steinen/Bäumen, Licht, Atmosphäre)
+- [x] 5 Referenzumgebung (Terrain mit Weg/Gras/Steinen/Bäumen, Licht, Atmosphäre) – Stil medieval, siehe „Umgebung (Terrain, Vegetation, Licht)“
 - [ ] 6 Vergleich (`?lookdev=medieval`, alt/neu, 3 Kameras) + Performance – Werkzeug erledigt (`?lookdev`, `scripts/lookdev.mjs`, Statistik; siehe „Pipeline“); offen: Vergleich mit den fertigen Referenz-Assets
 - [ ] 7 Dokumentation + Mac-Testanleitung
 
@@ -189,3 +189,37 @@ Spezifikation `PROMPT-5A.md`, Konventionen `assets/PIPELINE.md`. Branch `claude/
   Assets, weniger Materialien je Asset); GLB 1,0–1,25 MB je Asset unkomprimiert (Meshopt/gzip in 5B); Mehlsäcke und
   Brote sind nah noch grob; Einzelsteine (Sockel, Trittstein) nutzen `M_Stone_Rubble` (Hinweis Material-Agentin:
   `M_Rock` evtl. besser – nicht umgestellt, um keine weitere Materialzahl/Draw-Calls zu erzeugen).
+## Umgebung (Terrain, Vegetation, Licht) – Teilschritt 5
+
+Ausführlich mit Bildern und Messwerten: `docs/phase5a/ENVIRONMENT.md`. Konventionen: `assets/PIPELINE.md` (Abschnitt „Vegetation und Umgebung“).
+
+- **Vegetation (24 GLB-Assets, Blender-Skripte `assets/blender/models/veg_*.py`, Bibliothek `sp/veg.py`):** Stieleiche, Hängebirke,
+  Fichte je 3 Varianten (inkl. Jungbaum) aus Skelett + Blattkarten (M_Foliage-Atlas bzw. eigene Nadeltextur M_Foliage_Conifer),
+  Kronennormalen, analytische AO, LOD0/1/2 ≤ 6000/1500/300; Hasel/Weißdorn; Gras (2), Wiesenblumen (2), Farn als Geometrie mit
+  Palette M_Flora (kein Alpha-Overdraw); Findling/Fels/Platte/Lesesteine (≤ 1280 Dreiecke, Cycles-AO, Moosanteil); Holzzaun,
+  Flechtzaun, Gemüsebeet, liegender Stamm.
+- **Laufzeit `render/env/`:** `veg_layer.ts` (MedievalDecor: Instancing je Asset × LOD × Material, prozeduraler Rückfall),
+  `veg_place.ts` (Verteilung rein/deterministisch, LOD je Instanz, Sichtkegel-Auslese), `veg_material.ts` (Wind, Alpha-Test auch im
+  Schattenpass, Durchlicht, Birkenrinde/Moos), `terrain_medieval.ts` (Textur-Arrays Gras/Erde/Weg/Fels, höhenbasierte Übergänge,
+  Anti-Kachelung), `envmap.ts` (Wege mit Richtung/Fahrspuren, Kronendach), `atmosphere.ts` (Sonne, Himmel/PMREM, Nebel, AgX).
+- **Renderer-Erweiterungen (rückwärtskompatibel, classic unverändert):** `scene.ts` (Stilumschaltung, Licht/Himmel/Nebel/
+  Tonemapping medieval, eingepasste Schattenkamera, `whenEnvReady`, `setEnvExtras`), `terrain.ts` (Option `medieval`: Tönung, `aMed`,
+  Wasserfarben), `groundmap.ts` (`trailSegments`), `quality.ts` (Felder `env*`), `assets/materials.ts` (`texture()`, `sceneEnv`,
+  Halbkugel-Gewicht), `assets/manifest.ts` (`veg`, `uvTile`), `lookdev.ts`/`lookdev_scene.ts` (Wege, Requisiten, Kamera `3h-landscape`,
+  `&tone=`), `bench.ts` (wartet auf die Umgebung), `scripts/lookdev.mjs` (neue Kamera, `--tone`, `--timeout`), `scripts/bench-fps.mjs` (`--style=`),
+  `scripts/qa/s17_style_medieval.mjs` (Bauanimation im 640×360-Fenster beobachtet, s. u.).
+- **Tests:** `client/test/env_medieval.test.ts` (Atmosphäre, Umgebungskarte, Trampelpfade, Gelände-Attribute, Budgets/GLB der
+  Vegetation, Verteilung deterministisch/monoton/frei von Gebäuden-Wegen-Wasser, LookDev-Daten).
+- **Zahlen (Software-GL/SwiftShader, keine GPU-Werte; Details `docs/phase5a/ENVIRONMENT.md` §7):** LookDev 1280×720
+  medieval Niedrig/Mittel/Hoch 82–100 / 86–112 / 100–117 Draw-Calls, 103–182k / 240–581k / 349k–1,11 Mio. Dreiecke,
+  20–22 / 26–27 / 29 Programme (classic 35–42 / 41–53 / 43–55 Calls, 14 / 21 / 23 Programme). Texturen der GLB-Bibliothek
+  56 / 224 / 368 MB + Gelände-Arrays 17 / 67 / 67 MB (unkomprimiert geschätzt). `?bench&style=medieval` (2000 Einheiten):
+  JS je Bild ohne Raster 7,6 / 8,5 / 9,4 ms (classic 5,3 / 5,3 / 6,3 ms), 83–91 Draw-Calls – Ziel ≤ 8 ms auf Mittel knapp verfehlt.
+- **Bilder:** `docs/phase5a/assets/environment/{medieval,classic}/{low,medium,high}/*.jpg` (Kameras 1-rts, 2-mid, 3a, 3b, 3c,
+  3e-gate, 3h-landscape, je `stats.json`), AgX/ACES-Vergleich `docs/phase5a/assets/environment/tonemapping_agx_aces_*.jpg`.
+- **Prüfungen:** `pnpm test`, `pnpm -r typecheck`, `pnpm build` grün; `?quick=1&style=medieval` und LookDev ohne
+  Konsolenmeldungen; QA s17 10/10, s18 12/12; classic: alle 12 `?shots`-Szenen mit identischen Draw-Calls/Dreiecken/Programmen.
+  s17 beobachtet die Bauanimation jetzt in 640×360: in 1280×720 braucht ein Bild im Stil medieval unter SwiftShader ≈ 2,5 s
+  (Gelände-Shader ≈ 60 % davon), der Brunnen ist schneller fertig – kein Fehler im Spiel, aber ein Hinweis auf die Füllratenkosten.
+- **Offen:** Messung auf echter GPU/Safari (M3), `M_Ground_Path`/`M_Rock` nicht neu gebacken (im Shader ausgeglichen), keine
+  ausgelieferten Höhenkarten (Höhen-Ersatz aus AO/Helligkeit), KTX2-Kompression der Bibliothek, JS-Zeit Mittel 8,5 ms.

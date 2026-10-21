@@ -83,6 +83,18 @@ function dune(seed: number, x: number, y: number): number {
   return r * 0.7 + (n - 0.5) * 0.9;
 }
 
+// Stil medieval: natürlicheres, dunkleres Wasser (grünlich im Flachen, tiefes Blaugrau statt Türkis)
+const WM_SHALLOW = col(0x5f8a7c);
+const WM_MID = col(0x3b6a74);
+const WM_DEEP = col(0x22475a);
+
+/** Wassertönung des Stils medieval */
+export function waterTintMed(depth: number, moat: boolean): RGB {
+  const d = clamp01(depth);
+  if (moat) return mix(MOAT_SHALLOW, MOAT_DEEP, d);
+  return d < 0.5 ? mix(WM_SHALLOW, WM_MID, d * 2) : mix(WM_MID, WM_DEEP, (d - 0.5) * 2);
+}
+
 /** Wassertönung nach Tiefe 0 (Ufer) .. 1 (tief) */
 export function waterTint(depth: number, moat: boolean): RGB {
   const d = clamp01(depth);
@@ -91,6 +103,9 @@ export function waterTint(depth: number, moat: boolean): RGB {
 }
 
 class MeshAcc {
+  /** Stil medieval: Kartenrand-Ausblendung und Feuchte je Ecke (aMed); classic: leer */
+  med: number[] | null = null;
+  medCur: [number, number] = [0, 0.5];
   pos: number[] = [];
   col: number[] = [];
   /** Land: Oberflächengewichte (Gras, Sand, Fels, nass) */
@@ -100,6 +115,11 @@ class MeshAcc {
   depth: number[] = [];
   kind: number[] = [];
   vert(x: number, y: number, z: number, c: RGB, s: Surf = [0, 0, 0, 0], f = 0, d = 0, k = 0): void {
+    if (this.med) {
+      const w = this.medW;
+      const e = Math.min(x, z, w[0] - x, w[1] - z);
+      this.med.push(e < 10 ? (1 - e / 10) * (1 - e / 10) * 0.85 : 0, this.medCur[1]);
+    }
     this.pos.push(x, y, z);
     this.col.push(c[0], c[1], c[2]);
     this.surf.push(s[0], s[1], s[2], s[3]);
@@ -107,6 +127,8 @@ class MeshAcc {
     this.depth.push(d);
     this.kind.push(k);
   }
+  /** Kartengröße (für den Kartenrand in aMed) */
+  medW: [number, number] = [1, 1];
   tri(a: number[], b: number[], c: number[], ca: RGB, cb: RGB, cc: RGB, sa: Surf, sb: Surf, sc: Surf): void {
     this.vert(a[0], a[1], a[2], ca, sa);
     this.vert(b[0], b[1], b[2], cb, sb);
@@ -160,12 +182,27 @@ export class TerrainRenderer {
   /** Dünenmuster je Eckpunkt (wird von vier Tiles gebraucht, daher einmal berechnet; NaN = noch nicht) */
   private duneV: Float32Array = new Float32Array(0);
   biome: Biome;
+  /** Stil medieval: Vertexfarbe = Tönung (≈ 1) der Bibliothekstexturen, zusätzlich aMed; eigenes Material (env/) */
+  private readonly med: boolean;
+  /** Feuchte je Tile (nur medieval) */
+  private tileMoist: Float32Array = new Float32Array(0);
 
-  constructor(private map: GameMap) {
+  constructor(
+    private map: GameMap,
+    opts: { medieval?: boolean; material?: THREE.Material } = {},
+  ) {
     this.cw = Math.ceil(map.w / CHUNK);
     this.group.name = 'terrain';
     this.biome = biomeOf(map.seed);
+    this.med = !!opts.medieval;
+    if (opts.material) this.material = opts.material as THREE.MeshLambertMaterial;
     this.rebuildAll();
+  }
+
+  /** Stil medieval: Geländematerial tauschen (z. B. sobald die Texturen geladen sind) */
+  setLandMaterial(m: THREE.Material): void {
+    this.material = m as THREE.MeshLambertMaterial;
+    for (const c of this.chunks.values()) c.land.material = m;
   }
 
   setMap(map: GameMap): void {
@@ -186,8 +223,63 @@ export class TerrainRenderer {
     for (const c of this.chunks.values()) if (c.water) c.water.material = mat;
   }
 
+  /**
+   * Stil medieval: Tönung (Multiplikator der Bodentexturen, ≈ 1) statt fertiger Farbe, Feuchte und dieselben
+   * Oberflächengewichte. Wüste/Vorkommen/Pech färben die Erdschicht, Höhe hellt leicht auf.
+   */
+  private computeTileMed(i: number, x: number, y: number): void {
+    const m = this.map;
+    const t = m.terrain[i];
+    const r = hash2(m.seed + 17, x, y);
+    const moist = moistureAt(this.biome, m.seed, x, y);
+    let c: RGB = [1, 1, 1];
+    let green = 0.5;
+    const v = 0.95 + r * 0.1;
+    switch (t) {
+      case T.Steppe:
+        green = clamp01(this.biome.green * 0.85 + (moist - 0.5) * 0.95);
+        c = mix([1.1, 1.04, 0.8], [0.96, 1.02, 0.94], green);
+        break;
+      case T.Oasis:
+        c = mix([1.0, 1.0, 0.92], [0.94, 1.03, 0.94], moist);
+        break;
+      case T.Desert:
+        c = [1.45, 1.28, 1.0];
+        break;
+      case T.Swamp:
+        c = [0.72, 0.78, 0.62];
+        break;
+      case T.StoneDeposit:
+        c = [1.12, 1.1, 1.08];
+        break;
+      case T.IronDeposit:
+        c = [0.82, 0.62, 0.52];
+        break;
+      case T.PitchSpring:
+        c = [0.32, 0.3, 0.29];
+        break;
+      default:
+        break;
+    }
+    const lum = v * (1 + (m.height[i] - 1) * 0.03);
+    this.tileCol[i * 3] = c[0] * lum;
+    this.tileCol[i * 3 + 1] = c[1] * lum;
+    this.tileCol[i * 3 + 2] = c[2] * lum;
+    this.tileMoist[i] = moist;
+    const sw = surfaceWeights(t, green);
+    // Vorkommen: Erde + Fels, Wüste: Erde (Sand-Tönung)
+    this.tileSurf[i * 4] = sw[0];
+    this.tileSurf[i * 4 + 1] = sw[1];
+    this.tileSurf[i * 4 + 2] = sw[2];
+    this.tileSurf[i * 4 + 3] = sw[3];
+  }
+
   /** Farbe und Oberflächengewichte eines Tiles (Biom, großflächige Feuchte, Höhenlage, Zufallsvariation) */
   private computeTile(i: number, x: number, y: number): void {
+    if (this.med) {
+      this.computeTileMed(i, x, y);
+      return;
+    }
     const m = this.map;
     const t = m.terrain[i];
     const r = hash2(m.seed + 17, x, y);
@@ -302,6 +394,7 @@ export class TerrainRenderer {
     this.seenH = m.height.slice();
     this.tileCol = new Float32Array(m.n * 3);
     this.tileSurf = new Float32Array(m.n * 4);
+    if (this.med) this.tileMoist = new Float32Array(m.n);
     this.duneV = new Float32Array((m.w + 1) * (m.h + 1)).fill(NaN);
     for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) this.computeTile(m.idx(x, y), x, y);
     this.computeShore();
@@ -404,7 +497,7 @@ export class TerrainRenderer {
     g /= wsum;
     b /= wsum;
     amp /= wsum;
-    if (!selfWater && amp > 0) {
+    if (!selfWater && amp > 0 && !this.med) {
       const vi = py * (m.w + 1) + px;
       let d = this.duneV[vi];
       if (d !== d) d = this.duneV[vi] = dune(m.seed, px, py);
@@ -418,8 +511,8 @@ export class TerrainRenderer {
       g *= 0.88;
       b *= 0.88;
     }
-    // weicher Kartenrand zum Dunst
-    const edge = Math.min(px, py, m.w - px, m.h - py);
+    // weicher Kartenrand zum Dunst (medieval: im Shader über aMed)
+    const edge = this.med ? 99 : Math.min(px, py, m.w - px, m.h - py);
     if (edge < 10) {
       const f = 1 - edge / 10;
       const k = f * f * 0.85;
@@ -455,6 +548,10 @@ export class TerrainRenderer {
     const y1 = Math.min(m.h, y0 + CHUNK);
     const land = new MeshAcc();
     const water = new MeshAcc();
+    if (this.med) {
+      land.med = [];
+      land.medW = [m.w, m.h];
+    }
     const lStart = new Int32Array(CHUNK * CHUNK).fill(-1);
     const lCount = new Int32Array(CHUNK * CHUNK);
     const wStart = new Int32Array(CHUNK * CHUNK).fill(-1);
@@ -476,6 +573,7 @@ export class TerrainRenderer {
         const t = m.terrain[i];
         const wt = isWaterT(t);
         const yg = groundY(m, i);
+        if (this.med) land.medCur[1] = this.tileMoist[i];
         this.corner(i, x, y, c00, s00);
         this.corner(i, x + 1, y, c10, s10);
         this.corner(i, x, y + 1, c01, s01);
@@ -519,6 +617,7 @@ export class TerrainRenderer {
       } else {
         geo.setAttribute('aSurf', new THREE.Float32BufferAttribute(acc.surf, 4));
         geo.setAttribute('aFog', new THREE.Float32BufferAttribute(new Float32Array(acc.count).fill(1), 1));
+        if (acc.med) geo.setAttribute('aMed', new THREE.Float32BufferAttribute(acc.med, 2));
       }
       // Normalen werden für den Schattenversatz (normalBias) und die Klippenerkennung im Shader gebraucht
       geo.computeVertexNormals();
@@ -586,8 +685,18 @@ export class TerrainRenderer {
     const c1 = layer(1, h2);
     const c2 = layer(2.5, hash2(seed + 49, x * 4 + dx + 2, y * 4 + dy + 2));
     const c3 = mix(wetBank ? BED_DEEP : CLIFF, [0.1, 0.09, 0.08], 0.3 + h3 * 0.15);
-    const rowCols = [c0, c1, c2, c3];
+    let rowCols = [c0, c1, c2, c3];
+    if (this.med) {
+      // medieval: Tönung der Felstextur (≈ 1), Schichten leicht wechselnd, nasse Böschung dunkler, Fuß im Schatten
+      const wk = wetBank ? 0.72 : 1;
+      const tone = (k: number, hh: number): RGB => {
+        const v = (0.92 + hh * 0.14 - k * 0.07) * wk;
+        return [v * (1 + (hh - 0.5) * 0.06), v, v * (1 - (hh - 0.5) * 0.06)];
+      };
+      rowCols = [tone(0, h1), tone(1, h2), tone(2, h3), tone(3.5, h3)];
+    }
     const edgeFog = (c: RGB, px: number, py: number): RGB => {
+      if (this.med) return c;
       const e = Math.min(px, py, m.w - px, m.h - py);
       if (e >= 10) return c;
       const f = 1 - e / 10;
@@ -673,7 +782,7 @@ export class TerrainRenderer {
     // Schaum entlang des Ufers: die Tile-Mitte bekommt nur einen Teil (glatter Saum, schmale Rinnen füllen sich nicht ganz mit Schaum)
     const fc = (info.reduce((s, v) => s + v.foam, 0) / 4) * 0.45;
     const tintOf = (d: number, px: number, py: number): RGB => {
-      const c = waterTint(d, moat);
+      const c = this.med ? waterTintMed(d, moat) : waterTint(d, moat);
       return fogC([c[0] * (1 + jitter), c[1] * (1 + jitter), c[2] * (1 + jitter)], px, py);
     };
     const cols = corners.map(([px, py], k) => tintOf(info[k].depth, px, py));

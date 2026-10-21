@@ -5,8 +5,9 @@
  *   <out>/<stil>/<stufe>/<kamera>.jpg  +  <out>/<stil>/<stufe>/stats.json  +  <out>/stats.json (Übersicht)
  *
  *   node scripts/lookdev.mjs [--out=docs/phase5a/lookdev] [--styles=classic,medieval] [--qualities=low,medium,high]
- *                            [--cams=1-rts,2-mid,3a-building,3b-figures,3c-material] [--viewport=1280x720] [--frames=30]
+ *                            [--cams=1-rts,2-mid,3a-building,3b-figures,3c-material,3d-keep,3e-gate,3f-wall,3g-corner,3h-landscape] [--viewport=1280x720] [--frames=30]
  *                            [--sun=game|<Stunde>] [--check] [--hw] [--port=5641] [--dist=<gebauter Client>] [--url=http://…]
+ *                            [--tone=agx|aces] (nur medieval) [--timeout=<s je Bild, Standard 900>]
  *
  *  --check  Konsole prüfen: Warnungen/Fehler (außer bekannten Software-GL-Hinweisen) → Exit-Code 2
  *  --hw     echte GPU statt Software-GL (SwiftShader). OHNE --hw sind alle Zeiten Software-GL-Werte, KEINE GPU-Werte.
@@ -30,7 +31,7 @@ const args = Object.fromEntries(
 const list = (v, d) => (v && v !== true && v !== 'all' ? String(v).split(',') : d);
 const styles = list(args.styles, ['classic', 'medieval']);
 const qualities = list(args.qualities, ['low', 'medium', 'high']);
-const CAMS = ['1-rts', '2-mid', '3a-building', '3b-figures', '3c-material'];
+const CAMS = ['1-rts', '2-mid', '3a-building', '3b-figures', '3c-material', '3d-keep', '3e-gate', '3f-wall', '3g-corner', '3h-landscape'];
 const cams = list(args.cams, CAMS);
 const [vw, vh] = String(args.viewport ?? '1280x720').split('x').map(Number);
 const out = path.resolve(String(args.out ?? path.join(root, 'docs', 'phase5a', 'lookdev')));
@@ -38,6 +39,8 @@ const frames = Number(args.frames ?? 30);
 const sun = String(args.sun ?? 'game');
 const hw = !!args.hw;
 const check = !!args.check;
+/** Wartezeit je Seite/Kamera in Sekunden (Software-GL auf belasteten Rechnern braucht für Hoch mehrere Minuten) */
+const waitMs = Number(args.timeout ?? 900) * 1000;
 const IGNORE = [/GPU stall/i, /swiftshader/i, /Automatic fallback to software WebGL/i, /ReadPixels/i, /GL Driver Message/i];
 
 async function main() {
@@ -75,14 +78,14 @@ async function main() {
         });
         page.on('pageerror', (e) => msgs.push(`[Seitenfehler] ${e.message}`));
         const t0 = Date.now();
-        await page.goto(`${base}/?lookdev=${style}&quality=${quality}&cam=${cams[0]}&ui=0&stats=0&live=0&frames=${frames}&sun=${sun}`);
-        await page.waitForFunction(() => window.__lookdev && window.__lookdev.ready, null, { timeout: 900000, polling: 300 });
+        await page.goto(`${base}/?lookdev=${style}&quality=${quality}&cam=${cams[0]}&ui=0&stats=0&live=0&frames=${frames}&sun=${sun}${args.tone ? `&tone=${args.tone}` : ''}`);
+        await page.waitForFunction(() => window.__lookdev && window.__lookdev.ready, null, { timeout: waitMs, polling: 300 });
         const loadS = (Date.now() - t0) / 1000;
         const per = {};
         for (const cam of cams) {
           if (cam !== cams[0]) {
             await page.evaluate((c) => window.__lookdev.setCam(c), cam);
-            await page.waitForFunction(() => window.__lookdev.ready, null, { timeout: 900000, polling: 300 });
+            await page.waitForFunction(() => window.__lookdev.ready, null, { timeout: waitMs, polling: 300 });
           }
           const file = path.join(dir, `${cam}.jpg`);
           await page.screenshot({ path: file, type: 'jpeg', quality: Number(args.jpeg ?? 82) });

@@ -1,0 +1,85 @@
+{
+  "id": "veg_oak_b",
+  "desc": "Stieleiche, hoeher, unregelmaessige Krone, leicht schief",
+  "file": "models/veg_oak_b.glb",
+  "target": {
+    "prop": "veg_oak_b"
+  },
+  "class": "tree",
+  "footprint": null,
+  "height": 3.455,
+  "bbox": {
+    "min": [
+      -1.473,
+      -0.01,
+      -1.175
+    ],
+    "max": [
+      1.502,
+      3.455,
+      1.769
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 3761,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 450,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 129,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    }
+  ],
+  "tris": [
+    3761,
+    450,
+    129
+  ],
+  "budget": [
+    6000,
+    1500,
+    300
+  ],
+  "materials": [
+    "M_Bark",
+    "M_Foliage"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 255640,
+  "veg": {
+    "kind": "tree",
+    "species": "oak",
+    "role": "mature",
+    "height": 3.3,
+    "crown": [
+      1.05,
+      1.08
+    ]
+  },
+  "uvTile": {
+    "M_Bark": 0.541,
+    "M_Foliage": 0.541
+  },
+  "source": "assets/blender/models/veg_trees.py",
+  "blend": "assets/src/veg/veg_oak_b.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

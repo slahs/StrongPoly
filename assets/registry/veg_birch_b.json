@@ -1,0 +1,85 @@
+{
+  "id": "veg_birch_b",
+  "desc": "Haengebirke, kleiner, schief",
+  "file": "models/veg_birch_b.glb",
+  "target": {
+    "prop": "veg_birch_b"
+  },
+  "class": "tree",
+  "footprint": null,
+  "height": 2.718,
+  "bbox": {
+    "min": [
+      -0.871,
+      -0.012,
+      -1.046
+    ],
+    "max": [
+      1.049,
+      2.718,
+      0.962
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 3659,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 565,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 103,
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ]
+    }
+  ],
+  "tris": [
+    3659,
+    565,
+    103
+  ],
+  "budget": [
+    6000,
+    1500,
+    300
+  ],
+  "materials": [
+    "M_Bark",
+    "M_Foliage"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 235504,
+  "veg": {
+    "kind": "tree",
+    "species": "birch",
+    "role": "young",
+    "height": 2.8,
+    "crown": [
+      0.58,
+      1.0
+    ]
+  },
+  "uvTile": {
+    "M_Bark": 0.541,
+    "M_Foliage": 0.541
+  },
+  "source": "assets/blender/models/veg_trees.py",
+  "blend": "assets/src/veg/veg_birch_b.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

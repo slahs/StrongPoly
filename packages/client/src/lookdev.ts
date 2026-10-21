@@ -9,13 +9,14 @@ import { assetRegistry, parseStyle } from './render/assets/registry';
 import type { ArtStyle } from './render/assets/registry';
 import { textureBytes } from './render/assets/materials';
 import { GFX } from './render/materials';
+import { setToneOp } from './render/env/atmosphere';
 
 /**
  * LookDev der Phase 5A: `/?lookdev=medieval` (oder `classic`) – Referenzsiedlung im ECHTEN Renderer (GameScene, Terrain,
  * Dekor, EntityRenderer mit Override-Register), feste Kameras, Stil alt/neu, Qualitätsstufe, Sonnenstand, Statistik.
  *
  *   ?lookdev=medieval|classic   Stil (gleichbedeutend &style=)
- *   &cam=1-rts|2-mid|3a-building|3b-figures|3c-material
+ *   &cam=1-rts|2-mid|3a-building|3b-figures|3c-material|3h-landscape   &tone=agx|aces (nur medieval)
  *   &quality=low|medium|high    &sun=game|<Stunde 6..19>     &frames=N (Einschwingen, Standard 30)
  *   &ui=0 (ohne Leiste, für Aufnahmen)  &stats=0 (ohne Statistik)  &live=0 (Standbild nach dem Einschwingen)
  *
@@ -93,11 +94,14 @@ export function startLookdev(): void {
   document.title = 'StrongPoly LookDev';
   document.getElementById('ui')!.innerHTML = '';
 
+  // Stil medieval: Tonemapping-Operator vergleichen (&tone=agx|aces), muss vor dem ersten Kompilieren stehen
+  const tone = q.get('tone');
+  if (tone === 'agx' || tone === 'aces') setToneOp(tone);
   const rng = new Rng(0x10cdef);
   Math.random = () => rng.next();
   assetRegistry.setStyle(style);
 
-  const { spec, cx, cy } = lookdevSpec();
+  const { spec, cx, cy, roads, props } = lookdevSpec();
   const world = buildShowWorld(spec);
   const canvas = document.getElementById('view') as HTMLCanvasElement;
   const gs = new GameScene(canvas);
@@ -105,6 +109,7 @@ export function startLookdev(): void {
   gs.setClockOrigin(0);
   const entities = new EntityRenderer(world);
   gs.root.add(entities.group);
+  gs.setEnvExtras(roads, props);
   gs.setMap(world.map);
   gs.decor?.setOccupancy(world.bldAt, world.buildings);
   entities.onBuildingsChanged = () => gs.decor?.markDirty();
@@ -182,6 +187,9 @@ export function startLookdev(): void {
     for (const t of [GFX.uNoiseA.value, GFX.uNoiseN.value, GFX.uGround.value]) if (t) texs.add(t);
     let texBytes = 0;
     for (const t of texs) texBytes += texSize(t);
+    // Stil medieval: Gelände-Texturarrays (Uniforms im Shader, nicht an den Materialien) und Umgebungskarte
+    texBytes += gs.terrainTex.bytes;
+    if (gs.envMap) texBytes += gs.envMap.data.byteLength * 2;
     const sm = gs.sun.shadow.map;
     if (sm && gs.renderer.shadowMap.enabled) texBytes += sm.width * sm.height * 4 + sm.width * sm.height * 4;
     const gl = gs.renderer.getContext();
@@ -343,7 +351,7 @@ export function startLookdev(): void {
     setStyle: async (s: ArtStyle): Promise<void> => {
       style = s;
       assetRegistry.setStyle(s);
-      if (s === 'medieval') await assetRegistry.preload();
+      if (s === 'medieval') await preloadMedieval();
       syncUrl();
       renderBar();
       rerun();
@@ -361,10 +369,25 @@ export function startLookdev(): void {
     },
   };
   window.__lookdev = api;
+  // Diagnose (scripts/qa): Vegetations-/Umgebungszustand
+  (window as unknown as { __dbg: () => unknown }).__dbg = () => {
+    const veg: string[] = [];
+    gs.scene.traverse((o) => {
+      const m = o as THREE.InstancedMesh;
+      if (m.isInstancedMesh && o.name.startsWith('veg:') && m.count > 0) veg.push(`${o.name} x${m.count}${m.visible ? '' : ' (aus)'}`);
+    });
+    const d = gs.decor as unknown as { state?: string; stats?: unknown };
+    return { style: gs.style, decor: d.state ?? 'classic', stats: d.stats, veg: veg.sort(), programs: gs.renderer.info.programs?.map((p) => p.name) };
+  };
+  /** Stil medieval: Gebäude-/Figuren-Assets, Vegetation und Bodentexturen vor dem Einschwingen laden */
+  async function preloadMedieval(): Promise<void> {
+    await assetRegistry.preload();
+    await gs.whenEnvReady();
+  }
   running = true;
   const start = (): void => {
     requestAnimationFrame(loop);
   };
-  if (style === 'medieval') void assetRegistry.preload().then(start, start);
+  if (style === 'medieval') void preloadMedieval().then(start, start);
   else start();
 }

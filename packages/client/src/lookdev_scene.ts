@@ -1,5 +1,8 @@
 import { BT, BUILDINGS, GameMap, Rng, T, TREE_WOOD, U, generateMap } from '@strongpoly/shared';
 import { flatten } from './showcase_scenes';
+import { polylineSegs } from './render/env/envmap';
+import type { RoadSeg } from './render/env/envmap';
+import type { PropPlacement } from './render/env/veg_layer';
 import type { ShowBuilding, ShowCam, ShowSpec, ShowUnit, UnitMode } from './showcase_scenes';
 
 /**
@@ -17,7 +20,15 @@ export type LayoutItem =
   /** Gelände: Rechteck mit Geländeart (Gras = Oase, Weg = Steppe, Fels = Steine) */
   | { kind: 'ground'; terrain: number; x0: number; y0: number; x1: number; y1: number }
   /** Bäume: Rechteck mit Dichte 0..1 (deterministisch gestreut) */
-  | { kind: 'trees'; x0: number; y0: number; x1: number; y1: number; density: number };
+  | { kind: 'trees'; x0: number; y0: number; x1: number; y1: number; density: number }
+  /** einzelner Baum (Baum-Tile; Art aus dem Biom) */
+  | { kind: 'tree'; x: number; y: number }
+  /** Weg (nur Stil medieval sichtbar, als Polylinie in der Umgebungskarte): halbe Breite hw, Fahrspuren 0..1 */
+  | { kind: 'road'; pts: [number, number][]; hw: number; ruts: number }
+  /** Requisit aus der Vegetations-/Umgebungsbibliothek (nur Stil medieval): Asset-ID, Position, Drehung (rad), Größe */
+  | { kind: 'prop'; id: string; x: number; y: number; rot?: number; s?: number }
+  /** Reihe gleicher Requisiten (Zaun): von (x0,y0) nach (x1,y1), Abstand step, Drehung entlang der Linie */
+  | { kind: 'propLine'; id: string; x0: number; y0: number; x1: number; y1: number; step: number; s?: number };
 
 /** Siedlung: Bergfried, Fachwerkhäuser (Hütten), Bäckerei, Schmiede, Lager, Brunnen, Mauer mit Tor, Bauern, Soldaten, Weg, Gras, Wald, Steine */
 export const LOOKDEV_LAYOUT: LayoutItem[] = [
@@ -33,6 +44,31 @@ export const LOOKDEV_LAYOUT: LayoutItem[] = [
   { kind: 'trees', x0: 12, y0: -20, x1: 20, y1: -6, density: 0.55 },
   { kind: 'trees', x0: -20, y0: -20, x1: -14, y1: -12, density: 0.4 },
   { kind: 'trees', x0: 14, y0: 4, x1: 20, y1: 10, density: 0.25 },
+  // einzelne Bäume in der Wiese und am Weg (Solitäreichen, Birkengruppe)
+  { kind: 'tree', x: -15, y: 1 },
+  { kind: 'tree', x: 11, y: -2 },
+  { kind: 'tree', x: 9, y: 9 },
+  { kind: 'tree', x: -9, y: 7 },
+  { kind: 'tree', x: 5, y: 16 },
+  { kind: 'tree', x: -6, y: 17 },
+  // Wege (Stil medieval): Karrenweg vom Tor zum Platz, Abzweig zum Bergfried, Gasse zur Schmiede, Fußpfad zur Bäckerei
+  { kind: 'road', pts: [[0.6, 26], [0.9, 19], [0.5, 12.5], [0.9, 8.5], [1.3, 4.8], [0.4, 1.8]], hw: 1.05, ruts: 1 },
+  { kind: 'road', pts: [[0.4, 1.8], [-2.8, -1.6], [-6.2, -4.8], [-8.4, -7.6]], hw: 0.9, ruts: 0.7 },
+  { kind: 'road', pts: [[1.3, 4.8], [3.8, 4.4], [6.2, 5.8]], hw: 0.6, ruts: 0.25 },
+  { kind: 'road', pts: [[0.6, 3.4], [-2.4, 5.0], [-3.9, 5.6]], hw: 0.42, ruts: 0 },
+  // Zäune und Gärten (Stil medieval)
+  { kind: 'propLine', id: 'veg_fence_wattle', x0: 8.6, y0: -8.2, x1: 12.6, y1: -8.2, step: 1 },
+  { kind: 'propLine', id: 'veg_fence_wattle', x0: 12.6, y0: -8.2, x1: 12.6, y1: -5.2, step: 1 },
+  { kind: 'propLine', id: 'veg_fence_wattle', x0: 12.6, y0: -5.2, x1: 9.6, y1: -5.2, step: 1 },
+  { kind: 'prop', id: 'veg_garden_bed', x: 10.6, y: -7.4, rot: 0 },
+  { kind: 'prop', id: 'veg_garden_bed', x: 10.6, y: -6.0, rot: 0 },
+  { kind: 'propLine', id: 'veg_fence_rail', x0: 3.2, y0: 14.6, x1: 10.2, y1: 14.6, step: 1 },
+  { kind: 'propLine', id: 'veg_fence_rail', x0: 10.2, y0: 14.6, x1: 10.2, y1: 19.6, step: 1 },
+  { kind: 'propLine', id: 'veg_fence_wattle', x0: -7.6, y0: 6.6, x1: -3.6, y1: 6.6, step: 1 },
+  { kind: 'prop', id: 'veg_garden_bed', x: -5.6, y: 7.6, rot: 1.5708 },
+  { kind: 'prop', id: 'veg_rock_a', x: -2.6, y: 13.8, rot: 0.6, s: 1.1 },
+  { kind: 'prop', id: 'veg_rock_d', x: 2.6, y: 9.6, rot: 2.1 },
+  { kind: 'prop', id: 'veg_log', x: 12.2, y: -3.6, rot: 0.4 },
   // Gebäude
   { kind: 'building', t: BT.Keep, x: -11, y: -13, note: 'Bergfried' },
   { kind: 'building', t: BT.Stockpile, x: -10, y: -3, note: 'Lager (Wegenetz)' },
@@ -88,6 +124,7 @@ export const LOOKDEV_CAMS: LookdevCam[] = [
   { id: '4b-bakery', label: '4b Bäckerei', x: -3.5, y: 5.5, dist: 6.5, yaw: 0.95, pitch: 27, lookHeight: 1.1, fog: 3 },
   { id: '4c-smithy', label: '4c Schmiede', x: 7.5, y: 5.5, dist: 7.5, yaw: -0.5, pitch: 20, lookHeight: 1.0, fog: 3 },
   { id: '2b-town', label: '2b Häuser', x: 3, y: -5.5, dist: 12, yaw: 0.35, pitch: 34, lookHeight: 0.6, fog: 1.6 },
+  { id: '3h-landscape', label: '3h Landschaft', x: 10.5, y: -6, dist: 10, yaw: -0.75, pitch: 13, lookHeight: 1.1, fog: 2.6 },
 ];
 
 /** Karten-Seed mit feuchtem Biom ('lush': grüne Wiesen, Laub- und Nadelbäume) */
@@ -101,7 +138,7 @@ function hash2(s: number, x: number, y: number): number {
 }
 
 /** Baut die Spezifikation (Karte, Gebäude, Figuren, Kameras) – rein und deterministisch */
-export function lookdevSpec(layout: LayoutItem[] = LOOKDEV_LAYOUT): { spec: ShowSpec; cx: number; cy: number } {
+export function lookdevSpec(layout: LayoutItem[] = LOOKDEV_LAYOUT): { spec: ShowSpec; cx: number; cy: number; roads: RoadSeg[]; props: PropPlacement[] } {
   const map: GameMap = generateMap({ seed: LOOKDEV_SEED, size: LOOKDEV_SIZE, players: 2 });
   const cx = LOOKDEV_SIZE >> 1;
   const cy = LOOKDEV_SIZE >> 1;
@@ -109,6 +146,8 @@ export function lookdevSpec(layout: LayoutItem[] = LOOKDEV_LAYOUT): { spec: Show
   const rng = new Rng(0x10cd);
   const buildings: ShowBuilding[] = [];
   const units: ShowUnit[] = [];
+  const roads: RoadSeg[] = [];
+  const props: PropPlacement[] = [];
   for (const it of layout) {
     switch (it.kind) {
       case 'ground':
@@ -119,6 +158,28 @@ export function lookdevSpec(layout: LayoutItem[] = LOOKDEV_LAYOUT): { spec: Show
         for (let y = cy + it.y0; y <= cy + it.y1; y++)
           for (let x = cx + it.x0; x <= cx + it.x1; x++) if (map.inBounds(x, y) && hash2(7, x, y) < it.density) map.trees[map.idx(x, y)] = TREE_WOOD;
         break;
+      case 'tree':
+        if (map.inBounds(cx + it.x, cy + it.y)) map.trees[map.idx(cx + it.x, cy + it.y)] = TREE_WOOD;
+        break;
+      case 'road':
+        roads.push(...polylineSegs(it.pts.map(([x, y]) => [cx + x, cy + y] as [number, number]), it.hw, it.ruts));
+        break;
+      case 'prop':
+        props.push({ id: it.id, x: cx + it.x, y: cy + it.y, rot: it.rot ?? 0, s: it.s });
+        break;
+      case 'propLine': {
+        const dx = it.x1 - it.x0;
+        const dy = it.y1 - it.y0;
+        const L = Math.hypot(dx, dy);
+        const n = Math.max(1, Math.round(L / it.step));
+        // Zaunstück: Länge 1 entlang +x (Blender X) → Drehung um die Hochachse auf die Linienrichtung
+        const rot = Math.atan2(-dy, dx);
+        for (let k = 0; k < n; k++) {
+          const f = (k + 0.5) / n;
+          props.push({ id: it.id, x: cx + it.x0 + dx * f, y: cy + it.y0 + dy * f, rot, s: (L / n) / it.step * (it.s ?? 1) });
+        }
+        break;
+      }
       case 'building':
         buildings.push({ t: it.t, x: cx + it.x, y: cy + it.y, o: 0, rot: it.rot ?? 0, s: it.staffed ? 1 : 0 });
         break;
@@ -161,5 +222,6 @@ export function lookdevSpec(layout: LayoutItem[] = LOOKDEV_LAYOUT): { spec: Show
     fogScale: 1,
     desc: 'LookDev-Referenzsiedlung',
   };
-  return { spec, cx, cy };
+  // keine Requisiten auf Gebäuden
+  return { spec, cx, cy, roads, props };
 }

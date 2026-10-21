@@ -1,0 +1,85 @@
+{
+  "id": "veg_spruce_c",
+  "desc": "junge Fichte",
+  "file": "models/veg_spruce_c.glb",
+  "target": {
+    "prop": "veg_spruce_c"
+  },
+  "class": "tree",
+  "footprint": null,
+  "height": 2.208,
+  "bbox": {
+    "min": [
+      -0.764,
+      -0.218,
+      -0.836
+    ],
+    "max": [
+      0.795,
+      2.208,
+      0.853
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 3191,
+      "materials": [
+        "M_Bark",
+        "M_Foliage_Conifer"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 354,
+      "materials": [
+        "M_Bark",
+        "M_Foliage_Conifer"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 114,
+      "materials": [
+        "M_Bark",
+        "M_Foliage_Conifer"
+      ]
+    }
+  ],
+  "tris": [
+    3191,
+    354,
+    114
+  ],
+  "budget": [
+    6000,
+    1500,
+    300
+  ],
+  "materials": [
+    "M_Bark",
+    "M_Foliage_Conifer"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 218704,
+  "veg": {
+    "kind": "tree",
+    "species": "spruce",
+    "role": "young",
+    "height": 2.1,
+    "crown": [
+      0.64,
+      1.05
+    ]
+  },
+  "uvTile": {
+    "M_Bark": 0.541,
+    "M_Foliage_Conifer": 1.0
+  },
+  "source": "assets/blender/models/veg_trees.py",
+  "blend": "assets/src/veg/veg_spruce_c.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

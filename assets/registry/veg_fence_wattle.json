@@ -1,0 +1,74 @@
+{
+  "id": "veg_fence_wattle",
+  "desc": "Flechtzaun: Staken mit geflochtenen Haselruten (1 Einheit)",
+  "file": "models/veg_fence_wattle.glb",
+  "target": {
+    "prop": "veg_fence_wattle"
+  },
+  "class": "prop",
+  "footprint": null,
+  "height": 0.624,
+  "bbox": {
+    "min": [
+      -0.53,
+      -0.041,
+      -0.035
+    ],
+    "max": [
+      0.503,
+      0.624,
+      0.039
+    ]
+  },
+  "lods": [
+    {
+      "node": "LOD0",
+      "tris": 939,
+      "materials": [
+        "M_Bark"
+      ]
+    },
+    {
+      "node": "LOD1",
+      "tris": 240,
+      "materials": [
+        "M_Bark"
+      ]
+    },
+    {
+      "node": "LOD2",
+      "tris": 43,
+      "materials": [
+        "M_Bark"
+      ]
+    }
+  ],
+  "tris": [
+    939,
+    240,
+    43
+  ],
+  "budget": [
+    1500,
+    600,
+    150
+  ],
+  "materials": [
+    "M_Bark"
+  ],
+  "anchors": [],
+  "attributes": [
+    "COLOR_0"
+  ],
+  "bytes": 91360,
+  "veg": {
+    "kind": "prop",
+    "role": "fence"
+  },
+  "uvTile": {
+    "M_Bark": 0.541
+  },
+  "source": "assets/blender/models/veg_props.py",
+  "blend": "assets/src/veg/veg_fence_wattle.blend",
+  "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+}

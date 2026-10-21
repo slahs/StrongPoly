@@ -137,6 +137,40 @@
       "dirt": "#5a4a38",
       "maps": {}
     },
+    "M_Flora": {
+      "base": "#6f8a3e",
+      "rough": 0.75,
+      "metal": 0,
+      "tile": 1,
+      "dirt": "#3a4422",
+      "doubleSided": true,
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Flora/albedo.webp",
+          "bytes": 630,
+          "w": 256,
+          "h": 64,
+          "format": "webp",
+          "hash": "3ace80c3f2"
+        },
+        "normal": {
+          "file": "textures/M_Flora/normal.webp",
+          "bytes": 110,
+          "w": 256,
+          "h": 64,
+          "format": "webp",
+          "hash": "2538038942"
+        },
+        "orm": {
+          "file": "textures/M_Flora/orm.webp",
+          "bytes": 118,
+          "w": 256,
+          "h": 64,
+          "format": "webp",
+          "hash": "1681e9aac1"
+        }
+      }
+    },
     "M_Foliage": {
       "base": "#405128",
       "rough": 0.54,
@@ -177,6 +211,50 @@
           "hash": "606c082810",
           "sizes": {
             "512": "textures/M_Foliage/orm_512.webp"
+          }
+        }
+      }
+    },
+    "M_Foliage_Conifer": {
+      "base": "#2f4527",
+      "rough": 0.82,
+      "metal": 0,
+      "tile": 1,
+      "dirt": "#1f2a18",
+      "alphaTest": 0.5,
+      "doubleSided": true,
+      "maps": {
+        "albedo": {
+          "file": "textures/M_Foliage_Conifer/albedo.webp",
+          "bytes": 84534,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "b546862270",
+          "sizes": {
+            "512": "textures/M_Foliage_Conifer/albedo_512.webp"
+          }
+        },
+        "normal": {
+          "file": "textures/M_Foliage_Conifer/normal.webp",
+          "bytes": 122414,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "fbfbb895b5",
+          "sizes": {
+            "512": "textures/M_Foliage_Conifer/normal_512.webp"
+          }
+        },
+        "orm": {
+          "file": "textures/M_Foliage_Conifer/orm.webp",
+          "bytes": 15728,
+          "w": 1024,
+          "h": 1024,
+          "format": "webp",
+          "hash": "902cbae362",
+          "sizes": {
+            "512": "textures/M_Foliage_Conifer/orm_512.webp"
           }
         }
       }
@@ -1830,6 +1908,1929 @@
       "hash": "af05fe2a59",
       "source": "assets/blender/models/spearman.py",
       "blend": "assets/src/spearman.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_birch_a": {
+      "id": "veg_birch_a",
+      "desc": "Haengebirke, einstaemmig",
+      "file": "models/veg_birch_a.glb",
+      "target": {
+        "prop": "veg_birch_a"
+      },
+      "class": "tree",
+      "footprint": null,
+      "height": 3.112,
+      "bbox": {
+        "min": [
+          -0.814,
+          -0.005,
+          -1.113
+        ],
+        "max": [
+          0.94,
+          3.112,
+          1.026
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 4680,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 658,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 121,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        }
+      ],
+      "tris": [
+        4680,
+        658,
+        121
+      ],
+      "budget": [
+        6000,
+        1500,
+        300
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 298692,
+      "veg": {
+        "kind": "tree",
+        "species": "birch",
+        "role": "mature",
+        "height": 3.3,
+        "crown": [
+          0.68,
+          1.2
+        ]
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
+      },
+      "hash": "53c83a1f69",
+      "source": "assets/blender/models/veg_trees.py",
+      "blend": "assets/src/veg/veg_birch_a.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_birch_b": {
+      "id": "veg_birch_b",
+      "desc": "Haengebirke, kleiner, schief",
+      "file": "models/veg_birch_b.glb",
+      "target": {
+        "prop": "veg_birch_b"
+      },
+      "class": "tree",
+      "footprint": null,
+      "height": 2.718,
+      "bbox": {
+        "min": [
+          -0.871,
+          -0.012,
+          -1.046
+        ],
+        "max": [
+          1.049,
+          2.718,
+          0.962
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 3659,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 565,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 103,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        }
+      ],
+      "tris": [
+        3659,
+        565,
+        103
+      ],
+      "budget": [
+        6000,
+        1500,
+        300
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 235504,
+      "veg": {
+        "kind": "tree",
+        "species": "birch",
+        "role": "young",
+        "height": 2.8,
+        "crown": [
+          0.58,
+          1
+        ]
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
+      },
+      "hash": "ebe6f146c7",
+      "source": "assets/blender/models/veg_trees.py",
+      "blend": "assets/src/veg/veg_birch_b.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_birch_c": {
+      "id": "veg_birch_c",
+      "desc": "Haengebirke, zweistaemmig",
+      "file": "models/veg_birch_c.glb",
+      "target": {
+        "prop": "veg_birch_c"
+      },
+      "class": "tree",
+      "footprint": null,
+      "height": 2.952,
+      "bbox": {
+        "min": [
+          -1.248,
+          -0.018,
+          -1.162
+        ],
+        "max": [
+          1.246,
+          2.952,
+          1.231
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 5960,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 918,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 184,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        }
+      ],
+      "tris": [
+        5960,
+        918,
+        184
+      ],
+      "budget": [
+        6000,
+        1500,
+        300
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 382392,
+      "veg": {
+        "kind": "tree",
+        "species": "birch",
+        "role": "mature",
+        "height": 3.05,
+        "crown": [
+          0.82,
+          1.1
+        ]
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
+      },
+      "hash": "4e78022893",
+      "source": "assets/blender/models/veg_trees.py",
+      "blend": "assets/src/veg/veg_birch_c.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_bush_a": {
+      "id": "veg_bush_a",
+      "desc": "Haselstrauch: viele Triebe aus dem Boden, lockere Krone",
+      "file": "models/veg_bush_a.glb",
+      "target": {
+        "prop": "veg_bush_a"
+      },
+      "class": "bush",
+      "footprint": null,
+      "height": 1.349,
+      "bbox": {
+        "min": [
+          -0.945,
+          -0.009,
+          -0.839
+        ],
+        "max": [
+          0.887,
+          1.349,
+          0.971
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 1924,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 246,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 32,
+          "materials": [
+            "M_Foliage"
+          ]
+        }
+      ],
+      "tris": [
+        1924,
+        246,
+        32
+      ],
+      "budget": [
+        2400,
+        700,
+        160
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 129104,
+      "veg": {
+        "kind": "bush",
+        "role": "bush",
+        "height": 1.2
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
+      },
+      "hash": "44e3828adf",
+      "source": "assets/blender/models/veg_ground.py",
+      "blend": "assets/src/veg/veg_bush_a.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_bush_b": {
+      "id": "veg_bush_b",
+      "desc": "Weissdorn: dicht, rundlich",
+      "file": "models/veg_bush_b.glb",
+      "target": {
+        "prop": "veg_bush_b"
+      },
+      "class": "bush",
+      "footprint": null,
+      "height": 1.077,
+      "bbox": {
+        "min": [
+          -0.873,
+          -0.082,
+          -0.811
+        ],
+        "max": [
+          0.761,
+          1.077,
+          0.801
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 1718,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 163,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 18,
+          "materials": [
+            "M_Foliage"
+          ]
+        }
+      ],
+      "tris": [
+        1718,
+        163,
+        18
+      ],
+      "budget": [
+        2400,
+        700,
+        160
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 114356,
+      "veg": {
+        "kind": "bush",
+        "role": "bush",
+        "height": 0.9
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
+      },
+      "hash": "68d940ab16",
+      "source": "assets/blender/models/veg_ground.py",
+      "blend": "assets/src/veg/veg_bush_b.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_fence_rail": {
+      "id": "veg_fence_rail",
+      "desc": "Holzzaun: Eichenpfosten mit zwei Spaltstangen (1 Einheit)",
+      "file": "models/veg_fence_rail.glb",
+      "target": {
+        "prop": "veg_fence_rail"
+      },
+      "class": "prop",
+      "footprint": null,
+      "height": 0.69,
+      "bbox": {
+        "min": [
+          -0.542,
+          -0.051,
+          -0.082
+        ],
+        "max": [
+          0.531,
+          0.69,
+          0.059
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 130,
+          "materials": [
+            "M_Timber_Oak"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 73,
+          "materials": [
+            "M_Timber_Oak"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 32,
+          "materials": [
+            "M_Timber_Oak"
+          ]
+        }
+      ],
+      "tris": [
+        130,
+        73,
+        32
+      ],
+      "budget": [
+        1500,
+        600,
+        150
+      ],
+      "materials": [
+        "M_Timber_Oak"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 20464,
+      "veg": {
+        "kind": "prop",
+        "role": "fence"
+      },
+      "uvTile": {
+        "M_Timber_Oak": 0.541
+      },
+      "hash": "6febfd4ddc",
+      "source": "assets/blender/models/veg_props.py",
+      "blend": "assets/src/veg/veg_fence_rail.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_fence_wattle": {
+      "id": "veg_fence_wattle",
+      "desc": "Flechtzaun: Staken mit geflochtenen Haselruten (1 Einheit)",
+      "file": "models/veg_fence_wattle.glb",
+      "target": {
+        "prop": "veg_fence_wattle"
+      },
+      "class": "prop",
+      "footprint": null,
+      "height": 0.624,
+      "bbox": {
+        "min": [
+          -0.53,
+          -0.041,
+          -0.035
+        ],
+        "max": [
+          0.503,
+          0.624,
+          0.039
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 939,
+          "materials": [
+            "M_Bark"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 240,
+          "materials": [
+            "M_Bark"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 43,
+          "materials": [
+            "M_Bark"
+          ]
+        }
+      ],
+      "tris": [
+        939,
+        240,
+        43
+      ],
+      "budget": [
+        1500,
+        600,
+        150
+      ],
+      "materials": [
+        "M_Bark"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 91360,
+      "veg": {
+        "kind": "prop",
+        "role": "fence"
+      },
+      "uvTile": {
+        "M_Bark": 0.541
+      },
+      "hash": "c325af8e65",
+      "source": "assets/blender/models/veg_props.py",
+      "blend": "assets/src/veg/veg_fence_wattle.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_fern_a": {
+      "id": "veg_fern_a",
+      "desc": "Farn (Wurmfarn), sieben Wedel",
+      "file": "models/veg_fern_a.glb",
+      "target": {
+        "prop": "veg_fern_a"
+      },
+      "class": "flora",
+      "footprint": null,
+      "height": 0.28,
+      "bbox": {
+        "min": [
+          -0.377,
+          0,
+          -0.458
+        ],
+        "max": [
+          0.349,
+          0.28,
+          0.368
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 392,
+          "materials": [
+            "M_Flora"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 132,
+          "materials": [
+            "M_Flora"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 12,
+          "materials": [
+            "M_Flora"
+          ]
+        }
+      ],
+      "tris": [
+        392,
+        132,
+        12
+      ],
+      "budget": [
+        420,
+        140,
+        40
+      ],
+      "materials": [
+        "M_Flora"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 49312,
+      "veg": {
+        "kind": "flora",
+        "role": "fern"
+      },
+      "uvTile": {
+        "M_Flora": 1
+      },
+      "hash": "12423a5124",
+      "source": "assets/blender/models/veg_ground.py",
+      "blend": "assets/src/veg/veg_fern_a.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_flowers_a": {
+      "id": "veg_flowers_a",
+      "desc": "Wiesenblumen",
+      "file": "models/veg_flowers_a.glb",
+      "target": {
+        "prop": "veg_flowers_a"
+      },
+      "class": "flora",
+      "footprint": null,
+      "height": 0.291,
+      "bbox": {
+        "min": [
+          -0.121,
+          -0.01,
+          -0.143
+        ],
+        "max": [
+          0.149,
+          0.291,
+          0.152
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 106,
+          "materials": [
+            "M_Flora"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 39,
+          "materials": [
+            "M_Flora"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 20,
+          "materials": [
+            "M_Flora"
+          ]
+        }
+      ],
+      "tris": [
+        106,
+        39,
+        20
+      ],
+      "budget": [
+        420,
+        140,
+        40
+      ],
+      "materials": [
+        "M_Flora"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 14960,
+      "veg": {
+        "kind": "flora",
+        "role": "flowers"
+      },
+      "uvTile": {
+        "M_Flora": 1
+      },
+      "hash": "0c0271a72f",
+      "source": "assets/blender/models/veg_ground.py",
+      "blend": "assets/src/veg/veg_flowers_a.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_flowers_b": {
+      "id": "veg_flowers_b",
+      "desc": "Wiesenblumen",
+      "file": "models/veg_flowers_b.glb",
+      "target": {
+        "prop": "veg_flowers_b"
+      },
+      "class": "flora",
+      "footprint": null,
+      "height": 0.261,
+      "bbox": {
+        "min": [
+          -0.154,
+          -0.01,
+          -0.103
+        ],
+        "max": [
+          0.129,
+          0.261,
+          0.134
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 111,
+          "materials": [
+            "M_Flora"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 43,
+          "materials": [
+            "M_Flora"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 20,
+          "materials": [
+            "M_Flora"
+          ]
+        }
+      ],
+      "tris": [
+        111,
+        43,
+        20
+      ],
+      "budget": [
+        420,
+        140,
+        40
+      ],
+      "materials": [
+        "M_Flora"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 15020,
+      "veg": {
+        "kind": "flora",
+        "role": "flowers"
+      },
+      "uvTile": {
+        "M_Flora": 1
+      },
+      "hash": "c28e6c6f99",
+      "source": "assets/blender/models/veg_ground.py",
+      "blend": "assets/src/veg/veg_flowers_b.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_garden_bed": {
+      "id": "veg_garden_bed",
+      "desc": "Gemuesebeet: Erdhuegel mit Brettern, Kohl und Lauch",
+      "file": "models/veg_garden_bed.glb",
+      "target": {
+        "prop": "veg_garden_bed"
+      },
+      "class": "prop",
+      "footprint": null,
+      "height": 0.271,
+      "bbox": {
+        "min": [
+          -0.845,
+          -0.01,
+          -0.445
+        ],
+        "max": [
+          0.845,
+          0.271,
+          0.445
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 472,
+          "materials": [
+            "M_Flora",
+            "M_Ground_Dirt",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 144,
+          "materials": [
+            "M_Flora",
+            "M_Ground_Dirt",
+            "M_Wood_Planks"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 48,
+          "materials": [
+            "M_Ground_Dirt",
+            "M_Wood_Planks"
+          ]
+        }
+      ],
+      "tris": [
+        472,
+        144,
+        48
+      ],
+      "budget": [
+        1500,
+        600,
+        150
+      ],
+      "materials": [
+        "M_Flora",
+        "M_Ground_Dirt",
+        "M_Wood_Planks"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 57532,
+      "veg": {
+        "kind": "prop",
+        "role": "garden"
+      },
+      "uvTile": {
+        "M_Flora": 1,
+        "M_Ground_Dirt": 2.162,
+        "M_Wood_Planks": 0.811
+      },
+      "hash": "c9b59c4352",
+      "source": "assets/blender/models/veg_props.py",
+      "blend": "assets/src/veg/veg_garden_bed.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_grass_a": {
+      "id": "veg_grass_a",
+      "desc": "Grasbueschel",
+      "file": "models/veg_grass_a.glb",
+      "target": {
+        "prop": "veg_grass_a"
+      },
+      "class": "flora",
+      "footprint": null,
+      "height": 0.23,
+      "bbox": {
+        "min": [
+          -0.163,
+          -0.01,
+          -0.113
+        ],
+        "max": [
+          0.136,
+          0.23,
+          0.113
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 110,
+          "materials": [
+            "M_Flora"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 12,
+          "materials": [
+            "M_Flora"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 5,
+          "materials": [
+            "M_Flora"
+          ]
+        }
+      ],
+      "tris": [
+        110,
+        12,
+        5
+      ],
+      "budget": [
+        420,
+        140,
+        40
+      ],
+      "materials": [
+        "M_Flora"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 15924,
+      "veg": {
+        "kind": "flora",
+        "role": "grass"
+      },
+      "uvTile": {
+        "M_Flora": 1
+      },
+      "hash": "f0ea5ac258",
+      "source": "assets/blender/models/veg_ground.py",
+      "blend": "assets/src/veg/veg_grass_a.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_grass_b": {
+      "id": "veg_grass_b",
+      "desc": "Grasbueschel (hoch, Samenstaende)",
+      "file": "models/veg_grass_b.glb",
+      "target": {
+        "prop": "veg_grass_b"
+      },
+      "class": "flora",
+      "footprint": null,
+      "height": 0.508,
+      "bbox": {
+        "min": [
+          -0.164,
+          -0.01,
+          -0.197
+        ],
+        "max": [
+          0.149,
+          0.508,
+          0.195
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 106,
+          "materials": [
+            "M_Flora"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 18,
+          "materials": [
+            "M_Flora"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 4,
+          "materials": [
+            "M_Flora"
+          ]
+        }
+      ],
+      "tris": [
+        106,
+        18,
+        4
+      ],
+      "budget": [
+        420,
+        140,
+        40
+      ],
+      "materials": [
+        "M_Flora"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 16208,
+      "veg": {
+        "kind": "flora",
+        "role": "grassTall"
+      },
+      "uvTile": {
+        "M_Flora": 1
+      },
+      "hash": "36f70caedc",
+      "source": "assets/blender/models/veg_ground.py",
+      "blend": "assets/src/veg/veg_grass_b.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_log": {
+      "id": "veg_log",
+      "desc": "liegender Baumstamm mit Rinde und Schnittflaechen",
+      "file": "models/veg_log.glb",
+      "target": {
+        "prop": "veg_log"
+      },
+      "class": "prop",
+      "footprint": null,
+      "height": 0.274,
+      "bbox": {
+        "min": [
+          -0.851,
+          -0.03,
+          -0.197
+        ],
+        "max": [
+          0.856,
+          0.274,
+          0.13
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 210,
+          "materials": [
+            "M_Bark",
+            "M_Timber_Oak"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 100,
+          "materials": [
+            "M_Bark",
+            "M_Timber_Oak"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 30,
+          "materials": [
+            "M_Bark",
+            "M_Timber_Oak"
+          ]
+        }
+      ],
+      "tris": [
+        210,
+        100,
+        30
+      ],
+      "budget": [
+        1500,
+        600,
+        150
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Timber_Oak"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 32816,
+      "veg": {
+        "kind": "prop",
+        "role": "log"
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Timber_Oak": 0.541
+      },
+      "hash": "6de00461f4",
+      "source": "assets/blender/models/veg_props.py",
+      "blend": "assets/src/veg/veg_log.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_oak_a": {
+      "id": "veg_oak_a",
+      "desc": "Stieleiche, ausgewachsen, breite Krone",
+      "file": "models/veg_oak_a.glb",
+      "target": {
+        "prop": "veg_oak_a"
+      },
+      "class": "tree",
+      "footprint": null,
+      "height": 3.285,
+      "bbox": {
+        "min": [
+          -1.451,
+          -0.023,
+          -1.645
+        ],
+        "max": [
+          1.521,
+          3.285,
+          1.721
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 4724,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 518,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 151,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        }
+      ],
+      "tris": [
+        4724,
+        518,
+        151
+      ],
+      "budget": [
+        6000,
+        1500,
+        300
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 318676,
+      "veg": {
+        "kind": "tree",
+        "species": "oak",
+        "role": "mature",
+        "height": 3,
+        "crown": [
+          1.3,
+          0.92
+        ]
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
+      },
+      "hash": "5bd4ef04f2",
+      "source": "assets/blender/models/veg_trees.py",
+      "blend": "assets/src/veg/veg_oak_a.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_oak_b": {
+      "id": "veg_oak_b",
+      "desc": "Stieleiche, hoeher, unregelmaessige Krone, leicht schief",
+      "file": "models/veg_oak_b.glb",
+      "target": {
+        "prop": "veg_oak_b"
+      },
+      "class": "tree",
+      "footprint": null,
+      "height": 3.455,
+      "bbox": {
+        "min": [
+          -1.473,
+          -0.01,
+          -1.175
+        ],
+        "max": [
+          1.502,
+          3.455,
+          1.769
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 3761,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 450,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 129,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        }
+      ],
+      "tris": [
+        3761,
+        450,
+        129
+      ],
+      "budget": [
+        6000,
+        1500,
+        300
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 255640,
+      "veg": {
+        "kind": "tree",
+        "species": "oak",
+        "role": "mature",
+        "height": 3.3,
+        "crown": [
+          1.05,
+          1.08
+        ]
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
+      },
+      "hash": "12882e5d44",
+      "source": "assets/blender/models/veg_trees.py",
+      "blend": "assets/src/veg/veg_oak_b.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_oak_c": {
+      "id": "veg_oak_c",
+      "desc": "junge Eiche",
+      "file": "models/veg_oak_c.glb",
+      "target": {
+        "prop": "veg_oak_c"
+      },
+      "class": "tree",
+      "footprint": null,
+      "height": 2.186,
+      "bbox": {
+        "min": [
+          -1.276,
+          -0.018,
+          -1.22
+        ],
+        "max": [
+          1.096,
+          2.186,
+          1.126
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 2277,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 312,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 73,
+          "materials": [
+            "M_Bark",
+            "M_Foliage"
+          ]
+        }
+      ],
+      "tris": [
+        2277,
+        312,
+        73
+      ],
+      "budget": [
+        6000,
+        1500,
+        300
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 150996,
+      "veg": {
+        "kind": "tree",
+        "species": "oak",
+        "role": "young",
+        "height": 2.15,
+        "crown": [
+          0.78,
+          0.66
+        ]
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage": 0.541
+      },
+      "hash": "69afeabc12",
+      "source": "assets/blender/models/veg_trees.py",
+      "blend": "assets/src/veg/veg_oak_c.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_rock_a": {
+      "id": "veg_rock_a",
+      "desc": "Findling: gerundet, halb eingesunken, moosig",
+      "file": "models/veg_rock_a.glb",
+      "target": {
+        "prop": "veg_rock_a"
+      },
+      "class": "rock",
+      "footprint": null,
+      "height": 0.647,
+      "bbox": {
+        "min": [
+          -0.654,
+          -0.26,
+          -0.563
+        ],
+        "max": [
+          0.624,
+          0.647,
+          0.56
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 1280,
+          "materials": [
+            "M_Rock"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 320,
+          "materials": [
+            "M_Rock"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 80,
+          "materials": [
+            "M_Rock"
+          ]
+        }
+      ],
+      "tris": [
+        1280,
+        320,
+        80
+      ],
+      "budget": [
+        1500,
+        500,
+        150
+      ],
+      "materials": [
+        "M_Rock"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 152164,
+      "veg": {
+        "kind": "rock",
+        "role": "boulder"
+      },
+      "uvTile": {
+        "M_Rock": 1.622
+      },
+      "hash": "bb863d528c",
+      "source": "assets/blender/models/veg_rocks.py",
+      "blend": "assets/src/veg/veg_rock_a.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_rock_b": {
+      "id": "veg_rock_b",
+      "desc": "kantiger Fels mit Bruchflaechen und Schichtung",
+      "file": "models/veg_rock_b.glb",
+      "target": {
+        "prop": "veg_rock_b"
+      },
+      "class": "rock",
+      "footprint": null,
+      "height": 0.618,
+      "bbox": {
+        "min": [
+          -0.54,
+          -0.308,
+          -0.435
+        ],
+        "max": [
+          0.569,
+          0.618,
+          0.337
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 1280,
+          "materials": [
+            "M_Rock"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 320,
+          "materials": [
+            "M_Rock"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 80,
+          "materials": [
+            "M_Rock"
+          ]
+        }
+      ],
+      "tris": [
+        1280,
+        320,
+        80
+      ],
+      "budget": [
+        1500,
+        500,
+        150
+      ],
+      "materials": [
+        "M_Rock"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 144840,
+      "veg": {
+        "kind": "rock",
+        "role": "rock"
+      },
+      "uvTile": {
+        "M_Rock": 1.622
+      },
+      "hash": "61cf8dd3e9",
+      "source": "assets/blender/models/veg_rocks.py",
+      "blend": "assets/src/veg/veg_rock_b.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_rock_c": {
+      "id": "veg_rock_c",
+      "desc": "flache Felsplatte, rissig, moosig",
+      "file": "models/veg_rock_c.glb",
+      "target": {
+        "prop": "veg_rock_c"
+      },
+      "class": "rock",
+      "footprint": null,
+      "height": 0.212,
+      "bbox": {
+        "min": [
+          -0.67,
+          -0.157,
+          -0.52
+        ],
+        "max": [
+          0.764,
+          0.212,
+          0.482
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 1280,
+          "materials": [
+            "M_Rock"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 320,
+          "materials": [
+            "M_Rock"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 80,
+          "materials": [
+            "M_Rock"
+          ]
+        }
+      ],
+      "tris": [
+        1280,
+        320,
+        80
+      ],
+      "budget": [
+        1500,
+        500,
+        150
+      ],
+      "materials": [
+        "M_Rock"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 145444,
+      "veg": {
+        "kind": "rock",
+        "role": "rock"
+      },
+      "uvTile": {
+        "M_Rock": 1.622
+      },
+      "hash": "5152d66a92",
+      "source": "assets/blender/models/veg_rocks.py",
+      "blend": "assets/src/veg/veg_rock_c.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_rock_d": {
+      "id": "veg_rock_d",
+      "desc": "Lesesteine (vier Steine)",
+      "file": "models/veg_rock_d.glb",
+      "target": {
+        "prop": "veg_rock_d"
+      },
+      "class": "rock",
+      "footprint": null,
+      "height": 0.145,
+      "bbox": {
+        "min": [
+          -0.339,
+          -0.069,
+          -0.253
+        ],
+        "max": [
+          0.209,
+          0.145,
+          0.264
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 1280,
+          "materials": [
+            "M_Rock"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 320,
+          "materials": [
+            "M_Rock"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 80,
+          "materials": [
+            "M_Rock"
+          ]
+        }
+      ],
+      "tris": [
+        1280,
+        320,
+        80
+      ],
+      "budget": [
+        1500,
+        500,
+        150
+      ],
+      "materials": [
+        "M_Rock"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 129120,
+      "veg": {
+        "kind": "rock",
+        "role": "stones"
+      },
+      "uvTile": {
+        "M_Rock": 1.622
+      },
+      "hash": "7c8ac063b1",
+      "source": "assets/blender/models/veg_rocks.py",
+      "blend": "assets/src/veg/veg_rock_d.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_spruce_a": {
+      "id": "veg_spruce_a",
+      "desc": "Fichte, ausgewachsen",
+      "file": "models/veg_spruce_a.glb",
+      "target": {
+        "prop": "veg_spruce_a"
+      },
+      "class": "tree",
+      "footprint": null,
+      "height": 3.981,
+      "bbox": {
+        "min": [
+          -1.027,
+          -0.033,
+          -1.111
+        ],
+        "max": [
+          1.022,
+          3.981,
+          1.01
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 5683,
+          "materials": [
+            "M_Bark",
+            "M_Foliage_Conifer"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 586,
+          "materials": [
+            "M_Bark",
+            "M_Foliage_Conifer"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 150,
+          "materials": [
+            "M_Bark",
+            "M_Foliage_Conifer"
+          ]
+        }
+      ],
+      "tris": [
+        5683,
+        586,
+        150
+      ],
+      "budget": [
+        6000,
+        1500,
+        300
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage_Conifer"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 389436,
+      "veg": {
+        "kind": "tree",
+        "species": "spruce",
+        "role": "mature",
+        "height": 3.9,
+        "crown": [
+          0.95,
+          1.95
+        ]
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage_Conifer": 1
+      },
+      "hash": "db9a25833c",
+      "source": "assets/blender/models/veg_trees.py",
+      "blend": "assets/src/veg/veg_spruce_a.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_spruce_b": {
+      "id": "veg_spruce_b",
+      "desc": "Fichte, mittel, dicht",
+      "file": "models/veg_spruce_b.glb",
+      "target": {
+        "prop": "veg_spruce_b"
+      },
+      "class": "tree",
+      "footprint": null,
+      "height": 3.395,
+      "bbox": {
+        "min": [
+          -1.128,
+          -0.171,
+          -0.976
+        ],
+        "max": [
+          1.014,
+          3.395,
+          1.115
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 5544,
+          "materials": [
+            "M_Bark",
+            "M_Foliage_Conifer"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 560,
+          "materials": [
+            "M_Bark",
+            "M_Foliage_Conifer"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 150,
+          "materials": [
+            "M_Bark",
+            "M_Foliage_Conifer"
+          ]
+        }
+      ],
+      "tris": [
+        5544,
+        560,
+        150
+      ],
+      "budget": [
+        6000,
+        1500,
+        300
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage_Conifer"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 378320,
+      "veg": {
+        "kind": "tree",
+        "species": "spruce",
+        "role": "mature",
+        "height": 3.3,
+        "crown": [
+          0.88,
+          1.65
+        ]
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage_Conifer": 1
+      },
+      "hash": "ac2636932b",
+      "source": "assets/blender/models/veg_trees.py",
+      "blend": "assets/src/veg/veg_spruce_b.blend",
+      "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
+    },
+    "veg_spruce_c": {
+      "id": "veg_spruce_c",
+      "desc": "junge Fichte",
+      "file": "models/veg_spruce_c.glb",
+      "target": {
+        "prop": "veg_spruce_c"
+      },
+      "class": "tree",
+      "footprint": null,
+      "height": 2.208,
+      "bbox": {
+        "min": [
+          -0.764,
+          -0.218,
+          -0.836
+        ],
+        "max": [
+          0.795,
+          2.208,
+          0.853
+        ]
+      },
+      "lods": [
+        {
+          "node": "LOD0",
+          "tris": 3191,
+          "materials": [
+            "M_Bark",
+            "M_Foliage_Conifer"
+          ]
+        },
+        {
+          "node": "LOD1",
+          "tris": 354,
+          "materials": [
+            "M_Bark",
+            "M_Foliage_Conifer"
+          ]
+        },
+        {
+          "node": "LOD2",
+          "tris": 114,
+          "materials": [
+            "M_Bark",
+            "M_Foliage_Conifer"
+          ]
+        }
+      ],
+      "tris": [
+        3191,
+        354,
+        114
+      ],
+      "budget": [
+        6000,
+        1500,
+        300
+      ],
+      "materials": [
+        "M_Bark",
+        "M_Foliage_Conifer"
+      ],
+      "anchors": [],
+      "attributes": [
+        "COLOR_0"
+      ],
+      "bytes": 218704,
+      "veg": {
+        "kind": "tree",
+        "species": "spruce",
+        "role": "young",
+        "height": 2.1,
+        "crown": [
+          0.64,
+          1.05
+        ]
+      },
+      "uvTile": {
+        "M_Bark": 0.541,
+        "M_Foliage_Conifer": 1
+      },
+      "hash": "1ad7619fc8",
+      "source": "assets/blender/models/veg_trees.py",
+      "blend": "assets/src/veg/veg_spruce_c.blend",
       "license": "Eigenerstellung StrongPoly (Skript + Blender), keine Fremdquellen"
     },
     "wall_high_arm": {
